@@ -2,31 +2,8 @@ spring:
   application:
     name: myhr
 
-#  datasource:
-#    url: jdbc:h2:tcp://localhost/~/study/myhr/myhr
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-
   jpa:
     hibernate:
-#      ddl-auto: create
     properties:
       hibernate:
-#        show_sql: true        # sys.out? ?? sql? ??? ??
-#        format_sql: true
-#        highlight_sql: true
         default_batch_fetch_size: 100
-
-server:
-  servlet:
-    session:
-      timeout: 8h
-
-#logging:
-#  level:
-#    com.lshdainty.myhr.api: debug
-#    com.lshdainty.myhr.repository: debug
-#    com.lshdainty.myhr.service: debug
-#    org.hibernate.sql: debug           # logger? ?? ?? sql? ??? ??
-#    org.hibernate.orm.jdbc.bind: trace # ?? ????? ??? ??

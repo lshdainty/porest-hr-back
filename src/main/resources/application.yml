@@ -28,5 +28,6 @@ logging:
     com.lshdainty.myhr.api: debug
     com.lshdainty.myhr.repository: debug
     com.lshdainty.myhr.service: debug
+    com.lshdainty.myhr.domain: debug
     org.hibernate.sql: debug           # logger? ?? ?? sql? ??? ??
     org.hibernate.orm.jdbc.bind: trace # ?? ????? ??? ??

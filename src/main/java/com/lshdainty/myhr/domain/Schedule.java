@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -138,5 +139,19 @@ public class Schedule extends AuditingFields {
         return sourceSet.stream()
                 .map(LocalDate::from)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * start 날짜가 유저의 유연근무제에 맞춰
+     * 정상적으로 설정되어 있는지 확인하는 함수
+     *
+     * @return true, false 반환
+     */
+    public boolean isBetweenWorkTime() {
+        List<LocalTime> workTimes = getUser().convertWorkTimeToLocalTime();
+        LocalTime startTime = getStartDate().toLocalTime();
+
+        return (startTime.isAfter(workTimes.get(0)) || startTime.equals(workTimes.get(0))) &&
+                (startTime.isBefore(workTimes.get(1)) || startTime.equals(workTimes.get(1)));
     }
 }

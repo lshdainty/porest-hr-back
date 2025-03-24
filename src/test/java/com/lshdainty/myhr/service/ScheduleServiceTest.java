@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -156,6 +155,54 @@ class ScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스케줄(휴가) 추가 테스트 - 실패 (start, end 반대)")
+    void addScheduleWithVacationFailStartEndTest() {
+        // Given
+        Long userNo = 1L;
+        Long vacationId = 1L;
+        ScheduleType type = ScheduleType.DAYOFF;
+        String desc = "연차";
+        LocalDateTime start = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 10, 0, 0);
+        LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 8, 0, 0);
+
+        User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+
+        given(userRepository.findById(userNo)).willReturn(user);
+        given(vacationRepository.findById(vacationId)).willReturn(vacation);
+        given(scheduleRepository.findCountByVacation(any(Vacation.class))).willReturn(Collections.emptyList());
+        given(holidayRepository.findHolidaysByStartEndDate(any(), any())).willReturn(Collections.emptyList());
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () ->
+                scheduleService.addSchedule(userNo, vacationId, type, desc, start, end, 0L, "127.0.0.1"));
+    }
+
+    @Test
+    @DisplayName("스케줄(휴가) 추가 테스트 - 실패 (workTime 미충족)")
+    void addScheduleWithVacationFailUserWorkTimeTest() {
+        // Given
+        Long userNo = 1L;
+        Long vacationId = 1L;
+        ScheduleType type = ScheduleType.DAYOFF;
+        String desc = "연차";
+        LocalDateTime start = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 8, 0, 0);
+        LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 10, 0, 0);
+
+        User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+
+        given(userRepository.findById(userNo)).willReturn(user);
+        given(vacationRepository.findById(vacationId)).willReturn(vacation);
+        given(scheduleRepository.findCountByVacation(any(Vacation.class))).willReturn(Collections.emptyList());
+        given(holidayRepository.findHolidaysByStartEndDate(any(), any())).willReturn(Collections.emptyList());
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () ->
+                scheduleService.addSchedule(userNo, vacationId, type, desc, start, end, 0L, "127.0.0.1"));
+    }
+
+    @Test
     @DisplayName("스케줄(비휴가) 추가 테스트 - 성공")
     void addScheduleWithoutVacationSuccessTest() {
         // Given
@@ -271,7 +318,7 @@ class ScheduleServiceTest {
         Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
         Schedule schedule = Schedule.createSchedule(user, vacation, desc, type, start, end, 0L, "127.0.0.1");
 
-        List<LocalDate> holidays = Arrays.asList(LocalDate.of(2025, 5, 5));
+        List<LocalDate> holidays = List.of(LocalDate.of(2025, 5, 5));
 
         // When
         BigDecimal realUsed = scheduleService.calculateRealUsed(schedule, holidays);

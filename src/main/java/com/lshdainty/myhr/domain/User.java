@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -73,5 +74,34 @@ public class User {
     // 유저 삭제 (setter말고 해당 메소드 사용할 것)
     public void deleteUser() {
         this.delYN = "Y";
+    }
+
+    /* 비즈니스 편의 메소드 */
+    /**
+     * 사용자의 workTime에 맞춰
+     * start, end가 담긴 배열을 반환하는 함수
+     *
+     * @return [startTime, endTime] array
+     */
+    public List<LocalTime> convertWorkTimeToLocalTime() {
+        LocalTime start = LocalTime.of(0,0);
+        LocalTime end = LocalTime.of(0,0);
+
+        switch (getWorkTime()) {
+            case "8 ~ 5":
+                start = LocalTime.of(8,0);
+                end = LocalTime.of(17,0);
+                break;
+            case "9 ~ 6":
+                start = LocalTime.of(9,0);
+                end = LocalTime.of(18,0);
+                break;
+            case "10 ~ 7":
+                start = LocalTime.of(10,0);
+                end = LocalTime.of(19,0);
+                break;
+        }
+
+        return List.of(start, end);
     }
 }

@@ -88,8 +88,9 @@ public class ScheduleService {
         // grantTime - totalUsed - tobeuse < 0
         if (vacation.getGrantTime().subtract(used).subtract(toBeUse).compareTo(BigDecimal.ZERO) < 0) { throw new IllegalArgumentException("there is not enough vacation left"); }
 
-        // 사용자가 설정한 start, end 시간이 정확한지 판단하는 로직 추가 필요
-        // 판단 기준에 사용자 자율 출퇴근 시간 체크할 것
+        // start, end 시간이 사용자 workTime에 맞도록 설정되어 있는지 확인
+        if (schedule.getStartDate().isAfter(schedule.getEndDate())) { throw new IllegalArgumentException("the start time is greater than the end time"); }
+        if (!schedule.isBetweenWorkTime()) { throw new IllegalArgumentException("please match the start and end times to work time"); }
 
         // 휴가 등록
         scheduleRepository.save(schedule);
