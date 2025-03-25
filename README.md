@@ -3,7 +3,8 @@
 # myHR
 
 사업장에 속한 근로자의 일정관리 및 휴가관리를 쉽게 관리하고자 만든 서비스입니다.   
-기존 사용하던 Legacy 프로그램 개선 및 Golang -> Java로 언어 변경으로 인한 Study 프로젝트입니다.
+Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며   
+기존 사용하던 Legacy 프로그램을 JPA, QueryDSL 등 실무에서 많이 사용중인 lib를 사용하여 개선하고자 합니다.
 
 ## 기능
 ### 📅 일정관리
