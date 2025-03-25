@@ -1,4 +1,4 @@
-name: myHR Gradle Test
+name: CI
 
 on:
   pull_request:
