@@ -1,12 +1,19 @@
 package com.lshdainty.myhr.api;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Collection;
 
+@Slf4j
 @Getter
 @RequiredArgsConstructor
+@Builder
 public class ApiResponse<T> {
     private final int code;
     private final String message;
@@ -14,19 +21,11 @@ public class ApiResponse<T> {
     private final T data;
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(0, "success", getCount(data), data);
+        return new ApiResponse<>(HttpStatus.OK.value(), "success", getCount(data), data);
     }
 
     public static <T> ApiResponse<T> success() {
-        return new ApiResponse<>(0, "success", 0, null);
-    }
-
-    public static <T> ApiResponse<T> fail(T data) {
-        return new ApiResponse<>(0, "fail", 0, data);
-    }
-
-    public static <T> ApiResponse<T> fail() {
-        return new ApiResponse<>(0, "fail", 0, null);
+        return new ApiResponse<>(HttpStatus.OK.value(), "success", 0, null);
     }
 
     private static <T> int getCount(T data) {

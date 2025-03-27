@@ -25,7 +25,7 @@ public class LoginApiController {
         User user = userService.findUser(loginDto.getId());
 
         if (Objects.isNull(user)) {
-            return ApiResponse.fail();
+            throw new IllegalArgumentException("Invalid username or password");
         }
 
         req.getSession().setAttribute(SessionConst.LOGIN_MEMBER, user);
