@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,11 +29,13 @@ import static org.mockito.BDDMockito.*;
 @DisplayName("휴가 서비스 테스트")
 class VacationServiceTest {
     @Mock
+    private MessageSource ms;
+    @Mock
     private VacationRepositoryImpl vacationRepositoryImpl;
-
     @Mock
     private UserRepositoryImpl userRepositoryImpl;
-
+    @Mock
+    private UserService userService;
     @InjectMocks
     private VacationService vacationService;
 
@@ -54,14 +57,14 @@ class VacationServiceTest {
         // Reflection을 사용하여 id 설정
         setUserNo(user, userNo);
 
-        given(userRepositoryImpl.findById(userNo)).willReturn(user);
+        given(userService.checkUserExist(userNo)).willReturn(user);
         willDoNothing().given(vacationRepositoryImpl).save(any(Vacation.class));
 
         // When
         Long vacationId = vacationService.addVacation(userNo, name, desc, type, grantTime, occurDate, expiryDate, 0L, "127.0.0.1");
 
         // Then
-        then(userRepositoryImpl).should().findById(userNo);
+        then(userService).should().checkUserExist(userNo);
         then(vacationRepositoryImpl).should().save(any(Vacation.class));
     }
 
@@ -77,12 +80,12 @@ class VacationServiceTest {
         LocalDateTime expiryDate = LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59);
 
         Long userNo = 900L;
-        given(userRepositoryImpl.findById(userNo)).willReturn(null);
+        given(userService.checkUserExist(userNo)).willThrow(new IllegalArgumentException(""));
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
                 vacationService.addVacation(userNo, name, desc, type, grantTime, occurDate, expiryDate,0L, "127.0.0.1"));
-        then(userRepositoryImpl).should().findById(userNo);
+        then(userService).should().checkUserExist(userNo);
         then(vacationRepositoryImpl).should(never()).save(any(Vacation.class));
     }
 
@@ -102,12 +105,12 @@ class VacationServiceTest {
 
         // Reflection을 사용하여 id 설정
         setUserNo(user, userNo);
-        given(userRepositoryImpl.findById(userNo)).willReturn(user);
+        given(userService.checkUserExist(userNo)).willReturn(user);
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
                 vacationService.addVacation(userNo, name, desc, type, grantTime, occurDate, expiryDate,0L, "127.0.0.1"));
-        then(userRepositoryImpl).should().findById(userNo);
+        then(userService).should().checkUserExist(userNo);
         then(vacationRepositoryImpl).should(never()).save(any(Vacation.class));
     }
 
@@ -210,7 +213,7 @@ class VacationServiceTest {
         setVacationId(newVacation, newVacationId);
 
         given(vacationRepositoryImpl.findById(oldVacationId)).willReturn(oldVacation);
-        given(userRepositoryImpl.findById(userNo)).willReturn(user);
+        given(userService.checkUserExist(userNo)).willReturn(user);
         willDoNothing().given(vacationRepositoryImpl).save(any(Vacation.class));
         given(vacationRepositoryImpl.findById(null)).willReturn(newVacation);
 
@@ -220,7 +223,7 @@ class VacationServiceTest {
 
         // Then
         then(vacationRepositoryImpl).should().findById(oldVacationId);
-        then(userRepositoryImpl).should().findById(userNo);
+        then(userService).should().checkUserExist(userNo);
         then(vacationRepositoryImpl).should().save(any(Vacation.class));
 
         assertThat(result).isNotNull();
@@ -246,7 +249,7 @@ class VacationServiceTest {
                 vacationService.editVacation(vacationId, userNo, null, null, null, new BigDecimal("24"), null, null, 0L, "127.0.0.1"));
 
         then(vacationRepositoryImpl).should().findById(vacationId);
-        then(userRepositoryImpl).should(never()).findById(any(Long.class));
+        then(userService).should(never()).checkUserExist(userNo);
     }
 
     @Test
@@ -268,14 +271,14 @@ class VacationServiceTest {
         setVacationId(oldVacation, oldVacationId);
 
         given(vacationRepositoryImpl.findById(oldVacationId)).willReturn(oldVacation);
-        given(userRepositoryImpl.findById(userNo)).willReturn(null);
+        given(userService.checkUserExist(userNo)).willThrow(new IllegalArgumentException(""));
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
                 vacationService.editVacation(oldVacationId, userNo, null, null, null, new BigDecimal("24"), null, null, 0L, "127.0.0.1"));
 
         then(vacationRepositoryImpl).should().findById(oldVacationId);
-        then(userRepositoryImpl).should().findById(userNo);
+        then(userService).should().checkUserExist(userNo);
     }
 
     @Test
@@ -297,14 +300,14 @@ class VacationServiceTest {
         setVacationId(oldVacation, oldVacationId);
 
         given(vacationRepositoryImpl.findById(oldVacationId)).willReturn(oldVacation);
-        given(userRepositoryImpl.findById(userNo)).willReturn(null);
+        given(userService.checkUserExist(userNo)).willReturn(user);
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
                 vacationService.editVacation(oldVacationId, userNo, null, null, null, new BigDecimal("24"), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), 0L, "127.0.0.1"));
 
         then(vacationRepositoryImpl).should().findById(oldVacationId);
-        then(userRepositoryImpl).should().findById(userNo);
+        then(userService).should().checkUserExist(userNo);
         then(vacationRepositoryImpl).should(never()).save(any(Vacation.class));
     }
 

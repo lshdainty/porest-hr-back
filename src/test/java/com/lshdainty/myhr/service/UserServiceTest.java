@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 
 import java.util.*;
 
@@ -21,6 +22,9 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("유저 서비스 테스트")
 class UserServiceTest {
+    @Mock
+    private MessageSource ms;
+
     @Mock
     private UserRepositoryImpl userRepositoryImpl;
 

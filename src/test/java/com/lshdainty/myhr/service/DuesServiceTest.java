@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 
 import java.util.List;
 
@@ -23,6 +24,9 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("회비 서비스 테스트")
 class DuesServiceTest {
+    @Mock
+    private MessageSource ms;
+
     @Mock
     private DuesRepositoryImpl duesRepositoryImpl;
 
