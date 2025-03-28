@@ -7,6 +7,7 @@ import com.lshdainty.myhr.repository.UserRepositoryImpl;
 import com.lshdainty.myhr.repository.VacationRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +21,14 @@ import java.util.Objects;
 @Slf4j
 @Transactional(readOnly = true)
 public class VacationService {
+    private final MessageSource ms;
     private final VacationRepositoryImpl vacationRepositoryImpl;
     private final UserRepositoryImpl userRepositoryImpl;
+    private final UserService userService;
 
     @Transactional
     public Long addVacation(Long userNo, String name, String desc, VacationType type, BigDecimal grantTime, LocalDateTime occurDate, LocalDateTime expiryDate, Long addUserNo, String clientIP) {
-        User user = userRepositoryImpl.findById(userNo);
-
-        if (Objects.isNull(user)) { throw new IllegalArgumentException("user not found"); }
+        User user = userService.checkUserExist(userNo);
 
         Vacation vacation = Vacation.createVacation(user, name, desc, type, grantTime, occurDate, expiryDate, addUserNo, clientIP);
 
@@ -48,9 +49,7 @@ public class VacationService {
 
     @Transactional
     public Vacation editVacation(Long vacationId, Long userNo, String reqName, String reqDesc, VacationType reqType, BigDecimal reqGrantTime, LocalDateTime reqOccurDate, LocalDateTime reqExpiryDate, Long addUserNo, String clientIP) {
-        Vacation findVacation = vacationRepositoryImpl.findById(vacationId);
-
-        if (Objects.isNull(findVacation)) { throw new IllegalArgumentException("vacation not found"); }
+        Vacation findVacation = checkVacationExist(vacationId);
 
         String name = "";
         if (Objects.isNull(reqName)) { name = findVacation.getName(); } else { name = reqName; }
@@ -70,9 +69,7 @@ public class VacationService {
         LocalDateTime expiryDate = null;
         if (Objects.isNull(reqExpiryDate)) { expiryDate = findVacation.getExpiryDate(); } else { expiryDate = reqExpiryDate; }
 
-        User user = userRepositoryImpl.findById(userNo);
-
-        if (Objects.isNull(user)) { throw new IllegalArgumentException("user not found"); }
+        User user = userService.checkUserExist(userNo);
 
         Vacation newVacation = Vacation.createVacation(user, name, desc, type, grantTime, occurDate, expiryDate, addUserNo, clientIP);
 
@@ -86,10 +83,13 @@ public class VacationService {
 
     @Transactional
     public void deleteVacation(Long vacationId, Long delUserNo, String clientIP) {
+        Vacation vacation = checkVacationExist(vacationId);
+        vacation.deleteVacation(delUserNo, clientIP);
+    }
+
+    public Vacation checkVacationExist(Long vacationId) {
         Vacation findVacation = vacationRepositoryImpl.findById(vacationId);
-
-        if (Objects.isNull(findVacation)) { throw new IllegalArgumentException("vacation not found"); }
-
-        findVacation.deleteVacation(delUserNo, clientIP);
+        if (Objects.isNull(findVacation) || findVacation.getDelYN().equals("Y")) { throw new IllegalArgumentException(ms.getMessage("error.notfound.vacation", null, null)); }
+        return findVacation;
     }
 }

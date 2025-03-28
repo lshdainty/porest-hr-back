@@ -4,6 +4,7 @@ import com.lshdainty.myhr.domain.User;
 import com.lshdainty.myhr.repository.UserRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
 @Slf4j
 @Transactional(readOnly = true)
 public class UserService {
+    private final MessageSource ms;
     private final UserRepositoryImpl userRepositoryImpl;
 
     @Transactional
@@ -46,7 +48,7 @@ public class UserService {
 
     public User checkUserExist(Long userId) {
         User findUser = userRepositoryImpl.findById(userId);
-        if (Objects.isNull(findUser) || findUser.getDelYN().equals("Y")) { throw new IllegalArgumentException("user not found"); }
+        if (Objects.isNull(findUser) || findUser.getDelYN().equals("Y")) { throw new IllegalArgumentException(ms.getMessage("error.notfound.user", null, null)); }
         return findUser;
     }
 }

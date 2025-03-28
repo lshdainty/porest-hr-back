@@ -5,6 +5,7 @@ import com.lshdainty.myhr.domain.HolidayType;
 import com.lshdainty.myhr.repository.HolidayRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Slf4j
 @Transactional(readOnly = true)
 public class HolidayService {
+    private final MessageSource ms;
     private final HolidayRepositoryImpl holidayRepositoryImpl;
 
     @Transactional
@@ -51,7 +53,7 @@ public class HolidayService {
 
     public Holiday checkHolidayExist(Long holidaySeq) {
         Holiday findHoliday = holidayRepositoryImpl.findHoliday(holidaySeq);
-        if (Objects.isNull(findHoliday)) { throw new IllegalArgumentException("holiday not found"); }
+        if (Objects.isNull(findHoliday)) { throw new IllegalArgumentException(ms.getMessage("error.notfound.holiday", null, null)); }
         return findHoliday;
     }
 }

@@ -1,6 +1,9 @@
 spring:
   application:
     name: myhr
+  messages:
+    basename: message/messages
+    encoding: utf-8
 
   datasource:
     url: jdbc:h2:tcp://localhost/~/study/myhr/myhr

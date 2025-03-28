@@ -1,12 +1,10 @@
 package com.lshdainty.myhr.service;
 
 import com.lshdainty.myhr.domain.*;
-import com.lshdainty.myhr.repository.HolidayRepositoryImpl;
-import com.lshdainty.myhr.repository.ScheduleRepositoryImpl;
-import com.lshdainty.myhr.repository.UserRepositoryImpl;
-import com.lshdainty.myhr.repository.VacationRepositoryImpl;
+import com.lshdainty.myhr.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,24 +19,20 @@ import java.util.*;
 @Slf4j
 @Transactional(readOnly = true)
 public class ScheduleService {
+    private final MessageSource ms;
+    private final UserService userService;
+    private final VacationService vacationService;
     private final ScheduleRepositoryImpl scheduleRepositoryImpl;
-    private final VacationRepositoryImpl vacationRepositoryImpl;
     private final HolidayRepositoryImpl holidayRepositoryImpl;
-    private final UserRepositoryImpl userRepositoryImpl;
 
     @Transactional
     public Long addSchedule(Long userNo, Long vacationId, ScheduleType type, String desc, LocalDateTime start, LocalDateTime end, Long addUserNo, String clientIP) {
         // 유저 조회
-        User user = userRepositoryImpl.findById(userNo);
-
-        // 유저 없으면 에러 반환
-        if (Objects.isNull(user) || user.getDelYN().equals("Y")) { throw new IllegalArgumentException("user not found"); }
+        User user = userService.checkUserExist(userNo);
 
         // 휴가 조회
-        Vacation vacation = vacationRepositoryImpl.findById(vacationId);
+        Vacation vacation = vacationService.checkVacationExist(vacationId);
 
-        // 사용하려는 휴가가 없으면 에러 반환
-        if (Objects.isNull(vacation) || vacation.getDelYN().equals("Y")) { throw new IllegalArgumentException("vacation not found"); }
         // 사용기한이 지난 휴가면 사용불가
         if (vacation.getExpiryDate().isBefore(LocalDateTime.now())) { throw new IllegalArgumentException("this vacation has expired"); }
 
@@ -101,10 +95,7 @@ public class ScheduleService {
     @Transactional
     public Long addSchedule(Long userNo, ScheduleType type, String desc, LocalDateTime start, LocalDateTime end, Long addUserNo, String clientIP) {
         // 유저 조회
-        User user = userRepositoryImpl.findById(userNo);
-
-        // 유저 없으면 에러 반환
-        if (Objects.isNull(user) || user.getDelYN().equals("Y")) { throw new IllegalArgumentException("user not found"); }
+        User user = userService.checkUserExist(userNo);
 
         Schedule schedule = Schedule.createSchedule(user, null, desc, type, start, end, addUserNo, clientIP);
 
@@ -120,13 +111,17 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Long scheduleId, Long delUserNo, String clientIP) {
-        Schedule schedule = scheduleRepositoryImpl.findById(scheduleId);
-
-        if (Objects.isNull(schedule) || schedule.getDelYN().equals("Y")) { throw new IllegalArgumentException("schedule not found"); }
+        Schedule schedule = checkScheduleExist(scheduleId);
 
         if (schedule.getEndDate().isBefore(LocalDateTime.now())) { throw new IllegalArgumentException("Past schedules cannot be deleted"); }
 
         schedule.deleteSchedule(delUserNo, clientIP);
+    }
+
+    public Schedule checkScheduleExist(Long scheduleId) {
+        Schedule findSchedule = scheduleRepositoryImpl.findById(scheduleId);
+        if (Objects.isNull(findSchedule) || findSchedule.getDelYN().equals("Y")) { throw new IllegalArgumentException(ms.getMessage("error.notfound.schedule", null, null)); }
+        return findSchedule;
     }
 
     /**
