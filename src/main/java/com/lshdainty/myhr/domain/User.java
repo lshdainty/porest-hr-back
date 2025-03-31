@@ -62,6 +62,12 @@ public class User {
         return user;
     }
 
+    public static User createUser(Long id) {
+        User user = new User();
+        user.id = id;
+        return user;
+    }
+
     // 유저 수정 (setter말고 해당 메소드 사용할 것)
     public void updateUser(String name, String birth, String employ, String workTime, String lunarYN) {
         if (!Objects.isNull(name)) { this.name = name; }

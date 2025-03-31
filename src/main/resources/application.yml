@@ -42,3 +42,6 @@ decorator:
     p6spy:
       enable-logging: true
       multiline: true
+
+jwt:
+  secret: testkeyakljsdfashaweflkamsdflkjsahdfjklhasldjufrhawlekjflsdjhglmdnfljksdfjkasdhfljasdhfulawefmdsljkbdjkflkas

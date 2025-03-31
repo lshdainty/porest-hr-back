@@ -39,4 +39,15 @@ public class LoginApiController {
         if (Objects.nonNull(session)) { session.invalidate(); }
         return ApiResponse.success();
     }
+
+    @PostMapping("/jwt/login")
+    public ApiResponse jwtLogin(@RequestBody LoginDto loginDto, HttpServletRequest req) {
+        User user = userService.findUser(loginDto.getId());
+
+        if (Objects.isNull(user)) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
+        return ApiResponse.success();
+    }
 }

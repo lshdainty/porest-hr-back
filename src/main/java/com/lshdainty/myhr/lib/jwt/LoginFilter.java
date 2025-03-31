@@ -6,23 +6,28 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Iterator;
 
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
-
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse resp) throws AuthenticationException {
@@ -50,11 +55,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse resp, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("Successfully authenticated user {}", authResult.getPrincipal());
+
+        CustomUserDetails principal = (CustomUserDetails) authResult.getPrincipal();
+        Long userNo = principal.getUserNo();
+
+        Collection<? extends GrantedAuthority> authorities = principal.getAuthorities();
+        Iterator<? extends GrantedAuthority> authoritiesIterator = authorities.iterator();
+        GrantedAuthority authority = authoritiesIterator.next();
+
+        String role = authority.getAuthority();
+
+        String token = jwtUtil.generateToken(userNo, role, 60*60*1000L);
+
+        resp.addHeader("Authorization", "Bearer " + token);
     }
 
     // 로그인 실패 시 실행하는 메소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest req, HttpServletResponse resp, AuthenticationException failed) throws IOException, ServletException {
         log.info("Unsuccessful authentication");
+        resp.setStatus(401);
     }
 }

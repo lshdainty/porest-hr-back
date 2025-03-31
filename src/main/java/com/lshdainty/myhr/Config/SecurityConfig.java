@@ -1,7 +1,9 @@
 package com.lshdainty.myhr.Config;
 
+import com.lshdainty.myhr.lib.jwt.JwtFilter;
+import com.lshdainty.myhr.lib.jwt.JwtUtil;
 import com.lshdainty.myhr.lib.jwt.LoginFilter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,9 +18,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class SecurityConfig {
     private final AuthenticationConfiguration authConfig;
+    private final JwtUtil jwtUtil;
 
     // LoginFilter에 필요한 인증 메니저 주입
     @Bean
@@ -47,9 +50,11 @@ public class SecurityConfig {
 
         // 경로별 인가 작업
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/", "/login", "/join").permitAll() // 모든 권한 사용자 가능
+                .requestMatchers("/", "/login", "/join", "/jwt/login").permitAll() // 모든 권한 사용자 가능
                 .anyRequest().authenticated()   // 권한에 따른 접근
         );
+
+        http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
         // LoginFilter 추가 작업
         /*
@@ -57,7 +62,9 @@ public class SecurityConfig {
         * 자체적으로 생성한 JWT의 LoginFilter를
         * 기존 FormLogin 방식이 사용하는 UsernamePasswordAuthenticationFilter 위치에 추가하는 작업
         * */
-        http.addFilterAt(new LoginFilter(authenticationManager(authConfig)), UsernamePasswordAuthenticationFilter.class);
+        LoginFilter loginFilter = new LoginFilter(authenticationManager(authConfig), jwtUtil);
+        loginFilter.setFilterProcessesUrl("/jwt/login");
+        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         // http 세션 설정 (중요)
         http.sessionManagement((session) -> session
