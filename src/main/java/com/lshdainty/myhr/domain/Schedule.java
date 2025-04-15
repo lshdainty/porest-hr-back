@@ -72,6 +72,16 @@ public class Schedule extends AuditingFields {
     }
 
     /* 비즈니스 편의 메소드 */
+    /**
+     * startDate와 endDate 순서 체크 함수
+     * startDate > endDate : true
+     * startDate <= endDate : false
+     *
+     * @return boolean
+     */
+    public static boolean isAfterThanEndDate(LocalDateTime start, LocalDateTime end) {
+        return start.isAfter(end);
+    }
 
     /**
      * startDate, endDate 사이의

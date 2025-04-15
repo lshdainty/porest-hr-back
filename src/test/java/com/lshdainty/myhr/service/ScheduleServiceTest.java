@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
@@ -253,15 +255,15 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("사용자별 스케줄 조회 테스트 - 성공")
-    void findSchedulesByUserNoTest() {
+    void findSchedulesByUserNoSuccessTest() {
         // Given
         Long userNo = 1L;
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
         Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(scheduleRepositoryImpl.findSchedulesByUserNo(userNo)).willReturn(List.of(
-                Schedule.createSchedule(user, vacation, "휴가", ScheduleType.DAYOFF, LocalDateTime.now(), LocalDateTime.now().plusDays(1), 0L, "127.0.0.1"),
-                Schedule.createSchedule(user, null, "교육", ScheduleType.EDUCATION, LocalDateTime.now().plusDays(2), LocalDateTime.now().plusDays(3), 0L, "127.0.0.1")
+                Schedule.createSchedule(user, vacation, "휴가", ScheduleType.DAYOFF, LocalDateTime.of(LocalDateTime.now().getYear(), 1, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 20, 23, 59, 59), 0L, "127.0.0.1"),
+                Schedule.createSchedule(user, null, "교육", ScheduleType.EDUCATION, LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 23, 59, 59), 0L, "127.0.0.1")
         ));
 
         // When
@@ -273,6 +275,35 @@ class ScheduleServiceTest {
                 .extracting("desc")
                 .containsExactlyInAnyOrder("휴가", "교육");
         then(scheduleRepositoryImpl).should().findSchedulesByUserNo(userNo);
+    }
+
+    @Test
+    @DisplayName("스케줄 기간 조회 테스트 - 성공")
+    void findSchedulesByPeriodSuccessTest() {
+        // Given
+        Long userNo = 1L;
+        User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+
+        LocalDateTime start = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0);
+        LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59);
+
+        given(scheduleRepositoryImpl.findSchedulesByPeriod(start, end)).willReturn(List.of(
+                Schedule.createSchedule(user, vacation, "휴가", ScheduleType.DAYOFF, LocalDateTime.of(LocalDateTime.now().getYear(), 1, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 20, 23, 59, 59), 0L, "127.0.0.1"),
+                Schedule.createSchedule(user, null, "교육", ScheduleType.EDUCATION, LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 23, 59, 59), 0L, "127.0.0.1"),
+                Schedule.createSchedule(user, null, "예비군", ScheduleType.DEFENSE, LocalDateTime.of(LocalDateTime.now().getYear(), 7, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 7, 20, 23, 59, 59), 0L, "127.0.0.1"),
+                Schedule.createSchedule(user, null, "건강검진", ScheduleType.HEALTHCHECK, LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 23, 59, 59), 0L, "127.0.0.1")
+        ));
+
+        // When
+        List<Schedule> schedules = scheduleService.findSchedulesByPeriod(start, end);
+
+        // Then
+        assertThat(schedules).hasSize(4);
+        assertThat(schedules)
+                .extracting("desc")
+                .containsExactlyInAnyOrder("휴가", "교육", "예비군", "건강검진");
+        then(scheduleRepositoryImpl).should().findSchedulesByPeriod(start, end);
     }
 
     @Test

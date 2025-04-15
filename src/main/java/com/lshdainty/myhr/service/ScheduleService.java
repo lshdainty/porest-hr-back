@@ -109,6 +109,11 @@ public class ScheduleService {
         return scheduleRepositoryImpl.findSchedulesByUserNo(userNo);
     }
 
+    public List<Schedule> findSchedulesByPeriod(LocalDateTime start, LocalDateTime end) {
+        if (Schedule.isAfterThanEndDate(start, end)) { throw new IllegalArgumentException("The starttime is after the endtime"); }
+        return scheduleRepositoryImpl.findSchedulesByPeriod(start, end);
+    }
+
     @Transactional
     public void deleteSchedule(Long scheduleId, Long delUserNo, String clientIP) {
         Schedule schedule = checkScheduleExist(scheduleId);

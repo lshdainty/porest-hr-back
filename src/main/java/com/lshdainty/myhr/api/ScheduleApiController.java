@@ -6,8 +6,10 @@ import com.lshdainty.myhr.service.ScheduleService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +52,20 @@ public class ScheduleApiController {
     @GetMapping("/api/v1/schedules/user/{userNo}")
     public ApiResponse getSchedulesByUser(@PathVariable("userNo") Long userNo) {
         List<Schedule> schedules = scheduleService.findSchedulesByUserNo(userNo);
+
+        List<ScheduleDto> resp = schedules.stream()
+                .map(s -> new ScheduleDto(s))
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(resp);
+    }
+
+    @GetMapping("/api/v1/schedules/period")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    public ApiResponse getSchedulesByPeriod(
+            @RequestParam("startDate") LocalDateTime startDate,
+            @RequestParam("endDate") LocalDateTime endDate) {
+        List<Schedule> schedules = scheduleService.findSchedulesByPeriod(startDate, endDate);
 
         List<ScheduleDto> resp = schedules.stream()
                 .map(s -> new ScheduleDto(s))
