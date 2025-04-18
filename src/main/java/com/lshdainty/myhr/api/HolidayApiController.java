@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +24,19 @@ public class HolidayApiController {
         return ApiResponse.success(new HolidayDto(holidaySeq));
     }
 
-    @GetMapping("api/v1/holidays")
-    public ApiResponse getHolidaysByType(@RequestParam("type") HolidayType type) {
+    @GetMapping("api/v1/holidays/date")
+    public ApiResponse getHolidaysByStartEndDate(@RequestParam("start") String start, @RequestParam("end") String end) {
+        List<Holiday> holidays = holidayService.findHolidaysByStartEndDate(start, end);
+
+        List<HolidayDto> resp = holidays.stream()
+                .map(HolidayDto::new)
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(resp);
+    }
+
+    @GetMapping("api/v1/holidays/type/{type}")
+    public ApiResponse getHolidaysByType(@PathVariable("type") HolidayType type) {
         List<Holiday> holidays = holidayService.findHolidaysByType(type);
 
         List<HolidayDto> resp = holidays.stream()

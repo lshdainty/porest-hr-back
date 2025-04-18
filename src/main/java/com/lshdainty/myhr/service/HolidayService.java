@@ -35,6 +35,10 @@ public class HolidayService {
         return holidayRepositoryImpl.findHolidays();
     }
 
+    public List<Holiday> findHolidaysByStartEndDate(String startDate, String endDate) {
+        return holidayRepositoryImpl.findHolidaysByStartEndDate(startDate, endDate);
+    }
+
     public List<Holiday> findHolidaysByType(HolidayType type) {
         return holidayRepositoryImpl.findHolidaysByType(type);
     }
