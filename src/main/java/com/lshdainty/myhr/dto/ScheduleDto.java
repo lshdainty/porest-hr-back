@@ -17,8 +17,10 @@ import java.time.LocalDateTime;
 public class ScheduleDto {
     private Long scheduleId;
     private Long userNo;
+    private String userName;
     private Long vacationId;
     private ScheduleType scheduleType;
+    private String scheduleTypeName;
     private String scheduleDesc;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -30,10 +32,12 @@ public class ScheduleDto {
     public ScheduleDto(Schedule schedule) {
         this.scheduleId = schedule.getId();
         this.userNo = schedule.getUser().getId();
+        this.userName = schedule.getUser().getName();
         if (schedule.getType().isVacationType()) {
             this.vacationId = schedule.getVacation().getId();
         }
         this.scheduleType = schedule.getType();
+        this.scheduleTypeName = schedule.getType().getTypeName();
         this.scheduleDesc = schedule.getDesc();
         this.startDate = schedule.getStartDate();
         this.endDate = schedule.getEndDate();

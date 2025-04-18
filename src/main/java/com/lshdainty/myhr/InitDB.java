@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -139,6 +140,9 @@ public class InitDB {
             saveSchedule(1L, 7L, "오전반차", ScheduleType.MORNINGOFF, LocalDateTime.of(now.getYear(), 10, 15, 9, 0, 0), LocalDateTime.of(now.getYear(), 10, 15, 14, 0, 0));
             saveSchedule(1L, 7L, "오후반차", ScheduleType.AFTERNOONOFF, LocalDateTime.of(now.getYear(), 12, 20, 14, 0, 0), LocalDateTime.of(now.getYear(), 12, 20, 18, 0, 0));
             saveSchedule(1L, 25L, "휴가", ScheduleType.DAYOFF, LocalDateTime.of(now.getYear(), 4, 30, 0, 0, 0), LocalDateTime.of(now.getYear(), 5, 11, 23, 59, 59));
+            saveSchedule(1L, null, "교육", ScheduleType.EDUCATION, LocalDateTime.of(now.getYear(), 5, 1, 0, 0, 0), LocalDateTime.of(now.getYear(), 5, 3, 23, 59, 59));
+            saveSchedule(1L, null, "예비군", ScheduleType.DEFENSE, LocalDateTime.of(now.getYear(), 2, 23, 0, 0, 0), LocalDateTime.of(now.getYear(), 2, 28, 23, 59, 59));
+            saveSchedule(1L, null, "출장", ScheduleType.BUSINESSTRIP, LocalDateTime.of(now.getYear(), 3, 30, 0, 0, 0), LocalDateTime.of(now.getYear(), 3, 31, 23, 59, 59));
         }
 
         public void initSetDues() {
@@ -172,8 +176,16 @@ public class InitDB {
 
         public void saveSchedule(Long userNo, Long vacationId, String desc, ScheduleType type, LocalDateTime startDate, LocalDateTime endDate) {
             User user = em.find(User.class, userNo);
-            Vacation vacation = em.find(Vacation.class, vacationId);
-            Schedule schedule = Schedule.createSchedule(user, vacation, desc, type, startDate, endDate, 0L, "127.0.0.1");
+            Vacation vacation = null;
+            Schedule schedule = null;
+
+            if (Objects.nonNull(vacationId)) {
+                vacation = em.find(Vacation.class, vacationId);
+                schedule = Schedule.createSchedule(user, vacation, desc, type, startDate, endDate, 0L, "127.0.0.1");
+            } else {
+                schedule = Schedule.createSchedule(user, null, desc, type, startDate, endDate, 0L, "127.0.0.1");
+            }
+
             em.persist(schedule);
         }
 
