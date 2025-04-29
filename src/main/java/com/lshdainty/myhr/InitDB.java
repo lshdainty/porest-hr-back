@@ -144,6 +144,9 @@ public class InitDB {
             saveSchedule(1L, null, "교육", ScheduleType.EDUCATION, LocalDateTime.of(now.getYear(), 5, 1, 0, 0, 0), LocalDateTime.of(now.getYear(), 5, 3, 23, 59, 59));
             saveSchedule(1L, null, "예비군", ScheduleType.DEFENSE, LocalDateTime.of(now.getYear(), 2, 23, 0, 0, 0), LocalDateTime.of(now.getYear(), 2, 28, 23, 59, 59));
             saveSchedule(1L, null, "출장", ScheduleType.BUSINESSTRIP, LocalDateTime.of(now.getYear(), 3, 30, 0, 0, 0), LocalDateTime.of(now.getYear(), 3, 31, 23, 59, 59));
+            saveSchedule(1L, null, "건강검진", ScheduleType.HEALTHCHECK, LocalDateTime.of(now.getYear(), 5, 1, 0, 0, 0), LocalDateTime.of(now.getYear(), 5, 1, 23, 59, 59));
+            saveSchedule(1L, null, "생일", ScheduleType.BIRTHDAY, LocalDateTime.of(now.getYear(), 5, 1, 0, 0, 0), LocalDateTime.of(now.getYear(), 5, 1, 23, 59, 59));
+            saveSchedule(1L, null, "출장", ScheduleType.BUSINESSTRIP, LocalDateTime.of(now.getYear(), 5, 1, 0, 0, 0), LocalDateTime.of(now.getYear(), 5, 1, 23, 59, 59));
         }
 
         public void initSetDues() {
