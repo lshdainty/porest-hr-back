@@ -3,6 +3,7 @@ package com.lshdainty.myhr.service;
 import com.lshdainty.myhr.domain.*;
 import com.lshdainty.myhr.repository.HolidayRepositoryImpl;
 import com.lshdainty.myhr.repository.ScheduleRepositoryImpl;
+import com.lshdainty.myhr.repository.VacationRepositoryImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,8 @@ class ScheduleServiceTest {
     private UserService userService;
     @Mock
     private VacationService vacationService;
+    @Mock
+    private VacationRepositoryImpl vacationRepositoryImpl;
 
     @InjectMocks
     private ScheduleService scheduleService;
@@ -57,7 +60,7 @@ class ScheduleServiceTest {
         Schedule schedule = Schedule.createSchedule(user, vacation, desc, type, start, end, 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
-        given(vacationService.checkVacationExist(vacationId)).willReturn(vacation);
+        given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
         given(scheduleRepositoryImpl.findSchedulesByVacation(any(Vacation.class))).willReturn(Collections.emptyList());
         given(holidayRepositoryImpl.findHolidaysByStartEndDate(any(), any())).willReturn(Collections.emptyList());
         willDoNothing().given(scheduleRepositoryImpl).save(any(Schedule.class));
@@ -67,7 +70,7 @@ class ScheduleServiceTest {
 
         // Then
         then(userService).should().checkUserExist(userNo);
-        then(vacationService).should().checkVacationExist(vacationId);
+        then(vacationRepositoryImpl).should().findById(vacationId);
         then(scheduleRepositoryImpl).should().findSchedulesByVacation(any(Vacation.class));
         then(holidayRepositoryImpl).should().findHolidaysByStartEndDate(any(), any());
         then(scheduleRepositoryImpl).should().save(any(Schedule.class));
@@ -107,13 +110,13 @@ class ScheduleServiceTest {
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
-        given(vacationService.checkVacationExist(vacationId)).willThrow(new IllegalArgumentException(""));
+        given(vacationRepositoryImpl.findById(vacationId)).willThrow(new IllegalArgumentException(""));
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
                 scheduleService.registSchedule(userNo, vacationId, type, desc, start, end, 0L, "127.0.0.1"));
         then(userService).should().checkUserExist(userNo);
-        then(vacationService).should().checkVacationExist(vacationId);
+        then(vacationRepositoryImpl).should().findById(vacationId);;
     }
 
     @Test
@@ -131,13 +134,13 @@ class ScheduleServiceTest {
         Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear() - 1, 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear() - 1, 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
-//        given(vacationService.checkVacationExist(vacationId)).willReturn(vacation);
+        given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
                 scheduleService.registSchedule(userNo, vacationId, type, desc, start, end, 0L, "127.0.0.1"));
         then(userService).should().checkUserExist(userNo);
-//        then(vacationService).should().checkVacationExist(vacationId);
+        then(vacationRepositoryImpl).should().findById(vacationId);;
     }
 
     @Test
@@ -155,7 +158,7 @@ class ScheduleServiceTest {
         Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
-        given(vacationService.checkVacationExist(vacationId)).willReturn(vacation);
+        given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
         given(scheduleRepositoryImpl.findSchedulesByVacation(any(Vacation.class))).willReturn(Collections.emptyList());
         given(holidayRepositoryImpl.findHolidaysByStartEndDate(any(), any())).willReturn(Collections.emptyList());
 
@@ -163,7 +166,7 @@ class ScheduleServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 scheduleService.registSchedule(userNo, vacationId, type, desc, start, end, 0L, "127.0.0.1"));
         then(userService).should().checkUserExist(userNo);
-        then(vacationService).should().checkVacationExist(vacationId);
+        then(vacationRepositoryImpl).should().findById(vacationId);;
         then(scheduleRepositoryImpl).should().findSchedulesByVacation(any(Vacation.class));
         then(holidayRepositoryImpl).should().findHolidaysByStartEndDate(any(), any());
     }
@@ -183,7 +186,7 @@ class ScheduleServiceTest {
         Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
-        given(vacationService.checkVacationExist(vacationId)).willReturn(vacation);
+        given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
         given(scheduleRepositoryImpl.findSchedulesByVacation(any(Vacation.class))).willReturn(Collections.emptyList());
         given(holidayRepositoryImpl.findHolidaysByStartEndDate(any(), any())).willReturn(Collections.emptyList());
 
@@ -191,7 +194,7 @@ class ScheduleServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 scheduleService.registSchedule(userNo, vacationId, type, desc, start, end, 0L, "127.0.0.1"));
         then(userService).should().checkUserExist(userNo);
-        then(vacationService).should().checkVacationExist(vacationId);
+        then(vacationRepositoryImpl).should().findById(vacationId);;
         then(scheduleRepositoryImpl).should().findSchedulesByVacation(any(Vacation.class));
         then(holidayRepositoryImpl).should().findHolidaysByStartEndDate(any(), any());
     }
@@ -211,7 +214,7 @@ class ScheduleServiceTest {
         Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
-        given(vacationService.checkVacationExist(vacationId)).willReturn(vacation);
+        given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
         given(scheduleRepositoryImpl.findSchedulesByVacation(any(Vacation.class))).willReturn(Collections.emptyList());
         given(holidayRepositoryImpl.findHolidaysByStartEndDate(any(), any())).willReturn(Collections.emptyList());
 
@@ -219,7 +222,7 @@ class ScheduleServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 scheduleService.registSchedule(userNo, vacationId, type, desc, start, end, 0L, "127.0.0.1"));
         then(userService).should().checkUserExist(userNo);
-        then(vacationService).should().checkVacationExist(vacationId);
+        then(vacationRepositoryImpl).should().findById(vacationId);;
         then(scheduleRepositoryImpl).should().findSchedulesByVacation(any(Vacation.class));
         then(holidayRepositoryImpl).should().findHolidaysByStartEndDate(any(), any());
     }
