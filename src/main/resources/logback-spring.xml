@@ -3,7 +3,7 @@
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%highlight(%-5level)][%yellow(%d{yyyy.MM.dd HH:mm:ss.SSS})][%magenta(%-8(%X{requestId}))] - [%cyan(%logger{5})] - %msg%n</pattern>
+            <pattern>[%highlight(%-5level)][%yellow(%d{yyyy.MM.dd HH:mm:ss.SSS})][%magenta(%-8(%X{requestId}))] - [%cyan(%logger{0}.%M\(%L\))] - %msg%n</pattern>
         </encoder>
     </appender>
     <root level="info">
