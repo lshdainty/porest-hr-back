@@ -109,20 +109,20 @@ public class VacationService {
                     .desc(vacation.getDesc())
                     .type(vacation.getType())
                     .grantTime(vacation.getGrantTime())
-                    .usedTime(BigDecimal.ZERO)
-                    .remainTime(BigDecimal.ZERO)
+                    .usedTime(new BigDecimal("0.0000"))
+                    .remainTime(new BigDecimal("0.0000"))
                     .occurDate(vacation.getOccurDate())
                     .expiryDate(vacation.getExpiryDate())
                     .delYN(vacation.getDelYN())
                     .build();
 
-            if (vacation.getSchedules().size() == 0) {
+            if (vacation.getSchedules().isEmpty()) {
                 vacationDtos.add(vacationDto);
                 continue;
             }
 
             List<ScheduleServiceDto> scheduleDtos = scheduleService.convertRealUsedTimeDto(vacation.getSchedules());
-            BigDecimal usedTime = new BigDecimal(0);
+            BigDecimal usedTime = new BigDecimal("0.0000");
             for (ScheduleServiceDto scheduleDto : scheduleDtos) {
                 usedTime = usedTime.add(scheduleDto.getRealUsedTime());
             }

@@ -9,16 +9,16 @@ import java.util.function.Function;
 @Getter
 @RequiredArgsConstructor
 public enum ScheduleType {
-    DAYOFF("연차", "1", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(8))),           // 연차
-    MORNINGOFF("오전반차", "2", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(4))),       // 오전반차
-    AFTERNOONOFF("오후반차", "3", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(4))),     // 오후반차
-    ONETIMEOFF("1시간 휴가", "7", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(1))),       // 1시간 휴가
-    TWOTIMEOFF("2시간 휴가", "8", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(2))),       // 2시간 휴가
-    THREETIMEOFF("3시간 휴가", "9", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(3))),     // 3시간 휴가
-    FIVETIMEOFF("5시간 휴가", "10", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(5))),     // 5시간 휴가
-    SIXTIMEOFF("6시간 휴가", "11", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(6))),      // 6시간 휴가
-    SEVENTIMEOFF("7시간 휴가", "12", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(7))),    // 7시간 휴가
-    HALFTIMEOFF("30분 휴가", "13", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.5))),   // 30분 휴가
+    DAYOFF("연차", "1", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(1.0000))),           // 연차
+    MORNINGOFF("오전반차", "2", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.5000))),       // 오전반차
+    AFTERNOONOFF("오후반차", "3", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.5000))),     // 오후반차
+    ONETIMEOFF("1시간 휴가", "7", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.1250))),       // 1시간 휴가
+    TWOTIMEOFF("2시간 휴가", "8", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.2500))),       // 2시간 휴가
+    THREETIMEOFF("3시간 휴가", "9", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.3750))),     // 3시간 휴가
+    FIVETIMEOFF("5시간 휴가", "10", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.6250))),     // 5시간 휴가
+    SIXTIMEOFF("6시간 휴가", "11", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.7500))),      // 6시간 휴가
+    SEVENTIMEOFF("7시간 휴가", "12", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.8750))),    // 7시간 휴가
+    HALFTIMEOFF("30분 휴가", "13", true, dayDiff -> dayDiff.multiply(BigDecimal.valueOf(0.0625))),   // 30분 휴가
     EDUCATION("교육", "6", false),                                                           // 교육
     BIRTHDAY("생일", "5", false),                                                            // 생일
     BUSINESSTRIP("출장", "4", false),                                                        // 출장

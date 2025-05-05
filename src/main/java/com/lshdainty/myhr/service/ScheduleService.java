@@ -218,6 +218,6 @@ public class ScheduleService {
 
         List<LocalDate> results = schedule.removeAllDates(dates);
 
-        return new BigDecimal(0).add(schedule.getType().convertToValue(results.size()));
+        return new BigDecimal("0.0000").add(schedule.getType().convertToValue(results.size()));
     }
 }
