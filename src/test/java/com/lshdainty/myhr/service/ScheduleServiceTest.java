@@ -56,7 +56,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 23, 59, 59);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
         Schedule schedule = Schedule.createSchedule(user, vacation, desc, type, start, end, 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
@@ -131,7 +131,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 23, 59, 59);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear() - 1, 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear() - 1, 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear() - 1, 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear() - 1, 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
         given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
@@ -155,7 +155,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 23, 59, 59).plusDays(10);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
         given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
@@ -183,7 +183,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 8, 0, 0);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
         given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
@@ -211,7 +211,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 10, 0, 0);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(userService.checkUserExist(userNo)).willReturn(user);
         given(vacationRepositoryImpl.findById(vacationId)).willReturn(vacation);
@@ -257,7 +257,7 @@ class ScheduleServiceTest {
         // Given
         Long userNo = 1L;
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         given(scheduleRepositoryImpl.findSchedulesByUserNo(userNo)).willReturn(List.of(
                 Schedule.createSchedule(user, vacation, "휴가", ScheduleType.DAYOFF, LocalDateTime.of(LocalDateTime.now().getYear(), 1, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 20, 23, 59, 59), 0L, "127.0.0.1"),
@@ -281,7 +281,7 @@ class ScheduleServiceTest {
         // Given
         Long userNo = 1L;
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
 
         LocalDateTime start = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0);
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59);
@@ -315,7 +315,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 23, 59, 59);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
         Schedule schedule = Schedule.createSchedule(user, vacation, desc, type, start, end, 0L, "127.0.0.1");
 
         given(scheduleRepositoryImpl.findById(scheduleId)).willReturn(schedule);
@@ -352,7 +352,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 23, 59, 59).minusDays(2);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
         Schedule schedule = Schedule.createSchedule(user, vacation, desc, type, start, end, 0L, "127.0.0.1");
 
         given(scheduleRepositoryImpl.findById(scheduleId)).willReturn(schedule);
@@ -374,7 +374,7 @@ class ScheduleServiceTest {
         LocalDateTime end = LocalDateTime.of(2025, 5, 5, 0, 0, 0);
 
         User user = User.createUser("이서준", "19700723", "ADMIN", "9 ~ 6", "N");
-        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("32"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
+        Vacation vacation = Vacation.createVacation(user, "정기 휴가", "25년 1분기 정기 휴가", VacationType.BASIC, new BigDecimal("4.0000"), LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59, 59), 0L, "127.0.0.1");
         Schedule schedule = Schedule.createSchedule(user, vacation, desc, type, start, end, 0L, "127.0.0.1");
 
         List<LocalDate> holidays = List.of(LocalDate.of(2025, 5, 5));
@@ -383,6 +383,6 @@ class ScheduleServiceTest {
         BigDecimal realUsed = scheduleService.calculateRealUsed(schedule, holidays);
 
         // Then
-        assertThat(realUsed).isEqualTo(new BigDecimal("16"));
+        assertThat(realUsed).isEqualTo(new BigDecimal("2.0000"));
     }
 }
