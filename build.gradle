@@ -60,6 +60,22 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 
+def jacocoExcludes = [
+    '**/Application*',
+    '**/MyhrApplication*',
+    '**/InitDB*',
+    '**/api/**',    // 추후 제외대상
+    '**/domain/**',
+    '**/Q*',
+    '**/Config/**',
+    '**/config/**',
+    '**/lib/**',
+    '**/dto/**',
+    '**/service/dto/**',
+    '**/repository/*Custom*',
+    '**/SessionConst*'
+]
+
 jacocoTestReport {
     dependsOn test
     reports {
@@ -70,17 +86,7 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
-                    fileTree(dir: it, exclude: [
-                            '**/InitDB',
-                            '**/MyhrApplication',
-                            '**/InitDB.InitService',
-                            '**/api/**',    // 추후 제외대상
-                            '**/domain/**',
-                            '**/Config/**',
-                            '**/lib/**',
-                            '**/dto/**',
-                            '**/service/dto/**'
-                    ])
+                    fileTree(dir: it, exclude: jacocoExcludes)
                 })
         )
     }
@@ -88,20 +94,17 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: jacocoExcludes)
+                })
+        )
+    }
     violationRules {
         rule {
             enabled = true
             element = 'CLASS'
-            excludes = [
-                    '**.InitDB',
-                    '**.MyhrApplication',
-                    '**.InitService',
-                    '**.api/**',
-                    '**.domain/**',
-                    '**.Config/**',
-                    '**.lib/**',
-                    '**.dto/**'
-            ]
             limit {
                 counter = 'LINE'
                 value = 'COVEREDRATIO'
