@@ -73,7 +73,7 @@ jacocoTestReport {
                     fileTree(dir: it, exclude: [
                             '**/InitDB',
                             '**/MyhrApplication',
-                            'com/lshdainty/myhr/InitDB.InitService',
+                            '**/InitDB.InitService',
                             '**/api/**',    // 추후 제외대상
                             '**/domain/**',
                             '**/Config/**',
@@ -92,6 +92,15 @@ jacocoTestCoverageVerification {
         rule {
             enabled = true
             element = 'CLASS'
+            excludes = [
+                    '**.InitDB',
+                    '**.MyhrApplication',
+                    '**.InitService',
+                    '**.api/**',
+                    '**.domain/**',
+                    '**.Config/**',
+                    '**.lib/**',
+                    '**.dto/**']
             limit {
                 counter = 'LINE'
                 value = 'COVEREDRATIO'
