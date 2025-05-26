@@ -25,14 +25,14 @@ public class AuditingFields {
     private String createIP;
 
 //    @LastModifiedDate
-    @Column(name = "delete_date")
-    private LocalDateTime deleteDate;
+    @Column(name = "modify_date")
+    private LocalDateTime modifyDate;
 
-    @Column(name = "delete_by")
-    private Long deleteBy;
+    @Column(name = "modify_by")
+    private Long modifyBy;
 
-    @Column(name = "delete_ip")
-    private String deleteIP;
+    @Column(name = "modify_ip")
+    private String modifyIP;
 
     public void setCreated(LocalDateTime date, Long no, String ip) {
         this.createDate = date;
@@ -45,9 +45,14 @@ public class AuditingFields {
         this.createIP = ip;
     }
 
-    public void setDeleted(LocalDateTime date, Long no, String ip) {
-        this.deleteDate = date;
-        this.deleteBy = no;
-        this.deleteIP = ip;
+    public void setmodified(LocalDateTime date, Long no, String ip) {
+        this.modifyDate = date;
+        this.modifyBy = no;
+        this.modifyIP = ip;
+    }
+
+    public void setmodified(Long no, String ip) {
+        this.modifyBy = no;
+        this.modifyIP = ip;
     }
 }
