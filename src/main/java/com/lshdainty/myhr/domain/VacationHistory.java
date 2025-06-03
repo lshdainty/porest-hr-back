@@ -32,16 +32,13 @@ public class VacationHistory extends AuditingFields {
     @Column(name = "grant_time", precision = 7, scale = 4)
     private BigDecimal grantTime;
 
-    // grantTime을 제외한 type ~ endDate까지 있으면 휴가 사용 내역
+    // grantTime을 제외한 type, usedDateTime 있으면 휴가 사용 내역
     @Enumerated(EnumType.STRING)
     @Column(name = "vacation_time_type")
     private VacationTimeType type;
 
-    @Column(name = "start_date")
-    private LocalDateTime startDate;
-
-    @Column(name = "end_date")
-    private LocalDateTime endDate;
+    @Column(name = "used_date_time")
+    private LocalDateTime usedDateTime;
 
     @Column(name = "del_yn")
     private String delYN;
@@ -66,13 +63,12 @@ public class VacationHistory extends AuditingFields {
      * 휴가 사용에 따른 History 내역을 생성해주는 생성자
      * Setter를 사용하지 말고 해당 생성자를 통해 생성 및 사용할 것
      */
-    public static VacationHistory createUsedVacationHistory(Vacation vacation, String desc, VacationTimeType type, LocalDateTime startDate, LocalDateTime endDate, Long userNo, String clientIP) {
+    public static VacationHistory createUseVacationHistory(Vacation vacation, String desc, VacationTimeType type, LocalDateTime usedDateTime, Long userNo, String clientIP) {
         VacationHistory vacationHistory = new VacationHistory();
         vacationHistory.vacation = vacation;
         vacationHistory.desc = desc;
         vacationHistory.type = type;
-        vacationHistory.startDate = startDate;
-        vacationHistory.endDate = endDate;
+        vacationHistory.usedDateTime = usedDateTime;
         vacationHistory.delYN = "N";
         vacationHistory.setCreated(userNo, clientIP);
         return vacationHistory;
@@ -85,21 +81,5 @@ public class VacationHistory extends AuditingFields {
     public void deleteVacationHistory(Long userNo, String clientIP) {
         this.delYN = "Y";
         this.setmodified(LocalDateTime.now(), userNo, clientIP);
-    }
-
-    /**
-     * start 날짜가 유저의 유연근무제에 맞춰
-     * 정상적으로 설정되어 있는지 확인하는 함수
-     *
-     * @return true, false 반환
-     */
-    public boolean isBetweenWorkTime(User user) {
-        List<LocalTime> workTimes = user.convertWorkTimeToLocalTime();
-        LocalTime startTime = getStartDate().toLocalTime();
-
-        if (getType().equals(VacationTimeType.DAYOFF)) { return true; }
-
-        return (startTime.isAfter(workTimes.get(0)) || startTime.equals(workTimes.get(0))) &&
-                (startTime.isBefore(workTimes.get(1)) || startTime.equals(workTimes.get(1)));
     }
 }

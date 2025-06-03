@@ -1,20 +1,29 @@
 package com.lshdainty.myhr.service.vacation;
 
 import com.lshdainty.myhr.domain.User;
+import com.lshdainty.myhr.domain.Vacation;
+import com.lshdainty.myhr.domain.VacationHistory;
 import com.lshdainty.myhr.domain.VacationType;
+import com.lshdainty.myhr.repository.HolidayRepositoryImpl;
 import com.lshdainty.myhr.repository.UserRepositoryImpl;
 import com.lshdainty.myhr.repository.VacationHistoryRepositoryImpl;
 import com.lshdainty.myhr.repository.VacationRepositoryImpl;
 import com.lshdainty.myhr.service.UserService;
 import com.lshdainty.myhr.service.VacationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import com.lshdainty.myhr.domain.Vacation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+@Slf4j
 public class Annual extends VacationService {
+    MessageSource ms;
     VacationRepositoryImpl vacationRepositoryImpl;
+    VacationHistoryRepositoryImpl vacationHistoryRepositoryImpl;
+    UserRepositoryImpl userRepositoryImpl;
+    HolidayRepositoryImpl holidayRepositoryImpl;
     UserService userService;
 
     public Annual(
@@ -22,21 +31,37 @@ public class Annual extends VacationService {
             VacationRepositoryImpl vacationRepositoryImpl,
             VacationHistoryRepositoryImpl vacationHistoryRepositoryImpl,
             UserRepositoryImpl userRepositoryImpl,
+            HolidayRepositoryImpl holidayRepositoryImpl,
             UserService userService
     ) {
-        super(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, userService);
+        super(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+        this.ms = ms;
+        this.vacationRepositoryImpl = vacationRepositoryImpl;
+        this.vacationHistoryRepositoryImpl = vacationHistoryRepositoryImpl;
+        this.userRepositoryImpl = userRepositoryImpl;
+        this.holidayRepositoryImpl = holidayRepositoryImpl;
+        this.userService = userService;
     }
 
     @Override
     public Long registVacation(Long userNo, String desc, VacationType type, BigDecimal grantTime, LocalDateTime occurDate, LocalDateTime expiryDate, Long addUserNo, String clientIP) {
         User user = userService.checkUserExist(userNo);
 
-        // 올해 등록된 연차 휴가가 있는지 확인
-        // 등록된 휴가가 있으면 기존 휴가에 새롭게 부여한 휴가 더하기
-        // 히스토리 같이 저장하기
-        // 등록된 휴가가 없으면 새롭게 연차 등록하기
-        // 히스토리 같이 저장하기
+        Optional<Vacation> vacation = vacationRepositoryImpl.findVacationByTypeWithYear(userNo, type, String.valueOf(occurDate.getYear()));
+        if (vacation.isPresent()) {
+            vacation.get().addVacation(grantTime, userNo, clientIP);
+        } else {
+            // 연차의 경우 당해년도 1월 1일부터 12월 31일로 고정 생성
+            occurDate = LocalDateTime.of(occurDate.getYear(), 1, 1, 0, 0, 0);
+            expiryDate = LocalDateTime.of(occurDate.getYear(), 12, 31, 23, 59, 59);
+            Vacation newVacation = Vacation.createVacation(user, type, grantTime, occurDate, expiryDate, addUserNo, clientIP);
+            vacationRepositoryImpl.save(newVacation);
+            vacation = Optional.of(newVacation);
+        }
 
-        return 0L;
+        VacationHistory history = VacationHistory.createRegistVacationHistory(vacation.get(), desc, grantTime, addUserNo, clientIP);
+        vacationHistoryRepositoryImpl.save(history);
+
+        return vacation.get().getId();
     }
 }

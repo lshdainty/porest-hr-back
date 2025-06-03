@@ -66,7 +66,7 @@ public class Vacation extends AuditingFields {
 
     /* 비즈니스 편의 메소드 */
     /**
-     * 휴가 추가 메소드
+     * 휴가 추가 메소드<br>
      * remainTime(잔여시간)에 grantTime(추가시간)을 더함
      */
     public void addVacation(BigDecimal grantTime, Long userNo, String clientIP) {
@@ -75,16 +75,16 @@ public class Vacation extends AuditingFields {
     }
 
     /**
-     * 휴가 차감 메소드
+     * 휴가 차감 메소드<br>
      * remainTime(잔여시간)에서 deductTime을(사용시간)을 뺌
      */
-    public void DeductedVacation(BigDecimal deductTime, Long userNo, String clientIP) {
+    public void deductedVacation(BigDecimal deductTime, Long userNo, String clientIP) {
         this.remainTime =  getRemainTime().subtract(deductTime);
         this.setmodified(LocalDateTime.now(), userNo, clientIP);
     }
 
     /**
-     * occurDate, expireDate를 비교하여
+     * occurDate, expireDate를 비교하여<br>
      * 발생일자가 만료일자 이전인지 확인
      *
      * @return true, false

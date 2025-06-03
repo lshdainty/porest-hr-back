@@ -49,6 +49,15 @@ public class HolidayRepositoryImpl implements HolidayRepository {
                 .getResultList();
     }
 
+    @Override
+    public List<Holiday> findHolidaysByStartEndDateWithType(String start, String end, HolidayType type) {
+        return em.createQuery("select h from Holiday h where h.date between :start and :end and h.type = :type order by h.date", Holiday.class)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .setParameter("type", type)
+                .getResultList();
+    }
+
     // 휴일 삭제
     @Override
     public void delete(Holiday holiday) {

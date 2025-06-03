@@ -84,7 +84,7 @@ public class User {
 
     /* 비즈니스 편의 메소드 */
     /**
-     * 사용자의 workTime에 맞춰
+     * 사용자의 workTime에 맞춰<br>
      * start, end가 담긴 배열을 반환하는 함수
      *
      * @return [startTime, endTime] array
@@ -109,5 +109,19 @@ public class User {
         }
 
         return List.of(start, end);
+    }
+
+    /**
+     * 날짜가 유저의 유연근무제에 맞춰<br>
+     * 정상적으로 설정되어 있는지 확인하는 함수
+     *
+     * @Param time
+     * @return true, false 반환
+     */
+    public boolean isBetweenWorkTime(LocalTime time) {
+        List<LocalTime> workTimes = convertWorkTimeToLocalTime();
+
+        return (time.isAfter(workTimes.get(0)) || time.equals(workTimes.get(0))) &&
+                (time.isBefore(workTimes.get(1)) || time.equals(workTimes.get(1)));
     }
 }

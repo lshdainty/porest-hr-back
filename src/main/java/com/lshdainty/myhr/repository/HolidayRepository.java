@@ -11,5 +11,6 @@ public interface HolidayRepository {
     List<Holiday> findHolidays();
     List<Holiday> findHolidaysByStartEndDate(String start, String end);
     List<Holiday> findHolidaysByType(HolidayType type);
+    List<Holiday> findHolidaysByStartEndDateWithType(String start, String end, HolidayType type);
     void delete(Holiday holiday);
 }

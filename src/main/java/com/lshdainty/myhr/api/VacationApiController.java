@@ -25,15 +25,30 @@ public class VacationApiController {
     private final VacationService vacationService;
 
     @PostMapping("/api/v1/vacation")
-    public ApiResponse addVacation(@RequestBody VacationDto vacationDto, HttpServletRequest req) {
-        Long vacationId = vacationService.addVacation(
+    public ApiResponse registVacation(@RequestBody VacationDto vacationDto, HttpServletRequest req) {
+        Long vacationId = vacationService.registVacation(
                 vacationDto.getUserNo(),
-                vacationDto.getVacationName(),
                 vacationDto.getVacationDesc(),
                 vacationDto.getVacationType(),
                 vacationDto.getGrantTime(),
                 vacationDto.getOccurDate(),
                 vacationDto.getExpiryDate(),
+                0L, // 추후 로그인한 유저의 id를 가져와서 여기에다 넣을 것
+                req.getRemoteAddr()
+        );
+
+        return ApiResponse.success(new VacationDto(vacationId));
+    }
+
+    @PostMapping("/api/v1/vacation/use/{vacationId}")
+    public ApiResponse useVacation(@PathVariable("vacationId") Long vacationId, @RequestBody VacationDto vacationDto, HttpServletRequest req) {
+        vacationService.useVacation(
+                vacationId,
+                vacationDto.getUserNo(),
+                vacationDto.getVacationDesc(),
+                vacationDto.getVacationTimeType(),
+                vacationDto.getStartDate(),
+                vacationDto.getEndDate(),
                 0L, // 추후 로그인한 유저의 id를 가져와서 여기에다 넣을 것
                 req.getRemoteAddr()
         );
@@ -70,20 +85,7 @@ public class VacationApiController {
 
     @PutMapping("/api/v1/vacation/{id}")
     public ApiResponse editVacation(@PathVariable("id") Long vacationId, @RequestBody VacationDto vacationDto, HttpServletRequest req) {
-        Vacation vacation = vacationService.editVacation(
-                vacationId,
-                vacationDto.getUserNo(),
-                vacationDto.getVacationName(),
-                vacationDto.getVacationDesc(),
-                vacationDto.getVacationType(),
-                vacationDto.getGrantTime(),
-                vacationDto.getOccurDate(),
-                vacationDto.getExpiryDate(),
-                0L, // 추후 로그인한 유저의 id를 가져와서 여기에다 넣을 것
-                req.getRemoteAddr()
-        );
-
-        return ApiResponse.success(new VacationDto(vacation));
+        return ApiResponse.success();
     }
 
     @DeleteMapping("/api/v1/vacation/{id}")
