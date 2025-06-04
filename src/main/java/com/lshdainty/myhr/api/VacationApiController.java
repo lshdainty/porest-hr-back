@@ -5,8 +5,6 @@ import com.lshdainty.myhr.domain.Vacation;
 import com.lshdainty.myhr.dto.UserDto;
 import com.lshdainty.myhr.dto.VacationDto;
 import com.lshdainty.myhr.service.VacationService;
-import com.lshdainty.myhr.service.dto.ScheduleServiceDto;
-import com.lshdainty.myhr.service.dto.VacationServiceDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -63,8 +60,6 @@ public class VacationApiController {
         List<VacationDto> resp = vacations.stream()
                 .map(v -> VacationDto
                         .builder()
-                        .userNo(v.getUser().getId())
-                        .userName(v.getUser().getName())
                         .vacationId(v.getId())
                         .vacationType(v.getType())
                         .vacationTypeName(v.getType().getStrName())
@@ -107,47 +102,31 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    @PutMapping("/api/v1/vacation/{id}")
-    public ApiResponse editVacation(@PathVariable("id") Long vacationId, @RequestBody VacationDto vacationDto, HttpServletRequest req) {
-        return ApiResponse.success();
-    }
-
-    @DeleteMapping("/api/v1/vacation/{id}")
-    public ApiResponse deleteVacation(@PathVariable("id") Long vacationId, HttpServletRequest req) {
-        Long delUserNo = 0L;   // 추후 로그인 한 사람의 id를 가져와서 삭제한 사람의 userNo에 세팅
-        vacationService.deleteVacation(vacationId, delUserNo, req.getRemoteAddr());
-        return ApiResponse.success();
-    }
-
-    @GetMapping("/api/v1/vacation/check-possible/{userNo}")
+    @GetMapping("/api/v1/vacation/available/{userNo}")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    public ApiResponse checkPossibleVacations(
-            @PathVariable("userNo") Long userNo,
-            @RequestParam("startDate") LocalDateTime startDate,
-            HttpServletRequest req) {
+    public ApiResponse getAvailableVacation(@PathVariable("userNo") Long userNo, @RequestParam("startDate") LocalDateTime startDate, HttpServletRequest req) {
+        List<Vacation> vacations = vacationService.getAvailableVacation(userNo, startDate);
 
-        log.info("Check vacation by user no: {}", userNo);
-        log.info("Check vacation by startDate: {}", startDate);
-        List<VacationServiceDto> vacations = vacationService.checkPossibleVacations(userNo, startDate);
+        List<VacationDto> resp = vacations.stream()
+                .map(v -> VacationDto
+                        .builder()
+                        .vacationId(v.getId())
+                        .vacationType(v.getType())
+                        .vacationTypeName(v.getType().getStrName())
+                        .remainTime(v.getRemainTime())
+                        .occurDate(v.getOccurDate())
+                        .expiryDate(v.getExpiryDate())
+                        .build()
+                )
+                .toList();
 
-        for (VacationServiceDto vacation : vacations) {
-            log.info("Vacation: {}", vacation.toString());
+        return ApiResponse.success(resp);
+    }
 
-            if (vacation.getScheduleDtos() == null) {
-                continue;
-            }
-
-            for (ScheduleServiceDto schedule : vacation.getScheduleDtos()) {
-                log.info("Schedule: {}", schedule.toString());
-            }
-            log.info("\n");
-        }
-
-//        List<VacationDto> resp = vacations.stream()
-//                .map(v -> new VacationDto(v)).toList();
-
-
-//        return ApiResponse.success(resp);
+    @DeleteMapping("/api/v1/vacation/history/{id}")
+    public ApiResponse deleteVacationHistory(@PathVariable("id") Long vacationHistoryId, HttpServletRequest req) {
+        Long delUserNo = 0L;   // 추후 로그인 한 사람의 id를 가져와서 삭제한 사람의 userNo에 세팅
+        vacationService.deleteVacationHistory(vacationHistoryId, delUserNo, req.getRemoteAddr());
         return ApiResponse.success();
     }
 }

@@ -5,10 +5,8 @@ import com.lshdainty.myhr.repository.HolidayRepositoryImpl;
 import com.lshdainty.myhr.repository.UserRepositoryImpl;
 import com.lshdainty.myhr.repository.VacationHistoryRepositoryImpl;
 import com.lshdainty.myhr.repository.VacationRepositoryImpl;
-import com.lshdainty.myhr.service.dto.VacationServiceDto;
 import com.lshdainty.myhr.service.vacation.*;
 import com.lshdainty.myhr.util.MyhrTime;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -20,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,7 +68,7 @@ public class VacationService {
         // 연차가 아닌 시간단위 휴가인 경우 유연근무제 시간 체크
         if (!type.equals(VacationTimeType.DAYOFF)) {
             if (user.isBetweenWorkTime(startDate.toLocalTime())) {
-                throw new IllegalArgumentException(ms.getMessage("error.vaildate.worktime.startEndTime", null, null));
+                throw new IllegalArgumentException(ms.getMessage("error.validate.worktime.startEndTime", null, null));
             }
         }
 
@@ -83,8 +80,7 @@ public class VacationService {
                 startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 HolidayType.PUBLIC
-        )
-                .stream()
+        ).stream()
                 .map(h -> LocalDate.parse(h.getDate(), DateTimeFormatter.BASIC_ISO_DATE))
                 .toList();
 
@@ -98,7 +94,7 @@ public class VacationService {
 
         BigDecimal useTime = new BigDecimal("0.0000").add(type.convertToValue(betweenDates.size()));
         if (vacation.getRemainTime().compareTo(useTime) < 0) {
-            throw new IllegalArgumentException(ms.getMessage("error.vaildate.notRemainTime", null, null));
+            throw new IllegalArgumentException(ms.getMessage("error.validate.notRemainTime", null, null));
         }
 
         for (LocalDate betweenDate : betweenDates) {
@@ -126,88 +122,49 @@ public class VacationService {
         return userRepositoryImpl.findUsersWithVacations();
     }
 
-    @Transactional
-    public Vacation editVacation(Long vacationId, Long userNo, String reqName, String reqDesc, VacationType reqType, BigDecimal reqGrantTime, LocalDateTime reqOccurDate, LocalDateTime reqExpiryDate, Long addUserNo, String clientIP) {
-        Vacation findVacation = checkVacationExist(vacationId);
-
-        VacationType type = null;
-        if (Objects.isNull(reqType)) { type = findVacation.getType(); } else { type = reqType; }
-
-//        BigDecimal grantTime = new BigDecimal(0);
-//        if (reqGrantTime.compareTo(grantTime) == 0) { grantTime = findVacation.getGrantTime(); } else { grantTime = reqGrantTime; }
-
-        LocalDateTime occurDate = null;
-        if (Objects.isNull(reqOccurDate)) { occurDate = findVacation.getOccurDate(); } else { occurDate = reqOccurDate; }
-
-        LocalDateTime expiryDate = null;
-        if (Objects.isNull(reqExpiryDate)) { expiryDate = findVacation.getExpiryDate(); } else { expiryDate = reqExpiryDate; }
-
-        User user = userService.checkUserExist(userNo);
-
-//        Vacation newVacation = Vacation.createVacation(user, name, desc, type, grantTime, occurDate, expiryDate, addUserNo, clientIP);
-
-//        if (newVacation.isBeforeOccur()) { throw new IllegalArgumentException("the expiration date is earlier than the occurrence date"); }
-
-//        findVacation.deleteVacation(addUserNo, clientIP);
-//        vacationRepositoryImpl.save(newVacation);
-
-//        return vacationRepositoryImpl.findById(newVacation.getId());
-        return null;
-    }
-
-    @Transactional
-    public void deleteVacation(Long vacationId, Long delUserNo, String clientIP) {
-        Vacation vacation = checkVacationExist(vacationId);
-//        vacation.deleteVacation(delUserNo, clientIP);
-    }
-
-    public List<VacationServiceDto> checkPossibleVacations(Long userNo, LocalDateTime standardTime) {
+    public List<Vacation> getAvailableVacation(Long userNo, LocalDateTime startDate) {
         // 유저 조회
         userService.checkUserExist(userNo);
 
-        // 시작 날짜를 기준으로 등록 가능한 휴가날짜를 조회
-        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByParameterTimeWithSchedules(userNo, standardTime);
+        // 시작 날짜를 기준으로 등록 가능한 휴가 목록 조회
+        return vacationRepositoryImpl.findVacationsByBaseTime(userNo, startDate);
+    }
 
-        List<VacationServiceDto> vacationDtos = new ArrayList<>();
-        for (Vacation vacation : vacations) {
-            VacationServiceDto vacationDto = VacationServiceDto.builder()
-                    .id(vacation.getId())
-                    .user(vacation.getUser())
-                    .scheduleDtos(new ArrayList<>())
-                    .type(vacation.getType())
-                    .usedTime(new BigDecimal("0.0000"))
-                    .remainTime(new BigDecimal("0.0000"))
-                    .occurDate(vacation.getOccurDate())
-                    .expiryDate(vacation.getExpiryDate())
-                    .build();
+    @Transactional
+    public void deleteVacationHistory(Long vacationHistoryId, Long delUserNo, String clientIP) {
+        VacationHistory history = checkVacationHistoryExist(vacationHistoryId);
+        Vacation vacation = checkVacationExist(history.getVacation().getId());
 
-//            if (vacation.getSchedules().isEmpty()) {
-//                vacationDto.setRemainTime(vacation.getGrantTime());
-//                vacationDtos.add(vacationDto);
-//                continue;
-//            }
-
-//            List<ScheduleServiceDto> scheduleDtos = scheduleService.convertRealUsedTimeDto(vacation.getSchedules());
-//            BigDecimal usedTime = new BigDecimal("0.0000");
-//            for (ScheduleServiceDto scheduleDto : scheduleDtos) {
-//                usedTime = usedTime.add(scheduleDto.getRealUsedTime());
-//            }
-
-//            if (vacation.getGrantTime().compareTo(usedTime) == 0) { continue; }
-
-//            vacationDto.setScheduleDtos(scheduleDtos);
-//            vacationDto.setUsedTime(usedTime);
-//            vacationDto.setRemainTime(vacation.getGrantTime().subtract(usedTime));
-
-            vacationDtos.add(vacationDto);
+        if (MyhrTime.isAfterThanEndDate(LocalDateTime.now(), vacation.getExpiryDate())) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.expiryDateisAfterThanNow", null, null));
         }
 
-        return vacationDtos;
+        if (Objects.isNull(history.getType())) {
+            // 휴가 추가 내역
+            if (vacation.getRemainTime().compareTo(history.getGrantTime()) < 0) {
+                throw new IllegalArgumentException(ms.getMessage("error.validate.notEnoughRemainTime", null, null));
+            }
+
+            history.deleteRegistVacationHistory(vacation, delUserNo, clientIP);
+        } else {
+            // 휴가 사용 내역
+            if (MyhrTime.isAfterThanEndDate(LocalDateTime.now(), history.getUsedDateTime())) {
+                throw new IllegalArgumentException(ms.getMessage("error.validate.usedDateisAfterThanNow", null, null));
+            }
+
+            history.deleteUseVacationHistory(vacation, delUserNo, clientIP);
+        }
     }
 
     public Vacation checkVacationExist(Long vacationId) {
         Optional<Vacation> vacation = vacationRepositoryImpl.findById(vacationId);
         vacation.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation", null, null)));
         return vacation.get();
+    }
+
+    public VacationHistory checkVacationHistoryExist(Long vacationHistoryId) {
+        Optional<VacationHistory> history = vacationHistoryRepositoryImpl.findById(vacationHistoryId);
+        history.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation.history", null, null)));
+        return history.get();
     }
 }

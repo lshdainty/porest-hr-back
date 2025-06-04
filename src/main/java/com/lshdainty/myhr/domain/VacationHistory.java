@@ -75,10 +75,21 @@ public class VacationHistory extends AuditingFields {
     }
 
     /**
-     * 휴가 내역 삭제
+     * 휴가 추가 내역 삭제
      * Setter를 사용하지 말고 해당 메소드를 통해 설정할 것
      */
-    public void deleteVacationHistory(Long mdfUserNo, String clientIP) {
+    public void deleteRegistVacationHistory(Vacation vacation, Long mdfUserNo, String clientIP) {
+        vacation.deductedVacation(getGrantTime(), mdfUserNo, clientIP);
+        this.delYN = "Y";
+        this.setmodified(LocalDateTime.now(), mdfUserNo, clientIP);
+    }
+
+    /**
+     * 휴가 사용 내역 삭제
+     * Setter를 사용하지 말고 해당 메소드를 통해 설정할 것
+     */
+    public void deleteUseVacationHistory(Vacation vacation,Long mdfUserNo, String clientIP) {
+        vacation.addVacation(getType().convertToValue(1), mdfUserNo, clientIP);
         this.delYN = "Y";
         this.setmodified(LocalDateTime.now(), mdfUserNo, clientIP);
     }

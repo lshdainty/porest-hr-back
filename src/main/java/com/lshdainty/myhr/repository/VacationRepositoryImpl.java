@@ -15,32 +15,20 @@ import java.util.Optional;
 public class VacationRepositoryImpl implements VacationRepository {
     private final EntityManager em;
 
-    // 휴가 저장
     @Override
     public void save(Vacation vacation) {
         em.persist(vacation);
     }
 
-    // 단건 휴가 조회(delete용)
     @Override
     public Optional<Vacation> findById(Long vacationId) {
         return Optional.ofNullable(em.find(Vacation.class, vacationId));
     }
 
-    // 유저에 부여된 전체 휴가 조회
     @Override
     public List<Vacation> findVacationsByUserNo(Long userNo) {
         return em.createQuery("select v from Vacation v where v.user.id = :userNo", Vacation.class)
                 .setParameter("userNo", userNo)
-                .getResultList();
-    }
-
-    // 연도에 해당하는 휴가 조회
-    @Override
-    public List<Vacation> findVacationsByYear(String year) {
-        return em.createQuery("select v from Vacation v where year(v.expiryDate) = :year", Vacation.class)
-                .setParameter("year", year)
-//                .setParameter("delYN", "N")
                 .getResultList();
     }
 
@@ -55,23 +43,19 @@ public class VacationRepositoryImpl implements VacationRepository {
                 .findFirst();
     }
 
-    // 유저가 가진 휴가 중 기준 시간을 포함하는 휴가 리스트 조회
     @Override
-    public List<Vacation> findVacationsByParameterTime(Long userNo, LocalDateTime standardTime) {
-        return em.createQuery("select v from Vacation v where v.user.id = :userNo and :standardTime between v.occurDate and v.expiryDate and delYN = :delYN", Vacation.class)
+    public List<Vacation> findVacationsByBaseTime(Long userNo, LocalDateTime baseTime) {
+        return em.createQuery("select v from Vacation v where v.user.id = :userNo and :baseTime between v.occurDate and v.expiryDate", Vacation.class)
                 .setParameter("userNo", userNo)
-                .setParameter("standardTime", standardTime)
-                .setParameter("delYN", "N")
+                .setParameter("baseTime", baseTime)
                 .getResultList();
     }
 
-    // 유저가 가진 휴가 중 기준 시간을 포함하는 휴가와 스케줄 조회
     @Override
-    public List<Vacation> findVacationsByParameterTimeWithSchedules(Long userNo, LocalDateTime standardTime) {
-        return em.createQuery("select v from Vacation v left join fetch v.schedules s where v.user.id = :userNo and :standardTime between v.occurDate and v.expiryDate and v.delYN = :delYN", Vacation.class)
+    public List<Vacation> findVacationsByBaseTimeWithHistory(Long userNo, LocalDateTime baseTime) {
+        return em.createQuery("select v from Vacation v left join fetch v.historys s where v.user.id = :userNo and :baseTime between v.occurDate and v.expiryDate", Vacation.class)
                 .setParameter("userNo", userNo)
-                .setParameter("standardTime", standardTime)
-                .setParameter("delYN", "N")
+                .setParameter("baseTime", baseTime)
                 .getResultList();
     }
 }

@@ -18,12 +18,12 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VacationDto {
     private Long vacationId;
-    private Long userNo;
     private VacationType vacationType;
     private String vacationTypeName;
     private BigDecimal remainTime;
     private LocalDateTime occurDate;
     private LocalDateTime expiryDate;
+    private Long userNo;
     private String userName;
 
     private String vacationDesc;

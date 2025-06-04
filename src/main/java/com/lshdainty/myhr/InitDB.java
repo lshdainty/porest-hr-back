@@ -428,6 +428,64 @@ public class InitDB {
                 em.persist(overtime);
             }
             em.flush();
+
+            Vacation user1Annual26 = Vacation.createVacation(user1, VacationType.ANNUAL, new BigDecimal("15.0000"),
+                    LocalDateTime.of(now.getYear()+1, 1, 1, 0, 0, 0),
+                    LocalDateTime.of(now.getYear()+1, 12, 31, 23, 59, 59),
+                    0L, "127.0.0.1");
+            em.persist(user1Annual26);
+            em.flush();
+            List<VacationHistory> user1Annuals26 = List.of(
+                    VacationHistory.createRegistVacationHistory(user1Annual26, "1분기 휴가", new BigDecimal("4.0000"), 0L, "127.0.0.1"),
+                    VacationHistory.createRegistVacationHistory(user1Annual26, "2분기 휴가", new BigDecimal("4.0000"), 0L, "127.0.0.1"),
+                    VacationHistory.createRegistVacationHistory(user1Annual26, "3분기 휴가", new BigDecimal("4.0000"), 0L, "127.0.0.1"),
+                    VacationHistory.createRegistVacationHistory(user1Annual26, "4분기 휴가", new BigDecimal("3.0000"), 0L, "127.0.0.1")
+            );
+            for (VacationHistory annual : user1Annuals26) {
+                em.persist(annual);
+            }
+            em.flush();
+
+            Vacation user1Maternity26 = Vacation.createVacation(user1, VacationType.MATERNITY, new BigDecimal("10.0000"),
+                    LocalDateTime.of(now.getYear()+1, 10, 1, 0, 0, 0),
+                    LocalDateTime.of(now.getYear()+2, 4, 1, 23, 59, 59),
+                    0L, "127.0.0.1");
+            em.persist(user1Maternity26);
+            em.flush();
+            List<VacationHistory> user1Maternitys26 = List.of(
+                    VacationHistory.createRegistVacationHistory(user1Maternity26, "출산 휴가", new BigDecimal("10.0000"), 0L, "127.0.0.1")
+            );
+            for (VacationHistory maternity : user1Maternitys26) {
+                em.persist(maternity);
+            }
+            em.flush();
+
+            Vacation user1Overtime26 = Vacation.createVacation(user1, VacationType.OVERTIME, new BigDecimal("0.5000"),
+                    LocalDateTime.of(now.getYear()+1, 1, 1, 0, 0, 0),
+                    LocalDateTime.of(now.getYear()+1, 12, 31, 23, 59, 59),
+                    0L, "127.0.0.1");
+            em.persist(user1Overtime26);
+            List<VacationHistory> user1Overtimes26 = List.of(
+                    VacationHistory.createRegistVacationHistory(user1Overtime26, "OT", new BigDecimal("0.1250"), 0L, "127.0.0.1"),
+                    VacationHistory.createRegistVacationHistory(user1Overtime26, "OT", new BigDecimal("0.3750"), 0L, "127.0.0.1")
+            );
+            for (VacationHistory overtime : user1Overtimes26) {
+                em.persist(overtime);
+            }
+            em.flush();
+
+            Vacation user1Wedding26 = Vacation.createVacation(user1, VacationType.WEDDING, new BigDecimal("5.0000"),
+                    LocalDateTime.of(now.getYear()+1, 2, 17, 0, 0, 0),
+                    LocalDateTime.of(now.getYear()+1, 8, 17, 23, 59, 59),
+                    0L, "127.0.0.1");
+            em.persist(user1Wedding26);
+            List<VacationHistory> user1Weddings26 = List.of(
+                    VacationHistory.createRegistVacationHistory(user1Wedding26, "결혼 휴가", new BigDecimal("5.0000"), 0L, "127.0.0.1")
+            );
+            for (VacationHistory wedding : user1Weddings26) {
+                em.persist(wedding);
+            }
+            em.flush();
         }
 
         public void initSetSchedule() {
