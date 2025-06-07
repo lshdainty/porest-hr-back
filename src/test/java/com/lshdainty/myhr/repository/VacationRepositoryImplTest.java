@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,12 +40,12 @@ public class VacationRepositoryImplTest {
         LocalDateTime now = LocalDateTime.now();
         String name = "1분기 휴가";
         String desc = "";
-        VacationType type = VacationType.BASIC;
+        VacationType type = VacationType.ANNUAL;
         BigDecimal grantTime = new BigDecimal("4.0000");
         LocalDateTime occurDate = LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0);
         LocalDateTime expiryDate = LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59);
 
-        Vacation vacation = Vacation.createVacation(user, name, desc, type, grantTime, occurDate, expiryDate, 0L, "");
+        Vacation vacation = Vacation.createVacation(user, type, grantTime, occurDate, expiryDate, 0L, "");
 
         // when
         vacationRepositoryImpl.save(vacation);
@@ -51,15 +53,26 @@ public class VacationRepositoryImplTest {
         em.clear();
 
         // then
-        Vacation findVacation = vacationRepositoryImpl.findById(vacation.getId());
-        assertThat(findVacation).isNotNull();
-        assertThat(findVacation.getUser().getId()).isEqualTo(user.getId());
-        assertThat(findVacation.getName()).isEqualTo(name);
-        assertThat(findVacation.getDesc()).isEqualTo(desc);
-        assertThat(findVacation.getType()).isEqualTo(type);
-        assertThat(findVacation.getGrantTime()).isEqualTo(grantTime);
-        assertThat(findVacation.getOccurDate()).isEqualTo(occurDate);
-        assertThat(findVacation.getExpiryDate()).isEqualTo(expiryDate);
+        Optional<Vacation> findVacation = vacationRepositoryImpl.findById(vacation.getId());
+        assertThat(findVacation.isPresent()).isTrue();
+        assertThat(findVacation.get().getUser().getId()).isEqualTo(user.getId());
+        assertThat(findVacation.get().getType()).isEqualTo(type);
+        assertThat(findVacation.get().getRemainTime()).isEqualTo(grantTime);
+        assertThat(findVacation.get().getOccurDate()).isEqualTo(occurDate);
+        assertThat(findVacation.get().getExpiryDate()).isEqualTo(expiryDate);
+    }
+
+    @Test
+    @DisplayName("단건 조회 시 휴가가 없어도 Null이 반환되면 안된다.")
+    void findByIdEmpty() {
+        // given
+        Long vacationId = 1L;
+
+        // when
+        Optional<Vacation> findVacation = vacationRepositoryImpl.findById(vacationId);
+
+        // then
+        assertThat(findVacation.isEmpty()).isTrue();
     }
 
     @Test
@@ -70,9 +83,7 @@ public class VacationRepositoryImplTest {
         em.persist(user);
 
         LocalDateTime now = LocalDateTime.now();
-        String[] names = {"1분기 휴가", "OT 정산"};
-        String[] descs = {"1분기 휴가부여", "야간 배포에 따른 OT정산"};
-        VacationType[] types = {VacationType.BASIC, VacationType.ADDED};
+        VacationType[] types = {VacationType.ANNUAL, VacationType.OVERTIME};
         BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("0.1250")};
         LocalDateTime[] occurDates = {
                 LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
@@ -80,11 +91,11 @@ public class VacationRepositoryImplTest {
         };
         LocalDateTime[] expiryDates = {
                 LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
-                LocalDateTime.of(now.getYear(), 3, 31, 23, 59, 59),
+                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
         };
 
-        for (int i = 0; i < names.length; i++) {
-            Vacation vacation = Vacation.createVacation(user, names[i], descs[i], types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
             vacationRepositoryImpl.save(vacation);
         }
 
@@ -93,25 +104,48 @@ public class VacationRepositoryImplTest {
 
         // then
         assertThat(vacations.size()).isEqualTo(2);
-        assertThat(vacations).extracting("name").containsExactlyInAnyOrder(names);
-        assertThat(vacations).extracting("desc").containsExactlyInAnyOrder(descs);
         assertThat(vacations).extracting("type").containsExactlyInAnyOrder(types);
-        assertThat(vacations).extracting("grantTime").containsExactlyInAnyOrder(grantTimes);
+        assertThat(vacations).extracting("remainTime").containsExactlyInAnyOrder(grantTimes);
         assertThat(vacations).extracting("occurDate").containsExactlyInAnyOrder(occurDates);
         assertThat(vacations).extracting("expiryDate").containsExactlyInAnyOrder(expiryDates);
     }
 
     @Test
-    @DisplayName("유효 기간이 연도에 해당하는 휴가들만 조회돼야 한다.")
-    void getVacationsByYear() {
+    @DisplayName("유저에 부여된 휴가가 없더라도 Null이 반환되면 안된다.")
+    void getVacationsByUserNoEmpty() {
+        // given
+        User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
+        em.persist(user);
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByUserNo(user.getId());
+
+        // then
+        assertThat(vacations.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("유저 id가 null이 입력되어도 오류가 발생되면 안된다.")
+    void getVacationsByUserNoIsNull() {
+        // given
+        Long userNo = null;
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByUserNo(userNo);
+
+        // then
+        assertThat(vacations.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("해당 년도에 같은 타입으로 등록된 휴가가 있는지 확인되어야 한다.")
+    void getVacationsByTypeWithYear() {
         // given
         User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
         em.persist(user);
 
         LocalDateTime now = LocalDateTime.now();
-        String[] names = {"작년 1분기 휴가", "올해 1분기 휴가"};
-        String[] descs = {"", ""};
-        VacationType[] types = {VacationType.BASIC, VacationType.BASIC};
+        VacationType[] types = {VacationType.ANNUAL, VacationType.ANNUAL};
         BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("4.0000")};
         LocalDateTime[] occurDates = {
                 LocalDateTime.of(now.getYear() - 1, 1, 1, 0, 0, 0),
@@ -122,32 +156,183 @@ public class VacationRepositoryImplTest {
                 LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
         };
 
-        for (int i = 0; i < names.length; i++) {
-            Vacation vacation = Vacation.createVacation(user, names[i], descs[i], types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
             vacationRepositoryImpl.save(vacation);
         }
 
         // when
-        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByYear(String.valueOf(now.getYear()));
+        Optional<Vacation> vacation = vacationRepositoryImpl.findVacationByTypeWithYear(user.getId(), VacationType.ANNUAL, String.valueOf(now.getYear()));
+
+        // then
+        assertThat(vacation.isPresent()).isTrue();
+        assertThat(vacation.get().getType()).isEqualTo(VacationType.ANNUAL);
+        assertThat(vacation.get().getOccurDate()).isEqualTo(occurDates[1]);
+        assertThat(vacation.get().getExpiryDate()).isEqualTo(expiryDates[1]);
+    }
+
+    @Test
+    @DisplayName("해당 년도에 같은 타입으로 등록된 휴가가 없어도 Null이 반환되면 안된다.")
+    void getVacationsByTypeWithYearEmpty() {
+        // given
+        User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
+        em.persist(user);
+
+        LocalDateTime now = LocalDateTime.now();
+        VacationType[] types = {VacationType.ANNUAL, VacationType.OVERTIME};
+        BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("0.1250")};
+        LocalDateTime[] occurDates = {
+                LocalDateTime.of(now.getYear() - 1, 1, 1, 0, 0, 0),
+                LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0)
+        };
+        LocalDateTime[] expiryDates = {
+                LocalDateTime.of(now.getYear() - 1, 12, 31, 23, 59, 59),
+                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
+        };
+
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+            vacationRepositoryImpl.save(vacation);
+        }
+
+        // when
+        Optional<Vacation> vacation = vacationRepositoryImpl.findVacationByTypeWithYear(user.getId(), VacationType.ANNUAL, String.valueOf(now.getYear()));
+
+        // then
+        assertThat(vacation.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("vacation type이 null이 입력되어도 오류가 발생되면 안된다.")
+    void getVacationsByTypeNullWithYear() {
+        // given
+        Long userNo = 1L;
+        VacationType type = null;
+        String year = String.valueOf(LocalDateTime.now().getYear());
+
+        // when
+        Optional<Vacation> vacation = vacationRepositoryImpl.findVacationByTypeWithYear(userNo, type, year);
+
+        // then
+        assertThat(vacation.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("년도가 null이 입력되어도 오류가 발생되면 안된다.")
+    void getVacationsByTypeWithYearNull() {
+        // given
+        Long userNo = 1L;
+        VacationType type = VacationType.ANNUAL;
+        String year = null;
+
+        // when
+        Optional<Vacation> vacation = vacationRepositoryImpl.findVacationByTypeWithYear(userNo, type, year);
+
+        // then
+        assertThat(vacation.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("baseTime이 발생시간 및 유효기간 안에 해당하는 휴가들만 조회돼야 한다.")
+    void getVacationsByBaseTime() {
+        // given
+        User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
+        em.persist(user);
+
+        LocalDateTime now = LocalDateTime.now();
+        VacationType[] types = {VacationType.ANNUAL, VacationType.ANNUAL};
+        BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("4.0000")};
+        LocalDateTime[] occurDates = {
+                LocalDateTime.of(now.getYear() - 1, 1, 1, 0, 0, 0),
+                LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0)
+        };
+        LocalDateTime[] expiryDates = {
+                LocalDateTime.of(now.getYear() - 1, 12, 31, 23, 59, 59),
+                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
+        };
+
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+            vacationRepositoryImpl.save(vacation);
+        }
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTime(user.getId(), now);
 
         // then
         assertThat(vacations).hasSize(1);
-        assertThat(vacations.get(0).getName()).isEqualTo("올해 1분기 휴가");
         assertThat(vacations.get(0).getOccurDate()).isEqualTo(occurDates[1]);
         assertThat(vacations.get(0).getExpiryDate()).isEqualTo(expiryDates[1]);
     }
 
     @Test
-    @DisplayName("Today가 발생시간 및 유효기간 안에 해당하는 휴가들만 조회돼야 한다.")
-    void getVacationsByParamTime() {
+    @DisplayName("baseTime이 발생시간 및 유효기간 안에 해당하는 휴가가 없어도 Null이 반환되면 안된다.")
+    void getVacationsByBaseTimeEmpty() {
         // given
         User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
         em.persist(user);
 
         LocalDateTime now = LocalDateTime.now();
-        String[] names = {"작년 1분기 휴가", "올해 1분기 휴가"};
-        String[] descs = {"", ""};
-        VacationType[] types = {VacationType.BASIC, VacationType.BASIC};
+        VacationType[] types = {VacationType.ANNUAL, VacationType.OVERTIME};
+        BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("0.1250")};
+        LocalDateTime[] occurDates = {
+                LocalDateTime.of(now.getYear() - 1, 1, 1, 0, 0, 0),
+                LocalDateTime.of(now.getYear()-1, 1, 1, 0, 0, 0)
+        };
+        LocalDateTime[] expiryDates = {
+                LocalDateTime.of(now.getYear() - 1, 12, 31, 23, 59, 59),
+                LocalDateTime.of(now.getYear()-1, 12, 31, 23, 59, 59),
+        };
+
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+            vacationRepositoryImpl.save(vacation);
+        }
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTime(user.getId(), now);
+
+        // then
+        assertThat(vacations).isEmpty();
+    }
+
+    @Test
+    @DisplayName("userNo가 null이 입력되어도 오류가 발생되면 안된다.")
+    void getVacationsByBaseTimeUserNoNull() {
+        // given
+        Long userNo = null;
+        LocalDateTime baseTime = LocalDateTime.now();
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTime(userNo, baseTime);
+
+        // then
+        assertThat(vacations.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("baseTime이 null이 입력되어도 오류가 발생되면 안된다.")
+    void getVacationsByBaseTimeNull() {
+        // given
+        Long userNo = 1L;
+        LocalDateTime baseTime = null;
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTime(userNo, baseTime);
+
+        // then
+        assertThat(vacations.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("baseTime이 발생시간 및 유효기간 안에 해당하는 휴가가 조회돼야 한다.(history fetch join)")
+    void getVacationsByBaseTimeWithHistory() {
+        // given
+        User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
+        em.persist(user);
+
+        LocalDateTime now = LocalDateTime.now();
+        VacationType[] types = {VacationType.ANNUAL, VacationType.ANNUAL};
         BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("4.0000")};
         LocalDateTime[] occurDates = {
                 LocalDateTime.of(now.getYear() - 1, 1, 1, 0, 0, 0),
@@ -158,82 +343,171 @@ public class VacationRepositoryImplTest {
                 LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
         };
 
-        for (int i = 0; i < names.length; i++) {
-            Vacation vacation = Vacation.createVacation(user, names[i], descs[i], types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
             vacationRepositoryImpl.save(vacation);
         }
 
         // when
-        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByParameterTime(user.getId(), now);
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(user.getId(), now);
 
         // then
         assertThat(vacations).hasSize(1);
-        assertThat(vacations.get(0).getName()).isEqualTo("올해 1분기 휴가");
         assertThat(vacations.get(0).getOccurDate()).isEqualTo(occurDates[1]);
         assertThat(vacations.get(0).getExpiryDate()).isEqualTo(expiryDates[1]);
     }
 
     @Test
-    @DisplayName("Today가 발생시간 및 유효기간 안에 해당하는 휴가들과 그에 관련된 스케줄만 조회돼야 한다.")
-    void getVacationsByParamTimeWithSchedules() {
+    @DisplayName("baseTime이 발생시간 및 유효기간 안에 해당하는 휴가가 없어도 Null이 반환되면 안된다.(history fetch join)")
+    void getVacationsByBaseTimeWithHistoryEmpty() {
         // given
         User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
         em.persist(user);
 
         LocalDateTime now = LocalDateTime.now();
-        String[] names = {"작년 1분기 휴가", "올해 1분기 휴가"};
-        String[] descs = {"", ""};
-        VacationType[] types = {VacationType.BASIC, VacationType.BASIC};
-        BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("4.0000")};
+        VacationType[] types = {VacationType.ANNUAL, VacationType.OVERTIME};
+        BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("0.1250")};
         LocalDateTime[] occurDates = {
                 LocalDateTime.of(now.getYear() - 1, 1, 1, 0, 0, 0),
-                LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0)
+                LocalDateTime.of(now.getYear()-1, 1, 1, 0, 0, 0)
         };
         LocalDateTime[] expiryDates = {
                 LocalDateTime.of(now.getYear() - 1, 12, 31, 23, 59, 59),
-                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
+                LocalDateTime.of(now.getYear()-1, 12, 31, 23, 59, 59),
         };
 
-        for (int i = 0; i < names.length; i++) {
-            Vacation vacation = Vacation.createVacation(user, names[i], descs[i], types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
             vacationRepositoryImpl.save(vacation);
         }
 
         // when
-//        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByParameterTime(user.getId(), now);
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(user.getId(), now);
 
         // then
-//        assertThat(vacations).hasSize(1);
-//        assertThat(vacations.get(0).getName()).isEqualTo("올해 1분기 휴가");
-//        assertThat(vacations.get(0).getOccurDate()).isEqualTo(occurDates[1]);
-//        assertThat(vacations.get(0).getExpiryDate()).isEqualTo(expiryDates[1]);
+        assertThat(vacations).isEmpty();
     }
 
     @Test
-    @DisplayName("휴가 삭제")
-    void deleteVacation() {
+    @DisplayName("userNo가 null이 입력되어도 오류가 발생되면 안된다.(history fetch join)")
+    void getVacationsByBaseTimeWithHistoryUserNoNull() {
+        // given
+        Long userNo = null;
+        LocalDateTime baseTime = LocalDateTime.now();
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userNo, baseTime);
+
+        // then
+        assertThat(vacations.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("baseTime이 null이 입력되어도 오류가 발생되면 안된다.(history fetch join)")
+    void getVacationsByBaseTimeWithHistoryNull() {
+        // given
+        Long userNo = 1L;
+        LocalDateTime baseTime = null;
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userNo, baseTime);
+
+        // then
+        assertThat(vacations.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("vacation id목록을 조회 조건으로 사용하여 조회한다.")
+    void getVacationsByIdsWithUser() {
         // given
         User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
         em.persist(user);
 
         LocalDateTime now = LocalDateTime.now();
-        String name = "1분기 휴가";
-        String desc = "";
-        VacationType type = VacationType.BASIC;
-        BigDecimal grantTime = new BigDecimal("4.0000");
-        LocalDateTime occurDate = LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0);
-        LocalDateTime expiryDate = LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59);
+        VacationType[] types = {VacationType.ANNUAL, VacationType.OVERTIME};
+        BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("0.1250")};
+        LocalDateTime[] occurDates = {
+                LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
+                LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0)
+        };
+        LocalDateTime[] expiryDates = {
+                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
+                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
+        };
 
-        Vacation vacation = Vacation.createVacation(user, name, desc, type, grantTime, occurDate, expiryDate, 0L, "");
-        vacationRepositoryImpl.save(vacation);
+        List<Long> ids = new ArrayList<>();
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+            vacationRepositoryImpl.save(vacation);
+            ids.add(vacation.getId());
+        }
 
         // when
-        vacation.deleteVacation(0L, "");
-        em.flush();
-        em.clear();
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByIdsWithUser(ids);
 
         // then
-//        Vacation findVacation = vacationRepositoryImpl.findById(vacation.getId());
-//        assertThat(findVacation.getDelYN()).isEqualTo("Y");
+        assertThat(vacations).hasSize(2);
+        assertThat(vacations).extracting("type").containsExactlyInAnyOrder(types);
+        assertThat(vacations).extracting("remainTime").containsExactlyInAnyOrder(grantTimes);
+        assertThat(vacations).extracting("occurDate").containsExactlyInAnyOrder(occurDates);
+        assertThat(vacations).extracting("expiryDate").containsExactlyInAnyOrder(expiryDates);
+    }
+
+    @Test
+    @DisplayName("vacation id목록을 조회 조건으로 사용하여 조회한 데이터가 없어도 Null이 반환되면 안된다.")
+    void getVacationsByIdsWithUserEmpty() {
+        // given
+        User user = User.createUser("이서준", "19700723", "9 ~ 6", "ADMIN", "N");
+        em.persist(user);
+
+        LocalDateTime now = LocalDateTime.now();
+        VacationType[] types = {VacationType.ANNUAL, VacationType.OVERTIME};
+        BigDecimal[] grantTimes = {new BigDecimal("4.0000"), new BigDecimal("0.1250")};
+        LocalDateTime[] occurDates = {
+                LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
+                LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0)
+        };
+        LocalDateTime[] expiryDates = {
+                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
+                LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59),
+        };
+
+        List<Long> ids = List.of(998L, 999L);
+        for (int i = 0; i < types.length; i++) {
+            Vacation vacation = Vacation.createVacation(user, types[i], grantTimes[i], occurDates[i], expiryDates[i], 0L, "");
+            vacationRepositoryImpl.save(vacation);
+        }
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByIdsWithUser(ids);
+
+        // then
+        assertThat(vacations).isEmpty();
+    }
+
+    @Test
+    @DisplayName("vacation id목록이 비어있어도 오류가 발생되면 안된다.")
+    void getVacationsByIdsEmptyWithUser() {
+        // given
+        List<Long> ids = List.of();
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByIdsWithUser(ids);
+
+        // then
+        assertThat(vacations).isEmpty();
+    }
+
+    @Test
+    @DisplayName("vacation id목록이 null이 입력되어도 오류가 발생되면 안된다.")
+    void getVacationsByIdsNullWithUser() {
+        // given
+        List<Long> ids = null;
+
+        // when
+        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByIdsWithUser(ids);
+
+        // then
+        assertThat(vacations).isEmpty();
     }
 }
