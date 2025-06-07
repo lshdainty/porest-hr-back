@@ -91,14 +91,17 @@ public class VacationService {
         // 두 날짜 간 모든 날짜 가져오기
         List<LocalDate> betweenDates = MyhrTime.getBetweenDates(startDate, endDate);
         log.info("betweenDates : {}, weekDays : {}", betweenDates, weekDays);
+        // 사용자가 캘린더에서 선택한 날짜 중 휴일, 공휴일 제거
         betweenDates = MyhrTime.removeAllDates(betweenDates, weekDays);
         log.info("remainDays : {}", betweenDates);
 
+        // 등록하려는 총 사용시간 계산
         BigDecimal useTime = new BigDecimal("0.0000").add(type.convertToValue(betweenDates.size()));
         if (vacation.getRemainTime().compareTo(useTime) < 0) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.notEnoughRemainTime", null, null));
         }
 
+        // 휴가 사용 내역 등록
         for (LocalDate betweenDate : betweenDates) {
             VacationHistory history = VacationHistory.createUseVacationHistory(
                     vacation,
@@ -111,6 +114,7 @@ public class VacationService {
             vacationHistoryRepositoryImpl.save(history);
         }
 
+        // 사용한 휴가 차감
         vacation.deductedVacation(useTime, crtUserNo, clientIP);
 
         return vacation.getId();
@@ -147,6 +151,7 @@ public class VacationService {
                 throw new IllegalArgumentException(ms.getMessage("error.validate.notEnoughRemainTime", null, null));
             }
 
+            // 휴가 추가 내역은 삭제하고 추가된 휴가 차감
             history.deleteRegistVacationHistory(vacation, delUserNo, clientIP);
         } else {
             // 휴가 사용 내역
@@ -154,34 +159,44 @@ public class VacationService {
                 throw new IllegalArgumentException(ms.getMessage("error.validate.delete.isBeforeThanNow", null, null));
             }
 
+            // 휴가 사용 내역은 삭제하고 차감된 휴가 추가
             history.deleteUseVacationHistory(vacation, delUserNo, clientIP);
         }
     }
 
     public List<VacationServiceDto> getVacationHistoriesByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        // 기간에 맞는 history 내역 가져오기
         List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationHistorysByPeriod(startDate, endDate);
 
+        // 유저 정보 반환을 위해 vacation 정보 가져오기
         List<Vacation> vacations = vacationRepositoryImpl.findVacationsByIdsWithUser(histories.stream()
                 .map(h -> h.getVacation().getId())
                 .distinct()
                 .toList()
         );
 
+        // vacation id에 따른 user 정보 mapping
         Map<Long, User> userMap = vacations.stream()
                 .collect(Collectors.toMap(Vacation::getId, v -> v.getUser()));
 
+        // 연차인 내역만 추출
         List<VacationHistory> dayHistories = histories.stream()
                 .filter(h -> h.getType().equals(VacationTimeType.DAYOFF))
                 .collect(Collectors.toList());
 
+        // 시간단위 내역만 추출
         List<VacationHistory> hourHistories = histories.stream()
                 .filter(h -> !h.getType().equals(VacationTimeType.DAYOFF))
                 .collect(Collectors.toList());
 
+        // 연차인 경우 따로 분리된 휴가를 start - end화 하여 serviceDto로 변환
+        // 시간단위 휴가인 경우 단순 serviceDto로 변환
+        // 반환된 두 배열을 하나의 List로 합침
         List<VacationServiceDto> result = Stream.of(makeDayGroupDto(dayHistories), makeHourGroupDto(hourHistories))
                 .flatMap(Collection::stream)
                 .toList();
 
+        // controller에서 user정보를 사용할 수 있게 vacation id에 맞는 user정보 세팅
         for (VacationServiceDto dto : result) {
             dto.setUser(userMap.get(dto.getId()));
         }
