@@ -66,7 +66,7 @@ public class VacationRepositoryImplTest {
     @DisplayName("단건 조회 시 휴가가 없어도 Null이 반환되면 안된다.")
     void findByIdEmpty() {
         // given
-        Long vacationId = 1L;
+        Long vacationId = 999L;
 
         // when
         Optional<Vacation> findVacation = vacationRepositoryImpl.findById(vacationId);
@@ -103,7 +103,7 @@ public class VacationRepositoryImplTest {
         List<Vacation> vacations = vacationRepositoryImpl.findVacationsByUserNo(user.getId());
 
         // then
-        assertThat(vacations.size()).isEqualTo(2);
+        assertThat(vacations.size()).isEqualTo(types.length);
         assertThat(vacations).extracting("type").containsExactlyInAnyOrder(types);
         assertThat(vacations).extracting("remainTime").containsExactlyInAnyOrder(grantTimes);
         assertThat(vacations).extracting("occurDate").containsExactlyInAnyOrder(occurDates);
