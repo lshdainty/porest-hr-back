@@ -49,7 +49,6 @@ public class VacationService {
                     new Bereavement(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
             case OVERTIME ->
                     new Overtime(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
-            default -> throw new IllegalArgumentException("Invalid VacationType");
         };
 
         return vacationService.registVacation(userNo, desc, type, grantTime, occurDate, expiryDate, addUserNo, clientIP);
