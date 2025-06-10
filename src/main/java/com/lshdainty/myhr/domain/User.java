@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
@@ -115,12 +117,13 @@ public class User {
      * 날짜가 유저의 유연근무제에 맞춰<br>
      * 정상적으로 설정되어 있는지 확인하는 함수
      *
-     * @Param time
+     * @Param stratTime
+     * @Param endTime
      * @return true, false 반환
      */
-    public boolean isBetweenWorkTime(LocalTime time) {
+    public boolean isBetweenWorkTime(LocalTime startTime, LocalTime endTime) {
         List<LocalTime> workTimes = convertWorkTimeToLocalTime();
-        return (time.isAfter(workTimes.get(0)) || time.equals(workTimes.get(0))) &&
-                (time.isBefore(workTimes.get(1)) || time.equals(workTimes.get(1)));
+        return ((startTime.isAfter(workTimes.get(0)) || startTime.equals(workTimes.get(0))) && startTime.isBefore(workTimes.get(1))) &&
+                (endTime.isAfter(workTimes.get(0)) && (endTime.isBefore(workTimes.get(1)) || endTime.equals(workTimes.get(1))));
     }
 }

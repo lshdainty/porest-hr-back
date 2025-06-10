@@ -61,7 +61,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 추가 테스트 - 실패 (사용자 없음)")
-    void registScheduleFailUserNotFoundTest() {
+    void registScheduleFailTestNotFoundUser() {
         // Given
         Long userNo = 900L;
         ScheduleType type = ScheduleType.EDUCATION;
@@ -79,7 +79,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 추가 테스트 - 실패 (start, end 반대)")
-    void registScheduleFailStartEndTest() {
+    void registScheduleFailTestReverseStartEndDate() {
         // Given
         Long userNo = 1L;
         ScheduleType type = ScheduleType.EDUCATION;
@@ -149,7 +149,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 기간 조회 테스트 - 실패 (start, end 반대)")
-    void findSchedulesByPeriodFailTestStartEndTest() {
+    void findSchedulesByPeriodFailTestReverseStartEndDate() {
         // Given
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.minusDays(1);
@@ -184,7 +184,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 삭제 테스트 - 실패 (스케줄 없음)")
-    void deleteScheduleFailScheduleNotFoundTest() {
+    void deleteScheduleFailTestNotFoundSchedule() {
         // Given
         Long scheduleId = 900L;
         given(scheduleRepositoryImpl.findById(scheduleId)).willReturn(Optional.empty());
@@ -197,7 +197,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 삭제 테스트 - 실패 (이미 삭제된 스케줄)")
-    void deleteScheduleFailDeletedScheduleTest() {
+    void deleteScheduleFailTestDeletedSchedule() {
         // Given
         Long scheduleId = 1L;
         ScheduleType type = ScheduleType.EDUCATION;
@@ -219,7 +219,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 삭제 테스트 - 실패 (과거 스케줄)")
-    void deleteScheduleFailPastScheduleTest() {
+    void deleteScheduleFailTestPassedSchedule() {
         // Given
         Long scheduleId = 1L;
         ScheduleType type = ScheduleType.EDUCATION;

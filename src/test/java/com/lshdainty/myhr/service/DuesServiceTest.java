@@ -118,7 +118,7 @@ class DuesServiceTest {
 
     @Test
     @DisplayName("회비 삭제 테스트 - 실패 (회비 없음)")
-    void deleteDuesFailDuesNotFoundTest() {
+    void deleteDuesFailTestNotFoundDues() {
         // Given
         Long seq = 900L;
         given(duesRepositoryImpl.findById(seq)).willReturn(Optional.empty());

@@ -73,7 +73,7 @@ class HolidayServiceTest {
 
     @Test
     @DisplayName("단일 공휴일 조회 테스트 - 실패 (공휴일 없음)")
-    void findByIdFailHolidayNotFoundTest() {
+    void findByIdFailTestNotFoundHoliday() {
         // Given
         Long seq = 900L;
         given(holidayRepositoryImpl.findById(seq)).willReturn(Optional.empty());
@@ -173,7 +173,7 @@ class HolidayServiceTest {
 
     @Test
     @DisplayName("공휴일 수정 테스트 - 실패 (공휴일 없음)")
-    void editHolidayFailHolidayNotFoundTest() {
+    void editHolidayFailTestNotFoundHoliday() {
         // Given
         Long seq = 900L;
         String name = "신정";
@@ -208,7 +208,7 @@ class HolidayServiceTest {
 
     @Test
     @DisplayName("공휴일 삭제 테스트 - 실패 (공휴일 없음)")
-    void deleteHolidayFailHolidayNotFoundTest() {
+    void deleteHolidayFailTestNotFoundHoliday() {
         // Given
         Long seq = 900L;
         given(holidayRepositoryImpl.findById(seq)).willReturn(Optional.empty());

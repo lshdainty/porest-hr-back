@@ -79,7 +79,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("단건 유저 조회 테스트 - 실패 (유저 없음)")
-    void findUserFailUserNotFoundTest() {
+    void findUserFailTestNotFoundUser() {
         // Given
         Long id = 900L;
         given(userRepositoryImpl.findById(id)).willReturn(Optional.empty());
@@ -92,7 +92,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("단건 유저 조회 테스트 - 실패 (삭제된 유저 조회)")
-    void findUserFailDeletedUserTest() {
+    void findUserFailTestDeletedUser() {
         // Given
         Long id = 1L;
         String name = "이서준";
@@ -162,7 +162,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("유저 수정 테스트 - 실패 (유저 없음)")
-    void editUserFailUserNotFoundTest() {
+    void editUserFailTestNotFoundUser() {
         // Given
         Long id = 900L;
         given(userRepositoryImpl.findById(id)).willReturn(Optional.empty());
@@ -197,7 +197,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("유저 삭제 테스트 - 실패 (유저 없음)")
-    void deleteUserFailUserNotFoundTest() {
+    void deleteUserFailTestNotFoundUser() {
         // Given
         Long id = 900L;
         given(userRepositoryImpl.findById(id)).willReturn(Optional.empty());
