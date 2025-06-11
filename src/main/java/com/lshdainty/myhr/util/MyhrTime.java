@@ -1,5 +1,7 @@
 package com.lshdainty.myhr.util;
 
+import org.springframework.context.MessageSource;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,9 +32,11 @@ public class MyhrTime {
      *
      * @param start 시작시간(LocalDateTime)
      * @param end 종료시간(LocalDateTime)
+     * @param ms MessageSource
      * @return start ~ end 사이의 모든 날짜들
      */
-    public static List<LocalDate> getBetweenDates(LocalDateTime start, LocalDateTime end) {
+    public static List<LocalDate> getBetweenDates(LocalDateTime start, LocalDateTime end, MessageSource ms) {
+        if (start.isAfter(end)) throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null));
         return start.toLocalDate().datesUntil(end.toLocalDate().plusDays(1))
                 .collect(Collectors.toList());
     }
@@ -44,11 +48,15 @@ public class MyhrTime {
      * @param start 시작시간(LocalDateTime)
      * @param end 종료시간(LocalDateTime)
      * @param daysOfWeek int로 된 요일 리스트 (1 월요일 ~ 7 일요일)
+     * @param ms MessageSource
      * @return 요일에 해당하는 모든 날짜들
      */
-    public static List<LocalDate> getBetweenDatesByDayOfWeek(LocalDateTime start, LocalDateTime end, int[] daysOfWeek) {
+    public static List<LocalDate> getBetweenDatesByDayOfWeek(LocalDateTime start, LocalDateTime end, int[] daysOfWeek,  MessageSource ms) {
         List<DayOfWeek> targetDays = new ArrayList<>();
         for (int day : daysOfWeek) {
+            if (day < 1 || day > 7) {
+                throw new IllegalArgumentException(ms.getMessage("error.validate.dayOfWeek", null, null));
+            }
             targetDays.add(DayOfWeek.of(day));
         }
 

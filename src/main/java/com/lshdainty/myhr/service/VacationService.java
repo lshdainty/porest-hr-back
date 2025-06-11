@@ -72,7 +72,7 @@ public class VacationService {
         }
 
         // 주말 리스트 조회
-        List<LocalDate> weekDays = MyhrTime.getBetweenDatesByDayOfWeek(startDate, endDate, new int[]{6, 7});
+        List<LocalDate> weekDays = MyhrTime.getBetweenDatesByDayOfWeek(startDate, endDate, new int[]{6, 7}, ms);
 
         // 공휴일 리스트 조회
         List<LocalDate> holidays = holidayRepositoryImpl.findHolidaysByStartEndDateWithType(
@@ -86,7 +86,7 @@ public class VacationService {
         weekDays = MyhrTime.addAllDates(weekDays, holidays);
 
         // 두 날짜 간 모든 날짜 가져오기
-        List<LocalDate> betweenDates = MyhrTime.getBetweenDates(startDate, endDate);
+        List<LocalDate> betweenDates = MyhrTime.getBetweenDates(startDate, endDate, ms);
         log.info("betweenDates : {}, weekDays : {}", betweenDates, weekDays);
         // 사용자가 캘린더에서 선택한 날짜 중 휴일, 공휴일 제거
         betweenDates = MyhrTime.removeAllDates(betweenDates, weekDays);
