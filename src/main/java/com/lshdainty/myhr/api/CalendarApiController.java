@@ -25,7 +25,7 @@ public class CalendarApiController {
 
     @GetMapping("/api/v1/calendar/period")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    public ApiResponse getEventByPeriod(
+    public ApiResponse getEventsByPeriod(
             @RequestParam("startDate") LocalDateTime startDate,
             @RequestParam("endDate") LocalDateTime endDate) {
         List<CalendarDto> resp = new ArrayList<>();
