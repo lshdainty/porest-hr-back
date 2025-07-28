@@ -517,16 +517,16 @@ public class InitDB {
         }
 
         public void initSetDues() {
-            saveDues("이서준", 10000, DuesType.PLUS, "20250104", "생일비");
-            saveDues("김서연", 10000, DuesType.PLUS, "20250104", "생일비");
-            saveDues("김지후", 10000, DuesType.PLUS, "20250104", "생일비");
-            saveDues("이준우", 10000, DuesType.PLUS, "20250104", "생일비");
-            saveDues("조민서", 80000, DuesType.MINUS, "20250131", "생일비 출금");
-            saveDues("이하은", 10000, DuesType.PLUS, "20250204", "생일비");
-            saveDues("김서연", 10000, DuesType.PLUS, "20250204", "생일비");
-            saveDues("김지후", 10000, DuesType.PLUS, "20250204", "생일비");
-            saveDues("이준우", 10000, DuesType.PLUS, "20250204", "생일비");
-            saveDues("조민서", 30000, DuesType.MINUS, "20250228", "생일비 출금");
+            saveDues("이서준", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250104", "생일비");
+            saveDues("김서연", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250104", "생일비");
+            saveDues("김지후", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250104", "생일비");
+            saveDues("이준우", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250104", "생일비");
+            saveDues("조민서", 80000, DuesType.BIRTH, DuesCalcType.MINUS, "20250131", "생일비 출금");
+            saveDues("이하은", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250204", "생일비");
+            saveDues("김서연", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250204", "생일비");
+            saveDues("김지후", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250204", "생일비");
+            saveDues("이준우", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250204", "생일비");
+            saveDues("조민서", 30000, DuesType.BIRTH, DuesCalcType.MINUS, "20250228", "생일비 출금");
         }
 
         public void saveMember(String id, String pwd, String name, String email, String birth, String workTime, String employ, String lunar) {
@@ -545,8 +545,8 @@ public class InitDB {
             em.persist(schedule);
         }
 
-        public void saveDues(String userName, int amount, DuesType type, String date, String detail) {
-            Dues dues = Dues.createDues(userName, amount, type, date, detail);
+        public void saveDues(String userName, int amount, DuesType type, DuesCalcType calc, String date, String detail) {
+            Dues dues = Dues.createDues(userName, amount, type, calc, date, detail);
             em.persist(dues);
         }
     }

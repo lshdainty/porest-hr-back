@@ -1,6 +1,7 @@
 package com.lshdainty.myhr.service;
 
 import com.lshdainty.myhr.domain.Dues;
+import com.lshdainty.myhr.domain.DuesCalcType;
 import com.lshdainty.myhr.domain.DuesType;
 import com.lshdainty.myhr.repository.DuesRepositoryImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -39,13 +40,14 @@ class DuesServiceTest {
         // Given
         String userName = "이서준";
         int amount = 50000;
-        DuesType type = DuesType.PLUS;
+        DuesType type = DuesType.BIRTH;
+        DuesCalcType calc = DuesCalcType.PLUS;
         String date = "20250101";
         String detail = "1월 회비";
         willDoNothing().given(duesRepositoryImpl).save(any(Dues.class));
 
         // When
-        duesService.save(userName, amount, type, date, detail);
+        duesService.save(userName, amount, type, calc, date, detail);
 
         // Then
         then(duesRepositoryImpl).should().save(any(Dues.class));
@@ -56,9 +58,9 @@ class DuesServiceTest {
     void findDuesSuccessTest() {
         // Given
         given(duesRepositoryImpl.findDues()).willReturn(List.of(
-                Dues.createDues("이서준", 50000, DuesType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김서연", 10000, DuesType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김지후", 10000, DuesType.PLUS, "20250101", "1월 회비")
+                Dues.createDues("이서준", 50000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김서연", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김지후", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비")
         ));
 
         // When
@@ -82,9 +84,9 @@ class DuesServiceTest {
         // Given
         String year = "2025";
         given(duesRepositoryImpl.findDuesByYear(year)).willReturn(List.of(
-                Dues.createDues("이서준", 50000, DuesType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김서연", 10000, DuesType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김지후", 10000, DuesType.PLUS, "20250101", "1월 회비")
+                Dues.createDues("이서준", 50000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김서연", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김지후", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비")
         ));
 
         // When
@@ -103,7 +105,7 @@ class DuesServiceTest {
     void deleteDuesSuccessTest() {
         // Given
         Long seq = 1L;
-        Dues dues = Dues.createDues("이서준", 50000, DuesType.PLUS, "20250101", "1월 회비");
+        Dues dues = Dues.createDues("이서준", 50000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비");
 
         given(duesRepositoryImpl.findById(seq)).willReturn(Optional.of(dues));
         willDoNothing().given(duesRepositoryImpl).delete(dues);

@@ -2,6 +2,7 @@ package com.lshdainty.myhr.repository;
 
 import com.lshdainty.myhr.TestConfig;
 import com.lshdainty.myhr.domain.Dues;
+import com.lshdainty.myhr.domain.DuesCalcType;
 import com.lshdainty.myhr.domain.DuesType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,12 @@ public class DuesCustomRepositoryImplTest {
         // given
         String userName = "이서준";
         int amount = 10000;
-        DuesType type = DuesType.PLUS;
+        DuesType type = DuesType.BIRTH;
+        DuesCalcType calc = DuesCalcType.PLUS;
         String date = "20250120";
         String detail = "1월 생일 회비";
 
-        Dues dues = Dues.createDues(userName, amount, type, date, detail);
+        Dues dues = Dues.createDues(userName, amount, type, calc, date, detail);
 
         // when
         duesRepositoryImpl.save(dues);

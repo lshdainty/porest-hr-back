@@ -22,10 +22,11 @@ public class DuesApiController {
                 duesDto.getDuesUserName(),
                 duesDto.getDuesAmount(),
                 duesDto.getDuesType(),
+                duesDto.getDuesCalc(),
                 duesDto.getDuesDate(),
                 duesDto.getDuesDetail()
         );
-        return ApiResponse.success(new DuesDto(duesSeq));
+        return ApiResponse.success(DuesDto.builder().duesSeq(duesSeq).build());
     }
 
     @GetMapping("/api/v1/dues")
@@ -33,13 +34,20 @@ public class DuesApiController {
         List<Dues> dues = duesService.findDuesByYear(year);
 
         List<DuesDto> resp = dues.stream()
-                .map(d -> new DuesDto(d))
+                .map(d -> DuesDto.builder()
+                        .duesSeq(d.getSeq())
+                        .duesUserName(d.getUserName())
+                        .duesAmount(d.getAmount())
+                        .duesType(d.getType())
+                        .duesCalc(d.getCalc())
+                        .duesDate(d.getDate())
+                        .duesDetail(d.getDetail())
+                        .build())
                 .collect(Collectors.toList());
 
         int total = 0;
         for (DuesDto duesDto : resp) {
-            total = duesDto.getDuesType().applyAsType(total, duesDto.getDuesAmount());
-            duesDto.setDuesTotal(total);
+            duesDto.setDuesTotal(total = duesDto.getDuesCalc().applyAsType(total, duesDto.getDuesAmount()));
         }
 
         return ApiResponse.success(resp);

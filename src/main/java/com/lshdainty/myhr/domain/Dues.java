@@ -24,6 +24,10 @@ public class Dues {
     @Column(name = "dues_type")
     private DuesType type;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dues_calc")
+    private DuesCalcType calc;
+
     @Column(name = "dues_date")
     private String date;
 
@@ -31,11 +35,12 @@ public class Dues {
     private String detail;
 
     // 회비 생성자  (setter말고 해당 메소드 사용할 것)
-    public static Dues createDues(String userName, int amount, DuesType type, String date, String detail) {
+    public static Dues createDues(String userName, int amount, DuesType type, DuesCalcType calc, String date, String detail) {
         Dues dues = new Dues();
         dues.userName = userName;
         dues.amount = amount;
         dues.type = type;
+        dues.calc = calc;
         dues.date = date;
         dues.detail = detail;
         return dues;
