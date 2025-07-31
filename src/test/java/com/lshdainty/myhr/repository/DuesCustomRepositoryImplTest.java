@@ -33,7 +33,7 @@ public class DuesCustomRepositoryImplTest {
     void findDuesBySeq() {
         // given
         String userName = "이서준";
-        int amount = 10000;
+        Long amount = 10000L;
         DuesType type = DuesType.BIRTH;
         DuesCalcType calc = DuesCalcType.PLUS;
         String date = "20250120";

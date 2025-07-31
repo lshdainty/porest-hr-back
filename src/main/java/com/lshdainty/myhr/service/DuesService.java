@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +21,9 @@ import java.util.Optional;
 public class DuesService {
     private final MessageSource ms;
     private final DuesRepositoryImpl duesRepositoryImpl;
-    private final StandardServletMultipartResolver standardServletMultipartResolver;
 
     @Transactional
-    public Long save(String userName, long amount, DuesType type, DuesCalcType calc, String date, String detail) {
+    public Long save(String userName, Long amount, DuesType type, DuesCalcType calc, String date, String detail) {
         Dues dues = Dues.createDues(userName, amount, type, calc, date, detail);
         duesRepositoryImpl.save(dues);
         return dues.getSeq();

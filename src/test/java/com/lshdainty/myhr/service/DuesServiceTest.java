@@ -39,7 +39,7 @@ class DuesServiceTest {
     void saveDuesSuccessTest() {
         // Given
         String userName = "이서준";
-        int amount = 50000;
+        Long amount = 50000L;
         DuesType type = DuesType.BIRTH;
         DuesCalcType calc = DuesCalcType.PLUS;
         String date = "20250101";
@@ -58,9 +58,9 @@ class DuesServiceTest {
     void findDuesSuccessTest() {
         // Given
         given(duesRepositoryImpl.findDues()).willReturn(List.of(
-                Dues.createDues("이서준", 50000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김서연", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김지후", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비")
+                Dues.createDues("이서준", 50000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김서연", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김지후", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비")
         ));
 
         // When
@@ -75,7 +75,7 @@ class DuesServiceTest {
                 .containsExactly("이서준", "김서연", "김지후");
         assertThat(duesList)
                 .extracting("amount")
-                .containsExactly(50000, 10000, 10000);
+                .containsExactly(50000L, 10000L, 10000L);
     }
 
     @Test
@@ -84,9 +84,9 @@ class DuesServiceTest {
         // Given
         String year = "2025";
         given(duesRepositoryImpl.findDuesByYear(year)).willReturn(List.of(
-                Dues.createDues("이서준", 50000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김서연", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
-                Dues.createDues("김지후", 10000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비")
+                Dues.createDues("이서준", 50000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김서연", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
+                Dues.createDues("김지후", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비")
         ));
 
         // When
@@ -105,7 +105,7 @@ class DuesServiceTest {
     void deleteDuesSuccessTest() {
         // Given
         Long seq = 1L;
-        Dues dues = Dues.createDues("이서준", 50000, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비");
+        Dues dues = Dues.createDues("이서준", 50000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비");
 
         given(duesRepositoryImpl.findById(seq)).willReturn(Optional.of(dues));
         willDoNothing().given(duesRepositoryImpl).delete(dues);

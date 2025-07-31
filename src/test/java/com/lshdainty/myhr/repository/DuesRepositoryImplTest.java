@@ -32,7 +32,7 @@ class DuesRepositoryImplTest {
     void save() {
         // given
         String userName = "이서준";
-        int amount = 10000;
+        Long amount = 10000L;
         DuesType type = DuesType.OPERATION;
         DuesCalcType calc = DuesCalcType.PLUS;
         String date = "20250120";
@@ -74,7 +74,7 @@ class DuesRepositoryImplTest {
     void getDues() {
         // given
         String[] names = {"이서준" ,"조민서" ,"이준우"};
-        int[] amounts = {10000, 80000, 10000};
+        Long[] amounts = {10000L, 80000L, 10000L};
         DuesType[] types = {DuesType.BIRTH, DuesType.BIRTH, DuesType.BIRTH};
         DuesCalcType[] calcs = {DuesCalcType.PLUS, DuesCalcType.MINUS, DuesCalcType.PLUS};
         String[] dates = {"20250104", "20250131", "20250204"};
@@ -92,7 +92,7 @@ class DuesRepositoryImplTest {
         assertThat(dues.size()).isEqualTo(names.length);
         // 쿼리에서 날짜 기준으로 정렬하므로 순서까지 맞아야함
         assertThat(dues).extracting("userName").containsExactly(names);
-        assertThat(dues).extracting("amount").containsExactly(10000, 80000, 10000);
+        assertThat(dues).extracting("amount").containsExactly(10000L, 80000L, 10000L);
         assertThat(dues).extracting("type").containsExactly(types);
         assertThat(dues).extracting("calc").containsExactly(calcs);
         assertThat(dues).extracting("date").containsExactly(dates);
@@ -115,7 +115,7 @@ class DuesRepositoryImplTest {
         // given
         String year = "2025";
         String[] names = {"이서준" ,"조민서" ,"이준우"};
-        int[] amounts = {10000, 80000, 10000};
+        Long[] amounts = {10000L, 80000L, 10000L};
         DuesType[] types = {DuesType.BIRTH, DuesType.BIRTH, DuesType.BIRTH};
         DuesCalcType[] calcs = {DuesCalcType.PLUS, DuesCalcType.MINUS, DuesCalcType.PLUS};
         String[] dates = {"20241204", "20250131", "20250204"};
@@ -133,7 +133,7 @@ class DuesRepositoryImplTest {
         assertThat(dues.size()).isEqualTo(2);
         // 쿼리에서 날짜 기준으로 정렬하므로 순서까지 맞아야함
         assertThat(dues).extracting("userName").containsExactly("조민서" ,"이준우");
-        assertThat(dues).extracting("amount").containsExactly(80000, 10000);
+        assertThat(dues).extracting("amount").containsExactly(80000L, 10000L);
         assertThat(dues).extracting("type").containsExactly(DuesType.BIRTH, DuesType.BIRTH);
         assertThat(dues).extracting("calc").containsExactly(DuesCalcType.MINUS, DuesCalcType.PLUS);
         assertThat(dues).extracting("date").containsExactly("20250131", "20250204");
@@ -171,7 +171,7 @@ class DuesRepositoryImplTest {
     void deleteDues() {
         // given
         String userName = "이서준";
-        int amount = 10000;
+        Long amount = 10000L;
         DuesType type = DuesType.BIRTH;
         DuesCalcType calc = DuesCalcType.PLUS;
         String date = "20250120";
