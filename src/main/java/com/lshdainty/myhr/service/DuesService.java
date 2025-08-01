@@ -4,6 +4,7 @@ import com.lshdainty.myhr.domain.Dues;
 import com.lshdainty.myhr.domain.DuesCalcType;
 import com.lshdainty.myhr.domain.DuesType;
 import com.lshdainty.myhr.repository.DuesRepositoryImpl;
+import com.lshdainty.myhr.repository.dto.UserBirthDuesGroupMonthDto;
 import com.lshdainty.myhr.service.dto.DuesServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
