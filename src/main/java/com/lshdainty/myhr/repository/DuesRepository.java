@@ -1,7 +1,7 @@
 package com.lshdainty.myhr.repository;
 
 import com.lshdainty.myhr.domain.Dues;
-import com.lshdainty.myhr.repository.dto.UserBirthDuesGroupMonthDto;
+import com.lshdainty.myhr.repository.dto.UsersMonthBirthDuesDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +19,8 @@ public interface DuesRepository {
     List<Dues> findOperatingDuesByYear(String year);
     // 해당년도 해당월 생일비 합계 조회
     Long findBirthDuesByYearAndMonth(String year, String month);
-    // 해당년도 사용자 생일비 월별 입금 내역 조회
-    List<UserBirthDuesGroupMonthDto> findBirthDuesByYearGroupByMonth(String year);
+    // 해당년도 사용자 월별 생일비 입금내역 조회
+    List<UsersMonthBirthDuesDto> findUsersMonthBirthDues(String year);
     // 회비 삭제
     void delete(Dues dues);
 }

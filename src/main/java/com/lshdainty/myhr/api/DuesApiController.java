@@ -31,7 +31,7 @@ public class DuesApiController {
     }
 
     @GetMapping("/api/v1/dues")
-    public ApiResponse getYearDues(@RequestParam("year") String year) {
+    public ApiResponse yearDues(@RequestParam("year") String year) {
         List<Dues> dues = duesService.findDuesByYear(year);
 
         List<DuesDto> resp = dues.stream()
@@ -55,27 +55,38 @@ public class DuesApiController {
     }
 
     @GetMapping("/api/v1/dues/operation")
-    public ApiResponse getYearOperationDues(@RequestParam("year") String year) {
+    public ApiResponse yearOperationDues(@RequestParam("year") String year) {
         DuesServiceDto serviceDto = duesService.findOperatingDuesByYear(year);
         return ApiResponse.success(DuesDto.builder()
                 .totalDues(serviceDto.getTotalDues())
                 .totalDeposit(serviceDto.getTotalDeposit())
                 .totalWithdrawal(serviceDto.getTotalWithdrawal())
-                .build()
-        );
+                .build());
     }
 
     @GetMapping("/api/v1/dues/birth/month")
-    public ApiResponse getMonthBirthDues(@RequestParam("year") String year, @RequestParam("month") String month) {
+    public ApiResponse monthBirthDues(@RequestParam("year") String year, @RequestParam("month") String month) {
         Long birthDues = duesService.findBirthDuesByYearAndMonth(year, month);
         return ApiResponse.success(DuesDto.builder()
                 .birthMonthDues(birthDues)
-                .build()
-        );
+                .build());
+    }
+
+    @GetMapping("/api/v1/dues/users/birth/month")
+    public ApiResponse usersMonthBirthDues(@RequestParam("year") String year) {
+        List<DuesServiceDto> serviceDtos = duesService.findUsersMonthBirthDues(year);
+        return ApiResponse.success(serviceDtos.stream()
+                .map(d -> DuesDto.builder()
+                        .duesUserName(d.getUserName())
+                        .duesAmount(d.getAmount())
+                        .month(d.getDate())
+                        .duesDetail(d.getDetail())
+                        .build())
+                .collect(Collectors.toList()));
     }
 
     @DeleteMapping("/api/v1/dues/{seq}")
-    public ApiResponse deleteHoliday(@PathVariable("seq") Long seq) {
+    public ApiResponse deleteDues(@PathVariable("seq") Long seq) {
         duesService.deleteDues(seq);
         return ApiResponse.success();
     }

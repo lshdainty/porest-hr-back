@@ -26,4 +26,6 @@ public class DuesDto {
     private Long totalWithdrawal;
 
     private Long birthMonthDues;
+
+    private String month;
 }

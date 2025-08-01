@@ -4,7 +4,7 @@ import com.lshdainty.myhr.domain.Dues;
 import com.lshdainty.myhr.domain.DuesCalcType;
 import com.lshdainty.myhr.domain.DuesType;
 import com.lshdainty.myhr.repository.DuesRepositoryImpl;
-import com.lshdainty.myhr.repository.dto.UserBirthDuesGroupMonthDto;
+import com.lshdainty.myhr.repository.dto.UsersMonthBirthDuesDto;
 import com.lshdainty.myhr.service.dto.DuesServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +61,18 @@ public class DuesService {
 
     public Long findBirthDuesByYearAndMonth(String year, String month) {
         return duesRepositoryImpl.findBirthDuesByYearAndMonth(year, month);
+    }
+
+    public List<DuesServiceDto> findUsersMonthBirthDues(String year) {
+        List<UsersMonthBirthDuesDto> repositoryDtos = duesRepositoryImpl.findUsersMonthBirthDues(year);
+        return repositoryDtos.stream()
+                .map(d -> DuesServiceDto.builder()
+                        .userName(d.getUserName())
+                        .date(d.getMonth())
+                        .amount(d.getAmount())
+                        .detail(d.getDetail())
+                        .build())
+                .toList();
     }
 
     @Transactional
