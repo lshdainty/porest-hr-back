@@ -25,8 +25,15 @@ public class DuesService {
     private final DuesRepositoryImpl duesRepositoryImpl;
 
     @Transactional
-    public Long save(String userName, Long amount, DuesType type, DuesCalcType calc, String date, String detail) {
-        Dues dues = Dues.createDues(userName, amount, type, calc, date, detail);
+    public Long save(DuesServiceDto data) {
+        Dues dues = Dues.createDues(
+                data.getUserName(),
+                data.getAmount(),
+                data.getType(),
+                data.getCalc(),
+                data.getDate(),
+                data.getDetail()
+        );
         duesRepositoryImpl.save(dues);
         return dues.getSeq();
     }
@@ -112,6 +119,19 @@ public class DuesService {
                         .detail(d.getDetail())
                         .build())
                 .toList();
+    }
+
+    @Transactional
+    public void editDues(DuesServiceDto data) {
+        Dues dues = checkDuesExist(data.getSeq());
+        dues.updateDues(
+                data.getUserName(),
+                data.getAmount(),
+                data.getType(),
+                data.getCalc(),
+                data.getDate(),
+                data.getDetail()
+        );
     }
 
     @Transactional

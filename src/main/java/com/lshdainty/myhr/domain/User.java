@@ -50,7 +50,13 @@ public class User {
     @OneToMany(mappedBy = "user")   // JPA에서는 mappedBy는 읽기 전용
     private List<Vacation> vacations  =  new ArrayList<>();
 
-    // 유저 생성자 (setter말고 해당 메소드 사용할 것)
+    /**
+     * 유저 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 유저 생성할 것
+     *
+     * @return User
+     */
     public static User createUser(String id, String pwd, String name, String email, String birth, String employ, String workTime, String lunarYN) {
         User user = new User();
         user.id = id;
@@ -72,7 +78,11 @@ public class User {
         return user;
     }
 
-    // 유저 수정 (setter말고 해당 메소드 사용할 것)
+    /**
+     * 유저 수정 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 유저 수정할 것
+     */
     public void updateUser(String name, String email, String birth, String employ, String workTime, String lunarYN, RoleType role) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(email)) { this.email = email; }
@@ -83,7 +93,11 @@ public class User {
         if (!Objects.isNull(role)) { this.role = role; }
     }
 
-    // 유저 삭제 (setter말고 해당 메소드 사용할 것)
+    /**
+     * 유저 삭제 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 유저 삭제할 것
+     */
     public void deleteUser() {
         this.delYN = "Y";
     }

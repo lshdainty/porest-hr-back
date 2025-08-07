@@ -40,9 +40,11 @@ public class Schedule extends AuditingFields {
     private String delYN;
 
     /**
-     * 스케줄 생성자
-     * 최초 스케줄 생성시 사용하는 생성자
-     * Setter를 사용하지 말고 해당 생성자를 통해 생성 및 사용할 것
+     * 스케줄 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 스케줄 생성할 것
+     *
+     * @return Schedule
      */
     public static Schedule createSchedule(User user, String desc, ScheduleType type, LocalDateTime startDate, LocalDateTime endDate, String crtUserId, String clientIP) {
         Schedule schedule = new Schedule();
@@ -57,8 +59,9 @@ public class Schedule extends AuditingFields {
     }
 
     /**
-     * 스케줄 삭제
-     * Setter를 사용하지 말고 해당 메소드를 통해 설정할 것
+     * 스케줄 삭제 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 스케줄 삭제할 것
      */
     public void deleteSchedule(String mdfUserId, String clientIP) {
         this.delYN = "Y";

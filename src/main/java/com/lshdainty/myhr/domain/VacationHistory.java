@@ -51,9 +51,11 @@ public class VacationHistory extends AuditingFields {
     }
 
     /**
-     * 휴가 등록 내역 생성자
-     * 휴가 등록에 따른 History 내역을 생성해주는 생성자
-     * Setter를 사용하지 말고 해당 생성자를 통해 생성 및 사용할 것
+     * 휴가 등록 내역 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 휴가 등록 내역 생성할 것
+     *
+     * @return VacationHistory
      */
     public static VacationHistory createRegistVacationHistory(Vacation vacation, String desc, BigDecimal grantTime, String crtUserId, String clientIP) {
         VacationHistory vacationHistory = new VacationHistory();
@@ -66,9 +68,11 @@ public class VacationHistory extends AuditingFields {
     }
 
     /**
-     * 휴가 사용 내역 생성자
-     * 휴가 사용에 따른 History 내역을 생성해주는 생성자
-     * Setter를 사용하지 말고 해당 생성자를 통해 생성 및 사용할 것
+     * 휴가 사용 내역 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 휴가 사용 내역 생성할 것
+     *
+     * @return VacationHistory
      */
     public static VacationHistory createUseVacationHistory(Vacation vacation, String desc, VacationTimeType type, LocalDateTime usedDateTime, String crtUserId, String clientIP) {
         VacationHistory vacationHistory = new VacationHistory();
@@ -82,8 +86,9 @@ public class VacationHistory extends AuditingFields {
     }
 
     /**
-     * 휴가 추가 내역 삭제
-     * Setter를 사용하지 말고 해당 메소드를 통해 설정할 것
+     * 휴가 추가 내역 삭제 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 휴가 추가 내역 삭제할 것
      */
     public void deleteRegistVacationHistory(Vacation vacation, String mdfUserId, String clientIP) {
         vacation.deductedVacation(getGrantTime(), mdfUserId, clientIP);
@@ -92,8 +97,9 @@ public class VacationHistory extends AuditingFields {
     }
 
     /**
-     * 휴가 사용 내역 삭제
-     * Setter를 사용하지 말고 해당 메소드를 통해 설정할 것
+     * 휴가 사용 내역 삭제 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 휴가 사용 내역 삭제할 것
      */
     public void deleteUseVacationHistory(Vacation vacation,String mdfUserId, String clientIP) {
         vacation.addVacation(getType().convertToValue(1), mdfUserId, clientIP);

@@ -3,6 +3,7 @@ package com.lshdainty.myhr.service;
 import com.lshdainty.myhr.domain.Dues;
 import com.lshdainty.myhr.domain.DuesCalcType;
 import com.lshdainty.myhr.domain.DuesType;
+import com.lshdainty.myhr.domain.Vacation;
 import com.lshdainty.myhr.repository.DuesRepositoryImpl;
 import com.lshdainty.myhr.repository.dto.UsersMonthBirthDuesDto;
 import com.lshdainty.myhr.service.dto.DuesServiceDto;
@@ -49,7 +50,15 @@ class DuesServiceTest {
         willDoNothing().given(duesRepositoryImpl).save(any(Dues.class));
 
         // When
-        duesService.save(userName, amount, type, calc, date, detail);
+        duesService.save(DuesServiceDto.builder()
+                .userName(userName)
+                .amount(amount)
+                .type(type)
+                .calc(calc)
+                .date(date)
+                .detail(detail)
+                .build()
+        );
 
         // Then
         then(duesRepositoryImpl).should().save(any(Dues.class));
@@ -158,6 +167,51 @@ class DuesServiceTest {
     }
 
     @Test
+    @DisplayName("회비 수정 테스트 - 성공")
+    void editDuesSuccessTest() {
+        // Given
+        Long seq = 1L;
+        String userName = "이서준";
+        Long amount = 10000L;
+        DuesType type = DuesType.BIRTH;
+        DuesCalcType calc = DuesCalcType.PLUS;
+        String date = "20250101";
+        String detail = "1월 회비";
+        Dues dues = Dues.createDues(userName, amount, type, calc, date, detail);
+
+        setDuesSeq(dues, seq);
+        given(duesRepositoryImpl.findById(seq)).willReturn(Optional.of(dues));
+
+        // When
+        duesService.editDues(DuesServiceDto.builder()
+                .seq(seq)
+                .userName("이민서")
+                .build());
+
+        // Then
+        then(duesRepositoryImpl).should().findById(seq);
+        assertThat(dues.getUserName()).isEqualTo("이민서");
+        assertThat(dues.getAmount()).isEqualTo(amount);
+        assertThat(dues.getType()).isEqualTo(type);
+        assertThat(dues.getCalc()).isEqualTo(calc);
+        assertThat(dues.getDate()).isEqualTo(date);
+        assertThat(dues.getDetail()).isEqualTo(detail);
+    }
+
+    @Test
+    @DisplayName("회비 수정 테스트 - 실패 (회비 없음)")
+    void editDuesFailTestNotFoundDues() {
+        // Given
+        Long seq = 900L;
+        DuesServiceDto data = DuesServiceDto.builder().seq(seq).build();
+        given(duesRepositoryImpl.findById(seq)).willReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> duesService.editDues(data));
+        then(duesRepositoryImpl).should().findById(seq);
+    }
+
+    @Test
     @DisplayName("회비 삭제 테스트 - 성공")
     void deleteDuesSuccessTest() {
         // Given
@@ -186,5 +240,16 @@ class DuesServiceTest {
         assertThrows(IllegalArgumentException.class, () -> duesService.deleteDues(seq));
         then(duesRepositoryImpl).should().findById(seq);
         then(duesRepositoryImpl).should(never()).delete(any(Dues.class));
+    }
+
+    // 테스트 헬퍼 메서드
+    private void setDuesSeq(Dues dues, Long seq) {
+        try {
+            java.lang.reflect.Field field = Dues.class.getDeclaredField("seq");
+            field.setAccessible(true);
+            field.set(dues, seq);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

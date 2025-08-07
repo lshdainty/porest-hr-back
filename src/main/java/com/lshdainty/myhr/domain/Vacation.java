@@ -48,9 +48,11 @@ public class Vacation extends AuditingFields {
     }
 
     /**
-     * 휴가 생성자
-     * 최초 휴가 생성시 사용하는 생성자
-     * Setter를 사용하지 말고 해당 생성자를 통해 생성 및 사용할 것
+     * 휴가 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 휴가 생성할 것
+     *
+     * @return Vacation
      */
     public static Vacation createVacation(User user, VacationType type, BigDecimal grantTime, LocalDateTime occurDate, LocalDateTime expiryDate, String crtUserId, String clientIP) {
         Vacation vacation = new Vacation();

@@ -29,7 +29,13 @@ public class Holiday {
     @NotNull
     private HolidayType type;
 
-    // 휴일 생성자 (setter말고 해당 메소드 사용할 것)
+    /**
+     * 공휴일 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 공휴일 생성할 것
+     *
+     * @return Dues
+     */
     public static Holiday createHoliday(String name, String date, HolidayType type) {
         Holiday holiday = new Holiday();
         holiday.name = name;
@@ -38,7 +44,11 @@ public class Holiday {
         return holiday;
     }
 
-    // 휴일 수정 (setter말고 해당 메소드 사용할 것)
+    /**
+     * 공휴일 수정 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 공휴일 수정할 것
+     */
     public void updateHoliday(String name, String date, HolidayType type) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(date)) { this.date = date; }

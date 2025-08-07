@@ -21,14 +21,15 @@ public class DuesApiController {
     private final DuesService duesService;
 
     @PostMapping("/api/v1/dues")
-    public ApiResponse registDues(@RequestBody DuesDto duesDto) {
-        Long duesSeq = duesService.save(
-                duesDto.getDuesUserName(),
-                duesDto.getDuesAmount(),
-                duesDto.getDuesType(),
-                duesDto.getDuesCalc(),
-                duesDto.getDuesDate(),
-                duesDto.getDuesDetail()
+    public ApiResponse registDues(@RequestBody DuesDto data) {
+        Long duesSeq = duesService.save(DuesServiceDto.builder()
+                .userName(data.getDuesUserName())
+                .amount(data.getDuesAmount())
+                .type(data.getDuesType())
+                .calc(data.getDuesCalc())
+                .date(data.getDuesDate())
+                .detail(data.getDuesDetail())
+                .build()
         );
         return ApiResponse.success(DuesDto.builder().duesSeq(duesSeq).build());
     }
@@ -96,6 +97,21 @@ public class DuesApiController {
                 .collect(Collectors.toList());
 
         return ApiResponse.success(resp);
+    }
+
+    @PutMapping("/api/v1/dues/{seq}")
+    public ApiResponse editDues(@PathVariable("seq") Long seq, @RequestBody DuesDto data) {
+        duesService.editDues(DuesServiceDto.builder()
+                .seq(seq)
+                .userName(data.getDuesUserName())
+                .amount(data.getDuesAmount())
+                .type(data.getDuesType())
+                .calc(data.getDuesCalc())
+                .date(data.getDuesDate())
+                .detail(data.getDuesDetail())
+                .build()
+        );
+        return ApiResponse.success();
     }
 
     @DeleteMapping("/api/v1/dues/{seq}")
