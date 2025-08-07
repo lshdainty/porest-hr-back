@@ -4,12 +4,12 @@ import com.lshdainty.myhr.domain.RoleType;
 import com.lshdainty.myhr.domain.User;
 import com.lshdainty.myhr.dto.UserDto;
 import com.lshdainty.myhr.service.UserService;
+import com.lshdainty.myhr.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,16 +18,17 @@ public class UserApiController {
     private final UserService userService;
 
     @PostMapping("/api/v1/user")
-    public ApiResponse join(@RequestBody UserDto userDto) {
-        String userId = userService.join(
-                userDto.getUserId(),
-                userDto.getUserPwd(),
-                userDto.getUserName(),
-                userDto.getUserEmail(),
-                userDto.getUserBirth(),
-                userDto.getUserEmploy(),
-                userDto.getUserWorkTime(),
-                userDto.getLunarYN()
+    public ApiResponse join(@RequestBody UserDto data) {
+        String userId = userService.join(UserServiceDto.builder()
+                .id(data.getUserId())
+                .pwd(data.getUserPwd())
+                .name(data.getUserName())
+                .email(data.getUserEmail())
+                .birth(data.getUserBirth())
+                .employ(data.getUserEmploy())
+                .workTime(data.getUserWorkTime())
+                .lunarYN(data.getLunarYN())
+                .build()
         );
 
         return ApiResponse.success(UserDto.builder().userId(userId).build());
@@ -74,16 +75,17 @@ public class UserApiController {
     }
 
     @PutMapping("/api/v1/user/{id}")
-    public ApiResponse editUser(@PathVariable("id") String userId, @RequestBody UserDto userDto) {
-        userService.editUser(
-                userId,
-                userDto.getUserName(),
-                userDto.getUserEmail(),
-                userDto.getUserBirth(),
-                userDto.getUserEmploy(),
-                userDto.getUserWorkTime(),
-                userDto.getLunarYN(),
-                RoleType.valueOf(userDto.getUserRole())
+    public ApiResponse editUser(@PathVariable("id") String userId, @RequestBody UserDto data) {
+        userService.editUser(UserServiceDto.builder()
+                .id(userId)
+                .name(data.getUserName())
+                .email(data.getUserEmail())
+                .birth(data.getUserBirth())
+                .employ(data.getUserEmploy())
+                .workTime(data.getUserWorkTime())
+                .lunarYN(data.getLunarYN())
+                .role(RoleType.valueOf(data.getUserRole()))
+                .build()
         );
 
         User findUser = userService.findUser(userId);

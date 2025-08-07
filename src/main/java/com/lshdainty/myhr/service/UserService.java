@@ -1,8 +1,8 @@
 package com.lshdainty.myhr.service;
 
-import com.lshdainty.myhr.domain.RoleType;
 import com.lshdainty.myhr.domain.User;
 import com.lshdainty.myhr.repository.UserRepositoryImpl;
+import com.lshdainty.myhr.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -22,8 +21,17 @@ public class UserService {
     private final UserRepositoryImpl userRepositoryImpl;
 
     @Transactional
-    public String join(String id, String pwd, String name, String email, String birth, String employ, String workTime, String lunar) {
-        User user = User.createUser(id, pwd, name, email, birth, employ, workTime, lunar);
+    public String join(UserServiceDto data) {
+        User user = User.createUser(
+                data.getId(),
+                data.getPwd(),
+                data.getName(),
+                data.getEmail(),
+                data.getBirth(),
+                data.getEmploy(),
+                data.getWorkTime(),
+                data.getLunarYN()
+        );
         userRepositoryImpl.save(user);
         return user.getId();
     }
@@ -37,9 +45,17 @@ public class UserService {
     }
 
     @Transactional
-    public void editUser(String userId, String name, String email, String birth, String employ, String workTime, String lunar, RoleType role) {
-        User user = checkUserExist(userId);
-        user.updateUser(name, email, birth, employ, workTime, lunar, role);
+    public void editUser(UserServiceDto data) {
+        User user = checkUserExist(data.getId());
+        user.updateUser(
+                data.getName(),
+                data.getEmail(),
+                data.getBirth(),
+                data.getEmploy(),
+                data.getWorkTime(),
+                data.getLunarYN(),
+                data.getRole()
+        );
     }
 
     @Transactional
