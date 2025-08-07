@@ -14,14 +14,16 @@ import java.time.LocalDateTime;
 @Builder
 public class ScheduleServiceDto {
     private Long id;
-    private User user;
-    private Vacation vacation;
+    private String userId;
     private ScheduleType type;
     private String desc;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String delYN;
     private BigDecimal realUsedTime;
+
+    private User user;
+    private Vacation vacation;
 
     @Override
     public String toString() {

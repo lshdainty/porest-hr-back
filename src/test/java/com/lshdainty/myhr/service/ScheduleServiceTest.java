@@ -2,6 +2,7 @@ package com.lshdainty.myhr.service;
 
 import com.lshdainty.myhr.domain.*;
 import com.lshdainty.myhr.repository.ScheduleRepositoryImpl;
+import com.lshdainty.myhr.service.dto.ScheduleServiceDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,13 +47,21 @@ class ScheduleServiceTest {
         LocalDateTime end = start.plusDays(1);
 
         User user = User.createUser(userId);
-        Schedule.createSchedule(user, desc, type, start, end, "", "127.0.0.1");
 
         given(userService.checkUserExist(userId)).willReturn(user);
         willDoNothing().given(scheduleRepositoryImpl).save(any(Schedule.class));
 
         // When
-        scheduleService.registSchedule(userId, type, desc, start, end, "", "127.0.0.1");
+        scheduleService.registSchedule(ScheduleServiceDto.builder()
+                .userId(userId)
+                .type(type)
+                .desc(desc)
+                .startDate(start)
+                .endDate(end)
+                .build(),
+                "",
+                "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -64,16 +73,13 @@ class ScheduleServiceTest {
     void registScheduleFailTestNotFoundUser() {
         // Given
         String userId = "test2";
-        ScheduleType type = ScheduleType.EDUCATION;
-        String desc = "교육";
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = start.plusDays(1);
 
         given(userService.checkUserExist(userId)).willThrow(new IllegalArgumentException(""));
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () ->
-                scheduleService.registSchedule(userId, type, desc, start, end, "", "127.0.0.1"));
+        assertThrows(IllegalArgumentException.class, () -> scheduleService.registSchedule(
+                ScheduleServiceDto.builder().userId(userId).build(), "", "127.0.0.1")
+        );
         then(userService).should().checkUserExist(userId);
     }
 
@@ -92,8 +98,17 @@ class ScheduleServiceTest {
         given(userService.checkUserExist(userId)).willReturn(user);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () ->
-                scheduleService.registSchedule(userId, type, desc, start, end, "", "127.0.0.1"));
+        assertThrows(IllegalArgumentException.class, () -> scheduleService.registSchedule(
+                ScheduleServiceDto.builder()
+                        .userId(userId)
+                        .type(type)
+                        .desc(desc)
+                        .startDate(start)
+                        .endDate(end)
+                        .build(),
+                "",
+                "127.0.0.1")
+        );
         then(userService).should().checkUserExist(userId);
     }
 

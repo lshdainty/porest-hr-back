@@ -3,6 +3,7 @@ package com.lshdainty.myhr.api;
 import com.lshdainty.myhr.domain.Schedule;
 import com.lshdainty.myhr.dto.ScheduleDto;
 import com.lshdainty.myhr.service.ScheduleService;
+import com.lshdainty.myhr.service.dto.ScheduleServiceDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,14 @@ public class ScheduleApiController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/api/v1/schedule")
-    public ApiResponse registSchedule(@RequestBody ScheduleDto scheduleDto, HttpServletRequest req) {
-        Long scheduleId = scheduleService.registSchedule(
-                scheduleDto.getUserId(),
-                scheduleDto.getScheduleType(),
-                scheduleDto.getScheduleDesc(),
-                scheduleDto.getStartDate(),
-                scheduleDto.getEndDate(),
+    public ApiResponse registSchedule(@RequestBody ScheduleDto data, HttpServletRequest req) {
+        Long scheduleId = scheduleService.registSchedule(ScheduleServiceDto.builder()
+                .userId(data.getUserId())
+                .type(data.getScheduleType())
+                .desc(data.getScheduleDesc())
+                .startDate(data.getStartDate())
+                .endDate(data.getEndDate())
+                .build(),
                 "", // 추후 로그인한 유저의 id를 가져와서 여기에다 넣을 것
                 req.getRemoteAddr()
         );

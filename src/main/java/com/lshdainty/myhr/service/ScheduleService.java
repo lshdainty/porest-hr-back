@@ -2,6 +2,7 @@ package com.lshdainty.myhr.service;
 
 import com.lshdainty.myhr.domain.*;
 import com.lshdainty.myhr.repository.*;
+import com.lshdainty.myhr.service.dto.ScheduleServiceDto;
 import com.lshdainty.myhr.util.MyhrTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,21 @@ public class ScheduleService {
     private final UserService userService;
 
     @Transactional
-    public Long registSchedule(String userId, ScheduleType type, String desc, LocalDateTime start, LocalDateTime end, String crtUserId, String clientIP) {
+    public Long registSchedule(ScheduleServiceDto data, String crtUserId, String clientIP) {
         // 유저 조회
-        User user = userService.checkUserExist(userId);
+        User user = userService.checkUserExist(data.getUserId());
 
-        if (MyhrTime.isAfterThanEndDate(start, end)) { throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null)); }
+        if (MyhrTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) { throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null)); }
 
-        Schedule schedule = Schedule.createSchedule(user, desc, type, start, end, crtUserId, clientIP);
+        Schedule schedule = Schedule.createSchedule(
+                user,
+                data.getDesc(),
+                data.getType(),
+                data.getStartDate(),
+                data.getEndDate(),
+                crtUserId,
+                clientIP
+        );
 
         // 휴가 등록
         scheduleRepositoryImpl.save(schedule);
