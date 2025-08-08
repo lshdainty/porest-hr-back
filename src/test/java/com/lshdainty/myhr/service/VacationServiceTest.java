@@ -71,7 +71,17 @@ class VacationServiceTest {
         willDoNothing().given(vacationHistoryRepositoryImpl).save(any(VacationHistory.class));
 
         // When
-        vacationService.registVacation(userId, desc, type, grantTime, occurDate, expiryDate, "", "127.0.0.1");
+        vacationService.registVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .desc(desc)
+                        .type(type)
+                        .grantTime(grantTime)
+                        .occurDate(occurDate)
+                        .expiryDate(expiryDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -102,7 +112,17 @@ class VacationServiceTest {
         willDoNothing().given(vacationHistoryRepositoryImpl).save(any(VacationHistory.class));
 
         // When
-        vacationService.registVacation(userId, desc, type, grantTime, occurDate, expiryDate, "", "127.0.0.1");
+        vacationService.registVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .desc(desc)
+                        .type(type)
+                        .grantTime(grantTime)
+                        .occurDate(occurDate)
+                        .expiryDate(expiryDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -137,7 +157,17 @@ class VacationServiceTest {
         willDoNothing().given(vacationHistoryRepositoryImpl).save(any(VacationHistory.class));
 
         // When
-        vacationService.registVacation(userId, desc, type, grantTime, occurDate, expiryDate, "", "127.0.0.1");
+        vacationService.registVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .desc(desc)
+                        .type(type)
+                        .grantTime(grantTime)
+                        .occurDate(occurDate)
+                        .expiryDate(expiryDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -164,7 +194,17 @@ class VacationServiceTest {
         willDoNothing().given(vacationHistoryRepositoryImpl).save(any(VacationHistory.class));
 
         // When
-        vacationService.registVacation(userId, desc, type, grantTime, occurDate, expiryDate, "", "127.0.0.1");
+        vacationService.registVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .desc(desc)
+                        .type(type)
+                        .grantTime(grantTime)
+                        .occurDate(occurDate)
+                        .expiryDate(expiryDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -191,7 +231,17 @@ class VacationServiceTest {
         willDoNothing().given(vacationHistoryRepositoryImpl).save(any(VacationHistory.class));
 
         // When
-        vacationService.registVacation(userId, desc, type, grantTime, occurDate, expiryDate, "", "127.0.0.1");
+        vacationService.registVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .desc(desc)
+                        .type(type)
+                        .grantTime(grantTime)
+                        .occurDate(occurDate)
+                        .expiryDate(expiryDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -223,7 +273,17 @@ class VacationServiceTest {
         willDoNothing().given(vacationHistoryRepositoryImpl).save(any(VacationHistory.class));
 
         // When
-        vacationService.registVacation(userId, desc, type, grantTime, occurDate, expiryDate, "", "127.0.0.1");
+        vacationService.registVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .desc(desc)
+                        .type(type)
+                        .grantTime(grantTime)
+                        .occurDate(occurDate)
+                        .expiryDate(expiryDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -254,7 +314,17 @@ class VacationServiceTest {
         willDoNothing().given(vacationHistoryRepositoryImpl).save(any(VacationHistory.class));
 
         // When
-        vacationService.registVacation(userId, desc, type, grantTime, occurDate, expiryDate, "", "127.0.0.1");
+        vacationService.registVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .desc(desc)
+                        .type(type)
+                        .grantTime(grantTime)
+                        .occurDate(occurDate)
+                        .expiryDate(expiryDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -298,7 +368,17 @@ class VacationServiceTest {
         )).willReturn(List.of(holiday));
 
         // When
-        vacationService.useVacation(userId, vacationId, desc, timeType, startDate, endDate, "", "127.0.0.1");
+        vacationService.useVacation(
+                VacationServiceDto.builder()
+                        .userId(userId)
+                        .id(vacationId)
+                        .desc(desc)
+                        .timeType(timeType)
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .build(),
+                "", "127.0.0.1"
+        );
 
         // Then
         then(userService).should().checkUserExist(userId);
@@ -330,7 +410,17 @@ class VacationServiceTest {
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
-                vacationService.useVacation(userId, vacationId, desc, timeType, startDate, endDate, "", "127.0.0.1"));
+                vacationService.useVacation(
+                        VacationServiceDto.builder()
+                                .userId(userId)
+                                .id(vacationId)
+                                .desc(desc)
+                                .timeType(timeType)
+                                .startDate(startDate)
+                                .endDate(endDate)
+                                .build(),
+                        "", "127.0.0.1"
+                ));
     }
 
     @Test
@@ -356,7 +446,17 @@ class VacationServiceTest {
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
-                vacationService.useVacation(userId, vacationId, desc, timeType, startDate, endDate, "", "127.0.0.1"));
+                vacationService.useVacation(
+                        VacationServiceDto.builder()
+                                .userId(userId)
+                                .id(vacationId)
+                                .desc(desc)
+                                .timeType(timeType)
+                                .startDate(startDate)
+                                .endDate(endDate)
+                                .build(),
+                        "", "127.0.0.1"
+                ));
     }
 
     @Test
@@ -382,7 +482,17 @@ class VacationServiceTest {
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
-                vacationService.useVacation(userId, vacationId, desc, timeType, startDate, endDate, "", "127.0.0.1"));
+                vacationService.useVacation(
+                        VacationServiceDto.builder()
+                                .userId(userId)
+                                .id(vacationId)
+                                .desc(desc)
+                                .timeType(timeType)
+                                .startDate(startDate)
+                                .endDate(endDate)
+                                .build(),
+                        "", "127.0.0.1"
+                ));
     }
 
     @Test
@@ -413,7 +523,17 @@ class VacationServiceTest {
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
-                vacationService.useVacation(userId, vacationId, desc, timeType, startDate, endDate, "", "127.0.0.1"));
+                vacationService.useVacation(
+                        VacationServiceDto.builder()
+                                .userId(userId)
+                                .id(vacationId)
+                                .desc(desc)
+                                .timeType(timeType)
+                                .startDate(startDate)
+                                .endDate(endDate)
+                                .build(),
+                        "", "127.0.0.1"
+                ));
     }
 
     @Test

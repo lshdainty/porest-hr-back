@@ -55,7 +55,6 @@ public class VacationService {
     }
 
     @Transactional
-//    public Long useVacation(String userId, Long vacatoinId, String desc, VacationTimeType type, LocalDateTime startDate, LocalDateTime endDate, String crtUserId, String clientIP) {
     public Long useVacation(VacationServiceDto data, String crtUserId, String clientIP) {
         User user = userService.checkUserExist(data.getUserId());
         Vacation vacation = checkVacationExist(data.getId());

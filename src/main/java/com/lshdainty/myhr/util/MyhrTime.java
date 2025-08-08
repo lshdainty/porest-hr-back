@@ -5,11 +5,7 @@ import org.springframework.context.MessageSource;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MyhrTime {
@@ -51,7 +47,7 @@ public class MyhrTime {
      * @param ms MessageSource
      * @return 요일에 해당하는 모든 날짜들
      */
-    public static List<LocalDate> getBetweenDatesByDayOfWeek(LocalDateTime start, LocalDateTime end, int[] daysOfWeek,  MessageSource ms) {
+    public static List<LocalDate> getBetweenDatesByDayOfWeek(LocalDateTime start, LocalDateTime end, int[] daysOfWeek, MessageSource ms) {
         List<DayOfWeek> targetDays = new ArrayList<>();
         for (int day : daysOfWeek) {
             if (day < 1 || day > 7) {
@@ -111,18 +107,17 @@ public class MyhrTime {
      * 가장 큰 시간 값을 반환하는 함수
      *
      * @param dateTimes 시간 리스트
+     * @param ms MessageSource
      * @return LocalDateTime 타입의 가장 큰 시간
      */
-    public LocalDateTime findMaxDateTime(List<LocalDateTime> dateTimes) {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    public static LocalDateTime findMaxDateTime(List<LocalDateTime> dateTimes, MessageSource ms) {
+        if (dateTimes == null || dateTimes.isEmpty()) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.parameter.null", null, null));
+        }
 
-        int maxDateTimeInt = dateTimes.stream()
-                .map(t -> t.format(dateTimeFormat))
-                .mapToInt(Integer::parseInt)
-                .summaryStatistics()
-                .getMax();
-
-        return LocalDateTime.parse(Integer.toString(maxDateTimeInt), dateTimeFormat);
+        return dateTimes.stream()
+                .max(LocalDateTime::compareTo)
+                .orElseThrow(() -> new NoSuchElementException(ms.getMessage("error.notfound.max", null, null)));
     }
 
     /**
@@ -130,17 +125,16 @@ public class MyhrTime {
      * 가장 작은 시간 값을 반환하는 함수
      *
      * @param dateTimes 시간 리스트
+     * @param ms MessageSource
      * @return LocalDateTime 타입의 가장 작은 시간
      */
-    public LocalDateTime findMinDateTime(List<LocalDateTime> dateTimes) {
-        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    public static LocalDateTime findMinDateTime(List<LocalDateTime> dateTimes, MessageSource ms) {
+        if (dateTimes == null || dateTimes.isEmpty()) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.parameter.null", null, null));
+        }
 
-        int minDateTimeInt = dateTimes.stream()
-                .map(t -> t.format(dateTimeFormat))
-                .mapToInt(Integer::parseInt)
-                .summaryStatistics()
-                .getMin();
-
-        return LocalDateTime.parse(Integer.toString(minDateTimeInt), dateTimeFormat);
+        return dateTimes.stream()
+                .min(LocalDateTime::compareTo)
+                .orElseThrow(() -> new NoSuchElementException(ms.getMessage("error.notfound.min", null, null)));
     }
 }

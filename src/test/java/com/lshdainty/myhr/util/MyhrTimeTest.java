@@ -9,7 +9,6 @@ import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -118,18 +117,117 @@ class MyhrTimeTest {
     }
 
     @Test
+    @DisplayName("날짜 목록 더하기 - 성공")
     void addAllDates() {
+        // Given
+        List<LocalDate> sourceDates = List.of(
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 2),
+                LocalDate.of(2025, 1, 3)
+        );
+        List<LocalDate> targetDates = List.of(
+                LocalDate.of(2025, 1, 3),
+                LocalDate.of(2025, 1, 4),
+                LocalDate.of(2025, 1, 5)
+        );
+
+        // When & Then
+        assertThat(MyhrTime.addAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 2),
+                LocalDate.of(2025, 1, 3),
+                LocalDate.of(2025, 1, 4),
+                LocalDate.of(2025, 1, 5)
+        );
     }
 
     @Test
+    @DisplayName("날짜 목록 빼기 - 성공")
     void removeAllDates() {
+        // Given
+        List<LocalDate> sourceDates = List.of(
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 2),
+                LocalDate.of(2025, 1, 3)
+        );
+        List<LocalDate> targetDates = List.of(
+                LocalDate.of(2025, 1, 3),
+                LocalDate.of(2025, 1, 4),
+                LocalDate.of(2025, 1, 5)
+        );
+
+        // When & Then
+        assertThat(MyhrTime.removeAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 2)
+        );
     }
 
     @Test
+    @DisplayName("날짜 목록 중 가장 큰 날짜 찾기 - 성공")
     void findMaxDateTime() {
+        // Given
+        List<LocalDateTime> dateTimes = List.of(
+                LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+                LocalDateTime.of(2025, 1, 5, 12, 0, 0),
+                LocalDateTime.of(2025, 1, 3, 23, 59, 59)
+        );
+
+        // When & Then
+        assertThat(MyhrTime.findMaxDateTime(dateTimes, ms)).isEqualTo(LocalDateTime.of(2025, 1, 5, 12, 0, 0));
     }
 
     @Test
+    @DisplayName("날짜 목록 중 가장 큰 날짜 찾기 - 실패 (null)")
+    void findMaxDateTimeFailTestNull() {
+        // Given
+        when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMaxDateTime(null, ms));
+    }
+
+    @Test
+    @DisplayName("날짜 목록 중 가장 큰 날짜 찾기 - 실패 (empty)")
+    void findMaxDateTimeFailTestEmpty() {
+        // Given
+        when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMaxDateTime(List.of(), ms));
+    }
+
+    @Test
+    @DisplayName("날짜 목록 중 가장 작은 날짜 찾기 - 성공")
     void findMinDateTime() {
+        // Given
+        List<LocalDateTime> dateTimes = List.of(
+                LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+                LocalDateTime.of(2025, 1, 5, 12, 0, 0),
+                LocalDateTime.of(2025, 1, 3, 23, 59, 59)
+        );
+
+        // When & Then
+        assertThat(MyhrTime.findMinDateTime(dateTimes, ms)).isEqualTo(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
+    }
+
+    @Test
+    @DisplayName("날짜 목록 중 가장 작은 날짜 찾기 - 실패 (null)")
+    void findMinDateTimeFailTestNull() {
+        // Given
+        when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMinDateTime(null, ms));
+    }
+
+    @Test
+    @DisplayName("날짜 목록 중 가장 작은 날짜 찾기 - 실패 (empty)")
+    void findMinDateTimeFailTestEmpty() {
+        // Given
+        when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMinDateTime(List.of(), ms));
     }
 }
