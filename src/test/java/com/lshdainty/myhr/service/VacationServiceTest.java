@@ -538,7 +538,7 @@ class VacationServiceTest {
 
     @Test
     @DisplayName("단일 유저 휴가 조회 테스트 - 성공")
-    void getVacationsByUserSuccessTest() {
+    void getUserVacationsSuccessTest() {
         // Given
         String userId = "test1";
         User user = User.createUser("test1");
@@ -551,7 +551,7 @@ class VacationServiceTest {
         ));
 
         // When
-        List<Vacation> vacations = vacationService.findVacationsByUser(userId);
+        List<Vacation> vacations = vacationService.getUserVacations(userId);
 
         // Then
         then(vacationRepositoryImpl).should().findVacationsByUserId(userId);
@@ -563,7 +563,7 @@ class VacationServiceTest {
 
     @Test
     @DisplayName("유저별 휴가 조회 테스트 - 성공")
-    void getVacationsByUserGroupSuccessTest() {
+    void getUserGroupVacationsSuccessTest() {
         // Given
         User userA = User.createUser("", "",  "이서준", "", "19700723", "ADMIN", "9 ~ 6", "N");
         User userB = User.createUser("", "", "김서연", "", "19701026", "BP", "8 ~ 5", "N");
@@ -580,7 +580,7 @@ class VacationServiceTest {
         ));
 
         // When
-        List<User> users = vacationService.findVacationsByUserGroup();
+        List<User> users = vacationService.getUserGroupVacations();
 
         // Then
         then(userRepositoryImpl).should().findUsersWithVacations();
@@ -779,7 +779,7 @@ class VacationServiceTest {
 
     @Test
     @DisplayName("기간별 내역 리스트 조회 테스트 - 성공")
-    void getVacationHistoriesByPeriodSuccessTest() {
+    void getPeriodVacationUseHistoriesSuccessTest() {
         // Given
         User user = User.createUser("test1");
         Vacation vacation = Vacation.createVacation(user, VacationType.ANNUAL, new BigDecimal("10.0000"),
@@ -810,7 +810,7 @@ class VacationServiceTest {
                 .willReturn(List.of(vacation));
 
         // When
-        List<VacationServiceDto> result = vacationService.getVacationHistoriesByPeriod(
+        List<VacationServiceDto> result = vacationService.getPeriodVacationUseHistories(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 12, 31, 23, 59, 59)
         );
@@ -822,7 +822,7 @@ class VacationServiceTest {
 
     @Test
     @DisplayName("기간별 내역 리스트 조회 테스트 - 성공 (연차 그룹)")
-    void getVacationHistoriesByPeriodSuccessTestAnnualGroup() {
+    void getPeriodVacationUseHistoriesSuccessTestAnnualGroup() {
         // Given
         User user = User.createUser("test1");
         Vacation vacation1 = Vacation.createVacation(user, VacationType.ANNUAL, new BigDecimal("10.0000"),
@@ -871,7 +871,7 @@ class VacationServiceTest {
                 .willReturn(List.of(vacation1, vacation2));
 
         // When
-        List<VacationServiceDto> result = vacationService.getVacationHistoriesByPeriod(
+        List<VacationServiceDto> result = vacationService.getPeriodVacationUseHistories(
                 LocalDateTime.of(2024, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 12, 31, 23, 59, 59)
         );
@@ -883,7 +883,7 @@ class VacationServiceTest {
 
     @Test
     @DisplayName("기간별 내역 리스트 조회 테스트 - 성공 (연차 1건)")
-    void getVacationHistoriesByPeriodSuccessTestOneAnnual() {
+    void getPeriodVacationUseHistoriesSuccessTestOneAnnual() {
         // Given
         User user = User.createUser("test1");
         Vacation vacation = Vacation.createVacation(user, VacationType.ANNUAL, new BigDecimal("10.0000"),
@@ -906,7 +906,7 @@ class VacationServiceTest {
                 .willReturn(List.of(vacation));
 
         // When
-        List<VacationServiceDto> result = vacationService.getVacationHistoriesByPeriod(
+        List<VacationServiceDto> result = vacationService.getPeriodVacationUseHistories(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 12, 31, 23, 59, 59)
         );

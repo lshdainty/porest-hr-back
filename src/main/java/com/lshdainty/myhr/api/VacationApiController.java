@@ -57,8 +57,8 @@ public class VacationApiController {
     }
 
     @GetMapping("/api/v1/vacations/user/{userId}")
-    public ApiResponse getVacationsByUser(@PathVariable("userId") String userId) {
-        List<Vacation> vacations = vacationService.findVacationsByUser(userId);
+    public ApiResponse getUserVacations(@PathVariable("userId") String userId) {
+        List<Vacation> vacations = vacationService.getUserVacations(userId);
 
         List<VacationDto> resp = vacations.stream()
                 .map(v -> VacationDto.builder()
@@ -76,8 +76,8 @@ public class VacationApiController {
     }
 
     @GetMapping("/api/v1/vacations/usergroup")
-    public ApiResponse getVacationsByUserGroup() {
-        List<User> usersVacations = vacationService.findVacationsByUserGroup();
+    public ApiResponse getUserGroupVacations() {
+        List<User> usersVacations = vacationService.getUserGroupVacations();
 
         List<UserDto> resp = new ArrayList<>();
         for (User user : usersVacations) {
@@ -131,12 +131,12 @@ public class VacationApiController {
         return ApiResponse.success();
     }
 
-    @GetMapping("/api/v1/vacation/histories/period")
+    @GetMapping("/api/v1/vacation/use/histories/period")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    public ApiResponse getVacationHistoriesByPeriod(
+    public ApiResponse getPeriodVacationUseHistories(
             @RequestParam("startDate") LocalDateTime startDate,
             @RequestParam("endDate") LocalDateTime endDate) {
-        List<VacationServiceDto> histories = vacationService.getVacationHistoriesByPeriod(startDate, endDate);
+        List<VacationServiceDto> histories = vacationService.getPeriodVacationUseHistories(startDate, endDate);
 
         List<VacationDto> resp = histories.stream()
                 .map(v -> VacationDto.builder()
@@ -155,4 +155,30 @@ public class VacationApiController {
 
         return ApiResponse.success(resp);
     }
+
+    @GetMapping("/api/v1/vacation/use/histories/user/period")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    public ApiResponse getUserPeriodVacationUseHistories(
+            @RequestParam("userId") String userId,
+            @RequestParam("startDate") LocalDateTime startDate,
+            @RequestParam("endDate") LocalDateTime endDate) {
+        List<VacationServiceDto> histories = vacationService.getUserPeriodVacationUseHistories(userId, startDate, endDate);
+
+        List<VacationDto> resp = histories.stream()
+                .map(v -> VacationDto.builder()
+                        .vacationId(v.getId())
+                        .vacationDesc(v.getDesc())
+                        .vacationHistoryId(v.getHistoryId())
+                        .vacationTimeType(v.getTimeType())
+                        .vacationTimeTypeName(v.getTimeType().getStrName())
+                        .startDate(v.getStartDate())
+                        .endDate(v.getEndDate())
+                        .build()
+                )
+                .toList();
+
+        return ApiResponse.success(resp);
+    }
+
+//    @GetMapping("/api/v1/vacation/histories/user/{userId}/period")
 }

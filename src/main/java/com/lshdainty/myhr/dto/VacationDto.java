@@ -32,6 +32,7 @@ public class VacationDto {
 
     // 휴가 사용
     private List<Long> vacationHistoryIds;
+    private Long vacationHistoryId;
     private BigDecimal usedDateTime;
     private VacationTimeType vacationTimeType;
     private String vacationTimeTypeName;

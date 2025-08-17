@@ -117,11 +117,11 @@ public class VacationService {
         return vacation.getId();
     }
 
-    public List<Vacation> findVacationsByUser(String userId) {
+    public List<Vacation> getUserVacations(String userId) {
         return vacationRepositoryImpl.findVacationsByUserId(userId);
     }
 
-    public List<User> findVacationsByUserGroup() {
+    public List<User> getUserGroupVacations() {
         return userRepositoryImpl.findUsersWithVacations();
     }
 
@@ -161,7 +161,7 @@ public class VacationService {
         }
     }
 
-    public List<VacationServiceDto> getVacationHistoriesByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<VacationServiceDto> getPeriodVacationUseHistories(LocalDateTime startDate, LocalDateTime endDate) {
         // 기간에 맞는 history 내역 가져오기
         List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationHistorysByPeriod(startDate, endDate);
 
@@ -199,6 +199,23 @@ public class VacationService {
         }
 
         return result;
+    }
+
+    public List<VacationServiceDto> getUserPeriodVacationUseHistories(String userId,LocalDateTime startDate, LocalDateTime endDate) {
+        // 기간에 맞는 유저 history 내역 가져오기
+        List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationUseHistorysByUserAndPeriod(userId, startDate, endDate);
+
+        return histories.stream()
+                .map(vh -> VacationServiceDto.builder()
+                        .id(vh.getVacation().getId())
+                        .historyId(vh.getId())
+                        .timeType(vh.getType())
+                        .desc(vh.getDesc())
+                        .startDate(vh.getUsedDateTime())
+                        .endDate(vh.getUsedDateTime().plusSeconds(vh.getType().getSeconds()))
+                        .build()
+                )
+                .toList();
     }
 
     public Vacation checkVacationExist(Long vacationId) {

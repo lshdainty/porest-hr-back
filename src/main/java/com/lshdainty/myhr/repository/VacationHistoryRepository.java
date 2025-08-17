@@ -13,4 +13,6 @@ public interface VacationHistoryRepository {
     Optional<VacationHistory> findById(Long vacationHistoryId);
     // Calendar용 기간 휴가 내역 조회
     List<VacationHistory> findVacationHistorysByPeriod(LocalDateTime start, LocalDateTime end);
+    // 유저 기간 휴가 내역 조회
+    List<VacationHistory> findVacationUseHistorysByUserAndPeriod(String userId, LocalDateTime start, LocalDateTime end);
 }

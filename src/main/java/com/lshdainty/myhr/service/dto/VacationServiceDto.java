@@ -26,6 +26,7 @@ public class VacationServiceDto {
     private User user;
 
     private List<Long> historyIds;
+    private Long historyId;
 
     private BigDecimal grantTime;
 
