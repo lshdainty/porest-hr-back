@@ -38,4 +38,46 @@ public enum VacationTimeType {
     public BigDecimal convertToValue(int dayCount) {
         return expression.apply(BigDecimal.valueOf(dayCount));
     }
+
+    /**
+     * value -> 문자열 일수 변환 함수<br>
+     * ex. 2.3750 -> 2일 3시간
+     *
+     * @return dayStr
+     */
+    public static String convertValueToDay(BigDecimal value) {
+        String dayStr = "0일";
+
+        if (value.compareTo(BigDecimal.ZERO) > 0) {
+            StringBuilder builer = new StringBuilder();
+
+            // 넘어온 value에서 일 분리
+            int days = value.intValue();
+
+            // 넘어온 value에서 시간 분리
+            int hours = value.remainder(BigDecimal.valueOf(1.0000)) // 0.1250 ~ 0.8750 분리
+                    .divide(BigDecimal.valueOf(0.1250), 0, java.math.RoundingMode.DOWN).intValue(); // 0 ~ 7로 변환
+
+            // 넘어온 value에서 분 분리
+            int minutes = value.remainder(BigDecimal.valueOf(1.0000)) // 0.1250 ~ 0.8750 분리
+                    .remainder(BigDecimal.valueOf(0.1250)) // 0.0625 분리
+                    .divide(BigDecimal.valueOf(0.0625), 0, java.math.RoundingMode.DOWN).intValue() * 30; // 0 or 30
+
+            if (days > 0) {
+                builer.append(days).append("일");
+            }
+            if (hours > 0) {
+                if (!builer.isEmpty()) builer.append(" ");
+                builer.append(hours).append("시간");
+            }
+            if (minutes > 0) {
+                if (!builer.isEmpty()) builer.append(" ");
+                builer.append(minutes).append("분");
+            }
+
+            dayStr = builer.toString();
+        }
+
+        return dayStr;
+    }
 }

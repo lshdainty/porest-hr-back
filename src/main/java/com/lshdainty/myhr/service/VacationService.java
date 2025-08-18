@@ -167,7 +167,7 @@ public class VacationService {
 
         // 유저 정보 반환을 위해 vacation 정보 가져오기
         List<Vacation> vacations = vacationRepositoryImpl.findVacationsByIdsWithUser(histories.stream()
-                .map(h -> h.getVacation().getId())
+                .map(vh -> vh.getVacation().getId())
                 .distinct()
                 .toList()
         );
@@ -178,12 +178,12 @@ public class VacationService {
 
         // 연차인 내역만 추출
         List<VacationHistory> dayHistories = histories.stream()
-                .filter(h -> h.getType().equals(VacationTimeType.DAYOFF))
+                .filter(vh -> vh.getType().equals(VacationTimeType.DAYOFF))
                 .collect(Collectors.toList());
 
         // 시간단위 내역만 추출
         List<VacationHistory> hourHistories = histories.stream()
-                .filter(h -> !h.getType().equals(VacationTimeType.DAYOFF))
+                .filter(vh -> !vh.getType().equals(VacationTimeType.DAYOFF))
                 .collect(Collectors.toList());
 
         // 연차인 경우 따로 분리된 휴가를 start - end화 하여 serviceDto로 변환
@@ -201,7 +201,7 @@ public class VacationService {
         return result;
     }
 
-    public List<VacationServiceDto> getUserPeriodVacationUseHistories(String userId,LocalDateTime startDate, LocalDateTime endDate) {
+    public List<VacationServiceDto> getUserPeriodVacationUseHistories(String userId, LocalDateTime startDate, LocalDateTime endDate) {
         // 기간에 맞는 유저 history 내역 가져오기
         List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationUseHistorysByUserAndPeriod(userId, startDate, endDate);
 
@@ -214,6 +214,38 @@ public class VacationService {
                         .startDate(vh.getUsedDateTime())
                         .endDate(vh.getUsedDateTime().plusSeconds(vh.getType().getSeconds()))
                         .build()
+                )
+                .toList();
+    }
+
+    public List<VacationServiceDto> getUserMonthStatsVacationUseHistories(String userId, String year) {
+        // 기간에 맞는 유저 history 내역 가져오기
+        List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationUseHistorysByUserAndPeriod(
+                userId,
+                LocalDateTime.of(Integer.parseInt(year), 1, 1, 0, 0, 0),
+                LocalDateTime.of(Integer.parseInt(year), 12, 31, 23, 59, 59)
+        );
+
+        // 월별 사용량 Map 생성 및 0 초기화 (순서 보장위해 LinkedHashMap 사용)
+        Map<Integer, BigDecimal> monthlyMap = new LinkedHashMap<>();
+        for (int i = 1; i <= 12; i++) {
+            monthlyMap.put(i, BigDecimal.ZERO);
+        }
+
+        // 월별 사용량 집계
+        for (VacationHistory history : histories) {
+            int month = history.getUsedDateTime().getMonthValue();
+            // DB Insert시 하루 기준으로 넣었음
+            BigDecimal useValue = history.getType().convertToValue(1);
+            monthlyMap.merge(month, useValue, BigDecimal::add);
+        }
+
+        return monthlyMap.entrySet().stream()
+                .map(e -> VacationServiceDto.builder()
+                            .month(e.getKey())
+                            .usedTime(e.getValue())
+                            .usedTimeStr(VacationTimeType.convertValueToDay(e.getValue()))
+                            .build()
                 )
                 .toList();
     }

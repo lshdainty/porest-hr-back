@@ -38,4 +38,8 @@ public class VacationDto {
     private String vacationTimeTypeName;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+
+    // 사용자 월별 휴가 통계
+    private int month;
+    private String usedDateTimeStr;
 }

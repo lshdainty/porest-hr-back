@@ -180,5 +180,21 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-//    @GetMapping("/api/v1/vacation/histories/user/{userId}/period")
+    @GetMapping("/api/v1/vacation/use/histories/user/month/stats")
+    public ApiResponse getUserMonthStatsVacationUseHistories(
+            @RequestParam("userId") String userId,
+            @RequestParam("year") String year) {
+        List<VacationServiceDto> histories = vacationService.getUserMonthStatsVacationUseHistories(userId, year);
+
+        List<VacationDto> resp = histories.stream()
+                .map(v -> VacationDto.builder()
+                        .month(v.getMonth())
+                        .usedDateTime(v.getUsedTime())
+                        .usedDateTimeStr(v.getUsedTimeStr())
+                        .build()
+                )
+                .toList();
+
+        return ApiResponse.success(resp);
+    }
 }

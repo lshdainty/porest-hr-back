@@ -34,6 +34,10 @@ public class VacationServiceDto {
     private LocalDateTime endDate;
     private VacationTimeType timeType;
 
+    private int month;
+    private BigDecimal usedTime;
+    private String usedTimeStr;
+
     @Override
     public String toString() {
         return "VacationServiceDto{" +
