@@ -199,4 +199,14 @@ public class VacationApiController {
 
         return ApiResponse.success(resp);
     }
+
+    @GetMapping("/api/v1/vacation/use/stats/user")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    public ApiResponse getUserVacationUseStats(
+            @RequestParam("userId") String userId,
+            @RequestParam("baseDate") LocalDateTime baseDate) {
+        return ApiResponse.success(
+                vacationService.getUserVacationUseStats(userId, baseDate)
+        );
+    }
 }
