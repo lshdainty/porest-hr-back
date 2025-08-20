@@ -244,7 +244,6 @@ public class VacationService {
                 .map(e -> VacationServiceDto.builder()
                             .month(e.getKey())
                             .usedTime(e.getValue())
-                            .usedTimeStr(VacationTimeType.convertValueToDay(e.getValue()))
                             .build()
                 )
                 .toList();

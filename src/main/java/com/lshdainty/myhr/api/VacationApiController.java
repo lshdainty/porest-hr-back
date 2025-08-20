@@ -2,6 +2,7 @@ package com.lshdainty.myhr.api;
 
 import com.lshdainty.myhr.domain.User;
 import com.lshdainty.myhr.domain.Vacation;
+import com.lshdainty.myhr.domain.VacationTimeType;
 import com.lshdainty.myhr.dto.UserDto;
 import com.lshdainty.myhr.dto.VacationDto;
 import com.lshdainty.myhr.service.VacationService;
@@ -117,6 +118,7 @@ public class VacationApiController {
                         .remainTime(v.getRemainTime())
                         .occurDate(v.getOccurDate())
                         .expiryDate(v.getExpiryDate())
+                        .remainTimeStr(VacationTimeType.convertValueToDay(v.getRemainTime()))
                         .build()
                 )
                 .toList();
@@ -190,7 +192,7 @@ public class VacationApiController {
                 .map(v -> VacationDto.builder()
                         .month(v.getMonth())
                         .usedDateTime(v.getUsedTime())
-                        .usedDateTimeStr(v.getUsedTimeStr())
+                        .usedDateTimeStr(VacationTimeType.convertValueToDay(v.getUsedTime()))
                         .build()
                 )
                 .toList();

@@ -42,4 +42,7 @@ public class VacationDto {
     // 사용자 월별 휴가 통계
     private Integer month;
     private String usedDateTimeStr;
+
+    // 사용 가능 휴가
+    private String remainTimeStr;
 }

@@ -36,7 +36,6 @@ public class VacationServiceDto {
 
     private int month;
     private BigDecimal usedTime;
-    private String usedTimeStr;
 
     @Override
     public String toString() {
