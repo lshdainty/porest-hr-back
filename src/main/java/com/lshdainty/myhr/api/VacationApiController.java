@@ -191,8 +191,8 @@ public class VacationApiController {
         List<VacationDto> resp = histories.stream()
                 .map(v -> VacationDto.builder()
                         .month(v.getMonth())
-                        .usedDateTime(v.getUsedTime())
-                        .usedDateTimeStr(VacationTimeType.convertValueToDay(v.getUsedTime()))
+                        .usedTime(v.getUsedTime())
+                        .usedTimeStr(VacationTimeType.convertValueToDay(v.getUsedTime()))
                         .build()
                 )
                 .toList();
@@ -205,8 +205,26 @@ public class VacationApiController {
     public ApiResponse getUserVacationUseStats(
             @RequestParam("userId") String userId,
             @RequestParam("baseDate") LocalDateTime baseDate) {
-        return ApiResponse.success(
-                vacationService.getUserVacationUseStats(userId, baseDate)
+        VacationServiceDto stats = vacationService.getUserVacationUseStats(userId, baseDate);
+
+        return ApiResponse.success(VacationDto.builder()
+                .remainTime(stats.getRemainTime())
+                .remainTimeStr(VacationTimeType.convertValueToDay(stats.getRemainTime()))
+                .usedTime(stats.getUsedTime())
+                .usedTimeStr(VacationTimeType.convertValueToDay(stats.getUsedTime()))
+                .expectUsedTime(stats.getExpectUsedTime())
+                .expectUsedTimeStr(VacationTimeType.convertValueToDay(stats.getExpectUsedTime()))
+                .prevRemainTime(stats.getPrevRemainTime())
+                .prevRemainTimeStr(VacationTimeType.convertValueToDay(stats.getPrevRemainTime()))
+                .prevUsedTime(stats.getPrevUsedTime())
+                .prevUsedTimeStr(VacationTimeType.convertValueToDay(stats.getPrevUsedTime()))
+                .prevExpectUsedTime(stats.getPrevExpectUsedTime())
+                .prevExpectUsedTimeStr(VacationTimeType.convertValueToDay(stats.getPrevExpectUsedTime()))
+                .remainTimeGap(stats.getRemainTime().subtract(stats.getPrevRemainTime()))
+                .remainTimeGapStr(VacationTimeType.convertValueToDay(stats.getRemainTime().subtract(stats.getPrevRemainTime()).abs()))
+                .usedTimeGap(stats.getUsedTime().subtract(stats.getPrevUsedTime()))
+                .usedTimeGapStr(VacationTimeType.convertValueToDay(stats.getUsedTime().subtract(stats.getPrevUsedTime()).abs()))
+                .build()
         );
     }
 }

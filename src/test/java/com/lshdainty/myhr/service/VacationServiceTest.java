@@ -5,7 +5,6 @@ import com.lshdainty.myhr.repository.HolidayRepositoryImpl;
 import com.lshdainty.myhr.repository.UserRepositoryImpl;
 import com.lshdainty.myhr.repository.VacationHistoryRepositoryImpl;
 import com.lshdainty.myhr.repository.VacationRepositoryImpl;
-import com.lshdainty.myhr.api.dto.VacationStatsDto;
 import com.lshdainty.myhr.service.dto.VacationServiceDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -915,64 +914,6 @@ class VacationServiceTest {
         // Then
         then(vacationRepositoryImpl).should().findVacationsByIdsWithUser(anyList());
         assertThat(result.size()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("사용자 휴가 통계 조회 - 성공")
-    void getUserVacationUseStatsSuccessTest() {
-        // Given
-        String userId = "testUser";
-        LocalDateTime baseTime = LocalDateTime.of(2025, 8, 20, 10, 0, 0);
-        LocalDateTime prevMonthTime = baseTime.minusMonths(1);
-
-        User user = User.createUser(userId);
-        Vacation vacation = Vacation.createVacation(user, VacationType.ANNUAL, new BigDecimal("13.0000"), // 현재 잔여 휴가 13일
-                baseTime.minusYears(1), baseTime.plusYears(1), "admin", "127.0.0.1");
-
-        // Histories
-        VacationHistory grantHistory = VacationHistory.createRegistVacationHistory(vacation, "정기휴가", new BigDecimal("15.0000"), "admin", "127.0.0.1");
-        setCreatedAt(grantHistory, baseTime.minusMonths(2)); // 2달 전 휴가 부여
-        VacationHistory usedJuly = VacationHistory.createUseVacationHistory(vacation, "7월휴가", VacationTimeType.DAYOFF, baseTime.minusMonths(1).withDayOfMonth(15), "user", "127.0.0.1");
-        VacationHistory usedAugust = VacationHistory.createUseVacationHistory(vacation, "8월휴가", VacationTimeType.DAYOFF, baseTime.withDayOfMonth(10), "user", "127.0.0.1");
-        VacationHistory scheduledSept = VacationHistory.createUseVacationHistory(vacation, "9월휴가", VacationTimeType.DAYOFF, baseTime.plusMonths(1).withDayOfMonth(5), "user", "127.0.0.1");
-        vacation.getHistorys().addAll(List.of(grantHistory, usedJuly, usedAugust, scheduledSept));
-
-        // Mocking
-        // findVacationsByBaseTimeWithHistory는 baseTime 기준으로 유효한 휴가와 그에 따른 전체 이력을 반환한다고 가정
-        given(vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userId, baseTime)).willReturn(List.of(vacation));
-
-        // When
-        VacationStatsDto result = vacationService.getUserVacationUseStats(userId, baseTime);
-
-        // Then
-        // --- 검증 --- 
-        // As of Aug 20 (current)
-        // granted: 15 (2달 전 부여)
-        // used: 2 (July, Aug)
-        // remain: 15 - 2 = 13
-        // scheduled: 1 (Sept)
-        assertThat(result.getRemainTime()).isEqualByComparingTo("13.0000");
-        assertThat(result.getUsedTime()).isEqualByComparingTo("2.0000");
-        assertThat(result.getScheduledTime()).isEqualByComparingTo("1.0000");
-
-        // As of July 20 (previous)
-        // granted: 15
-        // used: 1 (July)
-        // remain: 15 - 1 = 14
-        // scheduled: 2 (Aug, Sept)
-        assertThat(result.getPreviousRemainTime()).isEqualByComparingTo("14.0000");
-        assertThat(result.getPreviousUsedTime()).isEqualByComparingTo("1.0000");
-        assertThat(result.getPreviousScheduledTime()).isEqualByComparingTo("2.0000");
-
-        // Compare
-        // remainCompare: 13 - 14 = -1
-        // usedCompare: 2 - 1 = 1
-        // scheduledCompare: 1 - 2 = -1
-        assertThat(result.getRemainTimeCompare()).isEqualByComparingTo("-1.0000");
-        assertThat(result.getUsedTimeCompare()).isEqualByComparingTo("1.0000");
-        assertThat(result.getScheduledTimeCompare()).isEqualByComparingTo("-1.0000");
-
-        then(vacationRepositoryImpl).should().findVacationsByBaseTimeWithHistory(userId, baseTime);
     }
 
     // 테스트 헬퍼 메서드

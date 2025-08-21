@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import com.lshdainty.myhr.api.dto.VacationStatsDto;
 
 import java.util.stream.Stream;
 
@@ -251,66 +250,32 @@ public class VacationService {
                 .toList();
     }
 
-        public VacationStatsDto getUserVacationUseStats(String userId, LocalDateTime baseTime) {
-        // 기준 시점에 유효한 모든 휴가와 전체 이력을 가져옵니다.
-        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userId, baseTime);
+    public VacationServiceDto getUserVacationUseStats(String userId, LocalDateTime baseTime) {
+        // 기준 시점에 유효한 모든 휴가 & 전체 이력
+        List<Vacation> curVacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userId, baseTime);
+        List<Vacation> prevVacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userId, baseTime.minusMonths(1));
 
-        List<VacationHistory> allHistories = vacations.stream()
+        // 삭제 안된 이력만 필터링
+        List<VacationHistory> curHistories = curVacations.stream()
+                .flatMap(v -> v.getHistorys().stream())
+                .filter(vh -> "N".equals(vh.getDelYN()))
+                .toList();
+        List<VacationHistory> prevHistories = prevVacations.stream()
                 .flatMap(v -> v.getHistorys().stream())
                 .filter(vh -> "N".equals(vh.getDelYN()))
                 .toList();
 
         // 현재 및 이전 달 통계 계산
-        VacationStatsDto currentStats = calculateStatsForDate(allHistories, baseTime);
-        VacationStatsDto previousStats = calculateStatsForDate(allHistories, baseTime.minusMonths(1));
+        VacationServiceDto curStats = calculateStatsForDate(curHistories, baseTime);
+        VacationServiceDto prevStats = calculateStatsForDate(prevHistories, baseTime.minusMonths(1));
 
-        // 증감 계산
-        BigDecimal remainTimeCompare = currentStats.getRemainTime().subtract(previousStats.getRemainTime());
-        BigDecimal usedTimeCompare = currentStats.getUsedTime().subtract(previousStats.getUsedTime());
-        BigDecimal scheduledTimeCompare = currentStats.getScheduledTime().subtract(previousStats.getScheduledTime());
-
-        return VacationStatsDto.builder()
-                .remainTime(currentStats.getRemainTime())
-                .usedTime(currentStats.getUsedTime())
-                .scheduledTime(currentStats.getScheduledTime())
-                .remainTimeCompare(remainTimeCompare)
-                .usedTimeCompare(usedTimeCompare)
-                .scheduledTimeCompare(scheduledTimeCompare)
-                .previousRemainTime(previousStats.getRemainTime())
-                .previousUsedTime(previousStats.getUsedTime())
-                .previousScheduledTime(previousStats.getScheduledTime())
-                .build();
-    }
-
-    private VacationStatsDto calculateStatsForDate(List<VacationHistory> allHistories, LocalDateTime baseDate) {
-        // 기준일 이전에 부여된 총 휴가
-        BigDecimal totalGranted = allHistories.stream()
-                .filter(h -> h.getGrantTime() != null)
-                .map(VacationHistory::getGrantTime)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        log.info("totalGranted : ${}", totalGranted);
-
-        // 기준일 이전에 사용된 총 휴가
-        BigDecimal totalUsedBefore = allHistories.stream()
-                .filter(h -> h.getType() != null && !h.getUsedDateTime().isAfter(baseDate))
-                .map(h -> h.getType().convertToValue(1))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        log.info("totalUsedBefore : ${}", totalUsedBefore);
-
-        // 기준일 이후에 사용될 총 휴가
-        BigDecimal totalScheduledAfter = allHistories.stream()
-                .filter(h -> h.getType() != null && h.getUsedDateTime().isAfter(baseDate))
-                .map(h -> h.getType().convertToValue(1))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        log.info("totalScheduledAfter : ${}", totalScheduledAfter);
-
-        BigDecimal remainTime = totalGranted.subtract(totalUsedBefore);
-        log.info("remainTime : ${}", remainTime);
-
-        return VacationStatsDto.builder()
-                .remainTime(remainTime)
-                .usedTime(totalUsedBefore)
-                .scheduledTime(totalScheduledAfter)
+        return VacationServiceDto.builder()
+                .remainTime(curStats.getRemainTime())
+                .usedTime(curStats.getUsedTime())
+                .expectUsedTime(curStats.getExpectUsedTime())
+                .prevRemainTime(prevStats.getRemainTime())
+                .prevUsedTime(prevStats.getUsedTime())
+                .prevExpectUsedTime(prevStats.getExpectUsedTime())
                 .build();
     }
 
@@ -409,5 +374,33 @@ public class VacationService {
         }
 
         return vacationDtos;
+    }
+
+    private VacationServiceDto calculateStatsForDate(List<VacationHistory> histories, LocalDateTime baseDate) {
+        // 기준일 이전에 부여된 총 휴가
+        BigDecimal totalGranted = histories.stream()
+                .filter(h -> h.getGrantTime() != null)
+                .map(VacationHistory::getGrantTime)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 기준일 이전에 사용된 총 휴가
+        BigDecimal totalUsedTime = histories.stream()
+                .filter(h -> h.getType() != null && !h.getUsedDateTime().isAfter(baseDate))
+                .map(h -> h.getType().convertToValue(1))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 기준일 이후에 사용될 총 휴가
+        BigDecimal totalExpectUsedTime = histories.stream()
+                .filter(h -> h.getType() != null && h.getUsedDateTime().isAfter(baseDate))
+                .map(h -> h.getType().convertToValue(1))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalRemainTime = totalGranted.subtract(totalUsedTime);
+
+        return VacationServiceDto.builder()
+                .remainTime(totalRemainTime)
+                .usedTime(totalUsedTime)
+                .expectUsedTime(totalExpectUsedTime)
+                .build();
     }
 }
