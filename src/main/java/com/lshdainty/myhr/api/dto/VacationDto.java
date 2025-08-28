@@ -57,8 +57,6 @@ public class VacationDto {
     // 사용자 월별 휴가 통계
     // 월별 통계 월
     private Integer month;
-    // 휴가 시간 타입별 통계 구조
-    private VacationDto[] stats;
     // 휴가 사용 시간
     private BigDecimal usedTime;
     // 휴가 사용 시간 문자열 (1일 1시간)

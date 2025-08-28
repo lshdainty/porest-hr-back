@@ -9,7 +9,6 @@ import com.lshdainty.myhr.service.dto.VacationServiceDto;
 import com.lshdainty.myhr.service.vacation.*;
 import com.lshdainty.myhr.type.HolidayType;
 import com.lshdainty.myhr.type.VacationTimeType;
-import com.lshdainty.myhr.type.VacationType;
 import com.lshdainty.myhr.util.MyhrTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -230,32 +229,26 @@ public class VacationService {
                 LocalDateTime.of(Integer.parseInt(year), 12, 31, 23, 59, 59)
         );
 
-        // 월별, 휴가타입별 사용량 Map 생성 및 0 초기화
-        Map<Integer, Map<VacationType, BigDecimal>> monthlyMap = new LinkedHashMap<>();
+        // 월별 사용량 Map 생성 및 0 초기화 (순서 보장위해 LinkedHashMap 사용)
+        Map<Integer, BigDecimal> monthlyMap = new LinkedHashMap<>();
         for (int i = 1; i <= 12; i++) {
-            Map<VacationType, BigDecimal> typeMap = new EnumMap<>(VacationType.class);
-            for (VacationType type : VacationType.values()) {
-                typeMap.put(type, BigDecimal.ZERO);
-            }
-            monthlyMap.put(i, typeMap);
+            monthlyMap.put(i, BigDecimal.ZERO);
         }
 
-        // 월별, 휴가타입별 사용량 집계
+        // 월별 사용량 집계
         for (VacationHistory history : histories) {
             int month = history.getUsedDateTime().getMonthValue();
-            VacationType type = history.getVacation().getType();
+            // DB Insert시 하루 기준으로 넣었음
             BigDecimal useValue = history.getType().convertToValue(1);
-
-            monthlyMap.get(month).merge(type, useValue, BigDecimal::add);
+            monthlyMap.merge(month, useValue, BigDecimal::add);
         }
 
         return monthlyMap.entrySet().stream()
-                .flatMap(entry -> entry.getValue().entrySet().stream()
-                        .map(innerEntry -> VacationServiceDto.builder()
-                                .month(entry.getKey())
-                                .type(innerEntry.getKey())
-                                .usedTime(innerEntry.getValue())
-                                .build()))
+                .map(e -> VacationServiceDto.builder()
+                            .month(e.getKey())
+                            .usedTime(e.getValue())
+                            .build()
+                )
                 .toList();
     }
 
