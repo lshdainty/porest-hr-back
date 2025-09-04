@@ -11,7 +11,6 @@ public enum ScheduleType {
     BUSINESSTRIP("출장"),
     DEFENSE("민방위"),
     DEFENSEHALF("민방위(반차)"),
-    HEALTHCHECK("건강검진"),
     HEALTHCHECKHALF("건강검진(반차)"),
     BIRTHPARTY("생일파티");
 
