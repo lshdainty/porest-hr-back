@@ -26,7 +26,10 @@ public class HolidayService {
         Holiday holiday = Holiday.createHoliday(
                 data.getName(),
                 data.getDate(),
-                data.getType()
+                data.getType(),
+                data.getCountryCode(),
+                data.getLunarYN(),
+                data.getIsRecurring()
         );
         holidayRepositoryImpl.save(holiday);
         return holiday.getSeq();
@@ -54,7 +57,10 @@ public class HolidayService {
         findHoliday.updateHoliday(
                 data.getName(),
                 data.getDate(),
-                data.getType()
+                data.getType(),
+                data.getCountryCode(),
+                data.getLunarYN(),
+                data.getIsRecurring()
         );
     }
 
