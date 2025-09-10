@@ -1,6 +1,7 @@
 package com.lshdainty.myhr.repository;
 
 import com.lshdainty.myhr.domain.Holiday;
+import com.lshdainty.myhr.type.CountryCode;
 import com.lshdainty.myhr.type.HolidayType;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +26,18 @@ public class HolidayRepositoryImpl implements HolidayRepository {
     }
 
     @Override
-    public List<Holiday> findHolidays() {
-        return em.createQuery("select h from Holiday h order by h.date", Holiday.class)
+    public List<Holiday> findHolidays(CountryCode countryCode) {
+        return em.createQuery("select h from Holiday h where h.countryCode = :countryCode order by h.date", Holiday.class)
+                .setParameter("countryCode", countryCode)
                 .getResultList();
     }
 
     @Override
-    public List<Holiday> findHolidaysByStartEndDate(String start, String end) {
-        return em.createQuery("select h from Holiday h where h.date between :start and :end order by h.date", Holiday.class)
+    public List<Holiday> findHolidaysByStartEndDate(String start, String end, CountryCode countryCode) {
+        return em.createQuery("select h from Holiday h where h.date between :start and :end and h.countryCode = :countryCode order by h.date", Holiday.class)
                 .setParameter("start", start)
                 .setParameter("end", end)
+                .setParameter("countryCode", countryCode)
                 .getResultList();
     }
 

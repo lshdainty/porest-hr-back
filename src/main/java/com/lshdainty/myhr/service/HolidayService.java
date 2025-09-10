@@ -1,6 +1,7 @@
 package com.lshdainty.myhr.service;
 
 import com.lshdainty.myhr.domain.Holiday;
+import com.lshdainty.myhr.type.CountryCode;
 import com.lshdainty.myhr.type.HolidayType;
 import com.lshdainty.myhr.repository.HolidayRepositoryImpl;
 import com.lshdainty.myhr.service.dto.HolidayServiceDto;
@@ -29,6 +30,7 @@ public class HolidayService {
                 data.getType(),
                 data.getCountryCode(),
                 data.getLunarYN(),
+                data.getLunarDate(),
                 data.getIsRecurring()
         );
         holidayRepositoryImpl.save(holiday);
@@ -39,12 +41,12 @@ public class HolidayService {
         return checkHolidayExist(seq);
     }
 
-    public List<Holiday> findHolidays() {
-        return holidayRepositoryImpl.findHolidays();
+    public List<Holiday> findHolidays(CountryCode countryCode) {
+        return holidayRepositoryImpl.findHolidays(countryCode);
     }
 
-    public List<Holiday> findHolidaysByStartEndDate(String startDate, String endDate) {
-        return holidayRepositoryImpl.findHolidaysByStartEndDate(startDate, endDate);
+    public List<Holiday> findHolidaysByStartEndDate(String startDate, String endDate, CountryCode countryCode) {
+        return holidayRepositoryImpl.findHolidaysByStartEndDate(startDate, endDate, countryCode);
     }
 
     public List<Holiday> findHolidaysByType(HolidayType type) {
@@ -60,6 +62,7 @@ public class HolidayService {
                 data.getType(),
                 data.getCountryCode(),
                 data.getLunarYN(),
+                data.getLunarDate(),
                 data.getIsRecurring()
         );
     }

@@ -20,31 +20,35 @@ public class Holiday {
     @Column(name = "holiday_seq")
     private Long seq;           // 공휴일 아이디
 
-    @Column(name = "holiday_date")
     @NotNull
+    @Column(name = "holiday_date")
     private String date;        // 공휴일 날짜
 
+    @NotNull
     @Column(name = "holiday_name")
     private String name;        // 공휴일 이름
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "holiday_type")
     @NotNull
+    @Column(name = "holiday_type")
     private HolidayType type;   // 공휴일 타입
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "country_code")
     @NotNull
+    @Column(name = "country_code")
     private CountryCode countryCode; // 국가 코드
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "lunar_yn")
     @NotNull
+    @Column(name = "lunar_yn")
     private YNType lunarYN;     // 음력 여부
 
+    @Column(name = "holiday_lunar_date")
+    private String lunarDate;   // 음력 날짜
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_recurring")
     @NotNull
+    @Column(name = "is_recurring")
     private YNType isRecurring; // 반복 여부
 
     /**
@@ -54,13 +58,14 @@ public class Holiday {
      *
      * @return Dues
      */
-    public static Holiday createHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, YNType isRecurring) {
+    public static Holiday createHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, String lunarDate, YNType isRecurring) {
         Holiday holiday = new Holiday();
         holiday.name = name;
         holiday.date = date;
         holiday.type = type;
         holiday.countryCode = countryCode;
         holiday.lunarYN = lunarYN;
+        holiday.lunarDate = lunarDate;
         holiday.isRecurring = isRecurring;
         return holiday;
     }
@@ -70,12 +75,13 @@ public class Holiday {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 공휴일 수정할 것
      */
-    public void updateHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, YNType isRecurring) {
+    public void updateHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, String lunarDate, YNType isRecurring) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(date)) { this.date = date; }
         if (!Objects.isNull(type)) { this.type = type; }
         if (!Objects.isNull(countryCode)) { this.countryCode = countryCode; }
         if (!Objects.isNull(lunarYN)) { this.lunarYN = lunarYN; }
+        if (!Objects.isNull(lunarDate)) { this.lunarDate = lunarDate; }
         if (!Objects.isNull(isRecurring)) { this.isRecurring = isRecurring; }
     }
 }

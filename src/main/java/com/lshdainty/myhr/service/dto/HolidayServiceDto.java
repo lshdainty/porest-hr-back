@@ -16,5 +16,6 @@ public class HolidayServiceDto {
     private HolidayType type;
     private CountryCode countryCode;
     private YNType lunarYN;
+    private String lunarDate;
     private YNType isRecurring;
 }

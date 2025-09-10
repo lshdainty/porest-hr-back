@@ -49,38 +49,38 @@ public class InitDB {
         }
 
         public void initSetHoliday() {
-            saveHoliday("설날연휴", "20241231", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, YNType.Y);
-            saveHoliday("설날", "20250101", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, YNType.Y);
-            saveHoliday("설날연휴", "20250102", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, YNType.Y);
-            saveHoliday("신정", "20250101", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("임시공휴일(설날)", "20250127", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("삼일절", "20250301", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("대체공휴일(삼일절)", "20250303", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("석가탄신일", "20250408", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, YNType.Y);
-            saveHoliday("근로자의 날", "20250501", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("어린이날", "20250505", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("대체공휴일(석가탄신일)", "20250506", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("임시공휴일(제 21대 대선)", "20250603", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("현충일", "20250606", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("광복절", "20250815", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("추석연휴", "20250814", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, YNType.Y);
-            saveHoliday("추석", "20250815", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, YNType.Y);
-            saveHoliday("추석연휴", "20250816", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, YNType.Y);
-            saveHoliday("개천절", "20251003", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("대체공휴일(추석)", "20251008", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("한글날", "20251009", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
-            saveHoliday("크리스마스", "20251225", HolidayType.PUBLIC, CountryCode.KR, YNType.N, YNType.Y);
+            saveHoliday("신정", "20250101", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("임시공휴일(설날)", "20250127", HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("설날연휴", "20250128", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, "20241231", YNType.Y);
+            saveHoliday("설날", "20250129", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, "20250101", YNType.Y);
+            saveHoliday("설날연휴", "20250130", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, "20250102", YNType.Y);
+            saveHoliday("삼일절", "20250301", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("대체공휴일(삼일절)", "20250303", HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("근로자의 날", "20250501", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("어린이날", "20250505", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("석가탄신일", "20250505", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, "20250408", YNType.Y);
+            saveHoliday("대체공휴일(석가탄신일)", "20250506", HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("임시공휴일(제 21대 대선)", "20250603", HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("현충일", "20250606", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("광복절", "20250815", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("개천절", "20251003", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("추석연휴", "20251005", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, "20250814", YNType.Y);
+            saveHoliday("추석", "20251006", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, "20250815", YNType.Y);
+            saveHoliday("추석연휴", "20251007", HolidayType.PUBLIC, CountryCode.KR, YNType.Y, "20250816", YNType.Y);
+            saveHoliday("대체공휴일(추석)", "20251008", HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("한글날", "20251009", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
+            saveHoliday("크리스마스", "20251225", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y);
 
-            saveHoliday("권장휴가", "20250131", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20250304", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20250404", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20250502", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20250523", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20250704", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20250814", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20250905", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20251010", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
-            saveHoliday("권장휴가", "20251114", HolidayType.ETC, CountryCode.KR, YNType.N, YNType.N);
+            saveHoliday("권장휴가", "20250131", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20250304", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20250404", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20250502", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20250523", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20250704", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20250814", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20250905", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20251010", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
+            saveHoliday("권장휴가", "20251114", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N);
         }
 
         public void initSetVacation() {
@@ -544,8 +544,8 @@ public class InitDB {
             em.persist(user);
         }
 
-        public void saveHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, YNType isRecurring) {
-            Holiday holiday = Holiday.createHoliday(name, date, type, countryCode, lunarYN, isRecurring);
+        public void saveHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, String lunarDate, YNType isRecurring) {
+            Holiday holiday = Holiday.createHoliday(name, date, type, countryCode, lunarYN, lunarDate, isRecurring);
             em.persist(holiday);
         }
 

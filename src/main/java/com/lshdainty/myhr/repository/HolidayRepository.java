@@ -1,6 +1,7 @@
 package com.lshdainty.myhr.repository;
 
 import com.lshdainty.myhr.domain.Holiday;
+import com.lshdainty.myhr.type.CountryCode;
 import com.lshdainty.myhr.type.HolidayType;
 
 import java.util.List;
@@ -12,9 +13,9 @@ public interface HolidayRepository {
     // 단건 휴일 조회
     Optional<Holiday> findById(Long seq);
     // 전체 휴일 조회
-    List<Holiday> findHolidays();
+    List<Holiday> findHolidays(CountryCode countryCode);
     // 기간에 해당하는 휴일 조회
-    List<Holiday> findHolidaysByStartEndDate(String start, String end);
+    List<Holiday> findHolidaysByStartEndDate(String start, String end, CountryCode countryCode);
     // 휴일 타입에 따른 조회
     List<Holiday> findHolidaysByType(HolidayType type);
     // 기간과 타입에 해당하는 휴일 조회
