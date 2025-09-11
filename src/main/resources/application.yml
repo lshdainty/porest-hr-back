@@ -47,9 +47,13 @@ jwt:
   secret: testkeyakljsdfashaweflkamsdflkjsahdfjklhasldjufrhawlekjflsdjhglmdnfljksdfjkasdhfljasdhfulawefmdsljkbdjkflkas
 
 file:
+  root-path: /Users/lshdainty/study/testimg
+  web-url-prefix: /media
+  resource-handler: ${file.web-url-prefix}/**
+  resource-locations: file:${file.root-path}/
   temp:
     path:
-      profile: /Users/lshdainty/study/testimg/temp/profile
+      profile: ${file.root-path}/temp/profile
   origin:
     path:
-      profile: /Users/lshdainty/study/testimg/origin/profile
+      profile: ${file.root-path}/origin/profile

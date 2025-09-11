@@ -49,6 +49,12 @@ public class User {
     @Column(name = "user_department")
     private DepartmentType department; // 유저 소속 부서
 
+    @Column(name = "profile_name")
+    private String profileName;
+
+    @Column(name = "profile_uuid")
+    private String profileUUID;
+
     @Column(name = "lunar_yn")
     private String lunarYN; // 음력여부
 
@@ -65,7 +71,9 @@ public class User {
      *
      * @return User
      */
-    public static User createUser(String id, String pwd, String name, String email, String birth, CompanyType company, DepartmentType department, String workTime, String lunarYN) {
+    public static User createUser(String id, String pwd, String name, String email, String birth,
+                                  CompanyType company, DepartmentType department, String workTime,
+                                  String lunarYN, String profileName, String profileUUID) {
         User user = new User();
         user.id = id;
         user.pwd = pwd;
@@ -77,8 +85,15 @@ public class User {
         user.department = department;
         user.workTime = workTime;
         user.lunarYN = lunarYN;
+        user.profileName = profileName;
+        user.profileUUID = profileUUID;
         user.delYN = "N";
         return user;
+    }
+
+    public static User createUser(String id, String pwd, String name, String email, String birth,
+                                  CompanyType company, DepartmentType department, String workTime, String lunarYN) {
+        return createUser(id, pwd, name, email, birth, company, department, workTime, lunarYN, null, null);
     }
 
     public static User createUser(String id) {
@@ -93,7 +108,9 @@ public class User {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 유저 수정할 것
      */
-    public void updateUser(String name, String email, RoleType role, String birth, CompanyType company, DepartmentType department, String workTime, String lunarYN) {
+    public void updateUser(String name, String email, RoleType role, String birth,
+                           CompanyType company, DepartmentType department, String workTime,
+                           String lunarYN, String profileName, String profileUUID) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(email)) { this.email = email; }
         if (!Objects.isNull(role)) { this.role = role; }
@@ -102,6 +119,13 @@ public class User {
         if (!Objects.isNull(department)) { this.department = department; }
         if (!Objects.isNull(workTime)) { this.workTime = workTime; }
         if (!Objects.isNull(lunarYN)) { this.lunarYN = lunarYN; }
+        if (!Objects.isNull(profileName)) { this.profileName = profileName; }
+        if (!Objects.isNull(profileUUID)) { this.profileUUID = profileUUID; }
+    }
+
+    public void updateUser(String name, String email, RoleType role, String birth,
+                           CompanyType company, DepartmentType department, String workTime, String lunarYN) {
+        updateUser(name, email, role, birth, company, department, workTime, lunarYN, null, null);
     }
 
     /**
