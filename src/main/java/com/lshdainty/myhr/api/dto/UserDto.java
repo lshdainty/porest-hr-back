@@ -35,4 +35,6 @@ public class UserDto {
     private String userRoleName;
 
     private MultipartFile profile;
+    private String profileUrl;
+    private String profileUUID;
 }

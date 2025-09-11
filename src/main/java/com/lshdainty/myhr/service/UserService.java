@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +28,43 @@ public class UserService {
     private final MessageSource ms;
     private final UserRepositoryImpl userRepositoryImpl;
 
+    @Value("${file.root-path}")
+    private String fileRootPath;
+
+    @Value("${file.web-url-prefix}")
+    private String webUrlPrefix;
+
     @Value("${file.temp.path.profile}")
     private String tempPath;
 
+    @Value("${file.origin.path.profile}")
+    private String originPath;
+
     @Transactional
     public String join(UserServiceDto data) {
+        String profileName = null;
+        String profileUUID = null;
+
+        // 만약 data에 이미지 uuid가 존재한다면 profile_url에서 webUrlPrefix를 제외해서 파일명을 구한 후
+        // tempPath + 파일명에 있는 파일을 originPath + 파일명에 복사해 그리고 복사에 성공하면
+        // profileName, profileUUID 를 같이 세팅해서 db에 저장
+        if (StringUtils.hasText(data.getProfileUUID()) && StringUtils.hasText(data.getProfileUrl())) {
+            String fileName = extractFileNameFromUrl(data.getProfileUrl());
+            if (fileName != null) {
+                String tempFilePath = Paths.get(tempPath, fileName).toString();
+                String originFilePath = Paths.get(originPath, fileName).toString();
+
+                try {
+                    if (PorestFile.copy(tempFilePath, originFilePath, ms)) {
+                        profileName = fileName;
+                        profileUUID = data.getProfileUUID();
+                    }
+                } catch (Exception e) {
+                    log.error("프로필 이미지 복사 실패: {}", fileName, e);
+                }
+            }
+        }
+
         User user = User.createUser(
                 data.getId(),
                 data.getPwd(),
@@ -41,23 +74,86 @@ public class UserService {
                 data.getCompany(),
                 data.getDepartment(),
                 data.getWorkTime(),
-                data.getLunarYN()
+                data.getLunarYN(),
+                profileName,
+                profileUUID
         );
+
         userRepositoryImpl.save(user);
         return user.getId();
     }
 
-    public User findUser(String userId) {
-        return checkUserExist(userId);
+    public UserServiceDto findUser(String userId) {
+        User user = checkUserExist(userId);
+
+        return UserServiceDto.builder()
+                .id(user.getId())
+                .pwd(user.getPwd())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .birth(user.getBirth())
+                .workTime(user.getWorkTime())
+                .company(user.getCompany())
+                .department(user.getDepartment())
+                .lunarYN(user.getLunarYN())
+                .profileName(user.getProfileName())
+                .profileUrl(StringUtils.hasText(user.getProfileName()) ?
+                        webUrlPrefix + user.getProfileName() : null)
+                .profileUUID(user.getProfileUUID())
+                .build();
     }
 
-    public List<User> findUsers() {
-        return userRepositoryImpl.findUsers();
+    public List<UserServiceDto> findUsers() {
+        List<User> users = userRepositoryImpl.findUsers();
+
+        return users.stream()
+                .map(user -> UserServiceDto.builder()
+                        .id(user.getId())
+                        .pwd(user.getPwd())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .role(user.getRole())
+                        .birth(user.getBirth())
+                        .workTime(user.getWorkTime())
+                        .company(user.getCompany())
+                        .department(user.getDepartment())
+                        .lunarYN(user.getLunarYN())
+                        .profileName(user.getProfileName())
+                        .profileUrl(StringUtils.hasText(user.getProfileName()) ?
+                                webUrlPrefix + user.getProfileName() : null)
+                        .profileUUID(user.getProfileUUID())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public void editUser(UserServiceDto data) {
         User user = checkUserExist(data.getId());
+
+        String profileName = null;
+        String profileUUID = null;
+
+        // db에서 조회한 user의 profile name, uuid와 dto의 name, uuid가 다르면 join의 TODO와 동일한 작업 진행
+        if (StringUtils.hasText(data.getProfileUUID()) &&
+                !data.getProfileUUID().equals(user.getProfileUUID())) {
+
+            String fileName = extractFileNameFromUrl(data.getProfileUrl());
+            if (fileName != null) {
+                String tempFilePath = Paths.get(tempPath, fileName).toString();
+                String originFilePath = Paths.get(originPath, fileName).toString();
+
+                try {
+                    if (PorestFile.copy(tempFilePath, originFilePath, ms)) {
+                        profileName = fileName;
+                        profileUUID = data.getProfileUUID();
+                    }
+                } catch (Exception e) {
+                    log.error("프로필 이미지 복사 실패: {}", fileName, e);
+                }
+            }
+        }
+
         user.updateUser(
                 data.getName(),
                 data.getEmail(),
@@ -66,7 +162,9 @@ public class UserService {
                 data.getCompany(),
                 data.getDepartment(),
                 data.getWorkTime(),
-                data.getLunarYN()
+                data.getLunarYN(),
+                profileName,
+                profileUUID
         );
     }
 
@@ -76,20 +174,39 @@ public class UserService {
         user.deleteUser();
     }
 
-    public String saveProfileImgInTempFolder(MultipartFile file) {
+    public UserServiceDto saveProfileImgInTempFolder(MultipartFile file) {
         // PorestFile.save를 호출하여 파일을 임시 디렉토리에 원본 파일명으로 저장
         PorestFile.save(file, tempPath, ms);
 
-        // 저장된 파일의 전체 경로를 생성하여 반환
+        // 저장된 파일의 절대 경로 생성
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-        Path filePath = Paths.get(tempPath, originalFilename);
+        String absolutePath = Paths.get(tempPath, originalFilename).toString();
 
-        return filePath.toString();
+        // 절대 경로를 웹 접근 가능 URL로 변환
+        return UserServiceDto.builder()
+                .profileUrl(absolutePath.replace(fileRootPath, webUrlPrefix))
+                .profileUUID(UUID.randomUUID().toString())
+                .build();
     }
 
     public User checkUserExist(String userId) {
         Optional<User> findUser = userRepositoryImpl.findById(userId);
-        if ((findUser.isEmpty()) || findUser.get().getDelYN().equals("Y")) { throw new IllegalArgumentException(ms.getMessage("error.notfound.user", null, null)); }
+        if ((findUser.isEmpty()) || findUser.get().getDelYN().equals("Y")) {
+            throw new IllegalArgumentException(ms.getMessage("error.notfound.user", null, null));
+        }
         return findUser.get();
+    }
+
+    /**
+     * 프로필 URL에서 파일명을 추출하는 헬퍼 메소드
+     */
+    private String extractFileNameFromUrl(String profileUrl) {
+        if (!StringUtils.hasText(profileUrl)) {
+            return null;
+        }
+
+        String relativePath = profileUrl.replace(webUrlPrefix, "");
+        Path path = Paths.get(relativePath);
+        return path.getFileName().toString();
     }
 }

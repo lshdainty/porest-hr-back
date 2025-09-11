@@ -20,4 +20,8 @@ public class UserServiceDto {
     private CompanyType company;
     private DepartmentType department;
     private String lunarYN;
+
+    private String profileName;
+    private String profileUrl;
+    private String profileUUID;
 }

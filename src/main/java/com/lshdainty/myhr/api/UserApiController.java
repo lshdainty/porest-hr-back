@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +30,8 @@ public class UserApiController {
                 .department(data.getUserDepartmentType())
                 .workTime(data.getUserWorkTime())
                 .lunarYN(data.getLunarYN())
+                .profileUrl(data.getProfileUrl())
+                .profileUUID(data.getProfileUUID())
                 .build()
         );
 
@@ -38,10 +40,10 @@ public class UserApiController {
 
     @GetMapping("/api/v1/user/{id}")
     public ApiResponse user(@PathVariable("id") String userId) {
-        User user = userService.findUser(userId);
+        UserServiceDto user = userService.findUser(userId);
 
         return ApiResponse.success(UserDto.builder()
-                .userId(userId)
+                .userId(user.getId())
                 .userName(user.getName())
                 .userEmail(user.getEmail())
                 .userBirth(user.getBirth())
@@ -53,17 +55,18 @@ public class UserApiController {
                 .userDepartmentType(user.getDepartment())
                 .userDepartmentName(user.getDepartment().getDepartmentName())
                 .lunarYN(user.getLunarYN())
+                .profileUrl(user.getProfileUrl())
+                .profileUUID(user.getProfileUUID())
                 .build()
         );
     }
 
     @GetMapping("/api/v1/users")
     public ApiResponse users() {
-        List<User> users = userService.findUsers();
+        List<UserServiceDto> users = userService.findUsers();
 
         List<UserDto> resps = users.stream()
-                .map(u -> UserDto
-                        .builder()
+                .map(u -> UserDto.builder()
                         .userId(u.getId())
                         .userName(u.getName())
                         .userEmail(u.getEmail())
@@ -76,9 +79,11 @@ public class UserApiController {
                         .userDepartmentType(u.getDepartment())
                         .userDepartmentName(u.getDepartment().getDepartmentName())
                         .lunarYN(u.getLunarYN())
+                        .profileUrl(u.getProfileUrl())
+                        .profileUUID(u.getProfileUUID())
                         .build()
                 )
-                .toList();
+                .collect(Collectors.toList());
 
         return ApiResponse.success(resps);
     }
@@ -95,14 +100,15 @@ public class UserApiController {
                 .department(data.getUserDepartmentType())
                 .workTime(data.getUserWorkTime())
                 .lunarYN(data.getLunarYN())
+                .profileUrl(data.getProfileUrl())
+                .profileUUID(data.getProfileUUID())
                 .build()
         );
 
-        User findUser = userService.findUser(userId);
+        UserServiceDto findUser = userService.findUser(userId);
 
-        return ApiResponse.success(UserDto
-                .builder()
-                .userId(userId)
+        return ApiResponse.success(UserDto.builder()
+                .userId(findUser.getId())
                 .userName(findUser.getName())
                 .userEmail(findUser.getEmail())
                 .userBirth(findUser.getBirth())
@@ -114,6 +120,8 @@ public class UserApiController {
                 .userDepartmentType(findUser.getDepartment())
                 .userDepartmentName(findUser.getDepartment().getDepartmentName())
                 .lunarYN(findUser.getLunarYN())
+                .profileUrl(findUser.getProfileUrl())
+                .profileUUID(findUser.getProfileUUID())
                 .build()
         );
     }
@@ -126,7 +134,10 @@ public class UserApiController {
 
     @PostMapping(value = "/api/v1/user/upload/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse uploadProfile(@ModelAttribute UserDto data) {
-        String tempFilePath = userService.saveProfileImgInTempFolder(data.getProfile());
-        return ApiResponse.success(tempFilePath);
+        UserServiceDto dto = userService.saveProfileImgInTempFolder(data.getProfile());
+        return ApiResponse.success(UserDto.builder()
+                .profileUrl(dto.getProfileUrl())
+                .profileUUID(dto.getProfileUUID())
+                .build());
     }
 }
