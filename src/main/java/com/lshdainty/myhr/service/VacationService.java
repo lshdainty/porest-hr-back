@@ -9,7 +9,7 @@ import com.lshdainty.myhr.service.dto.VacationServiceDto;
 import com.lshdainty.myhr.service.vacation.*;
 import com.lshdainty.myhr.type.HolidayType;
 import com.lshdainty.myhr.type.VacationTimeType;
-import com.lshdainty.myhr.util.MyhrTime;
+import com.lshdainty.myhr.util.PorestTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -63,7 +63,7 @@ public class VacationService {
         Vacation vacation = checkVacationExist(data.getId());
 
         // 시작, 종료시간 시간 비교
-        if (MyhrTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) {
+        if (PorestTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null));
         }
 
@@ -75,7 +75,7 @@ public class VacationService {
         }
 
         // 주말 리스트 조회
-        List<LocalDate> weekDays = MyhrTime.getBetweenDatesByDayOfWeek(data.getStartDate(), data.getEndDate(), new int[]{6, 7}, ms);
+        List<LocalDate> weekDays = PorestTime.getBetweenDatesByDayOfWeek(data.getStartDate(), data.getEndDate(), new int[]{6, 7}, ms);
 
         // 공휴일 리스트 조회
         List<LocalDate> holidays = holidayRepositoryImpl.findHolidaysByStartEndDateWithType(
@@ -86,13 +86,13 @@ public class VacationService {
                 .map(h -> LocalDate.parse(h.getDate(), DateTimeFormatter.BASIC_ISO_DATE))
                 .toList();
 
-        weekDays = MyhrTime.addAllDates(weekDays, holidays);
+        weekDays = PorestTime.addAllDates(weekDays, holidays);
 
         // 두 날짜 간 모든 날짜 가져오기
-        List<LocalDate> betweenDates = MyhrTime.getBetweenDates(data.getStartDate(), data.getEndDate(), ms);
+        List<LocalDate> betweenDates = PorestTime.getBetweenDates(data.getStartDate(), data.getEndDate(), ms);
         log.info("betweenDates : {}, weekDays : {}", betweenDates, weekDays);
         // 사용자가 캘린더에서 선택한 날짜 중 휴일, 공휴일 제거
-        betweenDates = MyhrTime.removeAllDates(betweenDates, weekDays);
+        betweenDates = PorestTime.removeAllDates(betweenDates, weekDays);
         log.info("remainDays : {}", betweenDates);
 
         // 등록하려는 총 사용시간 계산
@@ -141,7 +141,7 @@ public class VacationService {
         VacationHistory history = checkVacationHistoryExist(vacationHistoryId);
         Vacation vacation = checkVacationExist(history.getVacation().getId());
 
-        if (MyhrTime.isAfterThanEndDate(LocalDateTime.now(), vacation.getExpiryDate())) {
+        if (PorestTime.isAfterThanEndDate(LocalDateTime.now(), vacation.getExpiryDate())) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.expiry.isBeforeThanNow", null, null));
         }
 
@@ -155,7 +155,7 @@ public class VacationService {
             history.deleteRegistVacationHistory(vacation, delUserId, clientIP);
         } else {
             // 휴가 사용 내역
-            if (MyhrTime.isAfterThanEndDate(LocalDateTime.now(), history.getUsedDateTime())) {
+            if (PorestTime.isAfterThanEndDate(LocalDateTime.now(), history.getUsedDateTime())) {
                 throw new IllegalArgumentException(ms.getMessage("error.validate.delete.isBeforeThanNow", null, null));
             }
 

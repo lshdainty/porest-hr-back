@@ -45,3 +45,11 @@ decorator:
 
 jwt:
   secret: testkeyakljsdfashaweflkamsdflkjsahdfjklhasldjufrhawlekjflsdjhglmdnfljksdfjkasdhfljasdhfulawefmdsljkbdjkflkas
+
+file:
+  temp:
+    path:
+      profile: /Users/lshdainty/study/testimg/temp/profile
+  origin:
+    path:
+      profile: /Users/lshdainty/study/testimg/origin/profile

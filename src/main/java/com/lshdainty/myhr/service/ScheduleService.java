@@ -3,7 +3,7 @@ package com.lshdainty.myhr.service;
 import com.lshdainty.myhr.domain.*;
 import com.lshdainty.myhr.repository.*;
 import com.lshdainty.myhr.service.dto.ScheduleServiceDto;
-import com.lshdainty.myhr.util.MyhrTime;
+import com.lshdainty.myhr.util.PorestTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -27,7 +27,7 @@ public class ScheduleService {
         // 유저 조회
         User user = userService.checkUserExist(data.getUserId());
 
-        if (MyhrTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) { throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null)); }
+        if (PorestTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) { throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null)); }
 
         Schedule schedule = Schedule.createSchedule(
                 user,
@@ -50,7 +50,7 @@ public class ScheduleService {
     }
 
     public List<Schedule> findSchedulesByPeriod(LocalDateTime start, LocalDateTime end) {
-        if (MyhrTime.isAfterThanEndDate(start, end)) { throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null)); }
+        if (PorestTime.isAfterThanEndDate(start, end)) { throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null)); }
         return scheduleRepositoryImpl.findSchedulesByPeriod(start, end);
     }
 

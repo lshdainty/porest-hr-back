@@ -7,6 +7,7 @@ import com.lshdainty.myhr.type.CompanyType;
 import com.lshdainty.myhr.type.DepartmentType;
 import com.lshdainty.myhr.type.RoleType;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -32,4 +33,6 @@ public class UserDto {
     private String userCompanyName;
     private String userDepartmentName;
     private String userRoleName;
+
+    private MultipartFile profile;
 }

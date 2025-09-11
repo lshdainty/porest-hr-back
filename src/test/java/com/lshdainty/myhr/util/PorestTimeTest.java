@@ -17,7 +17,7 @@ import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("myHR Time Util 테스트")
-class MyhrTimeTest {
+class PorestTimeTest {
     @Mock
     private MessageSource ms;
 
@@ -25,7 +25,7 @@ class MyhrTimeTest {
     @DisplayName("시작 시간이 종료 시간 이후인지 확인 - 성공")
     void isAfterThanEndDateSuccessTest() {
         // Given & When & Then
-        assertThat(MyhrTime.isAfterThanEndDate(
+        assertThat(PorestTime.isAfterThanEndDate(
                 LocalDateTime.of(2025, 1, 2, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0))
         ).isTrue();
@@ -35,7 +35,7 @@ class MyhrTimeTest {
     @DisplayName("시작 시간이 종료 시간 이후인지 확인 - 실패 (시작 시간이 종료 시간 이전임)")
     void isAfterThanEndDateFailTest() {
         // Given & When & Then
-        assertThat(MyhrTime.isAfterThanEndDate(
+        assertThat(PorestTime.isAfterThanEndDate(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 2, 0, 0, 0))
         ).isFalse();
@@ -45,7 +45,7 @@ class MyhrTimeTest {
     @DisplayName("시작 시간이 종료 시간 이후인지 확인 - 실패 (시작 시간과 종료 시간 동일함)")
     void isAfterThanEndDateSuccessTestSameTime() {
         // Given & When & Then
-        assertThat(MyhrTime.isAfterThanEndDate(
+        assertThat(PorestTime.isAfterThanEndDate(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0))
         ).isFalse();
@@ -55,7 +55,7 @@ class MyhrTimeTest {
     @DisplayName("시작 시간과 종료 시간 사이의 날짜 목록 구하기 - 성공")
     void getBetweenDatesSuccessTest() {
         // Given & When & Then
-        assertThat(MyhrTime.getBetweenDates(
+        assertThat(PorestTime.getBetweenDates(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 5, 0, 0, 0),
                 ms
@@ -76,7 +76,7 @@ class MyhrTimeTest {
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () -> {
-            MyhrTime.getBetweenDates(
+            PorestTime.getBetweenDates(
                     LocalDateTime.of(2025, 1, 10, 0, 0, 0),
                     LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     ms
@@ -88,7 +88,7 @@ class MyhrTimeTest {
     @DisplayName("시작 시간과 종료 시간 사이의 요일에 해당하는 날짜 목록 구하기 - 성공")
     void getBetweenDatesByDayOfWeekSuccessTest() {
         // Given & When & Then
-        assertThat(MyhrTime.getBetweenDatesByDayOfWeek(
+        assertThat(PorestTime.getBetweenDatesByDayOfWeek(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 10, 0, 0, 0),
                 new int[]{6, 7},
@@ -107,7 +107,7 @@ class MyhrTimeTest {
 
         // Given & When & Then
         assertThrows(IllegalArgumentException.class, () -> {
-            MyhrTime.getBetweenDatesByDayOfWeek(
+            PorestTime.getBetweenDatesByDayOfWeek(
                     LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     LocalDateTime.of(2025, 1, 10, 0, 0, 0),
                     new int[]{8},
@@ -132,7 +132,7 @@ class MyhrTimeTest {
         );
 
         // When & Then
-        assertThat(MyhrTime.addAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
+        assertThat(PorestTime.addAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
                 LocalDate.of(2025, 1, 1),
                 LocalDate.of(2025, 1, 2),
                 LocalDate.of(2025, 1, 3),
@@ -157,7 +157,7 @@ class MyhrTimeTest {
         );
 
         // When & Then
-        assertThat(MyhrTime.removeAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
+        assertThat(PorestTime.removeAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
                 LocalDate.of(2025, 1, 1),
                 LocalDate.of(2025, 1, 2)
         );
@@ -174,7 +174,7 @@ class MyhrTimeTest {
         );
 
         // When & Then
-        assertThat(MyhrTime.findMaxDateTime(dateTimes, ms)).isEqualTo(LocalDateTime.of(2025, 1, 5, 12, 0, 0));
+        assertThat(PorestTime.findMaxDateTime(dateTimes, ms)).isEqualTo(LocalDateTime.of(2025, 1, 5, 12, 0, 0));
     }
 
     @Test
@@ -184,7 +184,7 @@ class MyhrTimeTest {
         when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMaxDateTime(null, ms));
+        assertThrows(IllegalArgumentException.class, () -> PorestTime.findMaxDateTime(null, ms));
     }
 
     @Test
@@ -194,7 +194,7 @@ class MyhrTimeTest {
         when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMaxDateTime(List.of(), ms));
+        assertThrows(IllegalArgumentException.class, () -> PorestTime.findMaxDateTime(List.of(), ms));
     }
 
     @Test
@@ -208,7 +208,7 @@ class MyhrTimeTest {
         );
 
         // When & Then
-        assertThat(MyhrTime.findMinDateTime(dateTimes, ms)).isEqualTo(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
+        assertThat(PorestTime.findMinDateTime(dateTimes, ms)).isEqualTo(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
     }
 
     @Test
@@ -218,7 +218,7 @@ class MyhrTimeTest {
         when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMinDateTime(null, ms));
+        assertThrows(IllegalArgumentException.class, () -> PorestTime.findMinDateTime(null, ms));
     }
 
     @Test
@@ -228,6 +228,6 @@ class MyhrTimeTest {
         when(ms.getMessage("error.validate.parameter.null", null, null)).thenReturn("");
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> MyhrTime.findMinDateTime(List.of(), ms));
+        assertThrows(IllegalArgumentException.class, () -> PorestTime.findMinDateTime(List.of(), ms));
     }
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MyhrTime {
+public class PorestTime {
     /**
      * startDate와 endDate 순서 체크 함수<br>
      * startDate > endDate : true<br>

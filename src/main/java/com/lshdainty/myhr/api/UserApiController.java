@@ -6,7 +6,9 @@ import com.lshdainty.myhr.service.UserService;
 import com.lshdainty.myhr.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -120,5 +122,11 @@ public class UserApiController {
     public ApiResponse deleteUser(@PathVariable("id") String userId) {
         userService.deleteUser(userId);
         return ApiResponse.success();
+    }
+
+    @PostMapping(value = "/api/v1/user/upload/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse uploadProfile(@ModelAttribute UserDto data) {
+        String tempFilePath = userService.saveProfileImgInTempFolder(data.getProfile());
+        return ApiResponse.success(tempFilePath);
     }
 }
