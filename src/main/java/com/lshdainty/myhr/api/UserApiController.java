@@ -1,6 +1,5 @@
 package com.lshdainty.myhr.api;
 
-import com.lshdainty.myhr.domain.User;
 import com.lshdainty.myhr.api.dto.UserDto;
 import com.lshdainty.myhr.service.UserService;
 import com.lshdainty.myhr.service.dto.UserServiceDto;
@@ -56,7 +55,6 @@ public class UserApiController {
                 .userDepartmentName(user.getDepartment().getDepartmentName())
                 .lunarYN(user.getLunarYN())
                 .profileUrl(user.getProfileUrl())
-                .profileUUID(user.getProfileUUID())
                 .build()
         );
     }
@@ -80,7 +78,6 @@ public class UserApiController {
                         .userDepartmentName(u.getDepartment().getDepartmentName())
                         .lunarYN(u.getLunarYN())
                         .profileUrl(u.getProfileUrl())
-                        .profileUUID(u.getProfileUUID())
                         .build()
                 )
                 .collect(Collectors.toList());
@@ -121,7 +118,6 @@ public class UserApiController {
                 .userDepartmentName(findUser.getDepartment().getDepartmentName())
                 .lunarYN(findUser.getLunarYN())
                 .profileUrl(findUser.getProfileUrl())
-                .profileUUID(findUser.getProfileUUID())
                 .build()
         );
     }
