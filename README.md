@@ -1,7 +1,7 @@
-[![](https://github.com/lshdainty/myHR-back/actions/workflows/ci-main.yml/badge.svg)](https://github.com/lshdainty/myHR-back/actions/workflows/ci-main.yml)
-[![codecov](https://codecov.io/gh/lshdainty/myHR-back/branch/main/graph/badge.svg)](https://codecov.io/gh/lshdainty/myHR-back)
+[![](https://github.com/lshdainty/porest-back/actions/workflows/ci-main.yml/badge.svg)](https://github.com/lshdainty/poresr-back/actions/workflows/ci-main.yml)
+[![codecov](https://codecov.io/gh/lshdainty/porest-back/branch/main/graph/badge.svg)](https://codecov.io/gh/lshdainty/porest-back)
 
-# myHR
+# POREST
 
 사업장에 속한 근로자의 일정관리 및 휴가관리를 쉽게 관리하고자 만든 서비스입니다.   
 Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며   
