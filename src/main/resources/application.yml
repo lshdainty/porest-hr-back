@@ -1,6 +1,6 @@
 spring:
   application:
-    name: myhr
+    name: porest
   messages:
     basename: message/messages
     encoding: utf-8
@@ -31,10 +31,10 @@ server:
 
 logging:
   level:
-    com.lshdainty.myhr.api: debug
-    com.lshdainty.myhr.repository: debug
-    com.lshdainty.myhr.service: debug
-    com.lshdainty.myhr.domain: debug
+    com.lshdainty.porest.api: debug
+    com.lshdainty.porest.repository: debug
+    com.lshdainty.porest.service: debug
+    com.lshdainty.porest.domain: debug
     p6spy: info
 
 decorator:

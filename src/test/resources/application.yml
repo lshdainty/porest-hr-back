@@ -1,6 +1,6 @@
 spring:
   application:
-    name: myhr
+    name: porest
 
   jpa:
     hibernate:

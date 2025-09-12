@@ -62,7 +62,7 @@ tasks.named('test') {
 
 def jacocoExcludes = [
     '**/Application*',
-    '**/MyhrApplication*',
+    '**/PorestApplication*',
     '**/InitDB*',
     '**/api/**',    // 추후 제외대상
     '**/domain/**',
