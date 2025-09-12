@@ -123,7 +123,7 @@ class ScheduleServiceTest {
         given(scheduleRepositoryImpl.findSchedulesByUserId(userId)).willReturn(List.of(
                 Schedule.createSchedule(user, "교육", ScheduleType.EDUCATION, LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 23, 59, 59), "", "127.0.0.1"),
                 Schedule.createSchedule(user, "예비군", ScheduleType.DEFENSE, LocalDateTime.of(LocalDateTime.now().getYear(), 7, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 7, 20, 23, 59, 59), "", "127.0.0.1"),
-                Schedule.createSchedule(user, "건강검진", ScheduleType.HEALTHCHECK, LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 23, 59, 59), "", "127.0.0.1")
+                Schedule.createSchedule(user, "건강검진(반차)", ScheduleType.HEALTHCHECKHALF, LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 9, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 14, 0, 0), "", "127.0.0.1")
         ));
 
         // When
@@ -133,7 +133,7 @@ class ScheduleServiceTest {
         assertThat(schedules).hasSize(3);
         assertThat(schedules)
                 .extracting("desc")
-                .containsExactlyInAnyOrder("교육", "예비군", "건강검진");
+                .containsExactlyInAnyOrder("교육", "예비군", "건강검진(반차)");
         then(scheduleRepositoryImpl).should().findSchedulesByUserId(userId);
     }
 
@@ -149,7 +149,7 @@ class ScheduleServiceTest {
         given(scheduleRepositoryImpl.findSchedulesByPeriod(start, end)).willReturn(List.of(
                 Schedule.createSchedule(user, "교육", ScheduleType.EDUCATION, LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 4, 20, 23, 59, 59), "", "127.0.0.1"),
                 Schedule.createSchedule(user, "예비군", ScheduleType.DEFENSE, LocalDateTime.of(LocalDateTime.now().getYear(), 7, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 7, 20, 23, 59, 59), "", "127.0.0.1"),
-                Schedule.createSchedule(user, "건강검진", ScheduleType.HEALTHCHECK, LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 0, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 23, 59, 59), "", "127.0.0.1")
+                Schedule.createSchedule(user, "건강검진(반차)", ScheduleType.HEALTHCHECKHALF, LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 9, 0, 0), LocalDateTime.of(LocalDateTime.now().getYear(), 12, 20, 14, 0, 0), "", "127.0.0.1")
         ));
 
         // When
@@ -159,7 +159,7 @@ class ScheduleServiceTest {
         assertThat(schedules).hasSize(3);
         assertThat(schedules)
                 .extracting("desc")
-                .containsExactlyInAnyOrder("교육", "예비군", "건강검진");
+                .containsExactlyInAnyOrder("교육", "예비군", "건강검진(반차)");
         then(scheduleRepositoryImpl).should().findSchedulesByPeriod(start, end);
     }
 

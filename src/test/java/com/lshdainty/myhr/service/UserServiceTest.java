@@ -58,13 +58,12 @@ class UserServiceTest {
         given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
 
         // When
-        User findUser = userService.findUser(id);
+        UserServiceDto findUser = userService.findUser(id);
 
         // Then
         then(userRepositoryImpl).should().findById(id);
         assertThat(findUser).isNotNull();
         assertThat(findUser.getName()).isEqualTo(name);
-        assertThat(findUser.getDelYN()).isEqualTo("N");
     }
 
     @Test
@@ -105,13 +104,13 @@ class UserServiceTest {
         ));
 
         // When
-        List<User> findUsers = userService.findUsers();
+        List<UserServiceDto> findUsers = userService.findUsers();
 
         // Then
         then(userRepositoryImpl).should().findUsers();
         assertThat(findUsers).hasSize(3);
         assertThat(findUsers)
-                .extracting(User::getName)
+                .extracting(UserServiceDto::getName)
                 .containsExactlyInAnyOrder("이서준", "김서연", "김지후");
     }
 

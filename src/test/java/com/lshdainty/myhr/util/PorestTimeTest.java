@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("myHR Time Util 테스트")
+@DisplayName("porest Time Util 테스트")
 class PorestTimeTest {
     @Mock
     private MessageSource ms;

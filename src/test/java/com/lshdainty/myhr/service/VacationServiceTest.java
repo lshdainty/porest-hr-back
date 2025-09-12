@@ -358,7 +358,7 @@ class VacationServiceTest {
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                 "", "127.0.0.1");
-        Holiday holiday = Holiday.createHoliday("현충일", "20250606", HolidayType.PUBLIC);
+        Holiday holiday = Holiday.createHoliday("현충일", "20250606", HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y, null);
 
         given(userService.checkUserExist(userId)).willReturn(user);
         given(vacationRepositoryImpl.findById(vacationId)).willReturn(Optional.of(vacation));

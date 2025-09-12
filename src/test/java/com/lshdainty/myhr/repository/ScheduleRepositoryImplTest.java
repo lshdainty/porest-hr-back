@@ -34,7 +34,7 @@ public class ScheduleRepositoryImplTest {
         User user = User.createUser("test1");
         em.persist(user);
 
-        String desc = "건강검진";
+        String desc = "건강검진(반차)";
         ScheduleType type = ScheduleType.HEALTHCHECKHALF;
         LocalDateTime start = LocalDateTime.of(2025, 1, 2, 9, 0, 0);
         LocalDateTime end = LocalDateTime.of(2025, 1, 2, 14, 0, 0);
@@ -75,11 +75,11 @@ public class ScheduleRepositoryImplTest {
         User user = User.createUser("test1");
         em.persist(user);
 
-        String[] descs = {"건강검진", "예비군"};
-        ScheduleType[] types = {ScheduleType.HEALTHCHECK, ScheduleType.DEFENSE};
+        String[] descs = {"건강검진(반차)", "예비군"};
+        ScheduleType[] types = {ScheduleType.HEALTHCHECKHALF, ScheduleType.DEFENSE};
         LocalDateTime[] starts = {
-                LocalDateTime.of(2025, 1, 2, 0, 0, 0),
-                LocalDateTime.of(2025, 2, 3, 0, 0, 0)
+                LocalDateTime.of(2025, 1, 2, 9, 0, 0),
+                LocalDateTime.of(2025, 2, 3, 14, 0, 0)
         };
         LocalDateTime[] ends = {
                 LocalDateTime.of(2025, 1, 2, 23, 59, 59),
@@ -136,14 +136,14 @@ public class ScheduleRepositoryImplTest {
         User user = User.createUser("test1");
         em.persist(user);
 
-        String[] descs = {"건강검진", "예비군"};
-        ScheduleType[] types = {ScheduleType.HEALTHCHECK, ScheduleType.DEFENSE};
+        String[] descs = {"건강검진(반차)", "예비군"};
+        ScheduleType[] types = {ScheduleType.HEALTHCHECKHALF, ScheduleType.DEFENSE};
         LocalDateTime[] starts = {
-                LocalDateTime.of(2025, 1, 2, 0, 0, 0),
+                LocalDateTime.of(2025, 1, 2, 9, 0, 0),
                 LocalDateTime.of(2025, 4, 3, 0, 0, 0)
         };
         LocalDateTime[] ends = {
-                LocalDateTime.of(2025, 1, 2, 23, 59, 59),
+                LocalDateTime.of(2025, 1, 2, 14, 0, 0),
                 LocalDateTime.of(2025, 4, 3, 23, 59, 59)
         };
 
@@ -160,10 +160,10 @@ public class ScheduleRepositoryImplTest {
 
         // then
         assertThat(findSchedules.size()).isEqualTo(1);
-        assertThat(findSchedules.get(0).getDesc()).isEqualTo("건강검진");
-        assertThat(findSchedules.get(0).getType()).isEqualTo(ScheduleType.HEALTHCHECK);
-        assertThat(findSchedules.get(0).getStartDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
-        assertThat(findSchedules.get(0).getEndDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 23, 59, 59));
+        assertThat(findSchedules.get(0).getDesc()).isEqualTo("건강검진(반차)");
+        assertThat(findSchedules.get(0).getType()).isEqualTo(ScheduleType.HEALTHCHECKHALF);
+        assertThat(findSchedules.get(0).getStartDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 9, 0, 0));
+        assertThat(findSchedules.get(0).getEndDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 14, 0, 0));
     }
 
     @Test
@@ -173,14 +173,14 @@ public class ScheduleRepositoryImplTest {
         User user = User.createUser("test1");
         em.persist(user);
 
-        String[] descs = {"건강검진", "예비군"};
-        ScheduleType[] types = {ScheduleType.HEALTHCHECK, ScheduleType.DEFENSE};
+        String[] descs = {"건강검진(반차)", "예비군"};
+        ScheduleType[] types = {ScheduleType.HEALTHCHECKHALF, ScheduleType.DEFENSE};
         LocalDateTime[] starts = {
-                LocalDateTime.of(2025, 1, 2, 0, 0, 0),
+                LocalDateTime.of(2025, 1, 2, 9, 0, 0),
                 LocalDateTime.of(2025, 4, 3, 0, 0, 0)
         };
         LocalDateTime[] ends = {
-                LocalDateTime.of(2025, 1, 2, 23, 59, 59),
+                LocalDateTime.of(2025, 1, 2, 14, 0, 0),
                 LocalDateTime.of(2025, 4, 3, 23, 59, 59)
         };
 
@@ -205,10 +205,10 @@ public class ScheduleRepositoryImplTest {
 
         // then
         assertThat(scheduleLeft.size()).isEqualTo(1);
-        assertThat(scheduleLeft.get(0).getDesc()).isEqualTo("건강검진");
-        assertThat(scheduleLeft.get(0).getType()).isEqualTo(ScheduleType.HEALTHCHECK);
-        assertThat(scheduleLeft.get(0).getStartDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
-        assertThat(scheduleLeft.get(0).getEndDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 23, 59, 59));
+        assertThat(scheduleLeft.get(0).getDesc()).isEqualTo("건강검진(반차)");
+        assertThat(scheduleLeft.get(0).getType()).isEqualTo(ScheduleType.HEALTHCHECKHALF);
+        assertThat(scheduleLeft.get(0).getStartDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 9, 0, 0));
+        assertThat(scheduleLeft.get(0).getEndDate()).isEqualTo(LocalDateTime.of(2025, 1, 2, 14, 0, 0));
 
         assertThat(scheduleRight.size()).isEqualTo(1);
         assertThat(scheduleRight.get(0).getDesc()).isEqualTo("예비군");
