@@ -17,24 +17,27 @@ public class PorestFile {
     private static final Logger log = LoggerFactory.getLogger(PorestFile.class);
 
     /**
-     * 파일을 저장하는 함수.
-     * MultipartFile에서 원본 파일명을 가져와서 저장합니다.
+     * 파일을 저장하는 함수</br>
+     * fileName을 넘겨주면 해당 파일명으로 저장</br>
+     * 없다면 multipartFile에서 가져온 파일명으로 저장
      *
      * @param multipartFile 저장할 파일
      * @param path 파일 저장 경로
+     * @param fileName 다른 이름으로 저장 시 사용
      * @param ms MessageSource
      * @return boolean 저장 성공 여부
      */
-    public static boolean save(MultipartFile multipartFile, String path, MessageSource ms) {
-        // multipartFile이 null이거나 비어있는지 확인
+    public static boolean save(MultipartFile multipartFile, String path, String fileName, MessageSource ms) {
         if (multipartFile == null || multipartFile.isEmpty()) {
             return false;
         }
 
-        // 원본 파일명 가져오기 및 경로 정리 (경로 조작 방지)
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        // 옵션 파일명이 없다면 객체에서 원본 파일명을 가져와서 저장
+        if (!StringUtils.hasText(fileName)) {
+            // 원본 파일명 가져오기 및 경로 정리 (경로 조작 방지)
+            fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        }
 
-        // 파일명이 없는 경우 처리
         if (fileName.isEmpty()) {
             log.warn("Could not save file with empty name.");
             return false;
@@ -52,7 +55,6 @@ public class PorestFile {
             multipartFile.transferTo(filePath.toFile());
             return true;
         } catch (IOException e) {
-            // 파일 저장 중 오류 발생 시 로그를 남기고 예외를 던집니다.
             log.error("File save failed. path: {}, fileName: {}", path, fileName, e);
             throw new RuntimeException(ms.getMessage("error.file.save", new String[]{fileName}, null), e);
         }
@@ -77,12 +79,10 @@ public class PorestFile {
                 // 파일 내용을 byte 배열로 읽어옴
                 return Files.readAllBytes(filePath);
             } else {
-                // 파일을 찾을 수 없을 경우 예외를 던집니다.
                 log.warn("File not found. fullPath: {}", fullPath);
                 throw new NoSuchElementException(ms.getMessage("error.file.notfound", new String[]{fullPath}, null));
             }
         } catch (IOException e) {
-            // 파일 읽기 중 오류 발생 시 로그를 남기고 예외를 던집니다.
             log.error("File read failed. fullPath: {}", fullPath, e);
             throw new RuntimeException(ms.getMessage("error.file.read", new String[]{fullPath}, null), e);
         }
@@ -117,7 +117,6 @@ public class PorestFile {
             Files.copy(source, target);
             return true;
         } catch (IOException e) {
-            // 파일 복사 중 오류 발생 시 로그를 남기고 예외를 던집니다.
             log.error("File copy failed. source: {}, target: {}", sourcePath, targetPath, e);
             throw new RuntimeException(ms.getMessage("error.file.copy", new String[]{sourcePath, targetPath}, null), e);
         }
@@ -152,9 +151,96 @@ public class PorestFile {
             Files.move(source, target);
             return true;
         } catch (IOException e) {
-            // 파일 이동 중 오류 발생 시 로그를 남기고 예외를 던집니다.
             log.error("File move failed. source: {}, target: {}", sourcePath, targetPath, e);
             throw new RuntimeException(ms.getMessage("error.file.move", new String[]{sourcePath, targetPath}, null), e);
         }
+    }
+
+    /**
+     * 원본 파일명과 UUID로 물리적 파일명 생성하는 함수 </br>
+     * 형식: originalName.ext + uuid -> originalName_uuid.ext
+     *
+     * @param originalFilename 원본 파일명
+     * @param uuid UUID 문자열
+     * @return 물리적 파일명 (originalName_UUID.extension)
+     */
+    public static String generatePhysicalFilename(String originalFilename, String uuid) {
+        if (!StringUtils.hasText(originalFilename) || !StringUtils.hasText(uuid)) {
+            return originalFilename;
+        }
+
+        // 확장자 분리
+        if (originalFilename.contains(".")) {
+            int lastDotIndex = originalFilename.lastIndexOf(".");
+            String nameWithoutExt = originalFilename.substring(0, lastDotIndex);
+            String extension = originalFilename.substring(lastDotIndex);
+            return nameWithoutExt + "_" + uuid + extension;
+        }
+
+        // 확장자가 없는 경우
+        return originalFilename + "_" + uuid;
+    }
+
+    /**
+     * 물리적 파일명에서 원본 파일명 추출하는 함수</br>
+     * 형식: originalName_UUID.extension -> originalName.extension
+     *
+     * @param physicalFilename 물리적 파일명
+     * @param uuid UUID 문자열 (null이면 패턴으로 찾아서 제거)
+     * @return 원본 파일명
+     */
+    public static String extractOriginalFilename(String physicalFilename, String uuid) {
+        if (!StringUtils.hasText(physicalFilename)) {
+            return null;
+        }
+
+        // UUID가 제공된 경우: 간단하게 replace로 제거
+        if (StringUtils.hasText(uuid)) {
+            return physicalFilename.replace("_" + uuid, "");
+        }
+
+        // UUID가 없는 경우: 패턴으로 찾아서 제거
+        // 마지막 '_' 이후부터 확장자 전까지가 UUID라고 가정
+        String extractedUuid = extractUuid(physicalFilename, null);
+        if (StringUtils.hasText(extractedUuid)) {
+            return physicalFilename.replace("_" + extractedUuid, "");
+        }
+
+        // UUID가 없으면 원본 그대로 반환
+        return physicalFilename;
+    }
+
+    /**
+     * 물리적 파일명에서 UUID 추출</br>
+     * 형식: originalName_UUID.extension -> UUID
+     *
+     * @param physicalFilename 물리적 파일명
+     * @param uuid UUID 문자열 (제공되면 그대로 반환, null이면 패턴으로 찾기)
+     * @return 추출된 UUID
+     */
+    public static String extractUuid(String physicalFilename, String uuid) {
+        if (!StringUtils.hasText(physicalFilename)) {
+            return null;
+        }
+
+        // UUID가 이미 제공된 경우 그대로 반환
+        if (StringUtils.hasText(uuid)) {
+            return uuid;
+        }
+
+        // UUID를 패턴으로 찾기
+        // 확장자 제거
+        String nameWithoutExt = physicalFilename;
+        if (physicalFilename.contains(".")) {
+            nameWithoutExt = physicalFilename.substring(0, physicalFilename.lastIndexOf("."));
+        }
+
+        // 마지막 '_' 이후가 UUID
+        int lastUnderscoreIndex = nameWithoutExt.lastIndexOf("_");
+        if (lastUnderscoreIndex != -1 && lastUnderscoreIndex < nameWithoutExt.length() - 1) {
+            return nameWithoutExt.substring(lastUnderscoreIndex + 1);
+        }
+
+        return null;
     }
 }
