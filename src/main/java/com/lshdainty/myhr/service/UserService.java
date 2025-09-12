@@ -79,8 +79,10 @@ public class UserService {
                 .company(user.getCompany())
                 .department(user.getDepartment())
                 .lunarYN(user.getLunarYN())
-                .profileUrl(StringUtils.hasText(user.getProfileName()) ?
-                                Paths.get(originPath, user.getProfileName()).toString().replace(fileRootPath, webUrlPrefix) : null)
+                .profileName(user.getProfileName())
+                .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
+                        generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
+                // profileUUID는 프론트엔드에 노출하지 않음
                 .build();
     }
 
@@ -99,8 +101,10 @@ public class UserService {
                         .company(user.getCompany())
                         .department(user.getDepartment())
                         .lunarYN(user.getLunarYN())
-                        .profileUrl(StringUtils.hasText(user.getProfileName()) ?
-                                Paths.get(originPath, user.getProfileName()).toString().replace(fileRootPath, webUrlPrefix) : null)
+                        .profileName(user.getProfileName())
+                        .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
+                                generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
+                        // profileUUID는 프론트엔드에 노출하지 않음
                         .build())
                 .collect(Collectors.toList());
     }
@@ -135,17 +139,23 @@ public class UserService {
     }
 
     public UserServiceDto saveProfileImgInTempFolder(MultipartFile file) {
-        // PorestFile.save를 호출하여 파일을 임시 디렉토리에 원본 파일명으로 저장
-        PorestFile.save(file, tempPath, ms);
-
-        // 저장된 파일의 절대 경로 생성
+        // 원본 파일명 추출
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-        String absolutePath = Paths.get(tempPath, originalFilename).toString();
 
-        // 절대 경로를 웹 접근 가능 URL로 변환
+        String uuid = UUID.randomUUID().toString();
+
+        // PorestFile의 static 메소드를 사용하여 물리적 파일명 생성
+        String physicalFilename = PorestFile.generatePhysicalFilename(originalFilename, uuid);
+
+        // 임시 폴더에 물리적 파일명으로 저장
+        PorestFile.save(file, tempPath, physicalFilename, ms);
+
+        // 저장된 파일의 절대 경로 생성 (물리적 파일명 기준)
+        String absolutePath = Paths.get(tempPath, physicalFilename).toString();
+
         return UserServiceDto.builder()
                 .profileUrl(absolutePath.replace(fileRootPath, webUrlPrefix))
-                .profileUUID(UUID.randomUUID().toString())
+                .profileUUID(uuid)
                 .build();
     }
 
@@ -158,9 +168,9 @@ public class UserService {
     }
 
     /**
-     * 프로필 URL에서 파일명을 추출하는 헬퍼 메소드
+     * 프로필 URL에서 물리적 파일명을 추출하는 헬퍼 메소드
      */
-    private String extractFileNameFromUrl(String profileUrl) {
+    private String extractPhysicalFileNameFromUrl(String profileUrl) {
         if (!StringUtils.hasText(profileUrl)) {
             return null;
         }
@@ -171,26 +181,40 @@ public class UserService {
     }
 
     /**
-     * 임시 폴더에 저장된 프로필 이미지를</br>
-     * 관리용 폴더로 복사하는 헬퍼 메소드
+     * 원본 파일명과 UUID로 프로필 URL 생성
+     */
+    private String generateProfileUrl(String originalFilename, String uuid) {
+        // PorestFile의 static 메소드를 사용하여 물리적 파일명 생성
+        String physicalFilename = PorestFile.generatePhysicalFilename(originalFilename, uuid);
+        if (physicalFilename == null) {
+            return null;
+        }
+
+        String absolutePath = Paths.get(originPath, physicalFilename).toString();
+        return absolutePath.replace(fileRootPath, webUrlPrefix);
+    }
+
+    /**
+     * 임시 폴더에 저장된 프로필 이미지를 관리용 폴더로 복사하는 헬퍼 메소드
      */
     private UserServiceDto copyTempProfileToOrigin(UserServiceDto data) {
         String profileName = null;
         String profileUUID = null;
 
-        String fileName = extractFileNameFromUrl(data.getProfileUrl());
-        if (fileName != null) {
-            String tempFilePath = Paths.get(tempPath, fileName).toString();
-            String originFilePath = Paths.get(originPath, fileName).toString();
+        String physicalFileName = extractPhysicalFileNameFromUrl(data.getProfileUrl());
+        if (physicalFileName != null) {
+            String tempFilePath = Paths.get(tempPath, physicalFileName).toString();
+            String originFilePath = Paths.get(originPath, physicalFileName).toString();
 
             if (PorestFile.copy(tempFilePath, originFilePath, ms)) {
-                profileName = fileName;
+                // PorestFile의 static 메소드를 사용하여 원본 파일명 추출
+                profileName = PorestFile.extractOriginalFilename(physicalFileName, null);
                 profileUUID = data.getProfileUUID();
             }
         }
 
         return UserServiceDto.builder()
-                .profileName(profileName)
+                .profileName(profileName) // 추출된 원본 파일명
                 .profileUUID(profileUUID)
                 .build();
     }
