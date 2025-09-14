@@ -8,7 +8,7 @@ import com.lshdainty.porest.repository.VacationRepositoryImpl;
 import com.lshdainty.porest.service.dto.VacationServiceDto;
 import com.lshdainty.porest.service.vacation.*;
 import com.lshdainty.porest.type.HolidayType;
-import com.lshdainty.porest.type.VacationTimeType;
+import com.lshdainty.porest.type.vacation.VacationTimeType;
 import com.lshdainty.porest.util.PorestTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +52,8 @@ public class VacationService {
                     new Bereavement(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
             case OVERTIME ->
                     new Overtime(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+            default ->
+                    new Annual(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
         };
 
         return vacationService.registVacation(data, addUserId, clientIP);

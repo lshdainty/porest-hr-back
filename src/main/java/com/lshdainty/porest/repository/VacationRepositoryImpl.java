@@ -1,7 +1,7 @@
 package com.lshdainty.porest.repository;
 
 import com.lshdainty.porest.domain.Vacation;
-import com.lshdainty.porest.type.VacationType;
+import com.lshdainty.porest.type.vacation.VacationType;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

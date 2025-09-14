@@ -4,7 +4,7 @@ import com.lshdainty.porest.domain.User;
 import com.lshdainty.porest.domain.Vacation;
 import com.lshdainty.porest.type.CompanyType;
 import com.lshdainty.porest.type.DepartmentType;
-import com.lshdainty.porest.type.VacationType;
+import com.lshdainty.porest.type.vacation.VacationType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package com.lshdainty.porest.service.dto;
 
 import com.lshdainty.porest.domain.User;
-import com.lshdainty.porest.type.VacationTimeType;
-import com.lshdainty.porest.type.VacationType;
+import com.lshdainty.porest.type.vacation.VacationTimeType;
+import com.lshdainty.porest.type.vacation.VacationType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

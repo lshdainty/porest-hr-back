@@ -3,8 +3,8 @@ package com.lshdainty.porest.api.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.lshdainty.porest.type.VacationTimeType;
-import com.lshdainty.porest.type.VacationType;
+import com.lshdainty.porest.type.vacation.VacationTimeType;
+import com.lshdainty.porest.type.vacation.VacationType;
 import lombok.*;
 
 import java.math.BigDecimal;

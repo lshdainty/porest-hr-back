@@ -2,7 +2,7 @@ package com.lshdainty.porest.api;
 
 import com.lshdainty.porest.domain.User;
 import com.lshdainty.porest.domain.Vacation;
-import com.lshdainty.porest.type.VacationTimeType;
+import com.lshdainty.porest.type.vacation.VacationTimeType;
 import com.lshdainty.porest.api.dto.UserDto;
 import com.lshdainty.porest.api.dto.VacationDto;
 import com.lshdainty.porest.service.VacationService;

@@ -2,6 +2,10 @@ package com.lshdainty.porest;
 
 import com.lshdainty.porest.domain.*;
 import com.lshdainty.porest.type.*;
+import com.lshdainty.porest.type.vacation.GrantMethod;
+import com.lshdainty.porest.type.vacation.RepeatUnit;
+import com.lshdainty.porest.type.vacation.VacationTimeType;
+import com.lshdainty.porest.type.vacation.VacationType;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ public class InitDB {
         initService.initSetVacation();
         initService.initSetSchedule();
         initService.initSetDues();
+        initService.initSetVacationPolicy();
     }
 
     @Component
@@ -539,6 +544,19 @@ public class InitDB {
             saveDues("이서준", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250704", "생일비");
         }
 
+        public void initSetVacationPolicy() {
+            LocalDateTime now = LocalDateTime.now();
+            saveVacationPolicy("연차", "연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("15.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0));
+            saveVacationPolicy("연차", "1분기 연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("4.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0));
+            saveVacationPolicy("연차", "2분기 연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("4.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 4, 1, 0, 0, 0));
+            saveVacationPolicy("연차", "3분기 연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("4.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 7, 1, 0, 0, 0));
+            saveVacationPolicy("연차", "4분기 연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("3.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 12, 1, 0, 0, 0));
+            saveVacationPolicy("건강검진", "건강검진 정책입니다.", VacationType.HEALTH, GrantMethod.REPEAT_GRANT, new BigDecimal("0.5000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 12, 1, 0, 0, 0));
+            saveVacationPolicy("연차", "4분기 연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("3.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 12, 1, 0, 0, 0));
+            saveVacationPolicy("연차", "4분기 연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("3.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 12, 1, 0, 0, 0));
+            saveVacationPolicy("연차", "4분기 연차 정책입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("3.0000"), RepeatUnit.YEARLY, LocalDateTime.of(now.getYear(), 12, 1, 0, 0, 0));
+        }
+
         public void saveMember(String id, String name, String email, String birth, CompanyType company, DepartmentType department, String workTime, String lunar) {
             User user = User.createUser(id, "", name, email, birth, company, department, workTime, lunar);
             em.persist(user);
@@ -558,6 +576,11 @@ public class InitDB {
         public void saveDues(String userName, Long amount, DuesType type, DuesCalcType calc, String date, String detail) {
             Dues dues = Dues.createDues(userName, amount, type, calc, date, detail);
             em.persist(dues);
+        }
+
+        public void saveVacationPolicy(String name, String desc, VacationType vacationType, GrantMethod grantMethod, BigDecimal grantAmount, RepeatUnit repeatUnit, LocalDateTime grantBaseDate) {
+//            VacationPolicy vacationPolicy = VacationPolicy.createVacationPolicy(name, desc, vacationType, grantMethod, grantAmount, repeatUnit, grantBaseDate);
+//            em.persist(vacationPolicy);
         }
     }
 }

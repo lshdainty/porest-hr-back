@@ -1,6 +1,6 @@
 package com.lshdainty.porest.domain;
 
-import com.lshdainty.porest.type.VacationTimeType;
+import com.lshdainty.porest.type.vacation.VacationTimeType;
 import jakarta.persistence.*;
 import lombok.*;
 

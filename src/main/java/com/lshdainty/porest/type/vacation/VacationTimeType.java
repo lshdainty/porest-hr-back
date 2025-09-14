@@ -1,4 +1,4 @@
-package com.lshdainty.porest.type;
+package com.lshdainty.porest.type.vacation;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

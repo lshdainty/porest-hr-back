@@ -7,6 +7,8 @@ import com.lshdainty.porest.repository.VacationHistoryRepositoryImpl;
 import com.lshdainty.porest.repository.VacationRepositoryImpl;
 import com.lshdainty.porest.service.dto.VacationServiceDto;
 import com.lshdainty.porest.type.*;
+import com.lshdainty.porest.type.vacation.VacationTimeType;
+import com.lshdainty.porest.type.vacation.VacationType;
 import com.lshdainty.porest.util.PorestTime;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;

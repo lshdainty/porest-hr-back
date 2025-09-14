@@ -1,6 +1,6 @@
 package com.lshdainty.porest.domain;
 
-import com.lshdainty.porest.type.VacationType;
+import com.lshdainty.porest.type.vacation.VacationType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
