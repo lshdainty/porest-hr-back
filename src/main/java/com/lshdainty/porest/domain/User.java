@@ -64,6 +64,9 @@ public class User {
     @OneToMany(mappedBy = "user")   // JPA에서는 mappedBy는 읽기 전용
     private List<Vacation> vacations  =  new ArrayList<>();
 
+    @OneToOne(mappedBy = "user_vacation_policy")
+    private UserVacationPolicy policies;
+
     /**
      * 유저 생성 함수<br>
      * Entity의 경우 Setter없이 Getter만 사용<br>

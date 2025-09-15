@@ -24,19 +24,8 @@ public class RepeatGrant extends VacationService {
         // 반복 휴가 정책의 경우 반복에 대한 값이 정확하게 설정되어야 한다.
         // 부여 시간이 null인 경우 에러 반환(스케줄러에서 휴가 부여 불가능
         if (Objects.isNull(data.getGrantTime())) {
-            throw new IllegalArgumentException(ms.getMessage("error.validate.vacation.policy.granttime", null, null));
+            throw new IllegalArgumentException(ms.getMessage("", null, null));
         }
-
-        // 반복 단위가 월, 반기, 분기인 경우 반복 간격이 1월부터 12월 사이에 있는지 확인
-        if (data.getRepeatUnit().equals(RepeatUnit.MONTHLY) ||
-            data.getRepeatUnit().equals(RepeatUnit.HALF) ||
-            data.getRepeatUnit().equals(RepeatUnit.QUARTERLY)) {
-            if (0 > data.getRepeatInterval() || data.getRepeatInterval() > 12) {
-                throw new IllegalArgumentException(ms.getMessage("error.validate.vacation.policy.repeatinterval", null, null));
-            }
-        }
-
-
 
         VacationPolicy vacationPolicy = VacationPolicy.createVacationPolicy(
                 data.getName(),

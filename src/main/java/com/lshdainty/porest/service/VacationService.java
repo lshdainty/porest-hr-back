@@ -310,6 +310,10 @@ public class VacationService {
         return vacationService.registVacationPolicy(data);
     }
 
+    public List<VacationPolicyServiceDto> getVacationPolicies() {
+
+    }
+
     private List<VacationServiceDto> makeDayGroupDto(List<VacationHistory> dayHistories) {
         List<VacationServiceDto> vacationDtos = new ArrayList<>();
 
