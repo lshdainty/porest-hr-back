@@ -13,5 +13,6 @@ public enum GrantTiming {
     GrantTiming(String strName) {
         this.strName = strName;
     }
+
     public String getStrName() {return strName;}
 }

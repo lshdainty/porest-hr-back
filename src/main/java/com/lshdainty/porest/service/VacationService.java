@@ -1,12 +1,13 @@
 package com.lshdainty.porest.service;
 
 import com.lshdainty.porest.domain.*;
-import com.lshdainty.porest.repository.HolidayRepositoryImpl;
-import com.lshdainty.porest.repository.UserRepositoryImpl;
-import com.lshdainty.porest.repository.VacationHistoryRepositoryImpl;
-import com.lshdainty.porest.repository.VacationRepositoryImpl;
+import com.lshdainty.porest.repository.*;
+import com.lshdainty.porest.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.service.dto.VacationServiceDto;
 import com.lshdainty.porest.service.vacation.*;
+import com.lshdainty.porest.service.vacation.policy.ManualGrant;
+import com.lshdainty.porest.service.vacation.policy.OnRequest;
+import com.lshdainty.porest.service.vacation.policy.RepeatGrant;
 import com.lshdainty.porest.type.HolidayType;
 import com.lshdainty.porest.type.vacation.VacationTimeType;
 import com.lshdainty.porest.util.PorestTime;
@@ -33,27 +34,28 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class VacationService {
     private final MessageSource ms;
-    private final VacationRepositoryImpl vacationRepositoryImpl;
-    private final VacationHistoryRepositoryImpl vacationHistoryRepositoryImpl;
-    private final UserRepositoryImpl userRepositoryImpl;
-    private final HolidayRepositoryImpl holidayRepositoryImpl;
+    private final VacationRepositoryImpl vacationRepository;
+    private final VacationHistoryRepositoryImpl vacationHistoryRepository;
+    private final VacationPolicyCustomRepositoryImpl vacationPolicyRepository;
+    private final UserRepositoryImpl userRepository;
+    private final HolidayRepositoryImpl holidayRepository;
     private final UserService userService;
 
     @Transactional
     public Long registVacation(VacationServiceDto data, String addUserId, String clientIP) {
         VacationService vacationService = switch (data.getType()) {
             case ANNUAL ->
-                    new Annual(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+                    new Annual(vacationRepository, vacationHistoryRepository, userService);
             case MATERNITY ->
-                    new Maternity(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+                    new Maternity(vacationRepository, vacationHistoryRepository, userService);
             case WEDDING ->
-                    new Wedding(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+                    new Wedding(vacationRepository, vacationHistoryRepository, userService);
             case BEREAVEMENT ->
-                    new Bereavement(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+                    new Bereavement(vacationRepository, vacationHistoryRepository, userService);
             case OVERTIME ->
-                    new Overtime(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+                    new Overtime(vacationRepository, vacationHistoryRepository, userService);
             default ->
-                    new Annual(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
+                    throw new IllegalArgumentException(ms.getMessage("error.notfound.vacationtype", null, null));
         };
 
         return vacationService.registVacation(data, addUserId, clientIP);
@@ -80,7 +82,7 @@ public class VacationService {
         List<LocalDate> weekDays = PorestTime.getBetweenDatesByDayOfWeek(data.getStartDate(), data.getEndDate(), new int[]{6, 7}, ms);
 
         // 공휴일 리스트 조회
-        List<LocalDate> holidays = holidayRepositoryImpl.findHolidaysByStartEndDateWithType(
+        List<LocalDate> holidays = holidayRepository.findHolidaysByStartEndDateWithType(
                 data.getStartDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 data.getEndDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 HolidayType.PUBLIC
@@ -113,7 +115,7 @@ public class VacationService {
                     crtUserId,
                     clientIP
             );
-            vacationHistoryRepositoryImpl.save(history);
+            vacationHistoryRepository.save(history);
         }
 
         // 사용한 휴가 차감
@@ -123,11 +125,11 @@ public class VacationService {
     }
 
     public List<Vacation> getUserVacations(String userId) {
-        return vacationRepositoryImpl.findVacationsByUserId(userId);
+        return vacationRepository.findVacationsByUserId(userId);
     }
 
     public List<User> getUserGroupVacations() {
-        return userRepositoryImpl.findUsersWithVacations();
+        return userRepository.findUsersWithVacations();
     }
 
     public List<Vacation> getAvailableVacations(String userId, LocalDateTime startDate) {
@@ -135,7 +137,7 @@ public class VacationService {
         userService.checkUserExist(userId);
 
         // 시작 날짜를 기준으로 등록 가능한 휴가 목록 조회
-        return vacationRepositoryImpl.findVacationsByBaseTime(userId, startDate);
+        return vacationRepository.findVacationsByBaseTime(userId, startDate);
     }
 
     @Transactional
@@ -168,10 +170,10 @@ public class VacationService {
 
     public List<VacationServiceDto> getPeriodVacationUseHistories(LocalDateTime startDate, LocalDateTime endDate) {
         // 기간에 맞는 history 내역 가져오기
-        List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationHistorysByPeriod(startDate, endDate);
+        List<VacationHistory> histories = vacationHistoryRepository.findVacationHistorysByPeriod(startDate, endDate);
 
         // 유저 정보 반환을 위해 vacation 정보 가져오기
-        List<Vacation> vacations = vacationRepositoryImpl.findVacationsByIdsWithUser(histories.stream()
+        List<Vacation> vacations = vacationRepository.findVacationsByIdsWithUser(histories.stream()
                 .map(vh -> vh.getVacation().getId())
                 .distinct()
                 .toList()
@@ -208,7 +210,7 @@ public class VacationService {
 
     public List<VacationServiceDto> getUserPeriodVacationUseHistories(String userId, LocalDateTime startDate, LocalDateTime endDate) {
         // 기간에 맞는 유저 history 내역 가져오기
-        List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationUseHistorysByUserAndPeriod(userId, startDate, endDate);
+        List<VacationHistory> histories = vacationHistoryRepository.findVacationUseHistorysByUserAndPeriod(userId, startDate, endDate);
 
         return histories.stream()
                 .map(vh -> VacationServiceDto.builder()
@@ -225,7 +227,7 @@ public class VacationService {
 
     public List<VacationServiceDto> getUserMonthStatsVacationUseHistories(String userId, String year) {
         // 기간에 맞는 유저 history 내역 가져오기
-        List<VacationHistory> histories = vacationHistoryRepositoryImpl.findVacationUseHistorysByUserAndPeriod(
+        List<VacationHistory> histories = vacationHistoryRepository.findVacationUseHistorysByUserAndPeriod(
                 userId,
                 LocalDateTime.of(Integer.parseInt(year), 1, 1, 0, 0, 0),
                 LocalDateTime.of(Integer.parseInt(year), 12, 31, 23, 59, 59)
@@ -256,8 +258,8 @@ public class VacationService {
 
     public VacationServiceDto getUserVacationUseStats(String userId, LocalDateTime baseTime) {
         // 기준 시점에 유효한 모든 휴가 & 전체 이력
-        List<Vacation> curVacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userId, baseTime);
-        List<Vacation> prevVacations = vacationRepositoryImpl.findVacationsByBaseTimeWithHistory(userId, baseTime.minusMonths(1));
+        List<Vacation> curVacations = vacationRepository.findVacationsByBaseTimeWithHistory(userId, baseTime);
+        List<Vacation> prevVacations = vacationRepository.findVacationsByBaseTimeWithHistory(userId, baseTime.minusMonths(1));
 
         // 삭제 안된 이력만 필터링
         List<VacationHistory> curHistories = curVacations.stream()
@@ -284,15 +286,28 @@ public class VacationService {
     }
 
     public Vacation checkVacationExist(Long vacationId) {
-        Optional<Vacation> vacation = vacationRepositoryImpl.findById(vacationId);
+        Optional<Vacation> vacation = vacationRepository.findById(vacationId);
         vacation.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation", null, null)));
         return vacation.get();
     }
 
     public VacationHistory checkVacationHistoryExist(Long vacationHistoryId) {
-        Optional<VacationHistory> history = vacationHistoryRepositoryImpl.findById(vacationHistoryId);
+        Optional<VacationHistory> history = vacationHistoryRepository.findById(vacationHistoryId);
         history.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation.history", null, null)));
         return history.get();
+    }
+
+    public Long registVacationPolicy(VacationPolicyServiceDto data) {
+        VacationService vacationService = switch (data.getGrantMethod()) {
+            case ON_REQUEST
+                    -> new OnRequest(vacationPolicyRepository);
+            case MANUAL_GRANT
+                    -> new ManualGrant(vacationPolicyRepository);
+            case REPEAT_GRANT
+                    -> new RepeatGrant(ms, vacationPolicyRepository);
+        };
+
+        return vacationService.registVacationPolicy(data);
     }
 
     private List<VacationServiceDto> makeDayGroupDto(List<VacationHistory> dayHistories) {

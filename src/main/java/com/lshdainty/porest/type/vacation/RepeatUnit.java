@@ -12,5 +12,6 @@ public enum RepeatUnit {
     RepeatUnit(String strName) {
         this.strName = strName;
     }
+
     public String getStrName() {return strName;}
 }

@@ -13,27 +13,18 @@ import com.lshdainty.porest.service.dto.VacationServiceDto;
 import org.springframework.context.MessageSource;
 
 public class Bereavement extends VacationService {
-    MessageSource ms;
-    VacationRepositoryImpl vacationRepositoryImpl;
-    VacationHistoryRepositoryImpl vacationHistoryRepositoryImpl;
-    UserRepositoryImpl userRepositoryImpl;
-    HolidayRepositoryImpl holidayRepositoryImpl;
+    VacationRepositoryImpl vacationRepository;
+    VacationHistoryRepositoryImpl vacationHistoryRepository;
     UserService userService;
 
     public Bereavement(
-            MessageSource ms,
-            VacationRepositoryImpl vacationRepositoryImpl,
-            VacationHistoryRepositoryImpl vacationHistoryRepositoryImpl,
-            UserRepositoryImpl userRepositoryImpl,
-            HolidayRepositoryImpl holidayRepositoryImpl,
+            VacationRepositoryImpl vacationRepository,
+            VacationHistoryRepositoryImpl vacationHistoryRepository,
             UserService userService
     ) {
-        super(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
-        this.ms = ms;
-        this.vacationRepositoryImpl = vacationRepositoryImpl;
-        this.vacationHistoryRepositoryImpl = vacationHistoryRepositoryImpl;
-        this.userRepositoryImpl = userRepositoryImpl;
-        this.holidayRepositoryImpl = holidayRepositoryImpl;
+        super(null, vacationRepository, vacationHistoryRepository, null, null, null, userService);
+        this.vacationRepository = vacationRepository;
+        this.vacationHistoryRepository = vacationHistoryRepository;
         this.userService = userService;
     }
 
@@ -50,10 +41,10 @@ public class Bereavement extends VacationService {
                 crtUserId,
                 clientIP
         );
-        vacationRepositoryImpl.save(vacation);
+        vacationRepository.save(vacation);
 
         VacationHistory history = VacationHistory.createRegistVacationHistory(vacation, data.getDesc(), data.getGrantTime(), crtUserId, clientIP);
-        vacationHistoryRepositoryImpl.save(history);
+        vacationHistoryRepository.save(history);
 
         return vacation.getId();
     }

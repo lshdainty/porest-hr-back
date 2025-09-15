@@ -1,5 +1,6 @@
 package com.lshdainty.porest.domain;
 
+import com.lshdainty.porest.type.YNType;
 import com.lshdainty.porest.type.vacation.GrantMethod;
 import com.lshdainty.porest.type.vacation.GrantTiming;
 import com.lshdainty.porest.type.vacation.RepeatUnit;
@@ -11,13 +12,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @ToString
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
-@Table(name = "vacation")
+@Table(name = "vacation_policy")
 public class VacationPolicy extends AuditingFields {
     @Id @GeneratedValue
     @Column(name = "vacation_policy_id")
@@ -37,8 +37,8 @@ public class VacationPolicy extends AuditingFields {
     @Column(name = "grant_method")
     private GrantMethod grantMethod;        // 부여 방법
     
-    @Column(name = "grant_amount")
-    private BigDecimal grantAmount;         // 부여 수량
+    @Column(name = "grant_time")
+    private BigDecimal grantTime;           // 부여 시간
 
     @Enumerated(EnumType.STRING)
     @Column(name = "repeat_unit")
@@ -52,27 +52,36 @@ public class VacationPolicy extends AuditingFields {
     private GrantTiming grantTiming;        // 부여 시점 지정 방식
 
     @Column(name = "specific_months")
-    private Integer specificMonths;          // 특정 월 지정
+    private Integer specificMonths;         // 특정 월 지정
 
     @Column(name = "specific_days")
-    private Integer specificDays;            // 특정 일 지정
+    private Integer specificDays;           // 특정 일 지정
 
-//    /**
-//     * 휴가 정책 생성 함수<br>
-//     * Entity의 경우 Setter없이 Getter만 사용<br>
-//     * 해당 메소드를 통해 휴가 생성할 것
-//     *
-//     * @return VacationPolicy
-//     */
-//    public static VacationPolicy createVacationPolicy(String name, String desc, VacationType vacationType, GrantMethod grantMethod, BigDecimal grantAmount, RepeatUnit repeatUnit, LocalDateTime grantBaseDate) {
-//        VacationPolicy vacationPolicy = new VacationPolicy();
-//        vacationPolicy.name = name;
-//        vacationPolicy.desc = desc;
-//        vacationPolicy.vacationType = vacationType;
-//        vacationPolicy.grantMethod = grantMethod;
-//        vacationPolicy.grantAmount = grantAmount;
-//        vacationPolicy.repeatUnit = repeatUnit;
-//        vacationPolicy.grantBaseDate = grantBaseDate;
-//        return vacationPolicy;
-//    }
+    @Column(name = "can_deleted")
+    private YNType canDeleted;              // 삭제 가능 여부
+
+    @Column(name = "is_deleted")
+    private YNType isDeleted;               // 삭제 여부
+
+    /**
+     * 휴가 정책 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 휴가 생성할 것
+     *
+     * @return VacationPolicy
+     */
+    public static VacationPolicy createVacationPolicy(String name, String desc, VacationType vacationType, GrantMethod grantMethod, BigDecimal grantTime, RepeatUnit repeatUnit, Integer repeatInterval, GrantTiming grantTiming, Integer specificMonths, Integer specificDays) {
+        VacationPolicy vacationPolicy = new VacationPolicy();
+        vacationPolicy.name = name;
+        vacationPolicy.desc = desc;
+        vacationPolicy.vacationType = vacationType;
+        vacationPolicy.grantMethod = grantMethod;
+        vacationPolicy.grantTime = grantTime;
+        vacationPolicy.repeatUnit = repeatUnit;
+        vacationPolicy.repeatInterval = repeatInterval;
+        vacationPolicy.grantTiming = grantTiming;
+        vacationPolicy.specificMonths = specificMonths;
+        vacationPolicy.specificDays = specificDays;
+        return vacationPolicy;
+    }
 }

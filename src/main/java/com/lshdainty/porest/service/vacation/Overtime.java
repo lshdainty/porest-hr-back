@@ -16,27 +16,18 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class Overtime extends VacationService {
-    MessageSource ms;
-    VacationRepositoryImpl vacationRepositoryImpl;
-    VacationHistoryRepositoryImpl vacationHistoryRepositoryImpl;
-    UserRepositoryImpl userRepositoryImpl;
-    HolidayRepositoryImpl holidayRepositoryImpl;
+    VacationRepositoryImpl vacationRepository;
+    VacationHistoryRepositoryImpl vacationHistoryRepository;
     UserService userService;
 
     public Overtime(
-            MessageSource ms,
-            VacationRepositoryImpl vacationRepositoryImpl,
-            VacationHistoryRepositoryImpl vacationHistoryRepositoryImpl,
-            UserRepositoryImpl userRepositoryImpl,
-            HolidayRepositoryImpl holidayRepositoryImpl,
+            VacationRepositoryImpl vacationRepository,
+            VacationHistoryRepositoryImpl vacationHistoryRepository,
             UserService userService
     ) {
-        super(ms, vacationRepositoryImpl, vacationHistoryRepositoryImpl, userRepositoryImpl, holidayRepositoryImpl, userService);
-        this.ms = ms;
-        this.vacationRepositoryImpl = vacationRepositoryImpl;
-        this.vacationHistoryRepositoryImpl = vacationHistoryRepositoryImpl;
-        this.userRepositoryImpl = userRepositoryImpl;
-        this.holidayRepositoryImpl = holidayRepositoryImpl;
+        super(null, vacationRepository, vacationHistoryRepository, null, null, null, userService);
+        this.vacationRepository = vacationRepository;
+        this.vacationHistoryRepository = vacationHistoryRepository;
         this.userService = userService;
     }
 
@@ -44,7 +35,7 @@ public class Overtime extends VacationService {
     public Long registVacation(VacationServiceDto data, String crtUserId, String clientIP) {
         User user = userService.checkUserExist(data.getUserId());
 
-        Optional<Vacation> vacation = vacationRepositoryImpl.findVacationByTypeWithYear(data.getUserId(), data.getType(), String.valueOf(data.getOccurDate().getYear()));
+        Optional<Vacation> vacation = vacationRepository.findVacationByTypeWithYear(data.getUserId(), data.getType(), String.valueOf(data.getOccurDate().getYear()));
         if (vacation.isPresent()) {
             vacation.get().addVacation(data.getGrantTime(), crtUserId, clientIP);
         } else {
@@ -58,12 +49,12 @@ public class Overtime extends VacationService {
                     crtUserId,
                     clientIP
             );
-            vacationRepositoryImpl.save(newVacation);
+            vacationRepository.save(newVacation);
             vacation = Optional.of(newVacation);
         }
 
         VacationHistory history = VacationHistory.createRegistVacationHistory(vacation.get(), data.getDesc(), data.getGrantTime(), crtUserId, clientIP);
-        vacationHistoryRepositoryImpl.save(history);
+        vacationHistoryRepository.save(history);
 
         return vacation.get().getId();
     }
