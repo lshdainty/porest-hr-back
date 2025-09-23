@@ -1035,7 +1035,7 @@ class VacationServiceTest {
     // 테스트 헬퍼 메서드들
     private User createTestUser(String userId, String workTime) {
         return User.createUser(userId, "password", "테스트유저", "test@test.com", "19900101",
-                OriginCompanyType.SKAX, DepartmentType.SKC, workTime, "N");
+                OriginCompanyType.SKAX, workTime, YNType.N, null, null);
     }
 
     private Vacation createTestVacation(User user, VacationType type, BigDecimal remainTime) {

@@ -3,10 +3,12 @@ package com.lshdainty.porest.repository;
 import com.lshdainty.porest.domain.Company;
 import com.lshdainty.porest.domain.Department;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.lshdainty.porest.domain.QCompany.company;
 import static com.lshdainty.porest.domain.QDepartment.department;
@@ -14,24 +16,27 @@ import static com.lshdainty.porest.domain.QDepartment.department;
 @Repository
 @RequiredArgsConstructor
 public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
+    private final EntityManager em;
+
     private final JPAQueryFactory query;
 
     @Override
     public void save(Company company) {
-
+        em.persist(company);
     }
 
     @Override
-    public Company findById(String id) {
-        return query
+    public Optional<Company> findById(String id) {
+        return Optional.ofNullable(query
                 .selectFrom(company)
                 .where(company.id.eq(id))
-                .fetchOne();
+                .fetchOne()
+        );
     }
 
     @Override
-    public Company findByIdWithDepartments(String id) {
-        Company result =  query
+    public Optional<Company> findByIdWithDepartments(String id) {
+        Optional<Company> result =  Optional.ofNullable(query
                 .selectFrom(company)
                 .leftJoin(company.departments, department).fetchJoin()
                 .where(
@@ -39,10 +44,11 @@ public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
                         department.parent.isNull().or(department.isNull())
                 )
                 .distinct()
-                .fetchOne();
+                .fetchOne()
+        );
 
-        if (result != null) {
-            loadAllDepartmentLevels(result.getDepartments());
+        if (result.isPresent()) {
+            loadAllDepartmentLevels(result.get().getDepartments());
         }
 
         return result;
