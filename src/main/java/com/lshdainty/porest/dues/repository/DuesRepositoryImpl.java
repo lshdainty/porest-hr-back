@@ -59,7 +59,7 @@ public class DuesRepositoryImpl implements DuesRepository {
 
     @Override
     public List<UsersMonthBirthDuesDto> findUsersMonthBirthDues(String year) {
-        return em.createQuery("select new com.lshdainty.porest.repository.dto.UsersMonthBirthDuesDto(d.userName, substring(d.date, 5, 2), sum(d.amount), d.detail) from Dues d where substring(d.date, 0, 4) = :year and d.type = :type and d.calc = :calc group by d.userName, substring(d.date, 5, 2), d.detail", UsersMonthBirthDuesDto.class)
+        return em.createQuery("select new com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto(d.userName, substring(d.date, 5, 2), sum(d.amount), d.detail) from Dues d where substring(d.date, 0, 4) = :year and d.type = :type and d.calc = :calc group by d.userName, substring(d.date, 5, 2), d.detail", UsersMonthBirthDuesDto.class)
                 .setParameter("year", year)
                 .setParameter("type", DuesType.BIRTH)
                 .setParameter("calc", DuesCalcType.PLUS)

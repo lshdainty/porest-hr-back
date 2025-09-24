@@ -1,5 +1,6 @@
 package com.lshdainty.porest.user.repository;
 
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.user.domain.User;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +27,14 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> findUsers() {
         return em.createQuery("select u from User u where u.delYN = :delYN", User.class)
-                .setParameter("delYN", "N")
+                .setParameter("delYN", YNType.N)
                 .getResultList();
     }
 
     @Override
     public List<User> findUsersWithVacations() {
         return em.createQuery("select u from User u left join fetch u.vacations v where u.delYN = :uDelYN", User.class)
-                .setParameter("uDelYN", "N")
+                .setParameter("uDelYN", YNType.N)
                 .getResultList();
     }
 }
