@@ -73,13 +73,13 @@ public class InitDB {
             Department parent = saveDepartment("생산운영", "생산운영", null, 0L, "mes 생산운영 파트입니다.", company);
             saveDepartment("Olive", "Olive", parent, 1L, "울산 운영 부서입니다.", company);
             Department mes = saveDepartment("G-MES", "G-MES", parent, 1L, "G-MES 부서입니다.", company);
-            saveDepartment("G-MESJ", "G-MESJ", mes, 1L, "정읍 G-MES 파트입니다.", company);
-            saveDepartment("G-MESM", "G-MESM", mes, 1L, "말련 G-MES 파트입니다.", company);
+            saveDepartment("G-MESJ", "G-MESJ", mes, 2L, "정읍 G-MES 파트입니다.", company);
+            saveDepartment("G-MESM", "G-MESM", mes, 2L, "말련 G-MES 파트입니다.", company);
             saveDepartment("G-SCM", "G-SCM", parent, 1L, "G-SCM 부서입니다.", company);
             Department dt = saveDepartment("DT", "DT", parent, 1L, "SKC DT 부서입니다.", company);
-            saveDepartment("myDATA", "myDATA", dt, 1L, "myDATA 파트입니다.", company);
-            saveDepartment("Tableau", "Tableau", dt, 1L, "Tableau 파트입니다.", company);
-            saveDepartment("AOI", "AOI", dt, 1L, "AOI 파트입니다.", company);
+            saveDepartment("myDATA", "myDATA", dt, 2L, "myDATA 파트입니다.", company);
+            saveDepartment("Tableau", "Tableau", dt, 2L, "Tableau 파트입니다.", company);
+            saveDepartment("AOI", "AOI", dt, 2L, "AOI 파트입니다.", company);
             saveDepartment("CMP", "CMP", parent, 1L, "CMP 부서입니다.", company);
         }
 

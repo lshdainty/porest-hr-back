@@ -9,6 +9,6 @@ public interface CompanyCustomRepository {
     void save(Company company);
     // 단건 회사 조회
     Optional<Company> findById(String id);
-    // 단건 회사 조회(부서 포함)
+    // 단건 회사 조회(최상위 부서 포함)
     Optional<Company> findByIdWithDepartments(String id);
 }
