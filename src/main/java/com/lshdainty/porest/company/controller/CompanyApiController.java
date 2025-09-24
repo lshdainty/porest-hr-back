@@ -8,9 +8,7 @@ import com.lshdainty.porest.department.controller.dto.DepartmentDto;
 import com.lshdainty.porest.department.service.dto.DepartmentServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,10 +16,40 @@ import org.springframework.web.bind.annotation.RestController;
 public class CompanyApiController {
     private final CompanyService companyService;
 
+    @PostMapping("/api/v1/company")
+    public ApiResponse registCompany(@RequestBody CompanyDto data) {
+        String companyId = companyService.regist(CompanyServiceDto.builder()
+                .id(data.getCompanyId())
+                .name(data.getCompanyName())
+                .desc(data.getCompanyDesc())
+                .build()
+        );
+
+        return ApiResponse.success(CompanyDto.builder().companyId(companyId).build());
+    }
+
+    @PutMapping("/api/v1/company/{id}")
+    public ApiResponse editCompany(@PathVariable("id") String companyId, @RequestBody CompanyDto data) {
+        companyService.edit(CompanyServiceDto.builder()
+                .id(companyId)
+                .name(data.getCompanyName())
+                .desc(data.getCompanyDesc())
+                .build()
+        );
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/api/v1/company/{id}")
+    public ApiResponse deleteCompany(@PathVariable("id") String companyId) {
+        companyService.delete(companyId);
+        return ApiResponse.success();
+    }
+
     @GetMapping("/api/v1/company/{id}/departments")
-    public ApiResponse getCompanyWithDepartments(@PathVariable("id") String companyId) {
-        CompanyServiceDto company = companyService.findCompanyWithDepartments(companyId);
-        CompanyDto resp = CompanyDto.builder()
+    public ApiResponse searchCompanyWithDepartments(@PathVariable("id") String companyId) {
+        CompanyServiceDto company = companyService.searchCompanyWithDepartments(companyId);
+
+        return ApiResponse.success(CompanyDto.builder()
                 .companyId(company.getId())
                 .companyName(company.getName())
                 .companyDesc(company.getDesc())
@@ -30,9 +58,8 @@ public class CompanyApiController {
                         .map(this::convertToDepartmentDto)
                         .toList()
                         : null)
-                .build();
-        log.info("Company with departments: " + resp);
-        return ApiResponse.success(resp);
+                .build()
+        );
     }
 
     /**

@@ -24,7 +24,7 @@ public class CompanyService {
     private final CompanyCustomRepositoryImpl companyRepository;
 
     @Transactional
-    public String save(CompanyServiceDto data) {
+    public String regist(CompanyServiceDto data) {
         checkAlreadyCompanyId(data.getId());
 
         Company company = Company.createCompany(
@@ -32,11 +32,33 @@ public class CompanyService {
                 data.getName(),
                 data.getDesc()
         );
+
         companyRepository.save(company);
         return company.getId();
     }
 
-    public CompanyServiceDto findCompanyWithDepartments(String id) {
+    @Transactional
+    public void edit(CompanyServiceDto data) {
+        Company company = checkCompanyExists(data.getId());
+
+        company.updateCompany(
+                data.getName(),
+                data.getDesc()
+        );
+    }
+
+    @Transactional
+    public void delete(String id) {
+        Company company = checkCompanyExists(id);
+
+        if (!company.getDepartments().isEmpty()) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.notnull.department", null, null));
+        }
+
+        company.deleteCompany();
+    }
+
+    public CompanyServiceDto searchCompanyWithDepartments(String id) {
         Optional<Company> OCompany = companyRepository.findByIdWithDepartments(id);
         if (OCompany.isEmpty()) {
             throw new IllegalArgumentException(ms.getMessage("error.notfound.company", null, null));
