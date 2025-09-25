@@ -37,7 +37,7 @@ public class InitDB {
     @PostConstruct
     public void init() {
         initService.initSetMember();
-        initService.initSetDepartment();
+//        initService.initSetDepartment();
         initService.initSetHoliday();
         initService.initSetVacation();
         initService.initSetSchedule();

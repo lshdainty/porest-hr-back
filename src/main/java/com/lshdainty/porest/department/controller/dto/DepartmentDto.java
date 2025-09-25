@@ -21,5 +21,6 @@ public class DepartmentDto {
     private String headUserId;
     private Long treeLevel;
     private String departmentDesc;
+    private String companyId;
     private List<DepartmentDto> children;
 }

@@ -24,12 +24,20 @@ public class DepartmentService {
     private final CompanyService companyService;
 
     @Transactional
-    public Long save(DepartmentServiceDto data) {
+    public Long regist(DepartmentServiceDto data) {
         // 회사 조회
         Company company = companyService.checkCompanyExists(data.getCompanyId());
 
         // 부모 부서 조회
-        Department parent = checkDepartmentExists(data.getParentId());
+        Department parent = null;
+        if (data.getParentId() != null) {
+            parent = checkDepartmentExists(data.getParentId());
+
+            // 부모 부서와 같은 회사인지 검증
+            if (!parent.getCompany().getId().equals(data.getCompanyId())) {
+                throw new IllegalArgumentException(ms.getMessage("error.validate.different.company", null, null));
+            }
+        }
 
         Department department = Department.createDepartment(
                 data.getName(),
@@ -44,7 +52,58 @@ public class DepartmentService {
         return department.getId();
     }
 
-    public DepartmentServiceDto getDepartmentById(Long id) {
+    @Transactional
+    public void edit(DepartmentServiceDto data) {
+        Department department = checkDepartmentExists(data.getId());
+
+        // 부모 부서 변경이 있는 경우 검증
+        Department newParent = null;
+        if (data.getParentId() != null) {
+            newParent = checkDepartmentExists(data.getParentId());
+
+            // 자기 자신을 부모로 설정하는 것 방지
+            if (newParent.getId().equals(data.getId())) {
+                throw new IllegalArgumentException(ms.getMessage("error.validate.self.parent", null, null));
+            }
+
+            // 순환 참조 방지 (자신의 하위 부서를 부모로 설정하는 것 방지)
+            if (isDescendant(department, newParent)) {
+                throw new IllegalArgumentException(ms.getMessage("error.validate.circular.reference", null, null));
+            }
+
+            // 같은 회사인지 검증
+            if (!newParent.getCompany().getId().equals(department.getCompany().getId())) {
+                throw new IllegalArgumentException(ms.getMessage("error.validate.different.company", null, null));
+            }
+        }
+
+        department.updateDepartment(
+                data.getName(),
+                data.getNameKR(),
+                newParent,
+                data.getHeadUserId(),
+                data.getLevel(),
+                data.getDesc()
+        );
+    }
+
+    @Transactional
+    public void delete(Long departmentId) {
+        Department department = checkDepartmentExists(departmentId);
+
+        // 하위에 자식 부서가 있는지 확인
+        boolean hasChildren = department.getChildren().stream()
+                .anyMatch(child -> child.getDelYN() == YNType.N);
+
+        if (hasChildren) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.has.children.department", null, null));
+        }
+
+        // 논리 삭제 실행
+        department.deleteDepartment();
+    }
+
+    public DepartmentServiceDto searchDepartmentById(Long id) {
         Department department = checkDepartmentExists(id);
         return DepartmentServiceDto.builder()
                 .id(department.getId())
@@ -58,7 +117,7 @@ public class DepartmentService {
                 .build();
     }
 
-    public DepartmentServiceDto getDepartmentByIdWithChildren(Long id) {
+    public DepartmentServiceDto searchDepartmentByIdWithChildren(Long id) {
         Department department = checkDepartmentExists(id);
         return convertToDtoWithChildren(department);
     }
@@ -69,6 +128,27 @@ public class DepartmentService {
             throw new IllegalArgumentException(ms.getMessage("error.notfound.department", null, null));
         }
         return department.get();
+    }
+
+    /**
+     * 순환 참조 검사: targetDepartment가 currentDepartment의 하위 부서인지 확인
+     */
+    private boolean isDescendant(Department currentDepartment, Department targetDepartment) {
+        if (currentDepartment == null || targetDepartment == null) {
+            return false;
+        }
+
+        for (Department child : currentDepartment.getChildren()) {
+            if (child.getDelYN() == YNType.N) {
+                if (child.getId().equals(targetDepartment.getId())) {
+                    return true;
+                }
+                if (isDescendant(child, targetDepartment)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected DepartmentServiceDto convertToDtoWithChildren(Department department) {

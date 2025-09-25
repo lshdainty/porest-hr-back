@@ -47,4 +47,18 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .fetchOne()
         );
     }
+
+    @Override
+    public boolean hasActiveChildren(Long departmentId) {
+        Long count = query
+                .select(department.count())
+                .from(department)
+                .where(
+                        department.parent.id.eq(departmentId),
+                        department.delYN.eq(YNType.N)
+                )
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
 }

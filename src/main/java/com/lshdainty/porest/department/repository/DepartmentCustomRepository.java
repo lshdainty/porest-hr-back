@@ -11,4 +11,6 @@ public interface DepartmentCustomRepository {
     Optional<Department> findById(Long id);
     // 자식 부서까지 모두 조회
     Optional<Department> findByIdWithChildren(Long id);
+    // 자식 부서가 존재하는지 체크
+    boolean hasActiveChildren(Long departmentId); // 추가
 }
