@@ -9,10 +9,24 @@ spring:
       - oauth
 
   datasource:
+    driver-class-name: org.h2.Driver
     url: jdbc:h2:tcp://localhost/~/study/h2/myhr
     username: sa
     password:
-    driver-class-name: org.h2.Driver
+    p6spy:
+      # JDBC 이벤트 로깅을 위한 P6LogFactory 등록
+      enable-logging: true
+
+      # com.p6spy.engine.spy.appender.MultiLineFormat 사용 (SingleLineFormat 대신)
+      multiline: true
+
+      # 기본 리스너들을 위한 로깅 사용 [slf4j, sysout, file, custom]
+      logging: slf4j
+
+      # 실제 값으로 '?'를 대체한 효과적인 SQL 문자열을 추적 시스템에 보고
+      # 참고: 이 설정은 로깅 메시지에 영향을 주지 않음
+      tracing:
+        include-parameter-values: true
 
   jpa:
     hibernate:
@@ -20,12 +34,6 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100
-
-  sleuth:
-    jdbc:
-      p6spy:
-        tracing:
-          include-parameter-values: true
 
 server:
   servlet:
@@ -39,12 +47,6 @@ logging:
     com.lshdainty.porest.service: debug
     com.lshdainty.porest.domain: debug
     p6spy: info
-
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: true
-      multiline: true
 
 file:
   root-path: /Users/lshdainty/study/testimg
