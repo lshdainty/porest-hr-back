@@ -1,4 +1,4 @@
-package com.lshdainty.porest.Config;
+package com.lshdainty.porest.common.config.database;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

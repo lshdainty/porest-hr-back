@@ -1,4 +1,4 @@
-package com.lshdainty.porest.Config;
+package com.lshdainty.porest.common.config.security;
 
 import com.lshdainty.porest.login.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,8 +15,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Configuration

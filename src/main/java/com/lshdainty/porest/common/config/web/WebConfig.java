@@ -1,4 +1,4 @@
-package com.lshdainty.porest.Config;
+package com.lshdainty.porest.common.config.web;
 
 import com.lshdainty.porest.login.LoginUserArgumentResolver;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.lshdainty.porest.lib.log.filter;
+package com.lshdainty.porest.common.config.web;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

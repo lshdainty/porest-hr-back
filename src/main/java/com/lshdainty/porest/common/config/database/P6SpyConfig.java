@@ -1,4 +1,4 @@
-package com.lshdainty.porest.Config;
+package com.lshdainty.porest.common.config.database;
 
 import com.p6spy.engine.logging.Category;
 import com.p6spy.engine.spy.P6SpyOptions;
@@ -29,7 +29,7 @@ public class P6SpyConfig implements MessageFormattingStrategy {
 
     private String stackTrace() {
         return Stream.of(new Throwable().getStackTrace())
-                .filter(t -> t.toString().startsWith("com.chaewsstore") && !t.toString().contains(
+                .filter(t -> t.toString().startsWith("com.lshdainty") && !t.toString().contains(
                         ClassUtils.getUserClass(this).getName()))
                 .map(StackTraceElement::toString)
                 .collect(Collectors.joining("\n"));
