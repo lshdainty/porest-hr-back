@@ -1,8 +1,6 @@
 package com.lshdainty.porest.login.service;
 
 import com.lshdainty.porest.login.OAuthAttributes;
-import com.lshdainty.porest.login.service.dto.LoginDto;
-import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -43,7 +41,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         // UserEntity 클래스를 사용하지 않고 SessionUser클래스를 사용하는 이유는 오류 방지.
-//        httpSession.setAttribute("user", new LoginDto(user)); // UserDTO : 세션에 사용자 정보를 저장하기 위한 Dto 클래스
+//        httpSession.setAttribute("user", new LoginServiceDto(user)); // UserDTO : 세션에 사용자 정보를 저장하기 위한 Dto 클래스
         httpSession.setAttribute("user", null); // UserDTO : 세션에 사용자 정보를 저장하기 위한 Dto 클래스
 
         return new DefaultOAuth2User(
