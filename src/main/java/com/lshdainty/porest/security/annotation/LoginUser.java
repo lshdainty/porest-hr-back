@@ -1,4 +1,4 @@
-package com.lshdainty.porest.login;
+package com.lshdainty.porest.security.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

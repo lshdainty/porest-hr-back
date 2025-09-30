@@ -14,4 +14,6 @@ public interface UserRepository {
     List<User> findUsers();
     // 유저가 가지고 있는 휴가 리스트 조회
     List<User> findUsersWithVacations();
+    // 초대 토큰으로 유저 검색
+    Optional<User> findByInvitationToken(String token);
 }

@@ -1,6 +1,7 @@
-package com.lshdainty.porest.login;
+package com.lshdainty.porest.security.resolver;
 
-import com.lshdainty.porest.login.service.dto.LoginServiceDto;
+import com.lshdainty.porest.security.annotation.LoginUser;
+import com.lshdainty.porest.user.controller.dto.UserDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginUser.class) != null;
-        boolean isUserClass = LoginServiceDto.class.equals(parameter.getParameterType());
+        boolean isUserClass = UserDto.class.equals(parameter.getParameterType());
 
         return isLoginUserAnnotation && isUserClass;
     }

@@ -1,6 +1,6 @@
 package com.lshdainty.porest.common.config.web;
 
-import com.lshdainty.porest.login.LoginUserArgumentResolver;
+import com.lshdainty.porest.security.resolver.LoginUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

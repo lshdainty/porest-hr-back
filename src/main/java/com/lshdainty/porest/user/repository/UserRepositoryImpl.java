@@ -37,6 +37,15 @@ public class UserRepositoryImpl implements UserRepository {
                 .setParameter("uDelYN", YNType.N)
                 .getResultList();
     }
+
+    @Override
+    public Optional<User> findByInvitationToken(String token) {
+        List<User> result = em.createQuery("select u from User u where u.invitationToken = :token and u.delYN = :delYN", User.class)
+                .setParameter("token", token)
+                .setParameter("delYN", YNType.N)
+                .getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    }
 }
 
 

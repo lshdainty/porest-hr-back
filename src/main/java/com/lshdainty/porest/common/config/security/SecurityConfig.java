@@ -1,27 +1,19 @@
 package com.lshdainty.porest.common.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.login.controller.dto.LoginDto;
-import com.lshdainty.porest.login.service.CustomOAuth2UserService;
-import com.lshdainty.porest.login.service.CustomUserDetailsService;
-import com.lshdainty.porest.user.domain.User;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.lshdainty.porest.security.handler.CustomAuthenticationFailureHandler;
+import com.lshdainty.porest.security.handler.CustomAuthenticationSuccessHandler;
+import com.lshdainty.porest.security.handler.CustomLogoutSuccessHandler;
+import com.lshdainty.porest.security.service.CustomOAuth2UserService;
+import com.lshdainty.porest.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -33,7 +25,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
     private final CustomOAuth2UserService OAuth2Login;
     private final CustomUserDetailsService formLogin;
-    private final ObjectMapper objectMapper;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     // password 암호화를 위한 bean 등록
     @Bean
@@ -79,8 +73,8 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")
                         .usernameParameter("user_id")
                         .passwordParameter("user_pw")
-                        .successHandler(loginSuccessHandler())
-                        .failureHandler(loginFailureHandler())
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler)
                         .permitAll()
                 )
                 .userDetailsService(formLogin);
@@ -100,7 +94,7 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
-                .logoutSuccessHandler(logoutSuccessHandler())
+                .logoutSuccessHandler(customLogoutSuccessHandler)
         );
 
         // 세션 정책: 세션 사용
@@ -127,56 +121,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
-    }
-
-    // 로그인 성공 핸들러
-    private AuthenticationSuccessHandler loginSuccessHandler() {
-        return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            CustomUserDetailsService.CustomUserDetails userDetails =
-                    (CustomUserDetailsService.CustomUserDetails) authentication.getPrincipal();
-            User user = userDetails.getUser();
-
-            LoginDto loginData = LoginDto.builder()
-                    .user_id(user.getId())
-                    .user_name(user.getName())
-                    .user_email(user.getEmail())
-                    .user_role(user.getRole().name())
-                    .build();
-
-            ApiResponse<LoginDto> apiResponse = ApiResponse.success(loginData);
-            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
-            response.getWriter().write(jsonResponse);
-        };
-    }
-
-    // 로그인 실패 핸들러
-    private AuthenticationFailureHandler loginFailureHandler() {
-        return (HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) -> {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            ApiResponse<Void> apiResponse = ApiResponse.fail(401, "로그인 실패: " + exception.getMessage());
-            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
-            response.getWriter().write(jsonResponse);
-        };
-    }
-
-    // 로그아웃 성공 핸들러
-    private LogoutSuccessHandler logoutSuccessHandler() {
-        return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            String message = "로그아웃 성공";
-            ApiResponse<String> apiResponse = ApiResponse.success(message);
-            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
-            response.getWriter().write(jsonResponse);
-        };
     }
 }

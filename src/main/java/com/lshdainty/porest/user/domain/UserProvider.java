@@ -15,20 +15,27 @@ public class UserProvider {
     @Column(name = "provider_seq")
     private Long seq;
 
-    @Column(name = "provider")
-    private String provider;
-
-    @Column(name = "provider_id")
-    private String providerId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @Setter
     private User user;
+
+    @Column(name = "provider_type")
+    private String type;
+
+    @Column(name = "provider_user_id")
+    private String id;
 
     // user 추가 연관관계 편의 메소드
     public void addUser(User user) {
         this.user = user;
         user.getProviders().add(this);
+    }
+
+    public static UserProvider createProvider(User user, String type, String id) {
+        UserProvider provider = new UserProvider();
+        provider.addUser(user);
+        provider.type = type;
+        provider.id = id;
+        return provider;
     }
 }

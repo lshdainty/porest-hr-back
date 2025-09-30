@@ -168,7 +168,7 @@ public class UserService {
     /**
      * 프로필 URL에서 물리적 파일명을 추출하는 헬퍼 메소드
      */
-    private String extractPhysicalFileNameFromUrl(String profileUrl) {
+    public String extractPhysicalFileNameFromUrl(String profileUrl) {
         if (!StringUtils.hasText(profileUrl)) {
             return null;
         }
@@ -181,7 +181,7 @@ public class UserService {
     /**
      * 원본 파일명과 UUID로 프로필 URL 생성
      */
-    private String generateProfileUrl(String originalFilename, String uuid) {
+    public String generateProfileUrl(String originalFilename, String uuid) {
         // PorestFile의 static 메소드를 사용하여 물리적 파일명 생성
         String physicalFilename = PorestFile.generatePhysicalFilename(originalFilename, uuid);
         if (physicalFilename == null) {
@@ -195,7 +195,7 @@ public class UserService {
     /**
      * 임시 폴더에 저장된 프로필 이미지를 관리용 폴더로 복사하는 헬퍼 메소드
      */
-    private UserServiceDto copyTempProfileToOrigin(UserServiceDto data) {
+    public UserServiceDto copyTempProfileToOrigin(UserServiceDto data) {
         String profileName = null;
         String profileUUID = null;
 
@@ -215,5 +215,101 @@ public class UserService {
                 .profileName(profileName) // 추출된 원본 파일명
                 .profileUUID(profileUUID)
                 .build();
+    }
+
+    /**
+     * 관리자가 사용자를 초대하여 생성
+     */
+    @Transactional
+    public UserServiceDto inviteUser(UserServiceDto data) {
+        User user = User.createInvitedUser(
+                data.getId(),
+                data.getName(),
+                data.getEmail(),
+                data.getCompany(),
+                data.getRole()
+        );
+
+        userRepositoryImpl.save(user);
+
+        return UserServiceDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .company(user.getCompany())
+                .role(user.getRole())
+                .invitationToken(user.getInvitationToken())
+                .build();
+    }
+
+    /**
+     * 초대 토큰으로 사용자 조회 및 유효성 검증
+     */
+    public UserServiceDto validateInvitationToken(String token) {
+        Optional<User> findUser = userRepositoryImpl.findByInvitationToken(token);
+        if (findUser.isEmpty()) {
+            throw new IllegalArgumentException(ms.getMessage("error.notfound.invitation", null, null));
+        }
+
+        User user = findUser.get();
+        if (!user.isInvitationValid()) {
+            throw new IllegalArgumentException(ms.getMessage("error.expired.invitation", null, null));
+        }
+
+        return UserServiceDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .company(user.getCompany())
+                .role(user.getRole())
+                .build();
+    }
+
+    /**
+     * 초대 이메일 재전송
+     */
+    @Transactional
+    public UserServiceDto resendInvitation(String userId) {
+        User user = checkUserExist(userId);
+        user.renewInvitationToken();
+
+        return UserServiceDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .invitationToken(user.getInvitationToken())
+                .build();
+    }
+
+    /**
+     * 사용자가 초대를 수락하고 회원가입 완료
+     */
+    @Transactional
+    public String completeInvitedUserRegistration(UserServiceDto data) {
+        Optional<User> findUser = userRepositoryImpl.findByInvitationToken(data.getInvitationToken());
+        if (findUser.isEmpty()) {
+            throw new IllegalArgumentException(ms.getMessage("error.notfound.invitation", null, null));
+        }
+
+        User user = findUser.get();
+        if (!user.isInvitationValid()) {
+            throw new IllegalArgumentException(ms.getMessage("error.expired.invitation", null, null));
+        }
+
+        UserServiceDto profileDto = UserServiceDto.builder().build();
+        if (StringUtils.hasText(data.getProfileUUID()) && StringUtils.hasText(data.getProfileUrl())) {
+            profileDto = copyTempProfileToOrigin(data);
+        }
+
+        user.completeRegistration(
+                data.getPwd(),
+                data.getBirth(),
+                data.getWorkTime(),
+                data.getLunarYN(),
+                profileDto.getProfileName(),
+                profileDto.getProfileUUID()
+        );
+
+        return user.getId();
     }
 }

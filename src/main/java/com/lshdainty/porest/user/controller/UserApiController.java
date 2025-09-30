@@ -1,12 +1,19 @@
 package com.lshdainty.porest.user.controller;
 
+import com.lshdainty.porest.security.service.CustomUserDetailsService;
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.user.controller.dto.UserDto;
 import com.lshdainty.porest.common.controller.ApiResponse;
+import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserApiController {
     private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/api/v1/user")
     public ApiResponse join(@RequestBody UserDto data) {
@@ -128,5 +136,124 @@ public class UserApiController {
                 .profileUrl(dto.getProfileUrl())
                 .profileUUID(dto.getProfileUUID())
                 .build());
+    }
+
+    @GetMapping("/api/v1/login/user-info")
+    public ApiResponse<UserDto> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() ||
+            "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new IllegalArgumentException("인증이 필요합니다.");
+        }
+
+        CustomUserDetailsService.CustomUserDetails userDetails = (CustomUserDetailsService.CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        UserDto result = UserDto.builder()
+                .userId(user.getId())
+                .userName(user.getName())
+                .userEmail(user.getEmail())
+                .userRoleType(user.getRole())
+                .userRoleName(user.getRole().name())
+                .isLogin(YNType.Y)
+                .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
+                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
+                .build();
+
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * 비밀번호 인코딩 유틸리티 API (개발/테스트용)
+     */
+    @PostMapping("/encode-password")
+    public ApiResponse<UserDto> encodePassword(@RequestBody UserDto data) {
+        log.info("Password encoding request for user: {}", data.getUserId());
+
+        String encodedPassword = passwordEncoder.encode(data.getUserPwd());
+
+        UserDto result = UserDto.builder()
+                .originalPW(data.getUserPwd())
+                .encodedPW(encodedPassword)
+                .build();
+
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * 관리자가 사용자 초대
+     */
+    @PostMapping("/api/v1/user/invite")
+    public ApiResponse inviteUser(@RequestBody UserDto data) {
+        UserServiceDto result = userService.inviteUser(UserServiceDto.builder()
+                .id(data.getUserId())
+                .name(data.getUserName())
+                .email(data.getUserEmail())
+                .company(data.getUserOriginCompanyType())
+                .role(data.getUserRoleType())
+                .build()
+        );
+
+        return ApiResponse.success(UserDto.builder()
+                .userId(result.getId())
+                .userName(result.getName())
+                .userEmail(result.getEmail())
+                .userCompanyName(result.getCompany().getCompanyName())
+                .userRoleName(result.getRole().name())
+                .invitationToken(result.getInvitationToken())
+                .build());
+    }
+
+    /**
+     * 초대 토큰 유효성 검증
+     */
+    @GetMapping("/api/v1/user/invitation/validate/{token}")
+    public ApiResponse validateInvitationToken(@PathVariable("token") String token) {
+        UserServiceDto result = userService.validateInvitationToken(token);
+
+        return ApiResponse.success(UserDto.builder()
+                .userId(result.getId())
+                .userName(result.getName())
+                .userEmail(result.getEmail())
+                .userOriginCompanyType(result.getCompany())
+                .userCompanyName(result.getCompany().getCompanyName())
+                .userRoleType(result.getRole())
+                .userRoleName(result.getRole().name())
+                .build());
+    }
+
+    /**
+     * 초대 이메일 재전송
+     */
+    @PostMapping("/api/v1/user/invitation/resend/{id}")
+    public ApiResponse resendInvitation(@PathVariable("id") String userId) {
+        UserServiceDto result = userService.resendInvitation(userId);
+
+        return ApiResponse.success(UserDto.builder()
+                .userId(result.getId())
+                .userName(result.getName())
+                .userEmail(result.getEmail())
+                .invitationToken(result.getInvitationToken())
+                .build());
+    }
+
+    /**
+     * 초대받은 사용자의 회원가입 완료
+     */
+    @PostMapping("/api/v1/user/invitation/complete")
+    public ApiResponse completeInvitedUserRegistration(@RequestBody UserDto data) {
+        String userId = userService.completeInvitedUserRegistration(UserServiceDto.builder()
+                .invitationToken(data.getInvitationToken())
+                .pwd(data.getUserPwd())
+                .birth(data.getUserBirth())
+                .workTime(data.getUserWorkTime())
+                .lunarYN(data.getLunarYN())
+                .profileUrl(data.getProfileUrl())
+                .profileUUID(data.getProfileUUID())
+                .build()
+        );
+
+        return ApiResponse.success(UserDto.builder().userId(userId).build());
     }
 }

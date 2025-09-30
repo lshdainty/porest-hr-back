@@ -3,6 +3,7 @@ package com.lshdainty.porest.user.domain;
 import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.type.RoleType;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.user.type.StatusType;
 import com.lshdainty.porest.vacation.domain.Vacation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -10,10 +11,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -58,6 +61,22 @@ public class User {
     private YNType lunarYN; // 음력여부
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "user_status")
+    private StatusType status; // 사용자 상태
+
+    @Column(name = "invitation_token")
+    private String invitationToken; // 초대 토큰
+
+    @Column(name = "invitation_sent_at")
+    private LocalDateTime invitationSentAt; // 초대 발송 시간
+
+    @Column(name = "invitation_expires_at")
+    private LocalDateTime invitationExpiresAt; // 초대 만료 시간
+
+    @Column(name = "registered_at")
+    private LocalDateTime registeredAt; // 실제 회원가입 완료 시간
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "del_yn")
     private YNType delYN; // 삭제여부
 
@@ -79,6 +98,7 @@ public class User {
 
     /**
      * 유저 생성 함수<br>
+     * 관리자가 초대용 사용자 생성<br>
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 유저 생성할 것
      *
@@ -108,6 +128,67 @@ public class User {
         user.id = id;
         user.delYN = YNType.N;
         return user;
+    }
+
+    /**
+     * 관리자가 초대용 사용자 생성<br>
+     * 초대 토큰과 만료 시간을 자동으로 생성하여 PENDING 상태의 사용자 생성
+     *
+     * @return User
+     */
+    public static User createInvitedUser(String id, String name, String email,
+                                       OriginCompanyType company, RoleType role) {
+        User user = new User();
+        user.id = id;
+        user.name = name;
+        user.email = email;
+        user.company = company;
+        user.role = role;
+        user.status = StatusType.PENDING; // 초대 상태로 설정
+        user.delYN = YNType.N;
+
+        // 초대 토큰 생성 (48시간 유효)
+        user.invitationToken = UUID.randomUUID().toString();
+        user.invitationSentAt = LocalDateTime.now();
+        user.invitationExpiresAt = LocalDateTime.now().plusHours(48);
+
+        return user;
+    }
+
+    /**
+     * 초대 이메일 재전송을 위한 토큰 갱신
+     */
+    public void renewInvitationToken() {
+        this.invitationToken = UUID.randomUUID().toString();
+        this.invitationSentAt = LocalDateTime.now();
+        this.invitationExpiresAt = LocalDateTime.now().plusHours(48);
+        this.status = StatusType.PENDING;
+    }
+
+    /**
+     * 초대 유효성 검사
+     */
+    public boolean isInvitationValid() {
+        return this.status == StatusType.PENDING &&
+               this.invitationExpiresAt != null &&
+               this.invitationExpiresAt.isAfter(LocalDateTime.now()) &&
+               this.invitationToken != null;
+    }
+
+    /**
+     * 회원가입 완료 처리
+     */
+    public void completeRegistration(String pwd, String birth, String workTime,
+                                   YNType lunarYN, String profileName, String profileUUID) {
+        this.pwd = pwd;
+        this.birth = birth;
+        this.workTime = workTime;
+        this.lunarYN = lunarYN;
+        this.profileName = profileName;
+        this.profileUUID = profileUUID;
+        this.status = StatusType.ACTIVE;
+        this.registeredAt = LocalDateTime.now();
+        this.invitationToken = null; // 토큰 제거
     }
 
     /**

@@ -27,6 +27,7 @@ public class UserDto {
     private OriginCompanyType userOriginCompanyType;
     private YNType lunarYN;
     private YNType delYN;
+    private YNType isLogin;
 
     private List<VacationDto> vacations;
 
@@ -37,4 +38,11 @@ public class UserDto {
     private MultipartFile profile;
     private String profileUrl;
     private String profileUUID;
+
+    // 비밀번호 인코딩용 필드
+    private String originalPW;
+    private String encodedPW;
+
+    // 초대 관련 필드
+    private String invitationToken;
 }
