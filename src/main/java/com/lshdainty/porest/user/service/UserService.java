@@ -331,18 +331,9 @@ public class UserService {
             throw new IllegalArgumentException(ms.getMessage("error.expired.invitation", null, null));
         }
 
-        UserServiceDto profileDto = UserServiceDto.builder().build();
-        if (StringUtils.hasText(data.getProfileUUID()) && StringUtils.hasText(data.getProfileUrl())) {
-            profileDto = copyTempProfileToOrigin(data);
-        }
-
         user.completeRegistration(
-                data.getPwd(),
                 data.getBirth(),
-                data.getWorkTime(),
-                data.getLunarYN(),
-                profileDto.getProfileName(),
-                profileDto.getProfileUUID()
+                data.getLunarYN()
         );
 
         return user.getId();

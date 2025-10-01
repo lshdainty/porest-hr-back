@@ -179,14 +179,9 @@ public class User {
     /**
      * 회원가입 완료 처리
      */
-    public void completeRegistration(String pwd, String birth, String workTime,
-                                   YNType lunarYN, String profileName, String profileUUID) {
-        this.pwd = pwd;
+    public void completeRegistration(String birth, YNType lunarYN) {
         this.birth = birth;
-        this.workTime = workTime;
         this.lunarYN = lunarYN;
-        this.profileName = profileName;
-        this.profileUUID = profileUUID;
         this.invitationStatus = StatusType.ACTIVE;
         this.registeredAt = LocalDateTime.now();
         this.invitationToken = null; // 토큰 제거

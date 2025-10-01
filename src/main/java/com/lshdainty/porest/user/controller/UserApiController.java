@@ -267,12 +267,8 @@ public class UserApiController {
     public ApiResponse completeInvitedUserRegistration(@RequestBody UserDto data) {
         String userId = userService.completeInvitedUserRegistration(UserServiceDto.builder()
                 .invitationToken(data.getInvitationToken())
-                .pwd(data.getUserPwd())
                 .birth(data.getUserBirth())
-                .workTime(data.getUserWorkTime())
                 .lunarYN(data.getLunarYN())
-                .profileUrl(data.getProfileUrl())
-                .profileUUID(data.getProfileUUID())
                 .build()
         );
 
