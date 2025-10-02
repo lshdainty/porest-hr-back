@@ -219,27 +219,6 @@ public class UserApiController {
     }
 
     /**
-     * 초대 토큰 유효성 검증
-     * TODO: Spring Security에서 해당 api 주소 제외시켜야함 (회원가입인데 인증을 진행할 수 없음)
-     */
-    @GetMapping("/api/v1/user/invitation/validate/{token}")
-    public ApiResponse validateInvitationToken(@PathVariable("token") String token) {
-        UserServiceDto result = userService.validateInvitationToken(token);
-
-        return ApiResponse.success(UserDto.builder()
-                .userId(result.getId())
-                .userName(result.getName())
-                .userEmail(result.getEmail())
-                .userOriginCompanyType(result.getCompany())
-                .userWorkTime(result.getWorkTime())
-                .userRoleType(result.getRole())
-                .invitationSentAt(result.getInvitationSentAt())
-                .invitationExpiresAt(result.getInvitationExpiresAt())
-                .invitationStatus(result.getInvitationStatus())
-                .build());
-    }
-
-    /**
      * 초대 이메일 재전송
      */
     @PostMapping("/api/v1/user/invitation/resend/{id}")
@@ -257,21 +236,5 @@ public class UserApiController {
                 .invitationExpiresAt(result.getInvitationExpiresAt())
                 .invitationStatus(result.getInvitationStatus())
                 .build());
-    }
-
-    /**
-     * 초대받은 사용자의 회원가입 완료
-     * TODO: Spring Security에서 해당 api 주소 제외시켜야함 (회원가입인데 인증을 진행할 수 없음)
-     */
-    @PostMapping("/api/v1/user/invitation/complete")
-    public ApiResponse completeInvitedUserRegistration(@RequestBody UserDto data) {
-        String userId = userService.completeInvitedUserRegistration(UserServiceDto.builder()
-                .invitationToken(data.getInvitationToken())
-                .birth(data.getUserBirth())
-                .lunarYN(data.getLunarYN())
-                .build()
-        );
-
-        return ApiResponse.success(UserDto.builder().userId(userId).build());
     }
 }

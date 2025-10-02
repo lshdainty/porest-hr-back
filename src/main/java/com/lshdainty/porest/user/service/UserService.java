@@ -266,33 +266,6 @@ public class UserService {
     }
 
     /**
-     * 초대 토큰으로 사용자 조회 및 유효성 검증
-     */
-    public UserServiceDto validateInvitationToken(String token) {
-        Optional<User> findUser = userRepositoryImpl.findByInvitationToken(token);
-        if (findUser.isEmpty()) {
-            throw new IllegalArgumentException(ms.getMessage("error.notfound.invitation", null, null));
-        }
-
-        User user = findUser.get();
-        if (!user.isInvitationValid()) {
-            throw new IllegalArgumentException(ms.getMessage("error.expired.invitation", null, null));
-        }
-
-        return UserServiceDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .company(user.getCompany())
-                .workTime(user.getWorkTime())
-                .role(user.getRole())
-                .invitationSentAt(user.getInvitationSentAt())
-                .invitationExpiresAt(user.getInvitationExpiresAt())
-                .invitationStatus(user.getInvitationStatus())
-                .build();
-    }
-
-    /**
      * 초대 이메일 재전송
      */
     @Transactional
