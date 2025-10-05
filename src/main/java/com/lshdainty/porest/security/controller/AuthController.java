@@ -46,9 +46,8 @@ public class AuthController {
 
     /**
      * 초대받은 사용자의 회원가입 완료
-     * TODO: Spring Security에서 해당 api 주소 제외시켜야함 (회원가입인데 인증을 진행할 수 없음)
      */
-    @PostMapping("/api/v1/user/invitation/complete")
+    @PostMapping("/oauth2/signup/invitation/complete")
     public ApiResponse completeInvitedUserRegistration(@RequestBody UserDto data) {
         String userId = userService.completeInvitedUserRegistration(UserServiceDto.builder()
                 .invitationToken(data.getInvitationToken())
@@ -58,6 +57,5 @@ public class AuthController {
         );
 
         return ApiResponse.success(UserDto.builder().userId(userId).build());
-//        return ApiResponse.success();
     }
 }

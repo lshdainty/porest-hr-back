@@ -1,6 +1,7 @@
 package com.lshdainty.porest.security.service;
 
 import com.lshdainty.porest.security.dto.OAuthAttributes;
+import com.lshdainty.porest.security.principal.CustomOAuth2User;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.domain.UserProvider;
 import com.lshdainty.porest.user.repository.UserRepository;
@@ -50,9 +51,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         User user = processOAuth2User(attributes);
 
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
+        return new CustomOAuth2User(
+                user,
                 attributes.getAttributes(),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
                 attributes.getNameAttributeKey());
     }
 

@@ -1,5 +1,6 @@
 package com.lshdainty.porest.security.service;
 
+import com.lshdainty.porest.security.principal.UserPrincipal;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.repository.UserRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     // Spring Security UserDetails 구현
-    public static class CustomUserDetails implements UserDetails {
+    public static class CustomUserDetails implements UserDetails, UserPrincipal {
         private final User user;
 
         public CustomUserDetails(User user) {
@@ -84,7 +85,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             return true;
         }
 
-        // User 객체 반환 메서드
+        // User 객체 반환 메서드 (UserPrincipal 인터페이스 구현)
+        @Override
         public User getUser() {
             return user;
         }

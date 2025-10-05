@@ -1,5 +1,6 @@
 package com.lshdainty.porest.user.controller;
 
+import com.lshdainty.porest.security.principal.UserPrincipal;
 import com.lshdainty.porest.security.service.CustomUserDetailsService;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.user.controller.dto.UserDto;
@@ -157,8 +158,15 @@ public class UserApiController {
             throw new IllegalArgumentException("인증이 필요합니다.");
         }
 
-        CustomUserDetailsService.CustomUserDetails userDetails = (CustomUserDetailsService.CustomUserDetails) authentication.getPrincipal();
-        User user = userDetails.getUser();
+        Object principal = authentication.getPrincipal();
+
+        // UserPrincipal 인터페이스로 통합 처리
+        if (!(principal instanceof UserPrincipal)) {
+            throw new IllegalArgumentException("지원하지 않는 인증 타입입니다.");
+        }
+
+        UserPrincipal userPrincipal = (UserPrincipal) principal;
+        User user = userPrincipal.getUser();
 
         UserDto result = UserDto.builder()
                 .userId(user.getId())
