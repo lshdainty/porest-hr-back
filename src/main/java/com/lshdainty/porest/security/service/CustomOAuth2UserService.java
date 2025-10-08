@@ -64,6 +64,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String oauthStep = (String) httpSession.getAttribute("oauthStep");
         String invitedUserId = (String) httpSession.getAttribute("invitedUserId");
 
+        log.info("Invitation Token: " + invitationToken);
+        log.info("OAuth Step: " + oauthStep);
+        log.info("Invited UserId: " + invitedUserId);
+
         // 2. 3가지의 값이 다 있다면 회원가입 아니면 로그인으로 간주
         if (invitationToken != null && "signup".equals(oauthStep) && invitedUserId != null) {
             // 회원 가입 부분
