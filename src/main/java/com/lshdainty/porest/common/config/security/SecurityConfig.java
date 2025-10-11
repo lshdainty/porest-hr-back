@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -28,6 +29,8 @@ public class SecurityConfig {
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomOAuth2AuthenticationFailureHandler customOAuth2AuthenticationFailureHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final RequestLoggingFilter requestLoggingFilter;
 
     // password 암호화를 위한 bean 등록
     @Bean
@@ -52,6 +55,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/",
                         "/login",                // 로그인
+                        "/login/check",          // 현재 로그인된 유저정보
                         "/logout",               // 로그아웃
                         "/oauth2/**",            // OAuth2 시작 URL
                         "/login/oauth2/**",      // OAuth2 콜백 URL (중요!)
@@ -103,6 +107,14 @@ public class SecurityConfig {
         // 세션 정책: 세션 사용
         http.sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+
+        // 인증되지 않은 사용자의 접근 처리
+        http.exceptionHandling(exception -> exception
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+        );
+
+        // 요청 로깅 필터 추가 (Security Filter Chain 앞에 추가)
+        http.addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
