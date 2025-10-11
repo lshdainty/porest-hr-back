@@ -45,6 +45,11 @@ public class AuthController {
         UserPrincipal userPrincipal = (UserPrincipal) principal;
         User user = userPrincipal.getUser();
 
+        /*
+        * TODO : 프로파일 이미지를 추후에 변경하면 세션에 적용안됨
+        *  수정 필요
+        * */
+
         UserDto result = UserDto.builder()
                 .userId(user.getId())
                 .userName(user.getName())
@@ -55,6 +60,8 @@ public class AuthController {
                 .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
                         userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
                 .build();
+
+        log.info("user info : {}, {}, {}, {}, {}, {}", result.getUserId(), result.getUserName(), result.getUserEmail(), result.getUserRoleType(), result.getUserRoleName(), result.getProfileUrl());
 
         return ApiResponse.success(result);
     }
