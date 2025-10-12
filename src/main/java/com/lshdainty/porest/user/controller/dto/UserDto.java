@@ -33,7 +33,7 @@ public class UserDto {
 
     private List<VacationDto> vacations;
 
-    private String userCompanyName;
+    private String userOriginCompanyName;
     private String userDepartmentName;
     private String userRoleName;
 

@@ -24,14 +24,14 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         String queryString = request.getQueryString();
         String fullPath = queryString != null ? uri + "?" + queryString : uri;
 
-        log.info("=== Incoming Request ===");
-        log.info("Method: {}", method);
-        log.info("Path: {}", fullPath);
-        log.info("Remote Address: {}", request.getRemoteAddr());
+//        log.info("=== Incoming Request ===");
+//        log.info("Method: {}", method);
+//        log.info("Path: {}", fullPath);
+//        log.info("Remote Address: {}", request.getRemoteAddr());
 
         filterChain.doFilter(request, response);
 
-        log.info("Response Status: {}", response.getStatus());
-        log.info("========================");
+//        log.info("Response Status: {}", response.getStatus());
+//        log.info("========================");
     }
 }

@@ -28,11 +28,12 @@ public class P6SpyConfig implements MessageFormattingStrategy {
     }
 
     private String stackTrace() {
-        return Stream.of(new Throwable().getStackTrace())
-                .filter(t -> t.toString().startsWith("com.lshdainty") && !t.toString().contains(
-                        ClassUtils.getUserClass(this).getName()))
-                .map(StackTraceElement::toString)
-                .collect(Collectors.joining("\n"));
+//        return Stream.of(new Throwable().getStackTrace())
+//                .filter(t -> t.toString().startsWith("com.lshdainty") && !t.toString().contains(
+//                        ClassUtils.getUserClass(this).getName()))
+//                .map(StackTraceElement::toString)
+//                .collect(Collectors.joining("\n"));
+        return "";
     }
 
     private String formatSql(String category, String sql) {

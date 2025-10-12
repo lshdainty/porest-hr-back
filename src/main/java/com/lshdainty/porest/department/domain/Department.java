@@ -104,7 +104,8 @@ public class Department extends AuditingFields {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(nameKR)) { this.nameKR = nameKR; }
         if (!Objects.isNull(parent)) { this.changeParent(parent); }
-        if (!Objects.isNull(headUserId)) { this.headUserId = headUserId; }
+        // 부서장의 경우 잘못 선택한 경우 공란으로 설정가능
+        this.headUserId = headUserId;
         if (!Objects.isNull(level)) { this.level = level; }
         if (!Objects.isNull(desc)) { this.desc = desc; }
     }
