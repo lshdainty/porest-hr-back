@@ -24,6 +24,14 @@ public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
     }
 
     @Override
+    public Optional<Company> find() {
+        return Optional.ofNullable(query
+                .selectFrom(company)
+                .fetchFirst()
+        );
+    }
+
+    @Override
     public Optional<Company> findById(String id) {
         return Optional.ofNullable(query
                 .selectFrom(company)

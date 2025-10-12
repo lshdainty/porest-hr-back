@@ -28,6 +28,22 @@ public class CompanyApiController {
         return ApiResponse.success(CompanyDto.builder().companyId(companyId).build());
     }
 
+    @GetMapping("/api/v1/company")
+    public ApiResponse searchCompany() {
+        CompanyServiceDto company = companyService.searchCompany();
+
+        if (company == null || company.getId() == null || company.getId().isEmpty()) {
+            return ApiResponse.success();
+        }
+
+        return ApiResponse.success(CompanyDto.builder()
+                .companyId(company.getId())
+                .companyName(company.getName())
+                .companyDesc(company.getDesc())
+                .build()
+        );
+    }
+
     @PutMapping("/api/v1/company/{id}")
     public ApiResponse editCompany(@PathVariable("id") String companyId, @RequestBody CompanyDto data) {
         companyService.edit(CompanyServiceDto.builder()

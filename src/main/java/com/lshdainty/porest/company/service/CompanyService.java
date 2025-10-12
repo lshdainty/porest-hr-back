@@ -58,6 +58,20 @@ public class CompanyService {
         company.deleteCompany();
     }
 
+    public CompanyServiceDto searchCompany() {
+        Optional<Company> OCompany = companyRepository.find();
+        if (OCompany.isPresent()) {
+            Company company = OCompany.get();
+            return CompanyServiceDto.builder()
+                    .id(company.getId())
+                    .name(company.getName())
+                    .desc(company.getDesc())
+                    .build();
+        } else {
+            return CompanyServiceDto.builder().build();
+        }
+    }
+
     public CompanyServiceDto searchCompanyWithDepartments(String id) {
         Optional<Company> OCompany = companyRepository.findByIdWithDepartments(id);
         if (OCompany.isEmpty()) {
