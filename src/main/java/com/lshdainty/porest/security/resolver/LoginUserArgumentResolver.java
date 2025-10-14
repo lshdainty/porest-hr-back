@@ -1,7 +1,7 @@
 package com.lshdainty.porest.security.resolver;
 
 import com.lshdainty.porest.security.annotation.LoginUser;
-import com.lshdainty.porest.user.controller.dto.UserDto;
+import com.lshdainty.porest.security.controller.dto.AuthApiDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
     private final HttpSession httpSession;
 
-    //파라미터에 @Login 어노테이션이 붙어 있고, 파라미터 클래스 타입이 UserDTO.class인 경우 true를 반환한다.
+    //파라미터에 @LoginUser 어노테이션이 붙어 있고, 파라미터 클래스 타입이 AuthApiDto.LoginUserInfo인 경우 true를 반환한다.
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginUser.class) != null;
-        boolean isUserClass = UserDto.class.equals(parameter.getParameterType());
+        boolean isUserClass = AuthApiDto.LoginUserInfo.class.equals(parameter.getParameterType());
 
         return isLoginUserAnnotation && isUserClass;
     }

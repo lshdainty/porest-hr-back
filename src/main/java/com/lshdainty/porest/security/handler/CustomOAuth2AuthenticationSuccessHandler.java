@@ -3,9 +3,9 @@ package com.lshdainty.porest.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.security.controller.dto.AuthApiDto;
 import com.lshdainty.porest.security.principal.CustomOAuth2User;
 import com.lshdainty.porest.security.service.CustomOAuth2UserService;
-import com.lshdainty.porest.user.controller.dto.UserDto;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import jakarta.servlet.ServletException;
@@ -98,18 +98,17 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
 
         // 세션에 사용자 정보 저장
         HttpSession session = request.getSession();
-        UserDto userDto = UserDto.builder()
-                .userId(user.getId())
-                .userName(user.getName())
-                .userEmail(user.getEmail())
-                .userRoleType(user.getRole())
-                .userRoleName(user.getRole().name())
-                .isLogin(YNType.Y)
-                .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
-                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
-                .build();
 
-        session.setAttribute("user", userDto);
+        session.setAttribute("user", new AuthApiDto.LoginUserInfo(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getRole().name(),
+                YNType.Y,
+                StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
+                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null
+        ));
         log.info("세션에 사용자 정보 저장 완료 - userId: {}, userName: {}", user.getId(), user.getName());
 
         // 로그인 페이지로 리다이렉트 (프론트에서 세션 정보 조회)

@@ -1,15 +1,11 @@
 package com.lshdainty.porest.security.dto;
 
-import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.security.oauth2.factory.OAuth2UserInfoFactory;
 import com.lshdainty.porest.security.oauth2.provider.OAuth2UserInfo;
-import com.lshdainty.porest.user.domain.User;
-import com.lshdainty.porest.user.domain.UserProvider;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Getter
 @Builder

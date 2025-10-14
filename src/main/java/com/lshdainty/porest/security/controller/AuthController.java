@@ -3,9 +3,9 @@ package com.lshdainty.porest.security.controller;
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.common.exception.UnauthorizedException;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.security.controller.dto.AuthApiDto;
 import com.lshdainty.porest.security.principal.UserPrincipal;
 import com.lshdainty.porest.security.service.SecurityService;
-import com.lshdainty.porest.user.controller.dto.UserDto;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
@@ -27,7 +27,7 @@ public class AuthController {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @GetMapping("login/check")
-    public ApiResponse<UserDto> getUserInfo() {
+    public ApiResponse<AuthApiDto.LoginUserInfo> getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() ||
@@ -50,16 +50,16 @@ public class AuthController {
         *  수정 필요
         * */
 
-        UserDto result = UserDto.builder()
-                .userId(user.getId())
-                .userName(user.getName())
-                .userEmail(user.getEmail())
-                .userRoleType(user.getRole())
-                .userRoleName(user.getRole().name())
-                .isLogin(YNType.Y)
-                .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
-                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
-                .build();
+        AuthApiDto.LoginUserInfo result = new AuthApiDto.LoginUserInfo(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getRole().name(),
+                YNType.Y,
+                StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
+                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null
+        );
 
         log.info("user info : {}, {}, {}, {}, {}, {}", result.getUserId(), result.getUserName(), result.getUserEmail(), result.getUserRoleType(), result.getUserRoleName(), result.getProfileUrl());
 
@@ -70,24 +70,22 @@ public class AuthController {
      * 비밀번호 인코딩 유틸리티 API (개발/테스트용)
      */
     @PostMapping("/encode-password")
-    public ApiResponse<UserDto> encodePassword(@RequestBody UserDto data) {
-        log.info("Password encoding request for user: {}", data.getUserId());
+    public ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(@RequestBody AuthApiDto.EncodePasswordReq data) {
+        log.info("Password encoding request");
 
         String encodedPassword = passwordEncoder.encode(data.getUserPwd());
 
-        UserDto result = UserDto.builder()
-                .originalPW(data.getUserPwd())
-                .encodedPW(encodedPassword)
-                .build();
-
-        return ApiResponse.success(result);
+        return ApiResponse.success(new AuthApiDto.EncodePasswordResp(
+                data.getUserPwd(),
+                encodedPassword
+        ));
     }
 
     /**
      * 초대 토큰 유효성 검증
      */
     @GetMapping("/oauth2/signup/validate")
-    public ApiResponse validateInvitationToken(@RequestParam("token") String token, HttpSession session) {
+    public ApiResponse<AuthApiDto.ValidateInvitationResp> validateInvitationToken(@RequestParam("token") String token, HttpSession session) {
         // 토큰 빈값이면 토큰 없다고 에러 반환
 
         UserServiceDto user = securityService.validateInvitationToken(token);
@@ -97,31 +95,31 @@ public class AuthController {
         session.setAttribute("oauthStep", "signup");
         session.setAttribute("invitedUserId", user.getId()); // 추가 보안
 
-        return ApiResponse.success(UserDto.builder()
-                .userId(user.getId())
-                .userName(user.getName())
-                .userEmail(user.getEmail())
-                .userOriginCompanyType(user.getCompany())
-                .userWorkTime(user.getWorkTime())
-                .userRoleType(user.getRole())
-                .invitationSentAt(user.getInvitationSentAt())
-                .invitationExpiresAt(user.getInvitationExpiresAt())
-                .invitationStatus(user.getInvitationStatus())
-                .build());
+        return ApiResponse.success(new AuthApiDto.ValidateInvitationResp(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCompany(),
+                user.getWorkTime(),
+                user.getRole(),
+                user.getInvitationSentAt(),
+                user.getInvitationExpiresAt(),
+                user.getInvitationStatus()
+        ));
     }
 
     /**
      * 초대받은 사용자의 회원가입 완료
      */
     @PostMapping("/oauth2/signup/invitation/complete")
-    public ApiResponse completeInvitedUserRegistration(@RequestBody UserDto data) {
+    public ApiResponse<AuthApiDto.CompleteInvitationResp> completeInvitedUserRegistration(@RequestBody AuthApiDto.CompleteInvitationReq data) {
         String userId = userService.completeInvitedUserRegistration(UserServiceDto.builder()
                 .invitationToken(data.getInvitationToken())
                 .birth(data.getUserBirth())
-                .lunarYN(data.getLunarYN())
+                .lunarYN(data.getLunarYn())
                 .build()
         );
 
-        return ApiResponse.success(UserDto.builder().userId(userId).build());
+        return ApiResponse.success(new AuthApiDto.CompleteInvitationResp(userId));
     }
 }

@@ -2,9 +2,9 @@ package com.lshdainty.porest.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.security.controller.dto.AuthApiDto;
 import com.lshdainty.porest.security.service.CustomUserDetailsService;
 import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.user.controller.dto.UserDto;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,17 +36,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 (CustomUserDetailsService.CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.getUser();
 
-        UserDto result = UserDto.builder()
-                .userId(user.getId())
-                .userName(user.getName())
-                .userEmail(user.getEmail())
-                .userRoleType(user.getRole())
-                .userRoleName(user.getRole().name())
-                .isLogin(YNType.Y)
-                .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
-                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
-                .build();
-        ApiResponse<UserDto> apiResponse = ApiResponse.success(result);
+        ApiResponse<AuthApiDto.LoginUserInfo> apiResponse = ApiResponse.success(new AuthApiDto.LoginUserInfo(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                user.getRole().name(),
+                YNType.Y,
+                StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
+                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null
+        ));
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);
         response.getWriter().write(jsonResponse);
     }
