@@ -7,7 +7,7 @@ import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.type.RoleType;
 import com.lshdainty.porest.user.type.StatusType;
 import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.vacation.controller.dto.VacationDto;
+//import com.lshdainty.porest.vacation.controller.dto.VacationDto;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +31,7 @@ public class UserDto {
     private YNType delYN;
     private YNType isLogin;
 
-    private List<VacationDto> vacations;
+//    private List<VacationDto> vacations;
 
     private String userOriginCompanyName;
     private String userDepartmentName;

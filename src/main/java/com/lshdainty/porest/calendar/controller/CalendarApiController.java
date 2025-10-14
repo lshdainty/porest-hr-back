@@ -1,8 +1,8 @@
 package com.lshdainty.porest.calendar.controller;
 
+import com.lshdainty.porest.calendar.controller.dto.CalendarApiDto;
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.schedule.domain.Schedule;
-import com.lshdainty.porest.calendar.controller.dto.CalendarDto;
 import com.lshdainty.porest.schedule.service.ScheduleService;
 import com.lshdainty.porest.vacation.service.VacationService;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
@@ -26,45 +26,41 @@ public class CalendarApiController {
 
     @GetMapping("/api/v1/calendar/period")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    public ApiResponse getEventsByPeriod(
+    public ApiResponse searchEventsByPeriod(
             @RequestParam("startDate") LocalDateTime startDate,
             @RequestParam("endDate") LocalDateTime endDate) {
-        List<CalendarDto> resp = new ArrayList<>();
+        List<CalendarApiDto.searchEventsByPeriodResp> resp = new ArrayList<>();
 
         List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(startDate, endDate);
         resp.addAll(schedules.stream()
-                .map(s -> CalendarDto
-                        .builder()
-                        .userId(s.getUser().getId())
-                        .userName(s.getUser().getName())
-                        .calendarName(s.getType().getStrName())
-                        .calendarType(s.getType().name())
-                        .calendarDesc(s.getDesc())
-                        .startDate(s.getStartDate())
-                        .endDate(s.getEndDate())
-                        .domainType("schedule")
-                        .historyIds(List.of())
-                        .scheduleId(s.getId())
-                        .build()
-                )
+                .map(s -> new CalendarApiDto.searchEventsByPeriodResp(
+                        s.getUser().getId(),
+                        s.getUser().getName(),
+                        s.getType().getStrName(),
+                        s.getType().name(),
+                        s.getDesc(),
+                        s.getStartDate(),
+                        s.getEndDate(),
+                        "schedule",
+                        List.of(),
+                        s.getId()
+                ))
                 .toList());
 
         List<VacationServiceDto> histories = vacationService.searchPeriodVacationUseHistories(startDate, endDate);
         resp.addAll(histories.stream()
-                .map(v -> CalendarDto
-                        .builder()
-                        .userId(v.getUser().getId())
-                        .userName(v.getUser().getName())
-                        .calendarType(v.getTimeType().name())
-                        .calendarName(v.getTimeType().getStrName())
-                        .calendarDesc(v.getDesc())
-                        .startDate(v.getStartDate())
-                        .endDate(v.getEndDate())
-                        .domainType("vacation")
-                        .historyIds(v.getHistoryIds())
-                        .scheduleId(0L)
-                        .build()
-                )
+                .map(v -> new CalendarApiDto.searchEventsByPeriodResp(
+                        v.getUser().getId(),
+                        v.getUser().getName(),
+                        v.getTimeType().getStrName(),
+                        v.getTimeType().name(),
+                        v.getDesc(),
+                        v.getStartDate(),
+                        v.getEndDate(),
+                        "vacation",
+                        v.getHistoryIds(),
+                        0L
+                ))
                 .toList());
 
         return ApiResponse.success(resp);
