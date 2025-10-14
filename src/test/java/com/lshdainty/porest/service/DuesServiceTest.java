@@ -39,7 +39,7 @@ class DuesServiceTest {
 
     @Test
     @DisplayName("회비 저장 테스트 - 성공")
-    void saveDuesSuccessTest() {
+    void registDuesDuesSuccessTest() {
         // Given
         String userName = "이서준";
         Long amount = 50000L;
@@ -50,7 +50,7 @@ class DuesServiceTest {
         willDoNothing().given(duesRepositoryImpl).save(any(Dues.class));
 
         // When
-        duesService.save(DuesServiceDto.builder()
+        duesService.registDues(DuesServiceDto.builder()
                 .userName(userName)
                 .amount(amount)
                 .type(type)
@@ -66,7 +66,7 @@ class DuesServiceTest {
 
     @Test
     @DisplayName("전체 회비 조회 테스트 - 성공 (시간 정렬)")
-    void findDuesSuccessTest() {
+    void searchDuesSuccessTest() {
         // Given
         given(duesRepositoryImpl.findDues()).willReturn(List.of(
                 Dues.createDues("이서준", 50000L, DuesType.BIRTH, DuesCalcType.PLUS, "20250101", "1월 회비"),
@@ -75,7 +75,7 @@ class DuesServiceTest {
         ));
 
         // When
-        List<DuesServiceDto> duesList = duesService.findDues();
+        List<DuesServiceDto> duesList = duesService.searchDues();
 
         // Then
         then(duesRepositoryImpl).should().findDues();
@@ -91,7 +91,7 @@ class DuesServiceTest {
 
     @Test
     @DisplayName("연도별 회비 조회 테스트 - 성공 (시간 정렬)")
-    void findDuesByYearSuccessTest() {
+    void searchYearDuesSuccessTest() {
         // Given
         String year = "2025";
         given(duesRepositoryImpl.findDuesByYear(year)).willReturn(List.of(
@@ -101,7 +101,7 @@ class DuesServiceTest {
         ));
 
         // When
-        List<DuesServiceDto> duesList = duesService.findDuesByYear(year);
+        List<DuesServiceDto> duesList = duesService.searchYearDues(year);
 
         // Then
         then(duesRepositoryImpl).should().findDuesByYear(year);
@@ -122,7 +122,7 @@ class DuesServiceTest {
         ));
 
         // When
-        DuesServiceDto result = duesService.findOperatingDuesByYear(year);
+        DuesServiceDto result = duesService.searchYearOperationDues(year);
 
         // Then
         then(duesRepositoryImpl).should().findOperatingDuesByYear(year);
@@ -140,7 +140,7 @@ class DuesServiceTest {
         given(duesRepositoryImpl.findBirthDuesByYearAndMonth(year, month)).willReturn(100000L);
 
         // When
-        Long totalAmount = duesService.findBirthDuesByYearAndMonth(year, month);
+        Long totalAmount = duesService.searchMonthBirthDues(year, month);
 
         // Then
         then(duesRepositoryImpl).should().findBirthDuesByYearAndMonth(year, month);
@@ -158,7 +158,7 @@ class DuesServiceTest {
         ));
 
         // When
-        List<DuesServiceDto> result = duesService.findUsersMonthBirthDues(year);
+        List<DuesServiceDto> result = duesService.searchUsersMonthBirthDues(year);
 
         // Then
         then(duesRepositoryImpl).should().findUsersMonthBirthDues(year);

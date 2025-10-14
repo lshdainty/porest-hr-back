@@ -24,7 +24,7 @@ public class DuesService {
     private final DuesRepositoryImpl duesRepositoryImpl;
 
     @Transactional
-    public Long save(DuesServiceDto data) {
+    public Long registDues(DuesServiceDto data) {
         Dues dues = Dues.createDues(
                 data.getUserName(),
                 data.getAmount(),
@@ -37,7 +37,7 @@ public class DuesService {
         return dues.getSeq();
     }
 
-    public List<DuesServiceDto> findDues() {
+    public List<DuesServiceDto> searchDues() {
         List<Dues> dues = duesRepositoryImpl.findDues();
 
         List<DuesServiceDto> dtos = dues.stream()
@@ -60,7 +60,7 @@ public class DuesService {
         return dtos;
     }
 
-    public List<DuesServiceDto> findDuesByYear(String year) {
+    public List<DuesServiceDto> searchYearDues(String year) {
         List<Dues> dues = duesRepositoryImpl.findDuesByYear(year);
 
         List<DuesServiceDto> dtos = dues.stream()
@@ -83,7 +83,7 @@ public class DuesService {
         return dtos;
     }
 
-    public DuesServiceDto findOperatingDuesByYear(String year) {
+    public DuesServiceDto searchYearOperationDues(String year) {
         List<Dues> dues = duesRepositoryImpl.findOperatingDuesByYear(year);
         Long total = 0L;
         Long deposit = 0L;
@@ -104,11 +104,11 @@ public class DuesService {
                 .build();
     }
 
-    public Long findBirthDuesByYearAndMonth(String year, String month) {
+    public Long searchMonthBirthDues(String year, String month) {
         return duesRepositoryImpl.findBirthDuesByYearAndMonth(year, month);
     }
 
-    public List<DuesServiceDto> findUsersMonthBirthDues(String year) {
+    public List<DuesServiceDto> searchUsersMonthBirthDues(String year) {
         List<UsersMonthBirthDuesDto> repositoryDtos = duesRepositoryImpl.findUsersMonthBirthDues(year);
         return repositoryDtos.stream()
                 .map(d -> DuesServiceDto.builder()

@@ -1,6 +1,6 @@
 package com.lshdainty.porest.dues.controller;
 
-import com.lshdainty.porest.dues.controller.dto.DuesDto;
+import com.lshdainty.porest.dues.controller.dto.DuesApiDto;
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.dues.service.DuesService;
 import com.lshdainty.porest.dues.service.dto.DuesServiceDto;
@@ -22,8 +22,8 @@ public class DuesApiController {
     private final DuesService duesService;
 
     @PostMapping("/api/v1/dues")
-    public ApiResponse registDues(@RequestBody DuesDto data) {
-        Long duesSeq = duesService.save(DuesServiceDto.builder()
+    public ApiResponse registDues(@RequestBody DuesApiDto.RegistDuesReq data) {
+        Long duesSeq = duesService.registDues(DuesServiceDto.builder()
                 .userName(data.getDuesUserName())
                 .amount(data.getDuesAmount())
                 .type(data.getDuesType())
@@ -32,52 +32,50 @@ public class DuesApiController {
                 .detail(data.getDuesDetail())
                 .build()
         );
-        return ApiResponse.success(DuesDto.builder().duesSeq(duesSeq).build());
+        return ApiResponse.success(new DuesApiDto.RegistDuesResp(duesSeq));
     }
 
     @GetMapping("/api/v1/dues")
-    public ApiResponse yearDues(@RequestParam("year") String year) {
-        List<DuesServiceDto> dtos = duesService.findDuesByYear(year);
+    public ApiResponse searchYearDues(@RequestParam("year") String year) {
+        List<DuesServiceDto> dtos = duesService.searchYearDues(year);
         return ApiResponse.success(dtos.stream()
-                .map(d -> DuesDto.builder()
-                        .duesSeq(d.getSeq())
-                        .duesUserName(d.getUserName())
-                        .duesAmount(d.getAmount())
-                        .duesType(d.getType())
-                        .duesCalc(d.getCalc())
-                        .duesDate(d.getDate())
-                        .duesDetail(d.getDetail())
-                        .totalDues(d.getTotalDues())
-                        .build())
+                .map(d -> new DuesApiDto.SearchYearDuesResp(
+                        d.getSeq(),
+                        d.getUserName(),
+                        d.getAmount(),
+                        d.getType(),
+                        d.getCalc(),
+                        d.getDate(),
+                        d.getDetail(),
+                        d.getTotalDues()
+                ))
                 .collect(Collectors.toList()));
     }
 
     @GetMapping("/api/v1/dues/operation")
-    public ApiResponse yearOperationDues(@RequestParam("year") String year) {
-        DuesServiceDto serviceDto = duesService.findOperatingDuesByYear(year);
-        return ApiResponse.success(DuesDto.builder()
-                .totalDues(serviceDto.getTotalDues())
-                .totalDeposit(serviceDto.getTotalDeposit())
-                .totalWithdrawal(serviceDto.getTotalWithdrawal())
-                .build());
+    public ApiResponse searchYearOperationDues(@RequestParam("year") String year) {
+        DuesServiceDto serviceDto = duesService.searchYearOperationDues(year);
+        return ApiResponse.success(new DuesApiDto.SearchYearOperationDuesResp(
+                serviceDto.getTotalDues(),
+                serviceDto.getTotalDeposit(),
+                serviceDto.getTotalWithdrawal()
+        ));
     }
 
     @GetMapping("/api/v1/dues/birth/month")
-    public ApiResponse monthBirthDues(@RequestParam("year") String year, @RequestParam("month") String month) {
-        Long birthDues = duesService.findBirthDuesByYearAndMonth(year, month);
-        return ApiResponse.success(DuesDto.builder()
-                .birthMonthDues(birthDues)
-                .build());
+    public ApiResponse searchMonthBirthDues(@RequestParam("year") String year, @RequestParam("month") String month) {
+        Long birthDues = duesService.searchMonthBirthDues(year, month);
+        return ApiResponse.success(new DuesApiDto.SearchMonthBirthDuesResp(birthDues));
     }
 
     @GetMapping("/api/v1/dues/users/birth/month")
-    public ApiResponse usersMonthBirthDues(@RequestParam("year") String year) {
-        List<DuesServiceDto> serviceDtos = duesService.findUsersMonthBirthDues(year);
+    public ApiResponse searchUsersMonthBirthDues(@RequestParam("year") String year) {
+        List<DuesServiceDto> serviceDtos = duesService.searchUsersMonthBirthDues(year);
 
         Map<String, List<DuesServiceDto>> duesByUserName = serviceDtos.stream()
                 .collect(Collectors.groupingBy(DuesServiceDto::getUserName, LinkedHashMap::new, Collectors.toList()));
 
-        List<DuesDto> resp = duesByUserName.entrySet().stream()
+        List<DuesApiDto.SearchUsersMonthBirthDuesResp> resp = duesByUserName.entrySet().stream()
                 .map(entry -> {
                     String userName = entry.getKey();
                     List<DuesServiceDto> userDues = entry.getValue();
@@ -90,10 +88,7 @@ public class DuesApiController {
                         }
                     }
 
-                    return DuesDto.builder()
-                            .duesUserName(userName)
-                            .monthBirthDues(monthBirthDues)
-                            .build();
+                    return new DuesApiDto.SearchUsersMonthBirthDuesResp(userName, monthBirthDues);
                 })
                 .collect(Collectors.toList());
 
@@ -101,7 +96,7 @@ public class DuesApiController {
     }
 
     @PutMapping("/api/v1/dues/{seq}")
-    public ApiResponse editDues(@PathVariable("seq") Long seq, @RequestBody DuesDto data) {
+    public ApiResponse editDues(@PathVariable("seq") Long seq, @RequestBody DuesApiDto.EditDuesReq data) {
         duesService.editDues(DuesServiceDto.builder()
                 .seq(seq)
                 .userName(data.getDuesUserName())
