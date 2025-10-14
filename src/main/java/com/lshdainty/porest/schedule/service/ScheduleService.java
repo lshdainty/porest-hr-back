@@ -47,11 +47,11 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    public List<Schedule> findSchedulesByUserId(String userId) {
+    public List<Schedule> searchSchedulesByUser(String userId) {
         return scheduleRepositoryImpl.findSchedulesByUserId(userId);
     }
 
-    public List<Schedule> findSchedulesByPeriod(LocalDateTime start, LocalDateTime end) {
+    public List<Schedule> searchSchedulesByPeriod(LocalDateTime start, LocalDateTime end) {
         if (PorestTime.isAfterThanEndDate(start, end)) { throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null)); }
         return scheduleRepositoryImpl.findSchedulesByPeriod(start, end);
     }

@@ -130,7 +130,7 @@ class ScheduleServiceTest {
         ));
 
         // When
-        List<Schedule> schedules = scheduleService.findSchedulesByUserId(userId);
+        List<Schedule> schedules = scheduleService.searchSchedulesByUser(userId);
 
         // Then
         assertThat(schedules).hasSize(3);
@@ -142,7 +142,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 기간 조회 테스트 - 성공")
-    void findSchedulesByPeriodSuccessTest() {
+    void searchSchedulesByPeriodSuccessTest() {
         // Given
         User user = User.createUser("test1");
 
@@ -156,7 +156,7 @@ class ScheduleServiceTest {
         ));
 
         // When
-        List<Schedule> schedules = scheduleService.findSchedulesByPeriod(start, end);
+        List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(start, end);
 
         // Then
         assertThat(schedules).hasSize(3);
@@ -168,14 +168,14 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 기간 조회 테스트 - 실패 (start, end 반대)")
-    void findSchedulesByPeriodFailTestReverseStartEndDate() {
+    void searchSchedulesByPeriodFailTestReverseStartEndDate() {
         // Given
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.minusDays(1);
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () ->
-                scheduleService.findSchedulesByPeriod(start, end));
+                scheduleService.searchSchedulesByPeriod(start, end));
     }
 
     @Test

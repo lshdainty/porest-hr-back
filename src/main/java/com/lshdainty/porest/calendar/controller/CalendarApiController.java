@@ -31,7 +31,7 @@ public class CalendarApiController {
             @RequestParam("endDate") LocalDateTime endDate) {
         List<CalendarDto> resp = new ArrayList<>();
 
-        List<Schedule> schedules = scheduleService.findSchedulesByPeriod(startDate, endDate);
+        List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(startDate, endDate);
         resp.addAll(schedules.stream()
                 .map(s -> CalendarDto
                         .builder()

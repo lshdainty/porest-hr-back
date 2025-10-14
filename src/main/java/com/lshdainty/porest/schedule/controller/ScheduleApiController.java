@@ -2,7 +2,7 @@ package com.lshdainty.porest.schedule.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.schedule.domain.Schedule;
-import com.lshdainty.porest.schedule.controller.dto.ScheduleDto;
+import com.lshdainty.porest.schedule.controller.dto.ScheduleApiDto;
 import com.lshdainty.porest.schedule.service.ScheduleService;
 import com.lshdainty.porest.schedule.service.dto.ScheduleServiceDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class ScheduleApiController {
     private final ScheduleService scheduleService;
 
     @PostMapping("/api/v1/schedule")
-    public ApiResponse registSchedule(@RequestBody ScheduleDto data, HttpServletRequest req) {
+    public ApiResponse registSchedule(@RequestBody ScheduleApiDto.RegistScheduleReq data, HttpServletRequest req) {
         Long scheduleId = scheduleService.registSchedule(ScheduleServiceDto.builder()
                 .userId(data.getUserId())
                 .type(data.getScheduleType())
@@ -33,24 +33,22 @@ public class ScheduleApiController {
                 req.getRemoteAddr()
         );
 
-        return ApiResponse.success(ScheduleDto.builder().scheduleId(scheduleId).build());
+        return ApiResponse.success(new ScheduleApiDto.RegistScheduleResp(scheduleId));
     }
 
     @GetMapping("/api/v1/schedules/user/{userNo}")
-    public ApiResponse getSchedulesByUser(@PathVariable("userNo") String userId) {
-        List<Schedule> schedules = scheduleService.findSchedulesByUserId(userId);
+    public ApiResponse searchSchedulesByUser(@PathVariable("userNo") String userId) {
+        List<Schedule> schedules = scheduleService.searchSchedulesByUser(userId);
 
-        List<ScheduleDto> resp = schedules.stream()
-                .map(s -> ScheduleDto
-                        .builder()
-                        .scheduleId(s.getId())
-                        .scheduleType(s.getType())
-                        .scheduleTypeName(s.getType().getStrName())
-                        .scheduleDesc(s.getDesc())
-                        .startDate(s.getStartDate())
-                        .endDate(s.getEndDate())
-                        .build()
-                )
+        List<ScheduleApiDto.SearchSchedulesByUserResp> resp = schedules.stream()
+                .map(s -> new ScheduleApiDto.SearchSchedulesByUserResp(
+                        s.getId(),
+                        s.getType(),
+                        s.getType().getStrName(),
+                        s.getDesc(),
+                        s.getStartDate(),
+                        s.getEndDate()
+                ))
                 .toList();
 
         return ApiResponse.success(resp);
@@ -58,24 +56,22 @@ public class ScheduleApiController {
 
     @GetMapping("/api/v1/schedules/period")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    public ApiResponse getSchedulesByPeriod(
+    public ApiResponse searchSchedulesByPeriod(
             @RequestParam("startDate") LocalDateTime startDate,
             @RequestParam("endDate") LocalDateTime endDate) {
-        List<Schedule> schedules = scheduleService.findSchedulesByPeriod(startDate, endDate);
+        List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(startDate, endDate);
 
-        List<ScheduleDto> resp = schedules.stream()
-                .map(s -> ScheduleDto
-                        .builder()
-                        .scheduleId(s.getId())
-                        .userId(s.getUser().getId())
-                        .userName(s.getUser().getName())
-                        .scheduleType(s.getType())
-                        .scheduleTypeName(s.getType().getStrName())
-                        .scheduleDesc(s.getDesc())
-                        .startDate(s.getStartDate())
-                        .endDate(s.getEndDate())
-                        .build()
-                )
+        List<ScheduleApiDto.SearchSchedulesByPeriodResp> resp = schedules.stream()
+                .map(s -> new ScheduleApiDto.SearchSchedulesByPeriodResp(
+                        s.getId(),
+                        s.getUser().getId(),
+                        s.getUser().getName(),
+                        s.getType(),
+                        s.getType().getStrName(),
+                        s.getDesc(),
+                        s.getStartDate(),
+                        s.getEndDate()
+                ))
                 .toList();
 
         return ApiResponse.success(resp);
