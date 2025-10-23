@@ -316,6 +316,24 @@ public class VacationService {
         return vacationService.registVacationPolicy(data);
     }
 
+    public VacationPolicyServiceDto searchVacationPolicy(Long vacationPolicyId) {
+        VacationPolicy policy = checkVacationPolicyExist(vacationPolicyId);
+
+        return VacationPolicyServiceDto.builder()
+                .id(policy.getId())
+                .name(policy.getName())
+                .desc(policy.getDesc())
+                .vacationType(policy.getVacationType())
+                .grantMethod(policy.getGrantMethod())
+                .grantTime(policy.getGrantTime())
+                .repeatUnit(policy.getRepeatUnit())
+                .repeatInterval(policy.getRepeatInterval())
+                .grantTiming(policy.getGrantTiming())
+                .specificMonths(policy.getSpecificMonths())
+                .specificDays(policy.getSpecificDays())
+                .build();
+    }
+
     public List<VacationPolicyServiceDto> searchVacationPolicies() {
         List<VacationPolicy> policies = vacationPolicyRepository.findVacationPolicies();
         return policies.stream()
@@ -333,6 +351,12 @@ public class VacationService {
                         .specificDays(p.getSpecificDays())
                         .build())
                 .toList();
+    }
+
+    public VacationPolicy checkVacationPolicyExist(Long vacationPolicyId) {
+        Optional<VacationPolicy> policy = vacationPolicyRepository.findVacationPolicyById(vacationPolicyId);
+        policy.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation.policy", null, null)));
+        return policy.get();
     }
 
     private List<VacationServiceDto> makeDayGroupDto(List<VacationHistory> dayHistories) {

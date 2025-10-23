@@ -59,7 +59,8 @@ public class UserApiController {
                 user.getInvitationSentAt(),
                 user.getInvitationExpiresAt(),
                 user.getInvitationStatus(),
-                user.getRegisteredAt()
+                user.getRegisteredAt(),
+                user.getMainDepartmentNameKR()
         ));
     }
 
@@ -91,7 +92,8 @@ public class UserApiController {
                         u.getInvitationSentAt(),
                         u.getInvitationExpiresAt(),
                         u.getInvitationStatus(),
-                        u.getRegisteredAt()
+                        u.getRegisteredAt(),
+                        u.getMainDepartmentNameKR()
                 ))
                 .collect(Collectors.toList());
 

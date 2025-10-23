@@ -161,6 +161,7 @@ public class VacationApiDto {
         private Long vacationPolicyId;
         private String vacationPolicyName;
         private String vacationPolicyDesc;
+        private VacationType vacationType;
         private GrantMethod grantMethod;
         private BigDecimal grantTime;
         private RepeatUnit repeatUnit;

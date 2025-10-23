@@ -72,6 +72,13 @@ public class UserService {
     public UserServiceDto searchUser(String userId) {
         User user = checkUserExist(userId);
 
+        // 메인 부서의 한글명 조회
+        String mainDepartmentNameKR = user.getUserDepartments().stream()
+                .filter(ud -> ud.getMainYN() == YNType.Y && ud.getDelYN() == YNType.N)
+                .findFirst()
+                .map(ud -> ud.getDepartment().getNameKR())
+                .orElse(null);
+
         return UserServiceDto.builder()
                 .id(user.getId())
                 .pwd(user.getPwd())
@@ -92,6 +99,7 @@ public class UserService {
                 .invitationExpiresAt(user.getInvitationExpiresAt())
                 .invitationStatus(user.getInvitationStatus())
                 .registeredAt(user.getRegisteredAt())
+                .mainDepartmentNameKR(mainDepartmentNameKR)
                 .build();
     }
 
@@ -100,27 +108,37 @@ public class UserService {
         List<User> users = userRepositoryImpl.findUsers();
 
         return users.stream()
-                .map(user -> UserServiceDto.builder()
-                        .id(user.getId())
-                        .pwd(user.getPwd())
-                        .name(user.getName())
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .birth(user.getBirth())
-                        .workTime(user.getWorkTime())
-                        .joinDate(user.getJoinDate())
-                        .company(user.getCompany())
-                        .lunarYN(user.getLunarYN())
-                        .profileName(user.getProfileName())
-                        .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
-                                generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
-                        // profileUUID는 프론트엔드에 노출하지 않음
-                        .invitationToken(user.getInvitationToken())
-                        .invitationSentAt(user.getInvitationSentAt())
-                        .invitationExpiresAt(user.getInvitationExpiresAt())
-                        .invitationStatus(user.getInvitationStatus())
-                        .registeredAt(user.getRegisteredAt())
-                        .build())
+                .map(user -> {
+                    // 메인 부서의 한글명 조회
+                    String mainDepartmentNameKR = user.getUserDepartments().stream()
+                            .filter(ud -> ud.getMainYN() == YNType.Y && ud.getDelYN() == YNType.N)
+                            .findFirst()
+                            .map(ud -> ud.getDepartment().getNameKR())
+                            .orElse(null);
+
+                    return UserServiceDto.builder()
+                            .id(user.getId())
+                            .pwd(user.getPwd())
+                            .name(user.getName())
+                            .email(user.getEmail())
+                            .role(user.getRole())
+                            .birth(user.getBirth())
+                            .workTime(user.getWorkTime())
+                            .joinDate(user.getJoinDate())
+                            .company(user.getCompany())
+                            .lunarYN(user.getLunarYN())
+                            .profileName(user.getProfileName())
+                            .profileUrl(StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
+                                    generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
+                            // profileUUID는 프론트엔드에 노출하지 않음
+                            .invitationToken(user.getInvitationToken())
+                            .invitationSentAt(user.getInvitationSentAt())
+                            .invitationExpiresAt(user.getInvitationExpiresAt())
+                            .invitationStatus(user.getInvitationStatus())
+                            .registeredAt(user.getRegisteredAt())
+                            .mainDepartmentNameKR(mainDepartmentNameKR)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

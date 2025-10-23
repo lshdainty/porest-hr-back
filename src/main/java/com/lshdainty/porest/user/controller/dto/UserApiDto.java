@@ -58,6 +58,7 @@ public class UserApiDto {
         private LocalDateTime invitationExpiresAt;
         private StatusType invitationStatus;
         private LocalDateTime registeredAt;
+        private String mainDepartmentNameKr;
     }
 
     @Getter

@@ -35,4 +35,7 @@ public class UserServiceDto {
     private LocalDateTime invitationExpiresAt; // 초대 토큰 만료 시간
     private StatusType invitationStatus; // 초대 상태
     private LocalDateTime registeredAt; // 회원가입 완료 시간
+
+    // 메인 부서 정보
+    private String mainDepartmentNameKR; // 메인 부서의 한글명
 }
