@@ -14,4 +14,7 @@ public interface VacationPolicyCustomRepository {
 
     // 전체 휴가 정책 조회
     List<VacationPolicy> findVacationPolicies();
+
+    // 휴가 정책명 중복 확인
+    boolean existsByName(String name);
 }

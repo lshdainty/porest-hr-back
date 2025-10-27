@@ -281,4 +281,49 @@ public class VacationApiController {
 
         return ApiResponse.success(resp);
     }
+
+    /**
+     * 유저에게 여러 휴가 정책을 일괄 할당
+     * POST /api/v1/users/{userId}/vacation-policies
+     */
+    @PostMapping("/api/v1/users/{userId}/vacation-policies")
+    public ApiResponse assignVacationPoliciesToUser(
+            @PathVariable("userId") String userId,
+            @RequestBody VacationApiDto.AssignVacationPoliciesToUserReq data) {
+        List<Long> assignedPolicyIds = vacationService.assignVacationPoliciesToUser(userId, data.getVacationPolicyIds());
+
+        return ApiResponse.success(new VacationApiDto.AssignVacationPoliciesToUserResp(
+                userId,
+                assignedPolicyIds
+        ));
+    }
+
+    /**
+     * 유저에게 할당된 휴가 정책 조회
+     * GET /api/v1/users/{userId}/vacation-policies
+     */
+    @GetMapping("/api/v1/users/{userId}/vacation-policies")
+    public ApiResponse searchUserVacationPolicies(@PathVariable("userId") String userId) {
+        List<VacationPolicyServiceDto> policies = vacationService.searchUserVacationPolicies(userId);
+
+        List<VacationApiDto.SearchUserVacationPoliciesResp> resp = policies.stream()
+                .map(vp -> new VacationApiDto.SearchUserVacationPoliciesResp(
+                        vp.getUserVacationPolicyId(),
+                        vp.getId(),
+                        vp.getName(),
+                        vp.getDesc(),
+                        vp.getVacationType(),
+                        vp.getGrantMethod(),
+                        vp.getGrantTime(),
+                        VacationTimeType.convertValueToDay(vp.getGrantTime()),
+                        vp.getRepeatUnit(),
+                        vp.getRepeatInterval(),
+                        vp.getGrantTiming(),
+                        vp.getSpecificMonths(),
+                        vp.getSpecificDays()
+                ))
+                .toList();
+
+        return ApiResponse.success(resp);
+    }
 }

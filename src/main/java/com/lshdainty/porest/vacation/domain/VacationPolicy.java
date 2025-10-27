@@ -104,6 +104,17 @@ public class VacationPolicy extends AuditingFields {
         vacationPolicy.grantTiming = grantTiming;
         vacationPolicy.specificMonths = specificMonths;
         vacationPolicy.specificDays = specificDays;
+        vacationPolicy.canDeleted = YNType.Y;
+        vacationPolicy.isDeleted = YNType.N;
         return vacationPolicy;
+    }
+
+    /**
+     * 휴가 정책 삭제 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 휴가 정책 삭제할 것
+     */
+    public void deleteVacationPolicy() {
+        this.isDeleted = YNType.Y;
     }
 }

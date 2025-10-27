@@ -41,4 +41,15 @@ public class VacationPolicyCustomRepositoryImpl implements VacationPolicyCustomR
                 .where(vacationPolicy.isDeleted.eq(YNType.N))
                 .fetch();
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        Integer count = query
+                .selectOne()
+                .from(vacationPolicy)
+                .where(vacationPolicy.name.eq(name)
+                        .and(vacationPolicy.isDeleted.eq(YNType.N)))
+                .fetchFirst();
+        return count != null;
+    }
 }

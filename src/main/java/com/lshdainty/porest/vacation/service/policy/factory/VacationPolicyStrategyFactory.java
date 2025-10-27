@@ -18,8 +18,8 @@ public class VacationPolicyStrategyFactory {
 
     public VacationPolicyStrategy getStrategy(GrantMethod grantMethod) {
         return switch (grantMethod) {
-            case ON_REQUEST -> new OnRequest(vacationPolicyRepository);
-            case MANUAL_GRANT -> new ManualGrant(vacationPolicyRepository);
+            case ON_REQUEST -> new OnRequest(ms, vacationPolicyRepository);
+            case MANUAL_GRANT -> new ManualGrant(ms, vacationPolicyRepository);
             case REPEAT_GRANT -> new RepeatGrant(ms, vacationPolicyRepository);
         };
     }

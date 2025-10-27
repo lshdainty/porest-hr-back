@@ -7,9 +7,11 @@ import com.lshdainty.porest.user.repository.UserRepositoryImpl;
 import com.lshdainty.porest.vacation.domain.Vacation;
 import com.lshdainty.porest.vacation.domain.VacationHistory;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
+import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
 import com.lshdainty.porest.vacation.repository.VacationHistoryRepositoryImpl;
 import com.lshdainty.porest.vacation.repository.VacationPolicyCustomRepositoryImpl;
 import com.lshdainty.porest.vacation.repository.VacationRepositoryImpl;
+import com.lshdainty.porest.vacation.repository.UserVacationPolicyCustomRepositoryImpl;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.service.policy.VacationPolicyStrategy;
@@ -45,6 +47,7 @@ public class VacationService {
     private final VacationRepositoryImpl vacationRepository;
     private final VacationHistoryRepositoryImpl vacationHistoryRepository;
     private final VacationPolicyCustomRepositoryImpl vacationPolicyRepository;
+    private final UserVacationPolicyCustomRepositoryImpl userVacationPolicyRepository;
     private final UserRepositoryImpl userRepository;
     private final HolidayRepositoryImpl holidayRepository;
     private final UserService userService;
@@ -337,6 +340,87 @@ public class VacationService {
         Optional<VacationPolicy> policy = vacationPolicyRepository.findVacationPolicyById(vacationPolicyId);
         policy.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation.policy", null, null)));
         return policy.get();
+    }
+
+    /**
+     * 유저에게 여러 휴가 정책을 일괄 할당
+     *
+     * @param userId 유저 ID
+     * @param vacationPolicyIds 휴가 정책 ID 리스트
+     * @return 할당된 휴가 정책 ID 리스트
+     */
+    @Transactional
+    public List<Long> assignVacationPoliciesToUser(String userId, List<Long> vacationPolicyIds) {
+        // 1. 유저 존재 확인
+        User user = userService.checkUserExist(userId);
+
+        // 2. 할당할 휴가 정책들의 유효성 검증
+        List<VacationPolicy> vacationPolicies = new ArrayList<>();
+        for (Long policyId : vacationPolicyIds) {
+            VacationPolicy policy = checkVacationPolicyExist(policyId);
+            vacationPolicies.add(policy);
+        }
+
+        // 3. 중복 할당 체크 및 필터링
+        List<Long> assignedPolicyIds = new ArrayList<>();
+        List<UserVacationPolicy> userVacationPolicies = new ArrayList<>();
+
+        for (VacationPolicy policy : vacationPolicies) {
+            // 이미 할당된 정책인지 확인
+            boolean alreadyAssigned = userVacationPolicyRepository.existsByUserIdAndVacationPolicyId(userId, policy.getId());
+
+            if (alreadyAssigned) {
+                log.warn("User {} already has vacation policy {}, skipping", userId, policy.getId());
+                continue;
+            }
+
+            // UserVacationPolicy 생성
+            UserVacationPolicy userVacationPolicy = UserVacationPolicy.createUserVacationPolicy(user, policy);
+            userVacationPolicies.add(userVacationPolicy);
+            assignedPolicyIds.add(policy.getId());
+        }
+
+        // 4. 일괄 저장
+        if (!userVacationPolicies.isEmpty()) {
+            userVacationPolicyRepository.saveAll(userVacationPolicies);
+            log.info("Assigned {} vacation policies to user {}", userVacationPolicies.size(), userId);
+        }
+
+        return assignedPolicyIds;
+    }
+
+    /**
+     * 유저에게 할당된 휴가 정책 조회
+     *
+     * @param userId 유저 ID
+     * @return 유저에게 할당된 휴가 정책 리스트
+     */
+    public List<VacationPolicyServiceDto> searchUserVacationPolicies(String userId) {
+        // 유저 존재 확인
+        userService.checkUserExist(userId);
+
+        // 유저에게 할당된 휴가 정책 조회
+        List<UserVacationPolicy> userVacationPolicies = userVacationPolicyRepository.findByUserId(userId);
+
+        return userVacationPolicies.stream()
+                .map(uvp -> {
+                    VacationPolicy policy = uvp.getVacationPolicy();
+                    return VacationPolicyServiceDto.builder()
+                            .userVacationPolicyId(uvp.getId())
+                            .id(policy.getId())
+                            .name(policy.getName())
+                            .desc(policy.getDesc())
+                            .vacationType(policy.getVacationType())
+                            .grantMethod(policy.getGrantMethod())
+                            .grantTime(policy.getGrantTime())
+                            .repeatUnit(policy.getRepeatUnit())
+                            .repeatInterval(policy.getRepeatInterval())
+                            .grantTiming(policy.getGrantTiming())
+                            .specificMonths(policy.getSpecificMonths())
+                            .specificDays(policy.getSpecificDays())
+                            .build();
+                })
+                .toList();
     }
 
     private List<VacationServiceDto> makeDayGroupDto(List<VacationHistory> dayHistories) {

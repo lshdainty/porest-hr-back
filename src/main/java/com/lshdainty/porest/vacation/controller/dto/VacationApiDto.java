@@ -194,4 +194,38 @@ public class VacationApiDto {
     public static class RegistVacationPolicyResp {
         private Long vacationPolicyId;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class AssignVacationPoliciesToUserReq {
+        private List<Long> vacationPolicyIds;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class AssignVacationPoliciesToUserResp {
+        private String userId;
+        private List<Long> assignedVacationPolicyIds;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class SearchUserVacationPoliciesResp {
+        private Long userVacationPolicyId;
+        private Long vacationPolicyId;
+        private String vacationPolicyName;
+        private String vacationPolicyDesc;
+        private VacationType vacationType;
+        private GrantMethod grantMethod;
+        private BigDecimal grantTime;
+        private String grantTimeStr;
+        private RepeatUnit repeatUnit;
+        private Integer repeatInterval;
+        private GrantTiming grantTiming;
+        private Integer specificMonths;
+        private Integer specificDays;
+    }
 }
