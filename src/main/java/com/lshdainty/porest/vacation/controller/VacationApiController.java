@@ -232,6 +232,7 @@ public class VacationApiController {
                 .grantTiming(data.getGrantTiming())
                 .specificMonths(data.getSpecificMonths())
                 .specificDays(data.getSpecificDays())
+                .firstGrantDate(data.getFirstGrantDate())
                 .build()
         );
 

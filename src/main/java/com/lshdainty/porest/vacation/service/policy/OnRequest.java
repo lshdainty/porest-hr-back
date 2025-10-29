@@ -19,7 +19,7 @@ public class OnRequest implements VacationPolicyStrategy {
         // 신청시 부여 방식 검증
         validateOnRequestPolicy(data);
 
-        // 반복 단위, 반복 간격, 부여시점 지정 방식, 특정월, 특정일을 모두 null로 설정하여 강제 저장
+        // 반복 단위, 반복 간격, 부여시점 지정 방식, 특정월, 특정일, 첫 부여 시점을 모두 null로 설정하여 강제 저장
         // 직접 신청하는 휴가의 경우 스케줄러가 필요없음
         VacationPolicy vacationPolicy = VacationPolicy.createVacationPolicy(
                 data.getName(),
@@ -27,11 +27,12 @@ public class OnRequest implements VacationPolicyStrategy {
                 data.getVacationType(),
                 data.getGrantMethod(),
                 data.getGrantTime(),
-                null,
-                null,
-                null,
-                null,
-                null
+                null,  // repeatUnit (스케줄러 불필요)
+                null,  // repeatInterval (스케줄러 불필요)
+                null,  // grantTiming (스케줄러 불필요)
+                null,  // specificMonths (스케줄러 불필요)
+                null,  // specificDays (스케줄러 불필요)
+                null   // firstGrantDate (스케줄러 불필요, 사용자가 신청 시 부여)
         );
 
         vacationPolicyRepository.save(vacationPolicy);

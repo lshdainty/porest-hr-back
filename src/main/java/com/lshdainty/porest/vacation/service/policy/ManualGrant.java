@@ -21,7 +21,7 @@ public class ManualGrant implements VacationPolicyStrategy {
         // 관리자 직접 부여 방식 검증
         validateManualGrantPolicy(data);
 
-        // 반복 단위, 반복 간격, 부여시점 지정 방식, 특정월, 특정일을 모두 null로 설정하여 강제 저장
+        // 반복 단위, 반복 간격, 부여시점 지정 방식, 특정월, 특정일, 첫 부여 시점을 모두 null로 설정하여 강제 저장
         // 관리자가 부여하는 휴가 정책의 경우 스케줄러가 필요없음
         VacationPolicy vacationPolicy = VacationPolicy.createVacationPolicy(
                 data.getName(),
@@ -29,11 +29,12 @@ public class ManualGrant implements VacationPolicyStrategy {
                 data.getVacationType(),
                 data.getGrantMethod(),
                 data.getGrantTime(),
-                null,
-                null,
-                null,
-                null,
-                null
+                null,  // repeatUnit (스케줄러 불필요)
+                null,  // repeatInterval (스케줄러 불필요)
+                null,  // grantTiming (스케줄러 불필요)
+                null,  // specificMonths (스케줄러 불필요)
+                null,  // specificDays (스케줄러 불필요)
+                null   // firstGrantDate (스케줄러 불필요, 관리자가 직접 부여)
         );
 
         vacationPolicyRepository.save(vacationPolicy);

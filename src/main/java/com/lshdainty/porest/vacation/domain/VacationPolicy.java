@@ -14,6 +14,7 @@ import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +62,9 @@ public class VacationPolicy extends AuditingFields {
     @Column(name = "specific_days")
     private Integer specificDays;           // 특정 일 지정
 
+    @Column(name = "first_grant_date")
+    private LocalDateTime firstGrantDate;   // 첫 부여 시점 (반복 부여의 기준일, 스케줄러가 이 날짜 기준으로 다음 부여일 계산)
+
     @Enumerated(EnumType.STRING)
     @Column(name = "can_deleted")
     private YNType canDeleted;              // 삭제 가능 여부
@@ -92,7 +96,7 @@ public class VacationPolicy extends AuditingFields {
      *
      * @return VacationPolicy
      */
-    public static VacationPolicy createVacationPolicy(String name, String desc, VacationType vacationType, GrantMethod grantMethod, BigDecimal grantTime, RepeatUnit repeatUnit, Integer repeatInterval, GrantTiming grantTiming, Integer specificMonths, Integer specificDays) {
+    public static VacationPolicy createVacationPolicy(String name, String desc, VacationType vacationType, GrantMethod grantMethod, BigDecimal grantTime, RepeatUnit repeatUnit, Integer repeatInterval, GrantTiming grantTiming, Integer specificMonths, Integer specificDays, LocalDateTime firstGrantDate) {
         VacationPolicy vacationPolicy = new VacationPolicy();
         vacationPolicy.name = name;
         vacationPolicy.desc = desc;
@@ -104,6 +108,7 @@ public class VacationPolicy extends AuditingFields {
         vacationPolicy.grantTiming = grantTiming;
         vacationPolicy.specificMonths = specificMonths;
         vacationPolicy.specificDays = specificDays;
+        vacationPolicy.firstGrantDate = firstGrantDate;
         vacationPolicy.canDeleted = YNType.Y;
         vacationPolicy.isDeleted = YNType.N;
         return vacationPolicy;

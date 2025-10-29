@@ -186,6 +186,7 @@ public class VacationApiDto {
         private GrantTiming grantTiming;
         private Integer specificMonths;
         private Integer specificDays;
+        private LocalDateTime firstGrantDate;  // 첫 부여 시점 (반복 부여 방식에서 필수)
     }
 
     @Getter

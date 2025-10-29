@@ -6,6 +6,9 @@ import com.lshdainty.porest.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @ToString
 @Entity
 @Getter
@@ -25,6 +28,12 @@ public class UserVacationPolicy extends AuditingFields {
     @JoinColumn(name = "vacation_policy_id")
     @Setter
     private VacationPolicy vacationPolicy;
+
+    @Column(name = "last_granted_at")
+    private LocalDateTime lastGrantedAt;    // 마지막 휴가 부여 시점 (스케줄러 중복 부여 방지용)
+
+    @Column(name = "next_grant_date")
+    private LocalDate nextGrantDate;        // 다음 휴가 부여 예정일 (스케줄러 조회 최적화용, 인덱스 권장)
 
     @Enumerated(EnumType.STRING)
     @Column(name = "del_yn")
@@ -64,5 +73,17 @@ public class UserVacationPolicy extends AuditingFields {
      */
     public void deleteUserVacationPolicy() {
         this.delYN = YNType.Y;
+    }
+
+    /**
+     * 휴가 부여 후 부여 이력 업데이트<br>
+     * 스케줄러에서 휴가 부여 후 마지막 부여 시점과 다음 부여 예정일을 갱신할 때 사용
+     *
+     * @param lastGrantedAt 마지막 부여 시점
+     * @param nextGrantDate 다음 부여 예정일
+     */
+    public void updateGrantHistory(LocalDateTime lastGrantedAt, LocalDate nextGrantDate) {
+        this.lastGrantedAt = lastGrantedAt;
+        this.nextGrantDate = nextGrantDate;
     }
 }

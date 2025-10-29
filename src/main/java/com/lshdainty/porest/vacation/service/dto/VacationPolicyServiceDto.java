@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter @Setter
 @Builder
@@ -25,4 +26,5 @@ public class VacationPolicyServiceDto {
     private GrantTiming grantTiming;
     private Integer specificMonths;
     private Integer specificDays;
+    private LocalDateTime firstGrantDate;  // 첫 부여 시점 (반복 부여 방식에서 필수)
 }
