@@ -36,8 +36,8 @@ public class UserVacationPolicy extends AuditingFields {
     private LocalDate nextGrantDate;        // 다음 휴가 부여 예정일 (스케줄러 조회 최적화용, 인덱스 권장)
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "del_yn")
-    private YNType delYN;                   // 삭제여부
+    @Column(name = "is_deleted")
+    private YNType isDeleted;                   // 삭제여부
 
     // user 추가 연관관계 편의 메소드
     public void addUser(User user) {
@@ -62,7 +62,7 @@ public class UserVacationPolicy extends AuditingFields {
         UserVacationPolicy userVacationPolicy = new UserVacationPolicy();
         userVacationPolicy.addUser(user);
         userVacationPolicy.addVacationPolicy(vacationPolicy);
-        userVacationPolicy.delYN = YNType.N;
+        userVacationPolicy.isDeleted = YNType.N;
         return userVacationPolicy;
     }
 
@@ -72,7 +72,7 @@ public class UserVacationPolicy extends AuditingFields {
      * 해당 메소드를 통해 유저 휴가정책 삭제할 것
      */
     public void deleteUserVacationPolicy() {
-        this.delYN = YNType.Y;
+        this.isDeleted = YNType.Y;
     }
 
     /**

@@ -101,7 +101,7 @@ public class DepartmentService {
 
         // 하위에 자식 부서가 있는지 확인
         boolean hasChildren = department.getChildren().stream()
-                .anyMatch(child -> child.getDelYN() == YNType.N);
+                .anyMatch(child -> child.getIsDeleted() == YNType.N);
 
         if (hasChildren) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.has.children.department", null, null));
@@ -231,7 +231,7 @@ public class DepartmentService {
 
     public Department checkDepartmentExists(Long departmentId) {
         Optional<Department> department = departmentRepository.findById(departmentId);
-        if ((department.isEmpty()) || department.get().getDelYN().equals(YNType.Y)) {
+        if ((department.isEmpty()) || department.get().getIsDeleted().equals(YNType.Y)) {
             throw new IllegalArgumentException(ms.getMessage("error.notfound.department", null, null));
         }
         return department.get();
@@ -246,7 +246,7 @@ public class DepartmentService {
         }
 
         for (Department child : currentDepartment.getChildren()) {
-            if (child.getDelYN() == YNType.N) {
+            if (child.getIsDeleted() == YNType.N) {
                 if (child.getId().equals(targetDepartment.getId())) {
                     return true;
                 }

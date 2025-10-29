@@ -39,8 +39,8 @@ public class Schedule extends AuditingFields {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    @Column(name = "del_yn")
-    private String delYN;
+    @Column(name = "is_deleted")
+    private String isDeleted;
 
     /**
      * 스케줄 생성 함수<br>
@@ -56,7 +56,7 @@ public class Schedule extends AuditingFields {
         schedule.type = type;
         schedule.startDate = startDate;
         schedule.endDate = endDate;
-        schedule.delYN = "N";
+        schedule.isDeleted = "N";
         return schedule;
     }
 
@@ -66,6 +66,6 @@ public class Schedule extends AuditingFields {
      * 해당 메소드를 통해 스케줄 삭제할 것
      */
     public void deleteSchedule() {
-        this.delYN = "Y";
+        this.isDeleted = "Y";
     }
 }

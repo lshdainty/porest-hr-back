@@ -84,8 +84,8 @@ public class User extends AuditingFields {
     private LocalDateTime registeredAt; // 실제 회원가입 완료 시간
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "del_yn")
-    private YNType delYN; // 삭제여부
+    @Column(name = "is_deleted")
+    private YNType isDeleted; // 삭제여부
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)   // JPA에서는 mappedBy는 읽기 전용
@@ -126,14 +126,14 @@ public class User extends AuditingFields {
         user.lunarYN = lunarYN;
         user.profileName = profileName;
         user.profileUUID = profileUUID;
-        user.delYN = YNType.N;
+        user.isDeleted = YNType.N;
         return user;
     }
 
     public static User createUser(String id) {
         User user = new User();
         user.id = id;
-        user.delYN = YNType.N;
+        user.isDeleted = YNType.N;
         return user;
     }
 
@@ -154,7 +154,7 @@ public class User extends AuditingFields {
         user.workTime = workTime;
         user.joinDate = joinDate;
         user.invitationStatus = StatusType.PENDING; // 초대 상태로 설정
-        user.delYN = YNType.N;
+        user.isDeleted = YNType.N;
 
         // 초대 토큰 생성 (48시간 유효)
         user.invitationToken = UUID.randomUUID().toString();
@@ -234,7 +234,7 @@ public class User extends AuditingFields {
      * 해당 메소드를 통해 유저 삭제할 것
      */
     public void deleteUser() {
-        this.delYN = YNType.Y;
+        this.isDeleted = YNType.Y;
     }
 
     /* 비즈니스 편의 메소드 */

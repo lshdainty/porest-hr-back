@@ -26,20 +26,20 @@ public class VacationHistoryRepositoryImpl implements VacationHistoryRepository 
 
     @Override
     public List<VacationHistory> findVacationHistorysByPeriod(LocalDateTime start, LocalDateTime end) {
-        return em.createQuery("select vh from VacationHistory vh where vh.type is not null and vh.usedDateTime between :start and :end and vh.delYN = :delYN order by vh.vacation.id, vh.usedDateTime", VacationHistory.class)
+        return em.createQuery("select vh from VacationHistory vh where vh.type is not null and vh.usedDateTime between :start and :end and vh.isDeleted = :isDeleted order by vh.vacation.id, vh.usedDateTime", VacationHistory.class)
                 .setParameter("start", start)
                 .setParameter("end", end)
-                .setParameter("delYN", "N")
+                .setParameter("isDeleted", "N")
                 .getResultList();
     }
 
     @Override
     public List<VacationHistory> findVacationUseHistorysByUserAndPeriod(String userId, LocalDateTime start, LocalDateTime end) {
-        return em.createQuery("select vh from VacationHistory vh join vh.vacation v join v.user u where u.id = :userId and vh.type is not null and vh.usedDateTime between :start and :end and vh.delYN = :delYN order by vh.usedDateTime", VacationHistory.class)
+        return em.createQuery("select vh from VacationHistory vh join vh.vacation v join v.user u where u.id = :userId and vh.type is not null and vh.usedDateTime between :start and :end and vh.isDeleted = :isDeleted order by vh.usedDateTime", VacationHistory.class)
                 .setParameter("userId", userId)
                 .setParameter("start", start)
                 .setParameter("end", end)
-                .setParameter("delYN", "N")
+                .setParameter("isDeleted", "N")
                 .getResultList();
     }
 }

@@ -74,7 +74,7 @@ public class UserService {
 
         // 메인 부서의 한글명 조회
         String mainDepartmentNameKR = user.getUserDepartments().stream()
-                .filter(ud -> ud.getMainYN() == YNType.Y && ud.getDelYN() == YNType.N)
+                .filter(ud -> ud.getMainYN() == YNType.Y && ud.getIsDeleted() == YNType.N)
                 .findFirst()
                 .map(ud -> ud.getDepartment().getNameKR())
                 .orElse(null);
@@ -111,7 +111,7 @@ public class UserService {
                 .map(user -> {
                     // 메인 부서의 한글명 조회
                     String mainDepartmentNameKR = user.getUserDepartments().stream()
-                            .filter(ud -> ud.getMainYN() == YNType.Y && ud.getDelYN() == YNType.N)
+                            .filter(ud -> ud.getMainYN() == YNType.Y && ud.getIsDeleted() == YNType.N)
                             .findFirst()
                             .map(ud -> ud.getDepartment().getNameKR())
                             .orElse(null);
@@ -193,7 +193,7 @@ public class UserService {
 
     public User checkUserExist(String userId) {
         Optional<User> findUser = userRepositoryImpl.findById(userId);
-        if ((findUser.isEmpty()) || findUser.get().getDelYN().equals(YNType.Y)) {
+        if ((findUser.isEmpty()) || findUser.get().getIsDeleted().equals(YNType.Y)) {
             throw new IllegalArgumentException(ms.getMessage("error.notfound.user", null, null));
         }
         return findUser.get();

@@ -29,8 +29,8 @@ public class Company extends AuditingFields {
     private String desc; // 회사 설명
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "del_yn")
-    private YNType delYN; // 삭제여부
+    @Column(name = "is_deleted")
+    private YNType isDeleted; // 삭제여부
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)   // JPA에서는 mappedBy는 읽기 전용
@@ -48,7 +48,7 @@ public class Company extends AuditingFields {
         company.id = id;
         company.name = name;
         company.desc = desc;
-        company.delYN = YNType.N;
+        company.isDeleted = YNType.N;
         return company;
     }
 
@@ -68,6 +68,6 @@ public class Company extends AuditingFields {
      * 해당 메소드를 통해 회사 삭제할 것
      */
     public void deleteCompany() {
-        this.delYN = YNType.Y;
+        this.isDeleted = YNType.Y;
     }
 }

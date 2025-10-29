@@ -64,8 +64,8 @@ public class VacationHistory extends AuditingFields {
     private LocalDateTime usedDateTime;
 
     /* 휴가 내역 삭제 여부 */
-    @Column(name = "del_yn")
-    private String delYN;
+    @Column(name = "is_deleted")
+    private String isDeleted;
 
     @Override
     public String toString() {
@@ -75,7 +75,7 @@ public class VacationHistory extends AuditingFields {
                 ", grantTime=" + grantTime +
                 ", type=" + type +
                 ", usedDateTime=" + usedDateTime +
-                ", delYN='" + delYN + '\'' +
+                ", isDeleted='" + isDeleted + '\'' +
                 '}';
     }
 
@@ -91,7 +91,7 @@ public class VacationHistory extends AuditingFields {
         vacationHistory.vacation = vacation;
         vacationHistory.desc = desc;
         vacationHistory.grantTime = grantTime;
-        vacationHistory.delYN = "N";
+        vacationHistory.isDeleted = "N";
         return vacationHistory;
     }
 
@@ -108,7 +108,7 @@ public class VacationHistory extends AuditingFields {
         vacationHistory.desc = desc;
         vacationHistory.type = type;
         vacationHistory.usedDateTime = usedDateTime;
-        vacationHistory.delYN = "N";
+        vacationHistory.isDeleted = "N";
         return vacationHistory;
     }
 
@@ -119,7 +119,7 @@ public class VacationHistory extends AuditingFields {
      */
     public void deleteRegistVacationHistory(Vacation vacation) {
         vacation.deductedVacation(getGrantTime());
-        this.delYN = "Y";
+        this.isDeleted = "Y";
     }
 
     /**
@@ -129,6 +129,6 @@ public class VacationHistory extends AuditingFields {
      */
     public void deleteUseVacationHistory(Vacation vacation) {
         vacation.addVacation(getType().convertToValue(1));
-        this.delYN = "Y";
+        this.isDeleted = "Y";
     }
 }

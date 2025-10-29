@@ -133,9 +133,9 @@ public class InitDB {
 
         private Department findDepartmentByName(String name) {
             return em.createQuery(
-                    "SELECT d FROM Department d WHERE d.name = :name AND d.delYN = :delYN", Department.class)
+                    "SELECT d FROM Department d WHERE d.name = :name AND d.isDeleted = :isDeleted", Department.class)
                     .setParameter("name", name)
-                    .setParameter("delYN", YNType.N)
+                    .setParameter("isDeleted", YNType.N)
                     .getSingleResult();
         }
 
@@ -568,42 +568,63 @@ public class InitDB {
             LocalDateTime now = LocalDateTime.now();
 
             // 관리자 부여용 휴가정책 (MANUAL_GRANT - firstGrantDate, isRecurring, maxGrantCount 모두 null)
-            saveVacationPolicy("연차(관리자용)", "연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("15.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("1분기 연차(관리자용)", "1분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("2분기 연차(관리자용)", "2분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("3분기 연차(관리자용)", "3분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("4분기 연차(관리자용)", "4분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("OT(관리자용)", "연장 근무에 대한 보상 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.OVERTIME, GrantMethod.MANUAL_GRANT, null, null, null, null, null, null, null, null, null);
-            saveVacationPolicy("건강검진", "건강검진 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.HEALTH, GrantMethod.MANUAL_GRANT, new BigDecimal("0.5000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("동원훈련(관리자용)", "동원 훈련에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("3.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("동미참훈련(관리자용)", "동미참 훈련에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("1.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("예비군(관리자용)", "예비군 훈련에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("1.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("예비군(반차)(관리자용)", "예비군 훈련에 대한 반차 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("0.5000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("결혼(관리자용)", "결혼에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.WEDDING, GrantMethod.MANUAL_GRANT, new BigDecimal("5.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("출산(관리자용)", "출산에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.MATERNITY, GrantMethod.MANUAL_GRANT, new BigDecimal("10.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("조사(관리자용)", "부친상, 모친상에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.MANUAL_GRANT, new BigDecimal("5.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("조사(관리자용)", "빙부상, 빙모상, 시부상, 시모상에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.MANUAL_GRANT, new BigDecimal("3.0000"), null, null, null, null, null, null, null, null);
+            saveVacationPolicy("연차(관리자용)", "연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("15.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("1분기 연차(관리자용)", "1분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("2분기 연차(관리자용)", "2분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("3분기 연차(관리자용)", "3분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("4분기 연차(관리자용)", "4분기 연차 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ANNUAL, GrantMethod.MANUAL_GRANT, new BigDecimal("4.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("OT(관리자용)", "연장 근무에 대한 보상 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.OVERTIME, GrantMethod.MANUAL_GRANT, null, null, null, null, null, null, null, null);
+            saveVacationPolicy("건강검진", "건강검진 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.HEALTH, GrantMethod.MANUAL_GRANT, new BigDecimal("0.5000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("동원훈련(관리자용)", "동원 훈련에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("3.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("동미참훈련(관리자용)", "동미참 훈련에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("1.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("예비군(관리자용)", "예비군 훈련에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("1.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("예비군(반차)(관리자용)", "예비군 훈련에 대한 반차 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.ARMY, GrantMethod.MANUAL_GRANT, new BigDecimal("0.5000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("결혼(관리자용)", "결혼에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.WEDDING, GrantMethod.MANUAL_GRANT, new BigDecimal("5.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("출산(관리자용)", "출산에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.MATERNITY, GrantMethod.MANUAL_GRANT, new BigDecimal("10.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("조사(관리자용)", "부친상, 모친상에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.MANUAL_GRANT, new BigDecimal("5.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("조사(관리자용)", "빙부상, 빙모상, 시부상, 시모상에 대한 휴가 정책입니다. 관리자가 직접 휴가를 부여하는 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.MANUAL_GRANT, new BigDecimal("3.0000"), null, null, null, null, null, null, null);
 
-            // 스케줄에 의한 휴가 생성 정책 (REPEAT_GRANT - firstGrantDate 설정, isRecurring=Y, maxGrantCount=null)
+            // ===== 반복 부여 휴가 정책 (REPEAT_GRANT) =====
+
+            // YEARLY 예제들
             saveVacationPolicy("연차", "연차 정책입니다. 매년 1월 1일 자동 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("15.0000"), RepeatUnit.YEARLY, 1, 1, 1, LocalDateTime.of(now.getYear(), 1, 1, 0, 0), YNType.Y, null);
             saveVacationPolicy("1분기 연차", "1분기 연차 정책입니다. 매년 1월 1일 자동 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("4.0000"), RepeatUnit.YEARLY, 1, 1, 1, LocalDateTime.of(now.getYear(), 1, 1, 0, 0), YNType.Y, null);
             saveVacationPolicy("2분기 연차", "2분기 연차 정책입니다. 매년 4월 1일 자동 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("4.0000"), RepeatUnit.YEARLY, 1, 4, 1, LocalDateTime.of(now.getYear(), 4, 1, 0, 0), YNType.Y, null);
             saveVacationPolicy("3분기 연차", "3분기 연차 정책입니다. 매년 7월 1일 자동 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("4.0000"), RepeatUnit.YEARLY, 1, 7, 1, LocalDateTime.of(now.getYear(), 7, 1, 0, 0), YNType.Y, null);
             saveVacationPolicy("4분기 연차", "4분기 연차 정책입니다. 매년 10월 1일 자동 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("3.0000"), RepeatUnit.YEARLY, 1, 10, 1, LocalDateTime.of(now.getYear(), 10, 1, 0, 0), YNType.Y, null);
+            saveVacationPolicy("생일 휴가", "매년 생일에 자동 부여되는 휴가입니다. 매년 3월 15일에 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("1.0000"), RepeatUnit.YEARLY, 1, 3, 15, LocalDateTime.of(now.getYear(), 3, 15, 0, 0), YNType.Y, null);
+            saveVacationPolicy("하계 휴가", "매년 6월에 자동 부여되는 하계 휴가입니다. 첫 부여일의 일자(15일) 사용.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("2.0000"), RepeatUnit.YEARLY, 1, 6, null, LocalDateTime.of(now.getYear(), 6, 15, 0, 0), YNType.Y, null);
             saveVacationPolicy("7년 근속 휴가", "7년 근속 시 1회 부여되는 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("5.0000"), RepeatUnit.YEARLY, 7, 1, 1, LocalDateTime.of(now.getYear() + 7, 1, 1, 0, 0), YNType.N, 1);
             saveVacationPolicy("3년 근속 휴가", "3년 근속 시 1회 부여되는 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("3.0000"), RepeatUnit.YEARLY, 3, 1, 1, LocalDateTime.of(now.getYear() + 3, 1, 1, 0, 0), YNType.N, 1);
+
+            // MONTHLY 예제들
             saveVacationPolicy("매월 리프레시 휴가", "매월 1일 자동 부여되는 리프레시 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("0.5000"), RepeatUnit.MONTHLY, 1, null, 1, LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0), YNType.Y, null);
+            saveVacationPolicy("매월 정기 휴가", "매월 15일 자동 부여되는 정기 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("0.5000"), RepeatUnit.MONTHLY, 1, null, 15, LocalDateTime.of(now.getYear(), now.getMonthValue(), 15, 0, 0), YNType.Y, null);
+            saveVacationPolicy("2개월마다 휴가", "2개월마다 첫 부여일의 일자에 자동 부여되는 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("1.0000"), RepeatUnit.MONTHLY, 2, null, null, LocalDateTime.of(now.getYear(), now.getMonthValue(), 10, 0, 0), YNType.Y, null);
+
+            // QUARTERLY 예제들
+            saveVacationPolicy("분기별 휴가", "매 분기 1일에 자동 부여되는 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("2.0000"), RepeatUnit.QUARTERLY, 1, null, 1, LocalDateTime.of(now.getYear(), 1, 1, 0, 0), YNType.Y, null);
+            saveVacationPolicy("분기별 건강 휴가", "매 분기 15일에 자동 부여되는 건강 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("1.5000"), RepeatUnit.QUARTERLY, 1, null, 15, LocalDateTime.of(now.getYear(), 1, 15, 0, 0), YNType.Y, null);
+            saveVacationPolicy("분기별 특별 휴가", "매 분기 첫 부여일의 일자(20일)에 자동 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("1.0000"), RepeatUnit.QUARTERLY, 1, null, null, LocalDateTime.of(now.getYear(), 1, 20, 0, 0), YNType.Y, null);
+
+            // HALF 예제들
+            saveVacationPolicy("반기별 휴가", "매 반기 1일에 자동 부여되는 휴가입니다.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("3.0000"), RepeatUnit.HALF, 1, null, 1, LocalDateTime.of(now.getYear(), 1, 1, 0, 0), YNType.Y, null);
+            saveVacationPolicy("반기별 리프레시", "매 반기 31일에 자동 부여되는 휴가입니다. 월말이 31일 미만이면 해당 월 마지막 날 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("2.5000"), RepeatUnit.HALF, 1, null, 31, LocalDateTime.of(now.getYear(), 1, 31, 0, 0), YNType.Y, null);
+            saveVacationPolicy("반기별 특별 휴가", "매 반기 첫 부여일의 일자(15일)에 자동 부여.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("2.0000"), RepeatUnit.HALF, 1, null, null, LocalDateTime.of(now.getYear(), 1, 15, 0, 0), YNType.Y, null);
+
+            // DAILY 예제
+            saveVacationPolicy("매일 포인트 휴가", "매일 자동 부여되는 포인트 휴가입니다. 0.1일씩 적립.", VacationType.ANNUAL, GrantMethod.REPEAT_GRANT, new BigDecimal("0.1000"), RepeatUnit.DAILY, 1, null, null, LocalDateTime.of(now.getYear(), 1, 1, 0, 0), YNType.Y, null);
 
             // 구성원 신청용 휴가 정책 (ON_REQUEST - firstGrantDate, isRecurring, maxGrantCount 모두 null)
-            saveVacationPolicy("동원훈련", "동원 훈련에 대한 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("3.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("동미참훈련", "동미참 훈련에 대한 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("1.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("예비군", "예비군 훈련에 대한 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("1.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("예비군(반차)", "예비군 훈련에 대한 반차 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("0.5000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("OT", "연장 근무에 대한 보상 휴가 정책입니다. 구성원이 직접 신청하는 휴가 정책입니다.", VacationType.OVERTIME, GrantMethod.ON_REQUEST, null, null, null, null, null, null, null, null, null);
-            saveVacationPolicy("결혼", "결혼에 대한 휴가 정책입니다.", VacationType.WEDDING, GrantMethod.ON_REQUEST, new BigDecimal("5.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("출산", "출산에 대한 휴가 정책입니다.", VacationType.MATERNITY, GrantMethod.ON_REQUEST, new BigDecimal("10.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("조사", "부친상, 모친상에 대한 휴가 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.ON_REQUEST, new BigDecimal("5.0000"), null, null, null, null, null, null, null, null);
-            saveVacationPolicy("조사", "빙부상, 빙모상, 시부상, 시모상에 대한 휴가 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.ON_REQUEST, new BigDecimal("3.0000"), null, null, null, null, null, null, null, null);
+            saveVacationPolicy("동원훈련", "동원 훈련에 대한 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("3.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("동미참훈련", "동미참 훈련에 대한 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("1.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("예비군", "예비군 훈련에 대한 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("1.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("예비군(반차)", "예비군 훈련에 대한 반차 휴가 정책입니다.", VacationType.ARMY, GrantMethod.ON_REQUEST, new BigDecimal("0.5000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("OT", "연장 근무에 대한 보상 휴가 정책입니다. 구성원이 직접 신청하는 휴가 정책입니다.", VacationType.OVERTIME, GrantMethod.ON_REQUEST, null, null, null, null, null, null, null, null);
+            saveVacationPolicy("결혼", "결혼에 대한 휴가 정책입니다.", VacationType.WEDDING, GrantMethod.ON_REQUEST, new BigDecimal("5.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("출산", "출산에 대한 휴가 정책입니다.", VacationType.MATERNITY, GrantMethod.ON_REQUEST, new BigDecimal("10.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("조사", "부친상, 모친상에 대한 휴가 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.ON_REQUEST, new BigDecimal("5.0000"), null, null, null, null, null, null, null);
+            saveVacationPolicy("조사", "빙부상, 빙모상, 시부상, 시모상에 대한 휴가 정책입니다.", VacationType.BEREAVEMENT, GrantMethod.ON_REQUEST, new BigDecimal("3.0000"), null, null, null, null, null, null, null);
         }
 
         public void saveMember(String id, String name, String email, LocalDate birth, OriginCompanyType company, String workTime, YNType lunar) {

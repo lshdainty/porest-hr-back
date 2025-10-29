@@ -60,8 +60,8 @@ public class Department extends AuditingFields {
     private List<UserDepartment> userDepartments = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "del_yn")
-    private YNType delYN; // 삭제여부
+    @Column(name = "is_deleted")
+    private YNType isDeleted; // 삭제여부
 
     // company 추가 연관관계 편의 메소드
     public void addCompany(Company company) {
@@ -94,7 +94,7 @@ public class Department extends AuditingFields {
         department.desc = desc;
         department.color = color;
         department.addCompany(company);
-        department.delYN = YNType.N;
+        department.isDeleted = YNType.N;
         return department;
     }
 
@@ -134,6 +134,6 @@ public class Department extends AuditingFields {
      * 해당 메소드를 통해 부서 삭제할 것
      */
     public void deleteDepartment() {
-        this.delYN = YNType.Y;
+        this.isDeleted = YNType.Y;
     }
 }

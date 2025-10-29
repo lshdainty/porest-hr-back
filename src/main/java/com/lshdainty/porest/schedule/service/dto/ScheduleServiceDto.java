@@ -19,7 +19,7 @@ public class ScheduleServiceDto {
     private String desc;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String delYN;
+    private String isDeleted;
     private BigDecimal realUsedTime;
 
     private User user;
@@ -33,7 +33,7 @@ public class ScheduleServiceDto {
                 ", desc: '" + desc + '\'' +
                 ", startDate: " + startDate +
                 ", endDate: " + endDate +
-                ", delYN: '" + delYN + '\'' +
+                ", isDeleted: '" + isDeleted + '\'' +
                 ", realUsedTime: " + realUsedTime +
                 '}';
     }

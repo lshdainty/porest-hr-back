@@ -34,7 +34,7 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .selectFrom(department)
                 .where(
                         department.id.eq(id),
-                        department.delYN.eq(YNType.N)
+                        department.isDeleted.eq(YNType.N)
                 )
                 .fetchOne()
         );
@@ -47,7 +47,7 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .leftJoin(department.children).fetchJoin()
                 .where(
                         department.id.eq(id),
-                        department.delYN.eq(YNType.N)
+                        department.isDeleted.eq(YNType.N)
                 )
                 .distinct()
                 .fetchOne()
@@ -61,7 +61,7 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .from(department)
                 .where(
                         department.parent.id.eq(departmentId),
-                        department.delYN.eq(YNType.N)
+                        department.isDeleted.eq(YNType.N)
                 )
                 .fetchOne();
 
@@ -80,7 +80,7 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .where(
                         userDepartment.user.id.eq(userId),
                         userDepartment.mainYN.eq(YNType.Y),
-                        userDepartment.delYN.eq(YNType.N)
+                        userDepartment.isDeleted.eq(YNType.N)
                 )
                 .fetchOne()
         );
@@ -93,7 +93,7 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .where(
                         userDepartment.user.id.eq(userId),
                         userDepartment.department.id.eq(departmentId),
-                        userDepartment.delYN.eq(YNType.N)
+                        userDepartment.isDeleted.eq(YNType.N)
                 )
                 .fetchOne()
         );
@@ -108,9 +108,9 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .join(userDepartment.department, department)
                 .where(
                         userDepartment.department.id.eq(departmentId),
-                        userDepartment.delYN.eq(YNType.N),
-                        department.delYN.eq(YNType.N),
-                        user.delYN.eq(YNType.N)
+                        userDepartment.isDeleted.eq(YNType.N),
+                        department.isDeleted.eq(YNType.N),
+                        user.isDeleted.eq(YNType.N)
                 )
                 .fetch();
     }
@@ -120,15 +120,15 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
         return query
                 .selectFrom(user)
                 .where(
-                        user.delYN.eq(YNType.N),
+                        user.isDeleted.eq(YNType.N),
                         JPAExpressions
                                 .selectFrom(userDepartment)
                                 .join(userDepartment.department, department)
                                 .where(
                                         userDepartment.user.id.eq(user.id),
                                         userDepartment.department.id.eq(departmentId),
-                                        userDepartment.delYN.eq(YNType.N),
-                                        department.delYN.eq(YNType.N)
+                                        userDepartment.isDeleted.eq(YNType.N),
+                                        department.isDeleted.eq(YNType.N)
                                 )
                                 .notExists()
                 )
@@ -143,9 +143,9 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .join(userDepartment.department, department)
                 .where(
                         userDepartment.department.id.eq(departmentId),
-                        userDepartment.delYN.eq(YNType.N),
-                        department.delYN.eq(YNType.N),
-                        user.delYN.eq(YNType.N)
+                        userDepartment.isDeleted.eq(YNType.N),
+                        department.isDeleted.eq(YNType.N),
+                        user.isDeleted.eq(YNType.N)
                 )
                 .fetch();
     }
@@ -158,7 +158,7 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 .where(
                         userDepartment.user.id.eq(userId),
                         userDepartment.mainYN.eq(YNType.Y),
-                        userDepartment.delYN.eq(YNType.N)
+                        userDepartment.isDeleted.eq(YNType.N)
                 )
                 .fetchOne();
 

@@ -262,11 +262,11 @@ public class VacationService {
         // 삭제 안된 이력만 필터링
         List<VacationHistory> curHistories = curVacations.stream()
                 .flatMap(v -> v.getHistorys().stream())
-                .filter(vh -> "N".equals(vh.getDelYN()))
+                .filter(vh -> "N".equals(vh.getIsDeleted()))
                 .toList();
         List<VacationHistory> prevHistories = prevVacations.stream()
                 .flatMap(v -> v.getHistorys().stream())
-                .filter(vh -> "N".equals(vh.getDelYN()))
+                .filter(vh -> "N".equals(vh.getIsDeleted()))
                 .toList();
 
         // 현재 및 이전 달 통계 계산
@@ -357,7 +357,7 @@ public class VacationService {
         VacationPolicy vacationPolicy = checkVacationPolicyExist(vacationPolicyId);
 
         // 2. 이미 삭제된 정책인지 확인
-        if (vacationPolicy.getDelYN() == YNType.Y) {
+        if (vacationPolicy.getIsDeleted() == YNType.Y) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.already.deleted.vacation.policy", null, null));
         }
 
@@ -375,7 +375,7 @@ public class VacationService {
 
         for (UserVacationPolicy uvp : userVacationPolicies) {
             // 이미 삭제된 경우 스킵
-            if (uvp.getDelYN() == YNType.Y) {
+            if (uvp.getIsDeleted() == YNType.Y) {
                 continue;
             }
 
@@ -501,7 +501,7 @@ public class VacationService {
                         ms.getMessage("error.notfound.user.vacation.policy", null, null)));
 
         // 4. 이미 삭제된 경우 예외 처리
-        if (userVacationPolicy.getDelYN() == YNType.Y) {
+        if (userVacationPolicy.getIsDeleted() == YNType.Y) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.already.deleted.user.vacation.policy", null, null));
         }
 
@@ -545,7 +545,7 @@ public class VacationService {
                 UserVacationPolicy userVacationPolicy = optionalUvp.get();
 
                 // 이미 삭제된 경우 스킵
-                if (userVacationPolicy.getDelYN() == YNType.Y) {
+                if (userVacationPolicy.getIsDeleted() == YNType.Y) {
                     log.warn("Vacation policy {} already revoked from user {}, skipping", policyId, userId);
                     continue;
                 }

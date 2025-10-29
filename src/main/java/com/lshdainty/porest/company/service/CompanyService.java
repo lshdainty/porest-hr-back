@@ -81,7 +81,7 @@ public class CompanyService {
 
         // 최상위(parent가 null) 부서만 필터링, 각 부서 트리를 재귀로 DTO 변환
         List<DepartmentServiceDto> departmentDtos = company.getDepartments().stream()
-                .filter(department -> department.getParent() == null && department.getDelYN() == YNType.N)
+                .filter(department -> department.getParent() == null && department.getIsDeleted() == YNType.N)
                 .map(DepartmentServiceDto::fromEntityWithChildren)
                 .toList();
 
@@ -102,7 +102,7 @@ public class CompanyService {
 
     public Company checkCompanyExists(String companyId) {
         Optional<Company> company = companyRepository.findById(companyId);
-        if ((company.isEmpty()) || (company.get().getDelYN().equals(YNType.Y))) {
+        if ((company.isEmpty()) || (company.get().getIsDeleted().equals(YNType.Y))) {
             throw new IllegalArgumentException(ms.getMessage("error.notfound.company", null, null));
         }
         return company.get();

@@ -29,7 +29,7 @@ public class VacationServiceDto {
     // 휴가 소멸 시간
     private LocalDateTime expiryDate;
     // 휴가 이력 삭제 여부
-    private String delYN;
+    private String isDeleted;
 
     // 휴가를 사용한 유저 객체 정보
     private User user;
@@ -77,7 +77,7 @@ public class VacationServiceDto {
                 ", startDate: " + startDate +
                 ", endDate: " + endDate +
                 ", timeType: " + timeType +
-                ", delYN: '" + delYN + '\'' +
+                ", isDeleted: '" + isDeleted + '\'' +
                 '}';
     }
 }

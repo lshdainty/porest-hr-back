@@ -30,8 +30,8 @@ public class UserDepartment extends AuditingFields {
     private YNType mainYN;          // 메인 부서 여부
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "del_yn")
-    private YNType delYN;           // 삭제여부
+    @Column(name = "is_deleted")
+    private YNType isDeleted;           // 삭제여부
 
     // user 추가 연관관계 편의 메소드
     public void addUser(User user) {
@@ -57,7 +57,7 @@ public class UserDepartment extends AuditingFields {
         userDepartment.addUser(user);
         userDepartment.addDepartment(department);
         userDepartment.mainYN = mainYN;
-        userDepartment.delYN = YNType.N;
+        userDepartment.isDeleted = YNType.N;
         return userDepartment;
     }
 
@@ -68,6 +68,6 @@ public class UserDepartment extends AuditingFields {
      */
     public void deleteUserDepartment() {
         this.mainYN = YNType.N;
-        this.delYN = YNType.Y;
+        this.isDeleted = YNType.Y;
     }
 }

@@ -137,8 +137,8 @@ public class VacationPolicy extends AuditingFields {
 
     /* 삭제 여부 */
     @Enumerated(EnumType.STRING)
-    @Column(name = "del_yn")
-    private YNType delYN;
+    @Column(name = "is_deleted")
+    private YNType isDeleted;
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "vacationPolicy", cascade = CascadeType.ALL)
@@ -147,13 +147,13 @@ public class VacationPolicy extends AuditingFields {
     // 개발용
     public void updateCantDeleted() {
         this.canDeleted = YNType.N;
-        this.delYN = YNType.N;
+        this.isDeleted = YNType.N;
     }
 
     // 개발용
     public void updateCanDeleted() {
         this.canDeleted = YNType.Y;
-        this.delYN = YNType.N;
+        this.isDeleted = YNType.N;
     }
 
     /**
@@ -178,7 +178,7 @@ public class VacationPolicy extends AuditingFields {
         vacationPolicy.isRecurring = isRecurring;
         vacationPolicy.maxGrantCount = maxGrantCount;
         vacationPolicy.canDeleted = YNType.Y;
-        vacationPolicy.delYN = YNType.N;
+        vacationPolicy.isDeleted = YNType.N;
         return vacationPolicy;
     }
 
@@ -191,6 +191,6 @@ public class VacationPolicy extends AuditingFields {
         if (this.canDeleted.equals(YNType.N)) {
             return;
         }
-        this.delYN = YNType.Y;
+        this.isDeleted = YNType.Y;
     }
 }
