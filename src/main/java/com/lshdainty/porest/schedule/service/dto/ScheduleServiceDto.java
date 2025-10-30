@@ -2,7 +2,6 @@ package com.lshdainty.porest.schedule.service.dto;
 
 import com.lshdainty.porest.schedule.type.ScheduleType;
 import com.lshdainty.porest.user.domain.User;
-import com.lshdainty.porest.vacation.domain.Vacation;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +22,6 @@ public class ScheduleServiceDto {
     private BigDecimal realUsedTime;
 
     private User user;
-    private Vacation vacation;
 
     @Override
     public String toString() {

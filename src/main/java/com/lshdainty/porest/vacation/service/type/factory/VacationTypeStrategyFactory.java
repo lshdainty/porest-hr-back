@@ -1,8 +1,6 @@
 package com.lshdainty.porest.vacation.service.type.factory;
 
 import com.lshdainty.porest.user.service.UserService;
-import com.lshdainty.porest.vacation.repository.VacationHistoryRepositoryImpl;
-import com.lshdainty.porest.vacation.repository.VacationRepositoryImpl;
 import com.lshdainty.porest.vacation.service.type.*;
 import com.lshdainty.porest.vacation.type.VacationType;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +11,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class VacationTypeStrategyFactory {
     private final MessageSource ms;
-    private final VacationRepositoryImpl vacationRepository;
-    private final VacationHistoryRepositoryImpl vacationHistoryRepository;
     private final UserService userService;
 
     public VacationTypeStrategy getStrategy(VacationType vacationType) {

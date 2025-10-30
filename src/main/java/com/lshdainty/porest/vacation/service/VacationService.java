@@ -39,24 +39,15 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class VacationService {
     private final MessageSource ms;
-    private final VacationRepositoryImpl vacationRepository;
-    private final VacationHistoryRepositoryImpl vacationHistoryRepository;
     private final VacationPolicyCustomRepositoryImpl vacationPolicyRepository;
     private final UserVacationPolicyCustomRepositoryImpl userVacationPolicyRepository;
     private final UserRepositoryImpl userRepository;
     private final HolidayRepositoryImpl holidayRepository;
     private final UserService userService;
     private final VacationPolicyStrategyFactory vacationPolicyStrategyFactory;
-    private final VacationTypeStrategyFactory vacationTypeStrategyFactory;
     private final VacationGrantCustomRepositoryImpl vacationGrantRepository;
     private final VacationUsageCustomRepositoryImpl vacationUsageRepository;
     private final VacationUsageDeductionCustomRepositoryImpl vacationUsageDeductionRepository;
-
-    @Transactional
-    public Long registVacation(VacationServiceDto data) {
-        VacationTypeStrategy strategy = vacationTypeStrategyFactory.getStrategy(data.getType());
-        return strategy.registVacation(data);
-    }
 
     @Transactional
     public Long useVacation(VacationServiceDto data) {
