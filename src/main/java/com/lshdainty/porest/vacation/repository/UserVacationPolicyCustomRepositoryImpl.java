@@ -1,11 +1,14 @@
 package com.lshdainty.porest.vacation.repository;
 
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
+import com.lshdainty.porest.vacation.type.GrantMethod;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +82,28 @@ public class UserVacationPolicyCustomRepositoryImpl implements UserVacationPolic
                 .join(userVacationPolicy.vacationPolicy).fetchJoin()
                 .join(userVacationPolicy.user).fetchJoin()
                 .where(userVacationPolicy.vacationPolicy.id.eq(vacationPolicyId))
+                .fetch();
+    }
+
+    @Override
+    public List<UserVacationPolicy> findRepeatGrantTargetsForToday(LocalDate today) {
+        return query
+                .selectFrom(userVacationPolicy)
+                .join(userVacationPolicy.vacationPolicy).fetchJoin()
+                .join(userVacationPolicy.user).fetchJoin()
+                .where(
+                        // 삭제되지 않은 정책
+                        userVacationPolicy.isDeleted.eq(YNType.N)
+                                // 반복 부여 타입
+                                .and(userVacationPolicy.vacationPolicy.grantMethod.eq(GrantMethod.REPEAT_GRANT))
+                                // nextGrantDate가 null이거나 오늘 이전
+                                .and(
+                                        userVacationPolicy.nextGrantDate.isNull()
+                                                .or(userVacationPolicy.nextGrantDate.loe(today))
+                                )
+                                // 정책 자체가 삭제되지 않음
+                                .and(userVacationPolicy.vacationPolicy.isDeleted.eq(YNType.N))
+                )
                 .fetch();
     }
 }

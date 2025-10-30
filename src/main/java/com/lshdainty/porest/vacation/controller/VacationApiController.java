@@ -37,12 +37,11 @@ public class VacationApiController {
         return ApiResponse.success(new VacationApiDto.RegistVacationResp(vacationId));
     }
 
-    @PostMapping("/api/v1/vacation/use/{vacationId}")
-    public ApiResponse useVacation(@PathVariable("vacationId") Long vacationId,
-                                   @RequestBody VacationApiDto.UseVacationReq data) {
-        Long respVacationId = vacationService.useVacation(VacationServiceDto.builder()
+    @PostMapping("/api/v1/vacation/use")
+    public ApiResponse useVacation(@RequestBody VacationApiDto.UseVacationReq data) {
+        Long vacationUsageId = vacationService.useVacation(VacationServiceDto.builder()
                         .userId(data.getUserId())
-                        .id(vacationId)
+                        .vacationType(data.getVacationType())
                         .desc(data.getVacationDesc())
                         .timeType(data.getVacationTimeType())
                         .startDate(data.getStartDate())
@@ -50,7 +49,7 @@ public class VacationApiController {
                         .build()
         );
 
-        return ApiResponse.success(new VacationApiDto.UseVacationResp(respVacationId));
+        return ApiResponse.success(new VacationApiDto.UseVacationResp(vacationUsageId));
     }
 
     @GetMapping("/api/v1/vacations/user/{userId}")

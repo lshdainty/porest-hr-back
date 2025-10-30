@@ -5,14 +5,8 @@ import com.lshdainty.porest.holiday.repository.HolidayRepositoryImpl;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.repository.UserRepositoryImpl;
-import com.lshdainty.porest.vacation.domain.Vacation;
-import com.lshdainty.porest.vacation.domain.VacationHistory;
-import com.lshdainty.porest.vacation.domain.VacationPolicy;
-import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
-import com.lshdainty.porest.vacation.repository.VacationHistoryRepositoryImpl;
-import com.lshdainty.porest.vacation.repository.VacationPolicyCustomRepositoryImpl;
-import com.lshdainty.porest.vacation.repository.VacationRepositoryImpl;
-import com.lshdainty.porest.vacation.repository.UserVacationPolicyCustomRepositoryImpl;
+import com.lshdainty.porest.vacation.domain.*;
+import com.lshdainty.porest.vacation.repository.*;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.service.policy.VacationPolicyStrategy;
@@ -54,6 +48,9 @@ public class VacationService {
     private final UserService userService;
     private final VacationPolicyStrategyFactory vacationPolicyStrategyFactory;
     private final VacationTypeStrategyFactory vacationTypeStrategyFactory;
+    private final VacationGrantCustomRepositoryImpl vacationGrantRepository;
+    private final VacationUsageCustomRepositoryImpl vacationUsageRepository;
+    private final VacationUsageDeductionCustomRepositoryImpl vacationUsageDeductionRepository;
 
     @Transactional
     public Long registVacation(VacationServiceDto data) {
@@ -63,25 +60,25 @@ public class VacationService {
 
     @Transactional
     public Long useVacation(VacationServiceDto data) {
+        // 1. 사용자 검증
         User user = userService.checkUserExist(data.getUserId());
-        Vacation vacation = checkVacationExist(data.getId());
 
-        // 시작, 종료시간 시간 비교
+        // 2. 시작, 종료시간 비교
         if (PorestTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null));
         }
 
-        // 연차가 아닌 시간단위 휴가인 경우 유연근무제 시간 체크
+        // 3. 연차가 아닌 시간단위 휴가인 경우 유연근무제 시간 체크
         if (!data.getTimeType().equals(VacationTimeType.DAYOFF)) {
             if (!user.isBetweenWorkTime(data.getStartDate().toLocalTime(), data.getEndDate().toLocalTime())) {
                 throw new IllegalArgumentException(ms.getMessage("error.validate.worktime.startEndTime", null, null));
             }
         }
 
-        // 주말 리스트 조회
+        // 4. 주말 리스트 조회
         List<LocalDate> weekDays = PorestTime.getBetweenDatesByDayOfWeek(data.getStartDate(), data.getEndDate(), new int[]{6, 7}, ms);
 
-        // 공휴일 리스트 조회
+        // 5. 공휴일 리스트 조회
         List<LocalDate> holidays = holidayRepository.findHolidaysByStartEndDateWithType(
                 data.getStartDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
                 data.getEndDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
@@ -92,34 +89,84 @@ public class VacationService {
 
         weekDays = PorestTime.addAllDates(weekDays, holidays);
 
-        // 두 날짜 간 모든 날짜 가져오기
+        // 6. 두 날짜 간 모든 날짜 가져오기
         List<LocalDate> betweenDates = PorestTime.getBetweenDates(data.getStartDate(), data.getEndDate(), ms);
         log.info("betweenDates : {}, weekDays : {}", betweenDates, weekDays);
-        // 사용자가 캘린더에서 선택한 날짜 중 휴일, 공휴일 제거
+
+        // 7. 사용자가 캘린더에서 선택한 날짜 중 휴일, 공휴일 제거
         betweenDates = PorestTime.removeAllDates(betweenDates, weekDays);
         log.info("remainDays : {}", betweenDates);
 
-        // 등록하려는 총 사용시간 계산
-        BigDecimal useTime = new BigDecimal("0.0000").add(data.getTimeType().convertToValue(betweenDates.size()));
-        if (vacation.getRemainTime().compareTo(useTime) < 0) {
+        // 8. 등록하려는 총 사용시간 계산
+        BigDecimal totalUseTime = new BigDecimal("0.0000").add(data.getTimeType().convertToValue(betweenDates.size()));
+
+        // 9. 사용 가능한 VacationGrant 조회 (FIFO: VacationType 일치 + 휴가 시작일이 유효기간 내 + 만료일 가까운 순)
+        List<VacationGrant> availableGrants = vacationGrantRepository.findAvailableGrantsByUserIdAndTypeAndDate(
+                data.getUserId(),
+                data.getVacationType(),
+                data.getStartDate()  // 사용자가 사용하려는 휴가 시작일
+        );
+
+        // 10. 총 잔여 시간 계산 및 검증
+        BigDecimal totalRemainTime = availableGrants.stream()
+                .map(VacationGrant::getRemainTime)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (totalRemainTime.compareTo(totalUseTime) < 0) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.notEnoughRemainTime", null, null));
         }
 
-        // 휴가 사용 내역 등록
-        for (LocalDate betweenDate : betweenDates) {
-            VacationHistory history = VacationHistory.createUseVacationHistory(
-                    vacation,
-                    data.getDesc(),
-                    data.getTimeType(),
-                    LocalDateTime.of(betweenDate, LocalTime.of(data.getStartDate().toLocalTime().getHour(), data.getStartDate().toLocalTime().getMinute(), 0))
-            );
-            vacationHistoryRepository.save(history);
+        // 11. 통합 기간 휴가 사용 내역 생성
+        VacationUsage usage = VacationUsage.createVacationUsage(
+                user,
+                data.getDesc(),
+                data.getTimeType(),
+                data.getStartDate(),
+                data.getEndDate(),
+                totalUseTime
+        );
+
+        // 12. FIFO로 VacationGrant에서 차감
+        List<VacationUsageDeduction> deductionsToSave = new ArrayList<>();
+        BigDecimal remainingNeedTime = totalUseTime;
+
+        for (VacationGrant grant : availableGrants) {
+            if (remainingNeedTime.compareTo(BigDecimal.ZERO) <= 0) {
+                break;
+            }
+
+            // 이 grant에서 차감 가능한 시간
+            BigDecimal deductibleTime = grant.getRemainTime().min(remainingNeedTime);
+
+            if (deductibleTime.compareTo(BigDecimal.ZERO) > 0) {
+                // VacationUsageDeduction 생성
+                VacationUsageDeduction deduction = VacationUsageDeduction.createVacationUsageDeduction(
+                        usage,
+                        grant,
+                        deductibleTime
+                );
+                deductionsToSave.add(deduction);
+
+                // VacationGrant의 remainTime 차감
+                grant.deductedVacation(deductibleTime);
+
+                remainingNeedTime = remainingNeedTime.subtract(deductibleTime);
+            }
         }
 
-        // 사용한 휴가 차감
-        vacation.deductedVacation(useTime);
+        // 차감이 완료되지 않았다면 예외 (이론적으로는 발생하지 않아야 함)
+        if (remainingNeedTime.compareTo(BigDecimal.ZERO) > 0) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.notEnoughRemainTime", null, null));
+        }
 
-        return vacation.getId();
+        // 13. 저장
+        vacationUsageRepository.save(usage);
+        vacationUsageDeductionRepository.saveAll(deductionsToSave);
+
+        log.info("휴가 사용 완료 - User: {}, Period: {} ~ {}, WorkingDays: {}, TotalUseTime: {}",
+                user.getId(), data.getStartDate(), data.getEndDate(), betweenDates.size(), totalUseTime);
+
+        return usage.getId();
     }
 
     public List<Vacation> searchUserVacations(String userId) {

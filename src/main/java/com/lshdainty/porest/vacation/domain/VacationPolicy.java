@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@ToString
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
@@ -150,6 +149,10 @@ public class VacationPolicy extends AuditingFields {
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "vacationPolicy", cascade = CascadeType.ALL)
     private List<UserVacationPolicy> userVacationPolicies = new ArrayList<>();
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "policy", cascade = CascadeType.ALL)
+    private List<VacationGrant> vacationGrants = new ArrayList<>();
 
     // 개발용
     public void updateCantDeleted() {

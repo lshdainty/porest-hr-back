@@ -37,6 +37,7 @@ public class VacationApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class UseVacationReq {
         private String userId;
+        private VacationType vacationType;
         private String vacationDesc;
         private VacationTimeType vacationTimeType;
         private LocalDateTime startDate;
@@ -47,7 +48,7 @@ public class VacationApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class UseVacationResp {
-        private Long vacationId;
+        private Long vacationUsageId;
     }
 
     @Getter

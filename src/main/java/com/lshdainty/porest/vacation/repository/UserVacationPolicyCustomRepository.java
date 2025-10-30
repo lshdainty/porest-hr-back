@@ -2,6 +2,7 @@ package com.lshdainty.porest.vacation.repository;
 
 import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,7 @@ public interface UserVacationPolicyCustomRepository {
 
     // 휴가 정책 ID로 모든 UserVacationPolicy 조회
     List<UserVacationPolicy> findByVacationPolicyId(Long vacationPolicyId);
+
+    // 오늘 부여 대상인 반복 부여 정책 조회 (스케줄러용)
+    List<UserVacationPolicy> findRepeatGrantTargetsForToday(LocalDate today);
 }

@@ -15,10 +15,7 @@ import com.lshdainty.porest.schedule.domain.Schedule;
 import com.lshdainty.porest.schedule.type.ScheduleType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.type.RoleType;
-import com.lshdainty.porest.vacation.domain.Vacation;
-import com.lshdainty.porest.vacation.domain.VacationHistory;
-import com.lshdainty.porest.vacation.domain.VacationPolicy;
-import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
+import com.lshdainty.porest.vacation.domain.*;
 import com.lshdainty.porest.vacation.type.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -44,11 +41,11 @@ public class InitDB {
         initService.initSetDepartment();
         initService.initSetUserDepartment();
         initService.initSetHoliday();
-        initService.initSetVacation();
         initService.initSetSchedule();
         initService.initSetDues();
         initService.initSetVacationPolicy();
         initService.initSetUserVacationPolicy();
+        initService.initSetVacationGrant();
     }
 
     @Component
@@ -174,353 +171,6 @@ public class InitDB {
             saveHoliday("권장휴가", "20250905", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N, "🏖");
             saveHoliday("권장휴가", "20251010", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N, "🏖");
             saveHoliday("권장휴가", "20251114", HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N, "🏖");
-        }
-
-        public void initSetVacation() {
-            LocalDateTime now = LocalDateTime.now();
-
-            User user1 = em.find(User.class, "user1");
-            User user2 = em.find(User.class, "user2");
-            User user3 = em.find(User.class, "user3");
-            User user4 = em.find(User.class, "user4");
-            User user5 = em.find(User.class, "user5");
-            User user6 = em.find(User.class, "user6");
-
-            Vacation user1Annual = Vacation.createVacation(user1, VacationType.ANNUAL, new BigDecimal("9.8750"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user1Annual);
-            em.flush();
-            List<VacationHistory> user1Annuals = List.of(
-                    VacationHistory.createRegistVacationHistory(user1Annual, "1분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user1Annual, "2분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user1Annual, "3분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user1Annual, "4분기 휴가", new BigDecimal("3.0000")),
-                    VacationHistory.createUseVacationHistory(user1Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 2, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 3, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Annual, "1시간", VacationTimeType.ONETIMEOFF,
-                            LocalDateTime.of(now.getYear(), 2, 3, 9, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 3, 17, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 10, 10, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Annual, "오전반차", VacationTimeType.MORNINGOFF,
-                            LocalDateTime.of(now.getYear(), 10, 15, 9, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Annual, "오후반차", VacationTimeType.AFTERNOONOFF,
-                            LocalDateTime.of(now.getYear(), 12, 19, 14, 0, 0))
-            );
-            for (VacationHistory annual : user1Annuals) {
-                em.persist(annual);
-            }
-            em.flush();
-
-            Vacation user2Annual = Vacation.createVacation(user2, VacationType.ANNUAL, new BigDecimal("11.0000"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user2Annual);
-            em.flush();
-            List<VacationHistory> user2Annuals = List.of(
-                    VacationHistory.createRegistVacationHistory(user2Annual, "1분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user2Annual, "2분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user2Annual, "3분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user2Annual, "4분기 휴가", new BigDecimal("3.0000")),
-                    VacationHistory.createUseVacationHistory(user2Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 4, 8, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user2Annual, "1시간", VacationTimeType.ONETIMEOFF,
-                            LocalDateTime.of(now.getYear(), 4, 9, 9, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user2Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 7, 25, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user2Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 8, 14, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user2Annual, "3시간", VacationTimeType.THREETIMEOFF,
-                            LocalDateTime.of(now.getYear(), 9, 8, 9, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user2Annual, "오후반차", VacationTimeType.AFTERNOONOFF,
-                            LocalDateTime.of(now.getYear(), 10, 10, 14, 0, 0))
-            );
-            for (VacationHistory annual : user2Annuals) {
-                em.persist(annual);
-            }
-
-            Vacation user3Annual = Vacation.createVacation(user3, VacationType.ANNUAL, new BigDecimal("9.2500"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user3Annual);
-            em.flush();
-            List<VacationHistory> user3Annuals = List.of(
-                    VacationHistory.createRegistVacationHistory(user3Annual, "1분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user3Annual, "2분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user3Annual, "3분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user3Annual, "4분기 휴가", new BigDecimal("3.0000")),
-                    VacationHistory.createUseVacationHistory(user3Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 2, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user3Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 3, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user3Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 3, 17, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user3Annual, "2시간", VacationTimeType.TWOTIMEOFF,
-                            LocalDateTime.of(now.getYear(), 4, 9, 9, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user3Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 6, 2, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user3Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 8, 14, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user3Annual, "오후반차", VacationTimeType.AFTERNOONOFF,
-                            LocalDateTime.of(now.getYear(), 10, 10, 14, 0, 0))
-            );
-            for (VacationHistory annual : user3Annuals) {
-                em.persist(annual);
-            }
-            em.flush();
-
-            Vacation user4Annual = Vacation.createVacation(user4, VacationType.ANNUAL, new BigDecimal("9.0000"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user4Annual);
-            em.flush();
-            List<VacationHistory> user4Annuals = List.of(
-                    VacationHistory.createRegistVacationHistory(user4Annual, "1분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user4Annual, "2분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user4Annual, "3분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user4Annual, "4분기 휴가", new BigDecimal("3.0000")),
-                    VacationHistory.createUseVacationHistory(user4Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 2, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user4Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 3, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user4Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 31, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user4Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 5, 7, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user4Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 5, 8, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user4Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 5, 9, 0, 0, 0))
-            );
-            for (VacationHistory annual : user4Annuals) {
-                em.persist(annual);
-            }
-            em.flush();
-
-            Vacation user5Annual = Vacation.createVacation(user5, VacationType.ANNUAL, new BigDecimal("5.0000"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user5Annual);
-            em.flush();
-            List<VacationHistory> user5Annuals = List.of(
-                    VacationHistory.createRegistVacationHistory(user5Annual, "1분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user5Annual, "2분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user5Annual, "3분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user5Annual, "4분기 휴가", new BigDecimal("3.0000")),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 2, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 1, 3, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 5, 7, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 5, 8, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 5, 9, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 6, 2, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 6, 4, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 6, 5, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 10, 10, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user5Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 12, 26, 0, 0, 0))
-            );
-            for (VacationHistory annual : user5Annuals) {
-                em.persist(annual);
-            }
-            em.flush();
-
-            Vacation user6Annual = Vacation.createVacation(user6, VacationType.ANNUAL, new BigDecimal("11.0000"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user6Annual);
-            em.flush();
-            List<VacationHistory> user6Annuals = List.of(
-                    VacationHistory.createRegistVacationHistory(user6Annual, "1분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user6Annual, "2분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user6Annual, "3분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user6Annual, "4분기 휴가", new BigDecimal("3.0000")),
-                    VacationHistory.createUseVacationHistory(user6Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 4, 8, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user6Annual, "1시간", VacationTimeType.ONETIMEOFF,
-                            LocalDateTime.of(now.getYear(), 4, 9, 9, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user6Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 7, 25, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user6Annual, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 8, 14, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user6Annual, "3시간", VacationTimeType.THREETIMEOFF,
-                            LocalDateTime.of(now.getYear(), 9, 8, 9, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user6Annual, "오후반차", VacationTimeType.AFTERNOONOFF,
-                            LocalDateTime.of(now.getYear(), 10, 10, 14, 0, 0))
-            );
-            for (VacationHistory annual : user6Annuals) {
-                em.persist(annual);
-            }
-            em.flush();
-
-            Vacation user1Maternity = Vacation.createVacation(user1, VacationType.MATERNITY, new BigDecimal("3.0000"),
-                    LocalDateTime.of(now.getYear(), 3, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 9, 1, 23, 59, 59));
-            em.persist(user1Maternity);
-            em.flush();
-            List<VacationHistory> user1Maternitys = List.of(
-                    VacationHistory.createRegistVacationHistory(user1Maternity, "출산 휴가", new BigDecimal("10.0000")),
-                    VacationHistory.createUseVacationHistory(user1Maternity, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 6, 2, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Maternity, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 6, 4, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Maternity, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 6, 5, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Maternity, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 8, 11, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Maternity, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 8, 12, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Maternity, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 8, 13, 0, 0, 0)),
-                    VacationHistory.createUseVacationHistory(user1Maternity, "연차", VacationTimeType.DAYOFF,
-                            LocalDateTime.of(now.getYear(), 8, 14, 0, 0, 0))
-            );
-            for (VacationHistory maternity : user1Maternitys) {
-                em.persist(maternity);
-            }
-            em.flush();
-
-            Vacation user1Overtime = Vacation.createVacation(user1, VacationType.OVERTIME, new BigDecimal("0.5000"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user1Overtime);
-            List<VacationHistory> user1Overtimes = List.of(
-                    VacationHistory.createRegistVacationHistory(user1Overtime, "OT", new BigDecimal("0.1250")),
-                    VacationHistory.createRegistVacationHistory(user1Overtime, "OT", new BigDecimal("0.2500")),
-                    VacationHistory.createRegistVacationHistory(user1Overtime, "OT", new BigDecimal("0.1250"))
-            );
-            for (VacationHistory overtime : user1Overtimes) {
-                em.persist(overtime);
-            }
-            em.flush();
-
-            Vacation user2Wedding = Vacation.createVacation(user2, VacationType.WEDDING, new BigDecimal("5.0000"),
-                    LocalDateTime.of(now.getYear(), 2, 17, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 8, 17, 23, 59, 59));
-            em.persist(user2Wedding);
-            List<VacationHistory> user2Weddings = List.of(
-                    VacationHistory.createRegistVacationHistory(user2Wedding, "결혼 휴가", new BigDecimal("5.0000"))
-            );
-            for (VacationHistory wedding : user2Weddings) {
-                em.persist(wedding);
-            }
-            em.flush();
-
-            Vacation user3Bereavement = Vacation.createVacation(user3, VacationType.BEREAVEMENT, new BigDecimal("3.0000"),
-                    LocalDateTime.of(now.getYear(), 4, 4, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 10, 4, 23, 59, 59));
-            em.persist(user3Bereavement);
-            List<VacationHistory> user3Bereavements = List.of(
-                    VacationHistory.createRegistVacationHistory(user3Bereavement, "상조 휴가", new BigDecimal("3.0000"))
-            );
-            for (VacationHistory bereavement : user3Bereavements) {
-                em.persist(bereavement);
-            }
-            em.flush();
-
-            Vacation user4Wedding = Vacation.createVacation(user4, VacationType.WEDDING, new BigDecimal("5.0000"),
-                    LocalDateTime.of(now.getYear(), 8, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear()+1, 2, 1, 23, 59, 59));
-            em.persist(user4Wedding);
-            List<VacationHistory> user4Weddings = List.of(
-                    VacationHistory.createRegistVacationHistory(user4Wedding, "결혼 휴가", new BigDecimal("5.0000"))
-            );
-            for (VacationHistory wedding : user4Weddings) {
-                em.persist(wedding);
-            }
-            em.flush();
-
-            Vacation user5Overtime = Vacation.createVacation(user5, VacationType.OVERTIME, new BigDecimal("0.3750"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user5Overtime);
-            List<VacationHistory> user5Overtimes = List.of(
-                    VacationHistory.createRegistVacationHistory(user5Overtime, "OT", new BigDecimal("0.1250")),
-                    VacationHistory.createRegistVacationHistory(user5Overtime, "OT", new BigDecimal("0.1250")),
-                    VacationHistory.createRegistVacationHistory(user5Overtime, "OT", new BigDecimal("0.1250"))
-            );
-            for (VacationHistory overtime : user5Overtimes) {
-                em.persist(overtime);
-            }
-            em.flush();
-
-            Vacation user6Overtime = Vacation.createVacation(user6, VacationType.OVERTIME, new BigDecimal("0.1250"),
-                    LocalDateTime.of(now.getYear(), 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 12, 31, 23, 59, 59));
-            em.persist(user6Overtime);
-            List<VacationHistory> user6Overtimes = List.of(
-                    VacationHistory.createRegistVacationHistory(user6Overtime, "OT", new BigDecimal("0.1250"))
-            );
-            for (VacationHistory overtime : user6Overtimes) {
-                em.persist(overtime);
-            }
-            em.flush();
-
-            Vacation user1Annual26 = Vacation.createVacation(user1, VacationType.ANNUAL, new BigDecimal("15.0000"),
-                    LocalDateTime.of(now.getYear()+1, 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear()+1, 12, 31, 23, 59, 59));
-            em.persist(user1Annual26);
-            em.flush();
-            List<VacationHistory> user1Annuals26 = List.of(
-                    VacationHistory.createRegistVacationHistory(user1Annual26, "1분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user1Annual26, "2분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user1Annual26, "3분기 휴가", new BigDecimal("4.0000")),
-                    VacationHistory.createRegistVacationHistory(user1Annual26, "4분기 휴가", new BigDecimal("3.0000"))
-            );
-            for (VacationHistory annual : user1Annuals26) {
-                em.persist(annual);
-            }
-            em.flush();
-
-            Vacation user1Maternity26 = Vacation.createVacation(user1, VacationType.MATERNITY, new BigDecimal("10.0000"),
-                    LocalDateTime.of(now.getYear()+1, 10, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear()+2, 4, 1, 23, 59, 59));
-            em.persist(user1Maternity26);
-            em.flush();
-            List<VacationHistory> user1Maternitys26 = List.of(
-                    VacationHistory.createRegistVacationHistory(user1Maternity26, "출산 휴가", new BigDecimal("10.0000"))
-            );
-            for (VacationHistory maternity : user1Maternitys26) {
-                em.persist(maternity);
-            }
-            em.flush();
-
-            Vacation user1Overtime26 = Vacation.createVacation(user1, VacationType.OVERTIME, new BigDecimal("0.5000"),
-                    LocalDateTime.of(now.getYear()+1, 1, 1, 0, 0, 0),
-                    LocalDateTime.of(now.getYear()+1, 12, 31, 23, 59, 59));
-            em.persist(user1Overtime26);
-            List<VacationHistory> user1Overtimes26 = List.of(
-                    VacationHistory.createRegistVacationHistory(user1Overtime26, "OT", new BigDecimal("0.1250")),
-                    VacationHistory.createRegistVacationHistory(user1Overtime26, "OT", new BigDecimal("0.3750"))
-            );
-            for (VacationHistory overtime : user1Overtimes26) {
-                em.persist(overtime);
-            }
-            em.flush();
-
-            Vacation user1Wedding26 = Vacation.createVacation(user1, VacationType.WEDDING, new BigDecimal("5.0000"),
-                    LocalDateTime.of(now.getYear()+1, 2, 17, 0, 0, 0),
-                    LocalDateTime.of(now.getYear()+1, 8, 17, 23, 59, 59));
-            em.persist(user1Wedding26);
-            List<VacationHistory> user1Weddings26 = List.of(
-                    VacationHistory.createRegistVacationHistory(user1Wedding26, "결혼 휴가", new BigDecimal("5.0000"))
-            );
-            for (VacationHistory wedding : user1Weddings26) {
-                em.persist(wedding);
-            }
-            em.flush();
         }
 
         public void initSetSchedule() {
@@ -731,6 +381,332 @@ public class InitDB {
         private void saveUserVacationPolicy(User user, VacationPolicy vacationPolicy) {
             UserVacationPolicy userVacationPolicy = UserVacationPolicy.createUserVacationPolicy(user, vacationPolicy);
             em.persist(userVacationPolicy);
+        }
+
+        /**
+         * 새로운 도메인 구조(VacationGrant, VacationUsage, VacationUsageDeduction)를 위한 예제 데이터 추가
+         */
+        public void initSetVacationGrant() {
+            LocalDateTime now = LocalDateTime.now();
+
+            // 유저 조회
+            User user1 = em.find(User.class, "user1");
+            User user2 = em.find(User.class, "user2");
+            User user3 = em.find(User.class, "user3");
+            User user4 = em.find(User.class, "user4");
+            User user5 = em.find(User.class, "user5");
+            User user6 = em.find(User.class, "user6");
+
+            // ===== user1 연차 부여 (현재 연도) =====
+            saveVacationGrant(user1, VacationType.ANNUAL, "1분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user1, VacationType.ANNUAL, "2분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user1, VacationType.ANNUAL, "3분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user1, VacationType.ANNUAL, "4분기 휴가", new BigDecimal("3.0000"), now.getYear());
+            // user1 OT 부여 (3건)
+            saveVacationGrant(user1, VacationType.OVERTIME, "OT", new BigDecimal("0.1250"), now.getYear());
+            saveVacationGrant(user1, VacationType.OVERTIME, "OT", new BigDecimal("0.2500"), now.getYear());
+            saveVacationGrant(user1, VacationType.OVERTIME, "OT", new BigDecimal("0.1250"), now.getYear());
+
+            // ===== user2 연차 부여 (현재 연도) =====
+            saveVacationGrant(user2, VacationType.ANNUAL, "1분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user2, VacationType.ANNUAL, "2분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user2, VacationType.ANNUAL, "3분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user2, VacationType.ANNUAL, "4분기 휴가", new BigDecimal("3.0000"), now.getYear());
+
+            // ===== user3 연차 부여 (현재 연도) =====
+            saveVacationGrant(user3, VacationType.ANNUAL, "1분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user3, VacationType.ANNUAL, "2분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user3, VacationType.ANNUAL, "3분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user3, VacationType.ANNUAL, "4분기 휴가", new BigDecimal("3.0000"), now.getYear());
+
+            // ===== user4 연차 부여 (현재 연도) =====
+            saveVacationGrant(user4, VacationType.ANNUAL, "1분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user4, VacationType.ANNUAL, "2분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user4, VacationType.ANNUAL, "3분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user4, VacationType.ANNUAL, "4분기 휴가", new BigDecimal("3.0000"), now.getYear());
+
+            // ===== user5 연차 부여 (현재 연도) =====
+            saveVacationGrant(user5, VacationType.ANNUAL, "1분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user5, VacationType.ANNUAL, "2분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user5, VacationType.ANNUAL, "3분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user5, VacationType.ANNUAL, "4분기 휴가", new BigDecimal("3.0000"), now.getYear());
+            // user5 OT 부여 (3건)
+            saveVacationGrant(user5, VacationType.OVERTIME, "OT", new BigDecimal("0.1250"), now.getYear());
+            saveVacationGrant(user5, VacationType.OVERTIME, "OT", new BigDecimal("0.1250"), now.getYear());
+            saveVacationGrant(user5, VacationType.OVERTIME, "OT", new BigDecimal("0.1250"), now.getYear());
+
+            // ===== user6 연차 부여 (현재 연도) =====
+            saveVacationGrant(user6, VacationType.ANNUAL, "1분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user6, VacationType.ANNUAL, "2분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user6, VacationType.ANNUAL, "3분기 휴가", new BigDecimal("4.0000"), now.getYear());
+            saveVacationGrant(user6, VacationType.ANNUAL, "4분기 휴가", new BigDecimal("3.0000"), now.getYear());
+            // user6 OT 부여
+            saveVacationGrant(user6, VacationType.OVERTIME, "OT", new BigDecimal("0.1250"), now.getYear());
+
+            // ===== user1 다음 연도 휴가 부여 =====
+            saveVacationGrant(user1, VacationType.ANNUAL, "1분기 휴가", new BigDecimal("4.0000"), now.getYear()+1);
+            saveVacationGrant(user1, VacationType.ANNUAL, "2분기 휴가", new BigDecimal("4.0000"), now.getYear()+1);
+            saveVacationGrant(user1, VacationType.ANNUAL, "3분기 휴가", new BigDecimal("4.0000"), now.getYear()+1);
+            saveVacationGrant(user1, VacationType.ANNUAL, "4분기 휴가", new BigDecimal("3.0000"), now.getYear()+1);
+            // user1 다음 연도 OT 부여 (2건)
+            saveVacationGrant(user1, VacationType.OVERTIME, "OT", new BigDecimal("0.1250"), now.getYear()+1);
+            saveVacationGrant(user1, VacationType.OVERTIME, "OT", new BigDecimal("0.3750"), now.getYear()+1);
+
+            // ===== 휴가 사용 내역 마이그레이션 (VacationUsage + VacationUsageDeduction) =====
+            // 모든 Grant를 다시 조회 (FIFO용)
+            List<VacationGrant> user1Grants = findGrantsByUserAndType(user1, VacationType.ANNUAL);
+            List<VacationGrant> user1MaternityGrants = findGrantsByUserAndType(user1, VacationType.MATERNITY);
+
+            List<VacationGrant> user2Grants = findGrantsByUserAndType(user2, VacationType.ANNUAL);
+
+            List<VacationGrant> user3Grants = findGrantsByUserAndType(user3, VacationType.ANNUAL);
+
+            List<VacationGrant> user4Grants = findGrantsByUserAndType(user4, VacationType.ANNUAL);
+
+            List<VacationGrant> user5Grants = findGrantsByUserAndType(user5, VacationType.ANNUAL);
+
+            List<VacationGrant> user6Grants = findGrantsByUserAndType(user6, VacationType.ANNUAL);
+
+            // user1 연차 사용 내역
+            saveVacationUsageWithFIFO(user1, user1Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 1, 2, 0, 0),
+                    LocalDateTime.of(now.getYear(), 1, 3, 23, 59, 59),
+                    new BigDecimal("2.0000"));
+
+            saveVacationUsageWithFIFO(user1, user1Grants, "1시간", VacationTimeType.ONETIMEOFF,
+                    LocalDateTime.of(now.getYear(), 2, 3, 9, 0),
+                    LocalDateTime.of(now.getYear(), 2, 3, 10, 0),
+                    new BigDecimal("0.1250"));
+
+            saveVacationUsageWithFIFO(user1, user1Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 3, 17, 0, 0),
+                    LocalDateTime.of(now.getYear(), 3, 17, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user1, user1Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 10, 10, 0, 0),
+                    LocalDateTime.of(now.getYear(), 10, 10, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user1, user1Grants, "오전반차", VacationTimeType.MORNINGOFF,
+                    LocalDateTime.of(now.getYear(), 10, 15, 9, 0),
+                    LocalDateTime.of(now.getYear(), 10, 15, 14, 0),
+                    new BigDecimal("0.5000"));
+
+            saveVacationUsageWithFIFO(user1, user1Grants, "오후반차", VacationTimeType.AFTERNOONOFF,
+                    LocalDateTime.of(now.getYear(), 12, 19, 14, 0),
+                    LocalDateTime.of(now.getYear(), 12, 19, 18, 0),
+                    new BigDecimal("0.5000"));
+
+            // user1 출산 휴가 사용 내역
+            saveVacationUsageWithFIFO(user1, user1MaternityGrants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 6, 2, 0, 0),
+                    LocalDateTime.of(now.getYear(), 6, 5, 23, 59, 59),
+                    new BigDecimal("3.0000"));
+
+            saveVacationUsageWithFIFO(user1, user1MaternityGrants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 8, 11, 0, 0),
+                    LocalDateTime.of(now.getYear(), 8, 14, 23, 59, 59),
+                    new BigDecimal("4.0000"));
+
+            // user2 연차 사용 내역
+            saveVacationUsageWithFIFO(user2, user2Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 4, 8, 0, 0),
+                    LocalDateTime.of(now.getYear(), 4, 8, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user2, user2Grants, "1시간", VacationTimeType.ONETIMEOFF,
+                    LocalDateTime.of(now.getYear(), 4, 9, 9, 0),
+                    LocalDateTime.of(now.getYear(), 4, 9, 10, 0),
+                    new BigDecimal("0.1250"));
+
+            saveVacationUsageWithFIFO(user2, user2Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 7, 25, 0, 0),
+                    LocalDateTime.of(now.getYear(), 7, 25, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user2, user2Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 8, 14, 0, 0),
+                    LocalDateTime.of(now.getYear(), 8, 14, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user2, user2Grants, "3시간", VacationTimeType.THREETIMEOFF,
+                    LocalDateTime.of(now.getYear(), 9, 8, 9, 0),
+                    LocalDateTime.of(now.getYear(), 9, 8, 12, 0),
+                    new BigDecimal("0.3750"));
+
+            saveVacationUsageWithFIFO(user2, user2Grants, "오후반차", VacationTimeType.AFTERNOONOFF,
+                    LocalDateTime.of(now.getYear(), 10, 10, 14, 0),
+                    LocalDateTime.of(now.getYear(), 10, 10, 18, 0),
+                    new BigDecimal("0.5000"));
+
+            // user3 연차 사용 내역
+            saveVacationUsageWithFIFO(user3, user3Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 1, 2, 0, 0),
+                    LocalDateTime.of(now.getYear(), 1, 3, 23, 59, 59),
+                    new BigDecimal("2.0000"));
+
+            saveVacationUsageWithFIFO(user3, user3Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 3, 17, 0, 0),
+                    LocalDateTime.of(now.getYear(), 3, 17, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user3, user3Grants, "2시간", VacationTimeType.TWOTIMEOFF,
+                    LocalDateTime.of(now.getYear(), 4, 9, 9, 0),
+                    LocalDateTime.of(now.getYear(), 4, 9, 11, 0),
+                    new BigDecimal("0.2500"));
+
+            saveVacationUsageWithFIFO(user3, user3Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 6, 2, 0, 0),
+                    LocalDateTime.of(now.getYear(), 6, 2, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user3, user3Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 8, 14, 0, 0),
+                    LocalDateTime.of(now.getYear(), 8, 14, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user3, user3Grants, "오후반차", VacationTimeType.AFTERNOONOFF,
+                    LocalDateTime.of(now.getYear(), 10, 10, 14, 0),
+                    LocalDateTime.of(now.getYear(), 10, 10, 18, 0),
+                    new BigDecimal("0.5000"));
+
+            // user4 연차 사용 내역
+            saveVacationUsageWithFIFO(user4, user4Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 1, 2, 0, 0),
+                    LocalDateTime.of(now.getYear(), 1, 3, 23, 59, 59),
+                    new BigDecimal("2.0000"));
+
+            saveVacationUsageWithFIFO(user4, user4Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 1, 31, 0, 0),
+                    LocalDateTime.of(now.getYear(), 1, 31, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user4, user4Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 5, 7, 0, 0),
+                    LocalDateTime.of(now.getYear(), 5, 9, 23, 59, 59),
+                    new BigDecimal("3.0000"));
+
+            // user5 연차 사용 내역
+            saveVacationUsageWithFIFO(user5, user5Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 1, 2, 0, 0),
+                    LocalDateTime.of(now.getYear(), 1, 3, 23, 59, 59),
+                    new BigDecimal("2.0000"));
+
+            saveVacationUsageWithFIFO(user5, user5Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 5, 7, 0, 0),
+                    LocalDateTime.of(now.getYear(), 5, 9, 23, 59, 59),
+                    new BigDecimal("3.0000"));
+
+            saveVacationUsageWithFIFO(user5, user5Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 6, 2, 0, 0),
+                    LocalDateTime.of(now.getYear(), 6, 5, 23, 59, 59),
+                    new BigDecimal("3.0000"));
+
+            saveVacationUsageWithFIFO(user5, user5Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 10, 10, 0, 0),
+                    LocalDateTime.of(now.getYear(), 10, 10, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user5, user5Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 12, 26, 0, 0),
+                    LocalDateTime.of(now.getYear(), 12, 26, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            // user6 연차 사용 내역
+            saveVacationUsageWithFIFO(user6, user6Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 4, 8, 0, 0),
+                    LocalDateTime.of(now.getYear(), 4, 8, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user6, user6Grants, "1시간", VacationTimeType.ONETIMEOFF,
+                    LocalDateTime.of(now.getYear(), 4, 9, 9, 0),
+                    LocalDateTime.of(now.getYear(), 4, 9, 10, 0),
+                    new BigDecimal("0.1250"));
+
+            saveVacationUsageWithFIFO(user6, user6Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 7, 25, 0, 0),
+                    LocalDateTime.of(now.getYear(), 7, 25, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user6, user6Grants, "연차", VacationTimeType.DAYOFF,
+                    LocalDateTime.of(now.getYear(), 8, 14, 0, 0),
+                    LocalDateTime.of(now.getYear(), 8, 14, 23, 59, 59),
+                    new BigDecimal("1.0000"));
+
+            saveVacationUsageWithFIFO(user6, user6Grants, "3시간", VacationTimeType.THREETIMEOFF,
+                    LocalDateTime.of(now.getYear(), 9, 8, 9, 0),
+                    LocalDateTime.of(now.getYear(), 9, 8, 12, 0),
+                    new BigDecimal("0.3750"));
+
+            saveVacationUsageWithFIFO(user6, user6Grants, "오후반차", VacationTimeType.AFTERNOONOFF,
+                    LocalDateTime.of(now.getYear(), 10, 10, 14, 0),
+                    LocalDateTime.of(now.getYear(), 10, 10, 18, 0),
+                    new BigDecimal("0.5000"));
+
+            em.flush();
+        }
+
+        private void saveVacationGrant(User user, VacationType type, String desc, BigDecimal grantTime, int year) {
+            VacationGrant grant = VacationGrant.createVacationGrant(
+                    user, null, desc, type, grantTime,
+                    LocalDateTime.of(year, 1, 1, 0, 0),
+                    LocalDateTime.of(year, 12, 31, 23, 59, 59)
+            );
+            em.persist(grant);
+        }
+
+        private List<VacationGrant> findGrantsByUserAndType(User user, VacationType type) {
+            return em.createQuery(
+                    "SELECT vg FROM VacationGrant vg " +
+                    "WHERE vg.user = :user AND vg.type = :type AND vg.isDeleted = :isDeleted " +
+                    "ORDER BY vg.expiryDate ASC, vg.grantDate ASC",
+                    VacationGrant.class)
+                    .setParameter("user", user)
+                    .setParameter("type", type)
+                    .setParameter("isDeleted", YNType.N)
+                    .getResultList();
+        }
+
+        private void saveVacationUsageWithFIFO(User user, List<VacationGrant> grants, String desc,
+                                               VacationTimeType timeType, LocalDateTime startDate,
+                                               LocalDateTime endDate, BigDecimal usedTime) {
+            // VacationUsage 생성
+            VacationUsage usage = VacationUsage.createVacationUsage(
+                    user, desc, timeType, startDate, endDate, usedTime
+            );
+            em.persist(usage);
+
+            // FIFO 차감
+            BigDecimal remainingNeedTime = usedTime;
+            for (VacationGrant grant : grants) {
+                if (remainingNeedTime.compareTo(BigDecimal.ZERO) <= 0) {
+                    break;
+                }
+
+                if (grant.getRemainTime().compareTo(BigDecimal.ZERO) <= 0) {
+                    continue; // 이미 다 사용한 Grant는 스킵
+                }
+
+                BigDecimal deductibleTime = grant.getRemainTime().min(remainingNeedTime);
+
+                if (deductibleTime.compareTo(BigDecimal.ZERO) > 0) {
+                    // VacationUsageDeduction 생성
+                    VacationUsageDeduction deduction = VacationUsageDeduction.createVacationUsageDeduction(
+                            usage, grant, deductibleTime
+                    );
+                    em.persist(deduction);
+
+                    // VacationGrant의 remainTime 차감
+                    grant.deductedVacation(deductibleTime);
+                    remainingNeedTime = remainingNeedTime.subtract(deductibleTime);
+                }
+            }
+
+            if (remainingNeedTime.compareTo(BigDecimal.ZERO) > 0) {
+                throw new IllegalStateException("휴가 사용 시간이 부족합니다. User: " + user.getId() +
+                        ", 필요: " + usedTime + ", 부족: " + remainingNeedTime);
+            }
         }
     }
 }

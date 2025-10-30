@@ -7,7 +7,8 @@ import com.lshdainty.porest.user.type.RoleType;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.user.type.StatusType;
 import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
-import com.lshdainty.porest.vacation.domain.Vacation;
+import com.lshdainty.porest.vacation.domain.VacationGrant;
+import com.lshdainty.porest.vacation.domain.VacationUsage;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -93,7 +94,11 @@ public class User extends AuditingFields {
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Vacation> vacations = new ArrayList<>();
+    private List<VacationGrant> vacationGrants = new ArrayList<>();
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<VacationUsage> vacationUsages = new ArrayList<>();
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
