@@ -23,11 +23,10 @@ public class RepeatGrant implements VacationPolicyStrategy {
         // 반복 휴가 정책의 검증
         validateRepeatGrantPolicy(data);
 
-        VacationPolicy vacationPolicy = VacationPolicy.createVacationPolicy(
+        VacationPolicy vacationPolicy = VacationPolicy.createRepeatGrantPolicy(
                 data.getName(),
                 data.getDesc(),
                 data.getVacationType(),
-                data.getGrantMethod(),
                 data.getGrantTime(),
                 data.getRepeatUnit(),
                 data.getRepeatInterval(),

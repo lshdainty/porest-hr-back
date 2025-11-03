@@ -75,6 +75,11 @@ public class VacationServiceDto {
     // 사용한 휴가 내역 리스트
     private List<VacationUsage> usages;
 
+    // 휴가 신청 사유 (ON_REQUEST 방식)
+    private String requestReason;
+    // 승인자 ID 리스트 (ON_REQUEST 방식)
+    private List<String> approverIds;
+
     @Override
     public String toString() {
         return "VacationServiceDto{" +

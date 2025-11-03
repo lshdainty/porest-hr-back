@@ -164,4 +164,15 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
 
         return count != null && count > 0;
     }
+
+    @Override
+    public List<Department> findByUserIds(List<String> userIds) {
+        return query
+                .selectFrom(department)
+                .where(
+                        department.headUserId.in(userIds),
+                        department.isDeleted.eq(YNType.N)
+                )
+                .fetch();
+    }
 }

@@ -210,6 +210,7 @@ public class VacationApiDto {
         private Integer maxGrantCount;         // 최대 부여 횟수 (1회성 정책용)
         private EffectiveType effectiveType;   // 유효기간 발효일 타입
         private ExpirationType expirationType; // 유효기간 만료일 타입
+        private Integer approvalRequiredCount;
     }
 
     @Getter
@@ -314,5 +315,73 @@ public class VacationApiDto {
     public static class RevokeVacationGrantResp {
         private Long vacationGrantId;
         private String userId;
+    }
+
+    // ========== 휴가 신청 및 승인 관련 DTO ==========
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class RequestVacationReq {
+        private Long policyId;
+        private String desc;
+        private List<String> approverIds;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class RequestVacationResp {
+        private Long vacationGrantId;
+        private String message;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class ApproveVacationResp {
+        private Long approvalId;
+        private String message;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class RejectVacationReq {
+        private String rejectionReason;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class RejectVacationResp {
+        private Long approvalId;
+        private String message;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class SearchPendingApprovalsResp {
+        private List<PendingApprovalInfo> pendingApprovals;
+
+        @Getter
+        @AllArgsConstructor
+        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+        public static class PendingApprovalInfo {
+            private Long approvalId;
+            private Long vacationGrantId;
+            private String requesterId;
+            private String requesterName;
+            private Long policyId;
+            private String policyName;
+            private String desc;
+            private LocalDateTime requestDate;
+            private BigDecimal grantTime;
+            private VacationType vacationType;
+            private String vacationTypeName;
+            private ApprovalStatus approvalStatus;
+            private String approvalStatusName;
+        }
     }
 }

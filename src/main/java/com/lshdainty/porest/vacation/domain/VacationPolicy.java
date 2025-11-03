@@ -130,6 +130,17 @@ public class VacationPolicy extends AuditingFields {
     private Integer maxGrantCount;
 
     /**
+     * 승인 처리 필요 인원수<br>
+     * grantMethod = ON_REQUEST일 경우에 사용되는 값<br>
+     * 사용자가 휴가를 신청했을 때 승인이 필요한 인원 수<br>
+     * null 또는 0: 승인 없이 즉시 부여<br>
+     * 1 이상: 지정된 인원 수만큼 승인이 필요<br>
+     * 예) 2명의 승인이 필요한 경우 approvalRequiredCount = 2
+     */
+    @Column(name = "approval_required_count")
+    private Integer approvalRequiredCount;
+
+    /**
      * 유효기간 발효일 타입<br>
      * 휴가 생성 시 추가되는 유효기간을 계산하기 위한 타입<br>
      * 지금은 간단하게 당해년도 1월 1일, 생성 즉시 2개만 생성
@@ -182,18 +193,107 @@ public class VacationPolicy extends AuditingFields {
     }
 
     /**
-     * 휴가 정책 생성 함수<br>
-     * Entity의 경우 Setter없이 Getter만 사용<br>
-     * 해당 메소드를 통해 휴가 생성할 것
+     * 신청시 부여(ON_REQUEST) 휴가 정책 생성 함수<br>
+     * 사용자가 휴가를 신청하면 승인 후 부여되는 정책<br>
+     * 스케줄러 관련 필드는 사용하지 않음
      *
+     * @param name 정책명
+     * @param desc 정책 설명
+     * @param vacationType 휴가 타입
+     * @param grantTime 부여 시간 (필수)
+     * @param approvalRequiredCount 승인 필요 인원수 (null 또는 0이면 즉시 부여)
+     * @param effectiveType 유효기간 발효일 타입
+     * @param expirationType 유효기간 만료일 타입
      * @return VacationPolicy
      */
-    public static VacationPolicy createVacationPolicy(String name, String desc, VacationType vacationType, GrantMethod grantMethod, BigDecimal grantTime, RepeatUnit repeatUnit, Integer repeatInterval, Integer specificMonths, Integer specificDays, LocalDateTime firstGrantDate, YNType isRecurring, Integer maxGrantCount, EffectiveType effectiveType, ExpirationType expirationType) {
+    public static VacationPolicy createOnRequestPolicy(String name, String desc, VacationType vacationType, BigDecimal grantTime, Integer approvalRequiredCount, EffectiveType effectiveType, ExpirationType expirationType) {
         VacationPolicy vacationPolicy = new VacationPolicy();
         vacationPolicy.name = name;
         vacationPolicy.desc = desc;
         vacationPolicy.vacationType = vacationType;
-        vacationPolicy.grantMethod = grantMethod;
+        vacationPolicy.grantMethod = GrantMethod.ON_REQUEST;
+        vacationPolicy.grantTime = grantTime;
+        vacationPolicy.approvalRequiredCount = approvalRequiredCount;
+        vacationPolicy.effectiveType = effectiveType;
+        vacationPolicy.expirationType = expirationType;
+        // 스케줄러 관련 필드는 모두 null
+        vacationPolicy.repeatUnit = null;
+        vacationPolicy.repeatInterval = null;
+        vacationPolicy.specificMonths = null;
+        vacationPolicy.specificDays = null;
+        vacationPolicy.firstGrantDate = null;
+        vacationPolicy.isRecurring = null;
+        vacationPolicy.maxGrantCount = null;
+        // 기본 필드
+        vacationPolicy.canDeleted = YNType.Y;
+        vacationPolicy.isDeleted = YNType.N;
+        return vacationPolicy;
+    }
+
+    /**
+     * 관리자 직접 부여(MANUAL_GRANT) 휴가 정책 생성 함수<br>
+     * 관리자가 직접 휴가를 부여하는 정책<br>
+     * 스케줄러 관련 필드와 승인 필드는 사용하지 않음
+     *
+     * @param name 정책명
+     * @param desc 정책 설명
+     * @param vacationType 휴가 타입
+     * @param grantTime 부여 시간 (선택, 관리자가 직접 지정할 수도 있음)
+     * @param effectiveType 유효기간 발효일 타입
+     * @param expirationType 유효기간 만료일 타입
+     * @return VacationPolicy
+     */
+    public static VacationPolicy createManualGrantPolicy(String name, String desc, VacationType vacationType, BigDecimal grantTime, EffectiveType effectiveType, ExpirationType expirationType) {
+        VacationPolicy vacationPolicy = new VacationPolicy();
+        vacationPolicy.name = name;
+        vacationPolicy.desc = desc;
+        vacationPolicy.vacationType = vacationType;
+        vacationPolicy.grantMethod = GrantMethod.MANUAL_GRANT;
+        vacationPolicy.grantTime = grantTime;
+        vacationPolicy.effectiveType = effectiveType;
+        vacationPolicy.expirationType = expirationType;
+        // 스케줄러 관련 필드는 모두 null
+        vacationPolicy.repeatUnit = null;
+        vacationPolicy.repeatInterval = null;
+        vacationPolicy.specificMonths = null;
+        vacationPolicy.specificDays = null;
+        vacationPolicy.firstGrantDate = null;
+        vacationPolicy.isRecurring = null;
+        vacationPolicy.maxGrantCount = null;
+        // 승인 관련 필드는 null
+        vacationPolicy.approvalRequiredCount = null;
+        // 기본 필드
+        vacationPolicy.canDeleted = YNType.Y;
+        vacationPolicy.isDeleted = YNType.N;
+        return vacationPolicy;
+    }
+
+    /**
+     * 반복 부여(REPEAT_GRANT) 휴가 정책 생성 함수<br>
+     * 스케줄러에 의해 자동으로 반복 부여되는 정책<br>
+     * 모든 스케줄 관련 필드를 사용
+     *
+     * @param name 정책명
+     * @param desc 정책 설명
+     * @param vacationType 휴가 타입
+     * @param grantTime 부여 시간
+     * @param repeatUnit 반복 단위
+     * @param repeatInterval 반복 간격
+     * @param specificMonths 특정 월 (선택)
+     * @param specificDays 특정 일 (선택)
+     * @param firstGrantDate 첫 부여 시점
+     * @param isRecurring 반복 여부
+     * @param maxGrantCount 최대 부여 횟수 (1회성일 경우 필수)
+     * @param effectiveType 유효기간 발효일 타입
+     * @param expirationType 유효기간 만료일 타입
+     * @return VacationPolicy
+     */
+    public static VacationPolicy createRepeatGrantPolicy(String name, String desc, VacationType vacationType, BigDecimal grantTime, RepeatUnit repeatUnit, Integer repeatInterval, Integer specificMonths, Integer specificDays, LocalDateTime firstGrantDate, YNType isRecurring, Integer maxGrantCount, EffectiveType effectiveType, ExpirationType expirationType) {
+        VacationPolicy vacationPolicy = new VacationPolicy();
+        vacationPolicy.name = name;
+        vacationPolicy.desc = desc;
+        vacationPolicy.vacationType = vacationType;
+        vacationPolicy.grantMethod = GrantMethod.REPEAT_GRANT;
         vacationPolicy.grantTime = grantTime;
         vacationPolicy.repeatUnit = repeatUnit;
         vacationPolicy.repeatInterval = repeatInterval;
@@ -204,6 +304,9 @@ public class VacationPolicy extends AuditingFields {
         vacationPolicy.maxGrantCount = maxGrantCount;
         vacationPolicy.effectiveType = effectiveType;
         vacationPolicy.expirationType = expirationType;
+        // 승인 관련 필드는 null
+        vacationPolicy.approvalRequiredCount = null;
+        // 기본 필드
         vacationPolicy.canDeleted = YNType.Y;
         vacationPolicy.isDeleted = YNType.N;
         return vacationPolicy;

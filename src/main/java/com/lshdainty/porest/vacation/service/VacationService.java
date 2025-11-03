@@ -4,10 +4,13 @@ import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.holiday.repository.HolidayRepositoryImpl;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.domain.User;
+import com.lshdainty.porest.department.domain.Department;
+import com.lshdainty.porest.department.repository.DepartmentCustomRepositoryImpl;
 import com.lshdainty.porest.vacation.domain.*;
 import com.lshdainty.porest.vacation.repository.*;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
+import com.lshdainty.porest.vacation.service.dto.VacationApprovalServiceDto;
 import com.lshdainty.porest.vacation.service.policy.VacationPolicyStrategy;
 import com.lshdainty.porest.vacation.service.policy.factory.VacationPolicyStrategyFactory;
 import com.lshdainty.porest.holiday.type.HolidayType;
@@ -40,6 +43,8 @@ public class VacationService {
     private final VacationGrantCustomRepositoryImpl vacationGrantRepository;
     private final VacationUsageCustomRepositoryImpl vacationUsageRepository;
     private final VacationUsageDeductionCustomRepositoryImpl vacationUsageDeductionRepository;
+    private final VacationApprovalCustomRepositoryImpl vacationApprovalRepository;
+    private final DepartmentCustomRepositoryImpl departmentRepository;
 
     @Transactional
     public Long useVacation(VacationServiceDto data) {
@@ -890,6 +895,297 @@ public class VacationService {
                 grant.getId(), grant.getUser().getId(), grant.getPolicy().getId(), grant.getGrantTime());
 
         return grant;
+    }
+
+    /**
+     * 휴가 신청 (ON_REQUEST 방식)
+     *
+     * @param userId 신청자 ID
+     * @param data 휴가 신청 정보 (정책 ID, 휴가 사유(desc), 승인자 ID 리스트)
+     * @return 생성된 VacationGrant ID
+     */
+    @Transactional
+    public Long requestVacation(String userId, VacationServiceDto data) {
+        // 1. 사용자 검증
+        User user = userService.checkUserExist(userId);
+
+        // 2. 휴가 정책 검증
+        VacationPolicy policy = checkVacationPolicyExist(data.getPolicyId());
+
+        // 3. 정책이 ON_REQUEST 방식인지 확인
+        if (policy.getGrantMethod() != GrantMethod.ON_REQUEST) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.notOnRequestPolicy", null, null)
+            );
+        }
+
+        // 4. 사용자에게 해당 정책이 할당되어 있는지 확인
+        boolean hasPolicy = userVacationPolicyRepository.existsByUserIdAndVacationPolicyId(userId, data.getPolicyId());
+        if (!hasPolicy) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.policyNotAssigned", null, null)
+            );
+        }
+
+        // 5. 신청 사유 필수 검증
+        if (data.getDesc() == null || data.getDesc().trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.requestReasonRequired", null, null)
+            );
+        }
+
+        // 6. 승인자 목록 검증
+        List<String> approverIds = data.getApproverIds();
+        Integer requiredCount = policy.getApprovalRequiredCount();
+
+        if (requiredCount != null && requiredCount > 0) {
+            if (approverIds == null || approverIds.isEmpty()) {
+                throw new IllegalArgumentException(
+                        ms.getMessage("error.validate.vacation.approverRequired", null, null)
+                );
+            }
+
+            if (approverIds.size() != requiredCount) {
+                throw new IllegalArgumentException(
+                        ms.getMessage("error.validate.vacation.approverCountMismatch",
+                                new Object[]{requiredCount, approverIds.size()}, null)
+                );
+            }
+
+            // 6-1. 승인자 중복 체크
+            Set<String> uniqueApproverIds = new HashSet<>(approverIds);
+            if (uniqueApproverIds.size() != approverIds.size()) {
+                throw new IllegalArgumentException(
+                        ms.getMessage("error.validate.vacation.duplicateApprover", null, null)
+                );
+            }
+
+            // 6-2. 승인자 모두 존재하는지 확인
+            for (String approverId : approverIds) {
+                userService.checkUserExist(approverId);
+            }
+
+            // 6-3. 승인자가 부서장인지 확인 (headUserId로 검증)
+            List<Department> departments = departmentRepository.findByUserIds(approverIds);
+
+            // 부서장이 아닌 승인자 찾기
+            Set<String> headUserIds = departments.stream()
+                    .map(Department::getHeadUserId)
+                    .collect(Collectors.toSet());
+
+            List<String> nonHeadApprovers = approverIds.stream()
+                    .filter(id -> !headUserIds.contains(id))
+                    .collect(Collectors.toList());
+
+            if (!nonHeadApprovers.isEmpty()) {
+                throw new IllegalArgumentException(
+                        ms.getMessage("error.validate.vacation.approverNotDepartmentHead",
+                                new Object[]{String.join(", ", nonHeadApprovers)}, null)
+                );
+            }
+
+            // 6-4. 승인자를 부서 레벨 순서로 정렬 (레벨 오름차순: 하위 부서장 먼저)
+            Map<String, Department> approverDepartmentMap = departments.stream()
+                    .collect(Collectors.toMap(Department::getHeadUserId, dept -> dept));
+
+            approverIds.sort((id1, id2) -> {
+                Department dept1 = approverDepartmentMap.get(id1);
+                Department dept2 = approverDepartmentMap.get(id2);
+
+                // 레벨이 작을수록(하위 부서) 먼저 승인
+                return Long.compare(dept1.getLevel(), dept2.getLevel());
+            });
+        }
+
+        // 7. VacationGrant 생성 (PENDING_APPROVAL 상태)
+        VacationGrant vacationGrant = VacationGrant.createPendingVacationGrant(
+                user,
+                policy,
+                data.getDesc(),
+                policy.getVacationType(),
+                policy.getGrantTime()
+        );
+
+        vacationGrantRepository.save(vacationGrant);
+
+        // 8. 승인이 필요한 경우 VacationApproval 생성 (순서대로)
+        if (requiredCount != null && requiredCount > 0 && approverIds != null) {
+            List<VacationApproval> approvals = new ArrayList<>();
+            int order = 1;
+            for (String approverId : approverIds) {
+                User approver = userService.checkUserExist(approverId);
+                VacationApproval approval = VacationApproval.createVacationApproval(vacationGrant, approver, order);
+                approvals.add(approval);
+                order++;
+            }
+            vacationApprovalRepository.saveAll(approvals);
+
+            log.info("휴가 신청 완료 - User: {}, Policy: {}, GrantId: {}, Approvers: {} (순서대로)",
+                    userId, policy.getId(), vacationGrant.getId(), approverIds);
+        } else {
+            // 승인이 필요 없는 경우 즉시 ACTIVE 상태로 전환
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime grantDate = policy.getEffectiveType().calculateDate(now);
+            LocalDateTime expiryDate = policy.getExpirationType().calculateDate(grantDate);
+            vacationGrant.approve(grantDate, expiryDate);
+
+            log.info("휴가 신청 완료 (즉시 승인) - User: {}, Policy: {}, GrantId: {}",
+                    userId, policy.getId(), vacationGrant.getId());
+        }
+
+        return vacationGrant.getId();
+    }
+
+    /**
+     * 휴가 승인 처리 (순차 승인)
+     *
+     * @param approvalId VacationApproval ID
+     * @param approverId 승인자 ID
+     * @return 처리된 VacationApproval ID
+     */
+    @Transactional
+    public Long approveVacation(Long approvalId, String approverId) {
+        // 1. VacationApproval 조회
+        VacationApproval approval = vacationApprovalRepository.findByIdWithVacationGrantAndUser(approvalId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ms.getMessage("error.notfound.vacation.approval", null, null)
+                ));
+
+        // 2. 승인자 권한 검증
+        if (!approval.getApprover().getId().equals(approverId)) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.notAuthorizedApprover", null, null)
+            );
+        }
+
+        // 3. 이미 처리된 승인인지 확인
+        if (!approval.isPending()) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.alreadyProcessed", null, null)
+            );
+        }
+
+        // 4. 순차 승인 검증: 이전 순서의 승인자들이 모두 승인했는지 확인
+        VacationGrant vacationGrant = approval.getVacationGrant();
+        List<VacationApproval> allApprovals = vacationApprovalRepository.findByVacationGrantId(vacationGrant.getId());
+
+        Integer currentOrder = approval.getApprovalOrder();
+
+        // 현재 승인자보다 앞선 순서의 승인자 중 아직 승인하지 않은 사람이 있는지 확인
+        boolean hasPendingPreviousApprovals = allApprovals.stream()
+                .filter(a -> a.getApprovalOrder() < currentOrder)
+                .anyMatch(a -> !a.isApproved());
+
+        if (hasPendingPreviousApprovals) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.previousApprovalRequired", null, null)
+            );
+        }
+
+        // 5. 승인 처리
+        approval.approve();
+
+        // 6. VacationGrant의 모든 승인이 완료되었는지 확인
+        boolean allApproved = allApprovals.stream().allMatch(VacationApproval::isApproved);
+
+        if (allApproved) {
+            // 모든 승인이 완료되면 VacationGrant를 ACTIVE 상태로 전환
+            VacationPolicy policy = vacationGrant.getPolicy();
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime grantDate = policy.getEffectiveType().calculateDate(now);
+            LocalDateTime expiryDate = policy.getExpirationType().calculateDate(grantDate);
+
+            vacationGrant.approve(grantDate, expiryDate);
+
+            log.info("휴가 전체 승인 완료 - VacationGrant ID: {}, Final Approver: {}, Status: ACTIVE",
+                    vacationGrant.getId(), approverId);
+        } else {
+            long pendingCount = allApprovals.stream().filter(VacationApproval::isPending).count();
+            log.info("휴가 부분 승인 완료 - VacationGrant ID: {}, Approver: {} (순서: {}), 남은 승인: {}",
+                    vacationGrant.getId(), approverId, currentOrder, pendingCount);
+        }
+
+        return approval.getId();
+    }
+
+    /**
+     * 휴가 거부 처리
+     *
+     * @param approvalId VacationApproval ID
+     * @param approverId 승인자 ID
+     * @param data 거부 사유
+     * @return 처리된 VacationApproval ID
+     */
+    @Transactional
+    public Long rejectVacation(Long approvalId, String approverId, VacationApprovalServiceDto data) {
+        // 1. VacationApproval 조회
+        VacationApproval approval = vacationApprovalRepository.findByIdWithVacationGrantAndUser(approvalId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ms.getMessage("error.notfound.vacation.approval", null, null)
+                ));
+
+        // 2. 승인자 권한 검증
+        if (!approval.getApprover().getId().equals(approverId)) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.notAuthorizedApprover", null, null)
+            );
+        }
+
+        // 3. 이미 처리된 승인인지 확인
+        if (!approval.isPending()) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.alreadyProcessed", null, null)
+            );
+        }
+
+        // 4. 거부 사유 필수 검증
+        if (data.getRejectionReason() == null || data.getRejectionReason().trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.rejectionReasonRequired", null, null)
+            );
+        }
+
+        // 5. 거부 처리
+        approval.reject(data.getRejectionReason());
+
+        // 6. VacationGrant를 REJECTED 상태로 전환
+        VacationGrant vacationGrant = approval.getVacationGrant();
+        vacationGrant.reject();
+
+        log.info("휴가 거부 완료 - VacationGrant ID: {}, Approver: {}, Reason: {}",
+                vacationGrant.getId(), approverId, data.getRejectionReason());
+
+        return approval.getId();
+    }
+
+    /**
+     * 승인자의 대기 중인 승인 목록 조회
+     *
+     * @param approverId 승인자 ID
+     * @return 대기 중인 승인 목록
+     */
+    public List<VacationApprovalServiceDto> searchPendingApprovals(String approverId) {
+        // 승인자 존재 확인
+        userService.checkUserExist(approverId);
+
+        // 대기 중인 승인 조회
+        List<VacationApproval> approvals = vacationApprovalRepository.findPendingApprovalsByApproverId(approverId);
+
+        return approvals.stream()
+                .map(approval -> VacationApprovalServiceDto.builder()
+                        .id(approval.getId())
+                        .vacationGrantId(approval.getVacationGrant().getId())
+                        .requesterId(approval.getVacationGrant().getUser().getId())
+                        .requesterName(approval.getVacationGrant().getUser().getName())
+                        .policyId(approval.getVacationGrant().getPolicy().getId())
+                        .policyName(approval.getVacationGrant().getPolicy().getName())
+                        .desc(approval.getVacationGrant().getDesc())
+                        .requestDate(approval.getVacationGrant().getRequestDate())
+                        .grantTime(approval.getVacationGrant().getGrantTime())
+                        .vacationType(approval.getVacationGrant().getType())
+                        .approvalStatus(approval.getApprovalStatus())
+                        .build())
+                .toList();
     }
 
 }

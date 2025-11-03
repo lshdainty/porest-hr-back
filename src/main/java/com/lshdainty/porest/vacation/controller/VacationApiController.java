@@ -4,6 +4,7 @@ import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.vacation.controller.dto.VacationApiDto;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
 import com.lshdainty.porest.vacation.service.VacationService;
+import com.lshdainty.porest.vacation.service.dto.VacationApprovalServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.type.VacationTimeType;
@@ -289,6 +290,7 @@ public class VacationApiController {
                 .maxGrantCount(data.getMaxGrantCount())
                 .effectiveType(data.getEffectiveType())
                 .expirationType(data.getExpirationType())
+                .approvalRequiredCount(data.getApprovalRequiredCount())
                 .build()
         );
 
@@ -481,5 +483,98 @@ public class VacationApiController {
                 grant.getId(),
                 grant.getUser().getId()
         ));
+    }
+
+    // ========== 휴가 신청 및 승인 관련 API ==========
+
+    /**
+     * 휴가 신청 (ON_REQUEST 방식)
+     * POST /api/v1/users/{userId}/vacation-requests
+     */
+    @PostMapping("/api/v1/users/{userId}/vacation-requests")
+    public ApiResponse requestVacation(
+            @PathVariable("userId") String userId,
+            @RequestBody VacationApiDto.RequestVacationReq data) {
+
+        Long vacationGrantId = vacationService.requestVacation(userId, VacationServiceDto.builder()
+                .policyId(data.getPolicyId())
+                .desc(data.getDesc())
+                .approverIds(data.getApproverIds())
+                .build());
+
+        return ApiResponse.success(new VacationApiDto.RequestVacationResp(
+                vacationGrantId,
+                "휴가 신청이 완료되었습니다."
+        ));
+    }
+
+    /**
+     * 휴가 승인
+     * POST /api/v1/vacation-approvals/{approvalId}/approve
+     */
+    @PostMapping("/api/v1/vacation-approvals/{approvalId}/approve")
+    public ApiResponse approveVacation(
+            @PathVariable("approvalId") Long approvalId,
+            @RequestParam("approverId") String approverId) {
+
+        Long processedApprovalId = vacationService.approveVacation(approvalId, approverId);
+
+        return ApiResponse.success(new VacationApiDto.ApproveVacationResp(
+                processedApprovalId,
+                "휴가가 승인되었습니다."
+        ));
+    }
+
+    /**
+     * 휴가 거부
+     * POST /api/v1/vacation-approvals/{approvalId}/reject
+     */
+    @PostMapping("/api/v1/vacation-approvals/{approvalId}/reject")
+    public ApiResponse rejectVacation(
+            @PathVariable("approvalId") Long approvalId,
+            @RequestParam("approverId") String approverId,
+            @RequestBody VacationApiDto.RejectVacationReq data) {
+
+        Long processedApprovalId = vacationService.rejectVacation(
+                approvalId,
+                approverId,
+                VacationApprovalServiceDto.builder()
+                        .rejectionReason(data.getRejectionReason())
+                        .build()
+        );
+
+        return ApiResponse.success(new VacationApiDto.RejectVacationResp(
+                processedApprovalId,
+                "휴가가 거부되었습니다."
+        ));
+    }
+
+    /**
+     * 승인자의 대기 중인 승인 목록 조회
+     * GET /api/v1/users/{approverId}/pending-approvals
+     */
+    @GetMapping("/api/v1/users/{approverId}/pending-approvals")
+    public ApiResponse searchPendingApprovals(@PathVariable("approverId") String approverId) {
+        List<VacationApprovalServiceDto> approvals = vacationService.searchPendingApprovals(approverId);
+
+        List<VacationApiDto.SearchPendingApprovalsResp.PendingApprovalInfo> approvalInfos = approvals.stream()
+                .map(a -> new VacationApiDto.SearchPendingApprovalsResp.PendingApprovalInfo(
+                        a.getId(),
+                        a.getVacationGrantId(),
+                        a.getRequesterId(),
+                        a.getRequesterName(),
+                        a.getPolicyId(),
+                        a.getPolicyName(),
+                        a.getDesc(),
+                        a.getRequestDate(),
+                        a.getGrantTime(),
+                        a.getVacationType(),
+                        a.getVacationType().getViewName(),
+                        a.getApprovalStatus(),
+                        a.getApprovalStatus().getViewName()
+                ))
+                .toList();
+
+        return ApiResponse.success(new VacationApiDto.SearchPendingApprovalsResp(approvalInfos));
     }
 }

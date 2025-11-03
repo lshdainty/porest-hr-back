@@ -30,4 +30,6 @@ public interface DepartmentCustomRepository {
     List<UserDepartment> findUserDepartmentsInDepartment(Long departmentId);
     // 특정 유저의 메인 부서 존재 여부 확인
     boolean hasMainDepartment(String userId);
+    // 여러 유저 ID로 Department 조회 (부서장 확인용)
+    List<Department> findByUserIds(List<String> userIds);
 }

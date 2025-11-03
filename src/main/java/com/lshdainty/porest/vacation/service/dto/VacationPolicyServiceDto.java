@@ -23,9 +23,10 @@ public class VacationPolicyServiceDto {
     private Integer repeatInterval;
     private Integer specificMonths;
     private Integer specificDays;
-    private LocalDateTime firstGrantDate;  // 첫 부여 시점 (반복 부여 방식에서 필수)
-    private YNType isRecurring;            // 반복 여부 (Y: 반복, N: 1회)
-    private Integer maxGrantCount;         // 최대 부여 횟수 (1회성 정책용)
-    private EffectiveType effectiveType;   // 유효기간 발효일 타입
-    private ExpirationType expirationType; // 유효기간 만료일 타입
+    private LocalDateTime firstGrantDate;
+    private YNType isRecurring;
+    private Integer maxGrantCount;
+    private EffectiveType effectiveType;
+    private ExpirationType expirationType;
+    private Integer approvalRequiredCount;
 }

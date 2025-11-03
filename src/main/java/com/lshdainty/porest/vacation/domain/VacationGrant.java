@@ -7,10 +7,13 @@ import com.lshdainty.porest.vacation.type.GrantStatus;
 import com.lshdainty.porest.vacation.type.VacationType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -103,11 +106,22 @@ public class VacationGrant extends AuditingFields {
     private GrantStatus status;
 
     /**
+     * 신청일시<br>
+     * ON_REQUEST 방식으로 사용자가 휴가를 신청한 일시
+     */
+    @Column(name = "request_date")
+    private LocalDateTime requestDate;
+
+    /**
      * 삭제 여부
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted")
     private YNType isDeleted;
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "vacationGrant", cascade = CascadeType.ALL)
+    private List<VacationApproval> vacationApprovals = new ArrayList<>();
 
     // user 추가 연관관계 편의 메소드
     public void addUser(User user) {
@@ -140,6 +154,33 @@ public class VacationGrant extends AuditingFields {
         vg.remainTime = grantTime;
         vg.status = GrantStatus.ACTIVE;
         vg.isDeleted = YNType.N;
+        return vg;
+    }
+
+    /**
+     * 휴가 신청 함수 (승인 대기 상태)<br>
+     * ON_REQUEST 방식으로 사용자가 휴가를 신청할 때 사용<br>
+     * 승인이 완료되면 ACTIVE 상태로 변경됨
+     *
+     * @param user 사용자
+     * @param policy 휴가 정책
+     * @param desc 휴가 신청 사유
+     * @param type 휴가 타입
+     * @param grantTime 부여 시간
+     * @return VacationGrant
+     */
+    public static VacationGrant createPendingVacationGrant(User user, VacationPolicy policy, String desc, VacationType type, BigDecimal grantTime) {
+        VacationGrant vg = new VacationGrant();
+        vg.addUser(user);
+        vg.addPolicy(policy);
+        vg.desc = desc;
+        vg.requestDate = LocalDateTime.now();
+        vg.type = type;
+        vg.grantTime = grantTime;
+        vg.remainTime = grantTime;
+        vg.status = GrantStatus.PENDING_APPROVAL;
+        vg.isDeleted = YNType.N;
+        // grantDate와 expiryDate는 승인 완료 시점에 설정
         return vg;
     }
 
@@ -201,5 +242,32 @@ public class VacationGrant extends AuditingFields {
                 getRemainTime().compareTo(BigDecimal.ZERO) > 0 &&
                 !isExpired() &&
                 getIsDeleted().equals(YNType.N);
+    }
+
+    /**
+     * 승인 완료 처리<br>
+     * 모든 승인자가 승인하면 ACTIVE 상태로 전환하고 유효기간을 설정
+     *
+     * @param grantDate 휴가 시작일
+     * @param expiryDate 휴가 만료일
+     */
+    public void approve(LocalDateTime grantDate, LocalDateTime expiryDate) {
+        if (this.status != GrantStatus.PENDING_APPROVAL) {
+            throw new IllegalStateException("승인 대기 상태가 아닌 휴가는 승인할 수 없습니다.");
+        }
+        this.status = GrantStatus.ACTIVE;
+        this.grantDate = grantDate;
+        this.expiryDate = expiryDate;
+    }
+
+    /**
+     * 승인 거부 처리<br>
+     * 한 명이라도 거부하면 REJECTED 상태로 전환
+     */
+    public void reject() {
+        if (this.status != GrantStatus.PENDING_APPROVAL) {
+            throw new IllegalStateException("승인 대기 상태가 아닌 휴가는 거부할 수 없습니다.");
+        }
+        this.status = GrantStatus.REJECTED;
     }
 }
