@@ -163,7 +163,7 @@ public class VacationService {
      * @param userId 유저 아이디
      * @return 부여받은 내역(VacationGrant)과 사용한 내역(VacationUsage)
      */
-    public VacationServiceDto searchUserVacations(String userId) {
+    public VacationServiceDto getUserVacationHistory(String userId) {
         // 유저 존재 확인
         userService.checkUserExist(userId);
 
@@ -184,7 +184,7 @@ public class VacationService {
      *
      * @return 모든 유저별 부여받은 내역(VacationGrant)과 사용한 내역(VacationUsage)
      */
-    public List<VacationServiceDto> searchUserGroupVacations() {
+    public List<VacationServiceDto> getAllUsersVacationHistory() {
         // 모든 부여 내역 조회
         List<VacationGrant> allGrants = vacationGrantRepository.findAllWithUser();
 
@@ -235,7 +235,7 @@ public class VacationService {
      * @param startDate 시작 날짜
      * @return VacationType별로 그룹화된 사용 가능한 휴가 내역
      */
-    public List<VacationServiceDto> searcgAvailableVacations(String userId, LocalDateTime startDate) {
+    public List<VacationServiceDto> getAvailableVacations(String userId, LocalDateTime startDate) {
         // 유저 조회
         userService.checkUserExist(userId);
 
@@ -263,14 +263,14 @@ public class VacationService {
     }
 
     /**
-     * 휴가 사용 내역 삭제
+     * 휴가 사용 취소
      * - VacationUsage를 소프트 삭제
      * - VacationGrant의 remainTime 복구
      *
      * @param vacationUsageId 휴가 사용 내역 ID
      */
     @Transactional
-    public void deleteVacationHistory(Long vacationUsageId) {
+    public void cancelVacationUsage(Long vacationUsageId) {
         // 1. VacationUsage 조회
         VacationUsage usage = vacationUsageRepository.findById(vacationUsageId)
                 .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation.usage", null, null)));
@@ -308,7 +308,7 @@ public class VacationService {
      * @param endDate 조회 종료일
      * @return 기간 내 모든 사용자의 휴가 사용 내역
      */
-    public List<VacationServiceDto> searchPeriodVacationUseHistories(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<VacationServiceDto> getVacationUsagesByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         // 기간에 맞는 휴가 사용 내역 조회 (startDate 기준)
         List<VacationUsage> usages = vacationUsageRepository.findByPeriodWithUser(startDate, endDate);
 
@@ -334,7 +334,7 @@ public class VacationService {
      * @param endDate 조회 종료일
      * @return 유저의 기간 내 휴가 사용 내역
      */
-    public List<VacationServiceDto> searchUserPeriodVacationUseHistories(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<VacationServiceDto> getUserVacationUsagesByPeriod(String userId, LocalDateTime startDate, LocalDateTime endDate) {
         // 유저 존재 확인
         userService.checkUserExist(userId);
 
@@ -361,7 +361,7 @@ public class VacationService {
      * @param year 년도
      * @return 월별 휴가 사용 통계 (1~12월)
      */
-    public List<VacationServiceDto> searchUserMonthStatsVacationUseHistories(String userId, String year) {
+    public List<VacationServiceDto> getUserMonthlyVacationStats(String userId, String year) {
         // 유저 존재 확인
         userService.checkUserExist(userId);
 
@@ -399,7 +399,7 @@ public class VacationService {
      * @param baseTime 기준 시간
      * @return 현재 및 이전달 휴가 통계
      */
-    public VacationServiceDto searchUserVacationUseStats(String userId, LocalDateTime baseTime) {
+    public VacationServiceDto getUserVacationStats(String userId, LocalDateTime baseTime) {
         // 유저 존재 확인
         userService.checkUserExist(userId);
 
@@ -453,20 +453,20 @@ public class VacationService {
                 .build();
     }
 
-    public VacationUsage checkVacationUsageExist(Long vacationUsageId) {
+    public VacationUsage validateAndGetVacationUsage(Long vacationUsageId) {
         Optional<VacationUsage> usage = vacationUsageRepository.findById(vacationUsageId);
         usage.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation.usage", null, null)));
         return usage.get();
     }
 
     @Transactional
-    public Long registVacationPolicy(VacationPolicyServiceDto data) {
+    public Long createVacationPolicy(VacationPolicyServiceDto data) {
         VacationPolicyStrategy strategy = vacationPolicyStrategyFactory.getStrategy(data.getGrantMethod());
         return strategy.registVacationPolicy(data);
     }
 
-    public VacationPolicyServiceDto searchVacationPolicy(Long vacationPolicyId) {
-        VacationPolicy policy = checkVacationPolicyExist(vacationPolicyId);
+    public VacationPolicyServiceDto getVacationPolicy(Long vacationPolicyId) {
+        VacationPolicy policy = validateAndGetVacationPolicy(vacationPolicyId);
 
         return VacationPolicyServiceDto.builder()
                 .id(policy.getId())
@@ -484,7 +484,7 @@ public class VacationService {
                 .build();
     }
 
-    public List<VacationPolicyServiceDto> searchVacationPolicies() {
+    public List<VacationPolicyServiceDto> getVacationPolicies() {
         List<VacationPolicy> policies = vacationPolicyRepository.findVacationPolicies();
         return policies.stream()
                 .map(p -> VacationPolicyServiceDto.builder()
@@ -504,7 +504,7 @@ public class VacationService {
                 .toList();
     }
 
-    public VacationPolicy checkVacationPolicyExist(Long vacationPolicyId) {
+    public VacationPolicy validateAndGetVacationPolicy(Long vacationPolicyId) {
         Optional<VacationPolicy> policy = vacationPolicyRepository.findVacationPolicyById(vacationPolicyId);
         policy.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.vacation.policy", null, null)));
         return policy.get();
@@ -522,7 +522,7 @@ public class VacationService {
     @Transactional
     public Long deleteVacationPolicy(Long vacationPolicyId) {
         // 1. 휴가 정책 존재 확인
-        VacationPolicy vacationPolicy = checkVacationPolicyExist(vacationPolicyId);
+        VacationPolicy vacationPolicy = validateAndGetVacationPolicy(vacationPolicyId);
 
         // 2. 이미 삭제된 정책인지 확인
         if (vacationPolicy.getIsDeleted() == YNType.Y) {
@@ -593,7 +593,7 @@ public class VacationService {
         // 2. 할당할 휴가 정책들의 유효성 검증
         List<VacationPolicy> vacationPolicies = new ArrayList<>();
         for (Long policyId : vacationPolicyIds) {
-            VacationPolicy policy = checkVacationPolicyExist(policyId);
+            VacationPolicy policy = validateAndGetVacationPolicy(policyId);
             vacationPolicies.add(policy);
         }
 
@@ -631,7 +631,7 @@ public class VacationService {
      * @param userId 유저 ID
      * @return 유저에게 할당된 휴가 정책 리스트
      */
-    public List<VacationPolicyServiceDto> searchUserVacationPolicies(String userId) {
+    public List<VacationPolicyServiceDto> getUserAssignedVacationPolicies(String userId) {
         // 유저 존재 확인
         userService.checkUserExist(userId);
 
@@ -673,7 +673,7 @@ public class VacationService {
         userService.checkUserExist(userId);
 
         // 2. 휴가 정책 존재 확인
-        checkVacationPolicyExist(vacationPolicyId);
+        validateAndGetVacationPolicy(vacationPolicyId);
 
         // 3. UserVacationPolicy 조회
         UserVacationPolicy userVacationPolicy = userVacationPolicyRepository
@@ -732,7 +732,7 @@ public class VacationService {
         for (Long policyId : vacationPolicyIds) {
             try {
                 // 휴가 정책 존재 확인
-                checkVacationPolicyExist(policyId);
+                validateAndGetVacationPolicy(policyId);
 
                 // UserVacationPolicy 조회
                 Optional<UserVacationPolicy> optionalUvp = userVacationPolicyRepository
@@ -800,7 +800,7 @@ public class VacationService {
         User user = userService.checkUserExist(userId);
 
         // 2. 휴가 정책 존재 확인
-        VacationPolicy policy = checkVacationPolicyExist(data.getPolicyId());
+        VacationPolicy policy = validateAndGetVacationPolicy(data.getPolicyId());
 
         // 3. 휴가 정책의 부여 방식이 MANUAL_GRANT인지 확인
         if (policy.getGrantMethod() != GrantMethod.MANUAL_GRANT) {
@@ -910,7 +910,7 @@ public class VacationService {
         User user = userService.checkUserExist(userId);
 
         // 2. 휴가 정책 검증
-        VacationPolicy policy = checkVacationPolicyExist(data.getPolicyId());
+        VacationPolicy policy = validateAndGetVacationPolicy(data.getPolicyId());
 
         // 3. 정책이 ON_REQUEST 방식인지 확인
         if (policy.getGrantMethod() != GrantMethod.ON_REQUEST) {
@@ -1164,7 +1164,7 @@ public class VacationService {
      * @param approverId 승인자 ID
      * @return 대기 중인 승인 목록
      */
-    public List<VacationApprovalServiceDto> searchPendingApprovals(String approverId) {
+    public List<VacationApprovalServiceDto> getPendingApprovalsByApprover(String approverId) {
         // 승인자 존재 확인
         userService.checkUserExist(approverId);
 

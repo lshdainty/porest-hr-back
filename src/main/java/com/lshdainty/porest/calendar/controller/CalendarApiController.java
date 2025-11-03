@@ -47,7 +47,7 @@ public class CalendarApiController {
                 ))
                 .toList());
 
-        List<VacationServiceDto> histories = vacationService.searchPeriodVacationUseHistories(startDate, endDate);
+        List<VacationServiceDto> histories = vacationService.getVacationUsagesByPeriod(startDate, endDate);
         resp.addAll(histories.stream()
                 .map(v -> new CalendarApiDto.searchEventsByPeriodResp(
                         v.getUser().getId(),

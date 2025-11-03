@@ -35,7 +35,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchUserVacationsResp {
+    public static class GetUserVacationHistoryResp {
         private List<VacationGrantInfo> grants;  // 부여받은 내역
         private List<VacationUsageInfo> usages;  // 사용한 내역
 
@@ -70,7 +70,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchUserGroupVacationsResp {
+    public static class GetAllUsersVacationHistoryResp {
         private String userId;
         private String userName;
         private List<VacationGrantInfo> grants;  // 부여받은 내역
@@ -107,7 +107,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchAvailableVacationsResp {
+    public static class GetAvailableVacationsResp {
         private VacationType vacationType;
         private String vacationTypeName;
         private BigDecimal totalRemainTime;
@@ -117,7 +117,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchPeriodVacationUseHistoriesResp {
+    public static class GetVacationUsagesByPeriodResp {
         private String userId;
         private String userName;
         private Long vacationUsageId;
@@ -132,7 +132,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchUserPeriodVacationUseHistoriesResp {
+    public static class GetUserVacationUsagesByPeriodResp {
         private Long vacationUsageId;
         private String vacationUsageDesc;
         private VacationTimeType vacationTimeType;
@@ -145,7 +145,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchUserMonthStatsVacationUseHistoriesResp {
+    public static class GetUserMonthlyVacationStatsResp {
         private Integer month;
         private BigDecimal usedTime;
         private String usedTimeStr;
@@ -154,7 +154,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchUserVacationUseStatsResp {
+    public static class GetUserVacationStatsResp {
         private BigDecimal remainTime;
         private String remainTimeStr;
         private BigDecimal usedTime;
@@ -176,7 +176,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchVacationPoliciesResp {
+    public static class GetVacationPolicyResp {
         private Long vacationPolicyId;
         private String vacationPolicyName;
         private String vacationPolicyDesc;
@@ -195,7 +195,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class RegistVacationPolicyReq {
+    public static class CreateVacationPolicyReq {
         private String vacationPolicyName;
         private String vacationPolicyDesc;
         private VacationType vacationType;
@@ -216,7 +216,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class RegistVacationPolicyResp {
+    public static class CreateVacationPolicyResp {
         private Long vacationPolicyId;
     }
 
@@ -238,7 +238,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchUserVacationPoliciesResp {
+    public static class GetUserAssignedVacationPoliciesResp {
         private Long userVacationPolicyId;
         private Long vacationPolicyId;
         private String vacationPolicyName;
@@ -359,7 +359,7 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class SearchPendingApprovalsResp {
+    public static class GetPendingApprovalsByApproverResp {
         private List<PendingApprovalInfo> pendingApprovals;
 
         @Getter
