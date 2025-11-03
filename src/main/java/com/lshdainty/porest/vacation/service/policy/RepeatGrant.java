@@ -11,7 +11,6 @@ import org.springframework.context.MessageSource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -321,11 +320,11 @@ public class RepeatGrant implements VacationPolicyStrategy {
 
             case QUARTERLY:
                 // 분기별 부여: 3개월마다
-                return calculateNextQuarterlyDate(firstDate, baseDate, policy.getSpecificDays());
+                return calculateNextQuarterlyDate(baseDate, policy.getSpecificDays());
 
             case HALF:
                 // 반기별 부여: 6개월마다
-                return calculateNextHalfYearlyDate(firstDate, baseDate, policy.getSpecificDays());
+                return calculateNextHalfYearlyDate(baseDate, policy.getSpecificDays());
 
             default:
                 throw new IllegalArgumentException("지원하지 않는 반복 단위입니다: " + repeatUnit);
@@ -398,12 +397,11 @@ public class RepeatGrant implements VacationPolicyStrategy {
      * 해당 월에 지정된 일이 없으면 해당 월의 마지막 날로 조정<br>
      * 예: days=31이면 1/31, 4/30, 7/31, 10/31
      *
-     * @param firstDate 첫 부여일
      * @param baseDate 기준일
      * @param specificDays 특정 일 (null이면 1일)
      * @return 다음 부여일
      */
-    private LocalDate calculateNextQuarterlyDate(LocalDate firstDate, LocalDate baseDate, Integer specificDays) {
+    private LocalDate calculateNextQuarterlyDate(LocalDate baseDate, Integer specificDays) {
         int currentYear = baseDate.getYear();
         int currentMonth = baseDate.getMonthValue();
         int targetDay = specificDays != null ? specificDays : 1;
@@ -435,12 +433,11 @@ public class RepeatGrant implements VacationPolicyStrategy {
      * 해당 월에 지정된 일이 없으면 해당 월의 마지막 날로 조정<br>
      * 예: days=31이면 1/31, 7/31
      *
-     * @param firstDate 첫 부여일
      * @param baseDate 기준일
      * @param specificDays 특정 일 (null이면 1일)
      * @return 다음 부여일
      */
-    private LocalDate calculateNextHalfYearlyDate(LocalDate firstDate, LocalDate baseDate, Integer specificDays) {
+    private LocalDate calculateNextHalfYearlyDate(LocalDate baseDate, Integer specificDays) {
         int currentYear = baseDate.getYear();
         int currentMonth = baseDate.getMonthValue();
         int targetDay = specificDays != null ? specificDays : 1;
@@ -461,29 +458,5 @@ public class RepeatGrant implements VacationPolicyStrategy {
         }
 
         return nextDate;
-    }
-
-    /**
-     * 오늘이 휴가 부여일인지 판단<br>
-     * 스케줄러에서 부여 대상을 확인할 때 사용
-     *
-     * @param today 오늘 날짜
-     * @param nextGrantDate 다음 부여 예정일
-     * @return 부여 대상 여부
-     */
-    public boolean shouldGrantToday(LocalDate today, LocalDate nextGrantDate) {
-        return nextGrantDate != null && !today.isBefore(nextGrantDate);
-    }
-
-    /**
-     * 오늘이 휴가 소멸일인지 판단<br>
-     * 스케줄러에서 소멸 대상을 확인할 때 사용
-     *
-     * @param today 오늘 날짜
-     * @param expiryDate 만료일
-     * @return 소멸 대상 여부
-     */
-    public boolean shouldExpireToday(LocalDate today, LocalDateTime expiryDate) {
-        return expiryDate != null && !today.isBefore(expiryDate.toLocalDate());
     }
 }

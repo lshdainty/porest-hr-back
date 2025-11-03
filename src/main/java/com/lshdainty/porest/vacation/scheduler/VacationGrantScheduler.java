@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,10 +88,10 @@ public class VacationGrantScheduler {
 
     /**
      * 반복 부여 휴가 자동 부여 스케줄러<br>
-     * 매일 12시에 실행<br>
+     * 매일 자정(00:00)에 실행<br>
      * cron: "초 분 시 일 월 요일"
      */
-    @Scheduled(cron = "0 0 12 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void grantVacationsDaily() {
         LocalDate today = LocalDate.now();
