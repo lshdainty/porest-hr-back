@@ -12,6 +12,7 @@ import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationApprovalServiceDto;
 import com.lshdainty.porest.vacation.service.policy.VacationPolicyStrategy;
+import com.lshdainty.porest.vacation.service.policy.RepeatGrant;
 import com.lshdainty.porest.vacation.service.policy.factory.VacationPolicyStrategyFactory;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import com.lshdainty.porest.vacation.type.*;
@@ -468,6 +469,12 @@ public class VacationService {
     public VacationPolicyServiceDto getVacationPolicy(Long vacationPolicyId) {
         VacationPolicy policy = validateAndGetVacationPolicy(vacationPolicyId);
 
+        // 반복 부여 정책일 경우 한국어 설명 생성
+        String repeatGrantDescription = null;
+        if (policy.getGrantMethod() == GrantMethod.REPEAT_GRANT) {
+            repeatGrantDescription = RepeatGrant.generateRepeatGrantDescription(policy);
+        }
+
         return VacationPolicyServiceDto.builder()
                 .id(policy.getId())
                 .name(policy.getName())
@@ -481,26 +488,36 @@ public class VacationService {
                 .specificDays(policy.getSpecificDays())
                 .effectiveType(policy.getEffectiveType())
                 .expirationType(policy.getExpirationType())
+                .repeatGrantDescription(repeatGrantDescription)
                 .build();
     }
 
     public List<VacationPolicyServiceDto> getVacationPolicies() {
         List<VacationPolicy> policies = vacationPolicyRepository.findVacationPolicies();
         return policies.stream()
-                .map(p -> VacationPolicyServiceDto.builder()
-                        .id(p.getId())
-                        .name(p.getName())
-                        .desc(p.getDesc())
-                        .vacationType(p.getVacationType())
-                        .grantMethod(p.getGrantMethod())
-                        .grantTime(p.getGrantTime())
-                        .repeatUnit(p.getRepeatUnit())
-                        .repeatInterval(p.getRepeatInterval())
-                        .specificMonths(p.getSpecificMonths())
-                        .specificDays(p.getSpecificDays())
-                        .effectiveType(p.getEffectiveType())
-                        .expirationType(p.getExpirationType())
-                        .build())
+                .map(p -> {
+                    // 반복 부여 정책일 경우 한국어 설명 생성
+                    String repeatGrantDescription = null;
+                    if (p.getGrantMethod() == GrantMethod.REPEAT_GRANT) {
+                        repeatGrantDescription = RepeatGrant.generateRepeatGrantDescription(p);
+                    }
+
+                    return VacationPolicyServiceDto.builder()
+                            .id(p.getId())
+                            .name(p.getName())
+                            .desc(p.getDesc())
+                            .vacationType(p.getVacationType())
+                            .grantMethod(p.getGrantMethod())
+                            .grantTime(p.getGrantTime())
+                            .repeatUnit(p.getRepeatUnit())
+                            .repeatInterval(p.getRepeatInterval())
+                            .specificMonths(p.getSpecificMonths())
+                            .specificDays(p.getSpecificDays())
+                            .effectiveType(p.getEffectiveType())
+                            .expirationType(p.getExpirationType())
+                            .repeatGrantDescription(repeatGrantDescription)
+                            .build();
+                })
                 .toList();
     }
 
@@ -641,6 +658,13 @@ public class VacationService {
         return userVacationPolicies.stream()
                 .map(uvp -> {
                     VacationPolicy policy = uvp.getVacationPolicy();
+
+                    // 반복 부여 정책일 경우 한국어 설명 생성
+                    String repeatGrantDescription = null;
+                    if (policy.getGrantMethod() == GrantMethod.REPEAT_GRANT) {
+                        repeatGrantDescription = RepeatGrant.generateRepeatGrantDescription(policy);
+                    }
+
                     return VacationPolicyServiceDto.builder()
                             .userVacationPolicyId(uvp.getId())
                             .id(policy.getId())
@@ -655,6 +679,7 @@ public class VacationService {
                             .specificDays(policy.getSpecificDays())
                             .effectiveType(policy.getEffectiveType())
                             .expirationType(policy.getExpirationType())
+                            .repeatGrantDescription(repeatGrantDescription)
                             .build();
                 })
                 .toList();

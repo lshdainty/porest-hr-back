@@ -318,7 +318,8 @@ public class VacationApiController {
                 policy.getSpecificMonths(),
                 policy.getSpecificDays(),
                 policy.getEffectiveType(),
-                policy.getExpirationType()
+                policy.getExpirationType(),
+                policy.getRepeatGrantDescription()
         ));
     }
 
@@ -344,7 +345,8 @@ public class VacationApiController {
                         vp.getSpecificMonths(),
                         vp.getSpecificDays(),
                         vp.getEffectiveType(),
-                        vp.getExpirationType()
+                        vp.getExpirationType(),
+                        vp.getRepeatGrantDescription()
                 ))
                 .toList();
 
@@ -401,7 +403,8 @@ public class VacationApiController {
                         vp.getSpecificMonths(),
                         vp.getSpecificDays(),
                         vp.getEffectiveType(),
-                        vp.getExpirationType()
+                        vp.getExpirationType(),
+                        vp.getRepeatGrantDescription()
                 ))
                 .toList();
 

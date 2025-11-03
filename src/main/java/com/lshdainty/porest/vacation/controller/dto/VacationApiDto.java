@@ -190,6 +190,7 @@ public class VacationApiDto {
         private Integer specificDays;
         private EffectiveType effectiveType;
         private ExpirationType expirationType;
+        private String repeatGrantDesc; // 반복 부여 정책의 한국어 설명
     }
 
     @Getter
@@ -253,6 +254,7 @@ public class VacationApiDto {
         private Integer specificDays;
         private EffectiveType effectiveType;
         private ExpirationType expirationType;
+        private String repeatGrantDescription; // 반복 부여 정책의 한국어 설명
     }
 
     @Getter

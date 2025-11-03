@@ -4,6 +4,7 @@ import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
 import com.lshdainty.porest.vacation.repository.VacationPolicyCustomRepositoryImpl;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
+import com.lshdainty.porest.vacation.type.GrantMethod;
 import com.lshdainty.porest.vacation.type.RepeatUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -457,5 +458,119 @@ public class RepeatGrant implements VacationPolicyStrategy {
         }
 
         return nextDate;
+    }
+
+    /* ==================== 한국어 설명 생성 로직 ==================== */
+
+    /**
+     * 반복 부여 정책을 한국어로 설명하는 문자열 생성<br>
+     * 예시:<br>
+     * - "매년 1월 1일 부여"<br>
+     * - "2년 간격으로 매년 1월 1일 부여"<br>
+     * - "매년 1월 1일, 7년 후 1회 부여"<br>
+     * - "매월 15일 부여"<br>
+     * - "분기마다 1일 부여"<br>
+     * - "반기마다 부여"<br>
+     *
+     * @param policy 휴가 정책
+     * @return 한국어 설명 문자열
+     */
+    public static String generateRepeatGrantDescription(VacationPolicy policy) {
+        if (policy == null || policy.getGrantMethod() != GrantMethod.REPEAT_GRANT) {
+            return null;
+        }
+
+        RepeatUnit repeatUnit = policy.getRepeatUnit();
+        Integer repeatInterval = policy.getRepeatInterval();
+        Integer specificMonths = policy.getSpecificMonths();
+        Integer specificDays = policy.getSpecificDays();
+        YNType isRecurring = policy.getIsRecurring();
+        Integer maxGrantCount = policy.getMaxGrantCount();
+
+        StringBuilder description = new StringBuilder();
+
+        // 1. 반복 간격 (2년 이상일 경우만 표시)
+        if (repeatInterval != null && repeatInterval > 1) {
+            description.append(repeatInterval).append(getRepeatUnitSuffix(repeatUnit)).append(" 간격으로 ");
+        }
+
+        // 2. 반복 단위 (매년, 매월, 매일, 분기, 반기)
+        if (repeatUnit != null) {
+            description.append(repeatUnit.getViewName());
+        }
+
+        // 3. 특정 월/일 (반복 단위에 따라)
+        switch (repeatUnit) {
+            case YEARLY:
+                // 매년 X월 Y일 형태
+                if (specificMonths != null) {
+                    description.append(" ").append(specificMonths).append("월");
+                }
+                if (specificDays != null) {
+                    description.append(" ").append(specificDays).append("일");
+                }
+                break;
+
+            case MONTHLY:
+                // 매월 Y일 형태
+                if (specificDays != null) {
+                    description.append(" ").append(specificDays).append("일");
+                }
+                break;
+
+            case QUARTERLY:
+            case HALF:
+                // 분기/반기마다 Y일 형태
+                if (specificDays != null) {
+                    description.append(" ").append(specificDays).append("일");
+                }
+                break;
+
+            case DAILY:
+                // 매일은 추가 정보 없음
+                break;
+        }
+
+        // 4. "부여" 추가
+        description.append(" 부여");
+
+        // 5. 1회성 부여 여부
+        if (YNType.N.equals(isRecurring) && maxGrantCount != null) {
+            // 첫 부여일 기준으로 몇 년 후인지 계산
+            LocalDateTime firstGrantDate = policy.getFirstGrantDate();
+            if (firstGrantDate != null && repeatUnit == RepeatUnit.YEARLY && repeatInterval != null) {
+                int yearsLater = repeatInterval * (maxGrantCount - 1);
+                if (yearsLater > 0) {
+                    description.append(", ").append(yearsLater).append("년 후");
+                }
+            }
+            description.append(" ").append(maxGrantCount).append("회 부여");
+        }
+
+        return description.toString();
+    }
+
+    /**
+     * 반복 단위에 따른 접미사 반환 (간격 표시용)<br>
+     * 예: YEARLY → "년", MONTHLY → "개월", DAILY → "일"
+     *
+     * @param repeatUnit 반복 단위
+     * @return 접미사 문자열
+     */
+    private static String getRepeatUnitSuffix(RepeatUnit repeatUnit) {
+        switch (repeatUnit) {
+            case YEARLY:
+                return "년";
+            case MONTHLY:
+                return "개월";
+            case DAILY:
+                return "일";
+            case QUARTERLY:
+                return "분기";
+            case HALF:
+                return "반기";
+            default:
+                return "";
+        }
     }
 }
