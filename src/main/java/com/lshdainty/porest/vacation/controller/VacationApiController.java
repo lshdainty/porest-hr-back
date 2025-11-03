@@ -500,10 +500,7 @@ public class VacationApiController {
                 .approverIds(data.getApproverIds())
                 .build());
 
-        return ApiResponse.success(new VacationApiDto.RequestVacationResp(
-                vacationGrantId,
-                "휴가 신청이 완료되었습니다."
-        ));
+        return ApiResponse.success(new VacationApiDto.RequestVacationResp(vacationGrantId));
     }
 
     /**
@@ -517,10 +514,7 @@ public class VacationApiController {
 
         Long processedApprovalId = vacationService.approveVacation(approvalId, approverId);
 
-        return ApiResponse.success(new VacationApiDto.ApproveVacationResp(
-                processedApprovalId,
-                "휴가가 승인되었습니다."
-        ));
+        return ApiResponse.success(new VacationApiDto.ApproveVacationResp(processedApprovalId));
     }
 
     /**
@@ -541,10 +535,7 @@ public class VacationApiController {
                         .build()
         );
 
-        return ApiResponse.success(new VacationApiDto.RejectVacationResp(
-                processedApprovalId,
-                "휴가가 거부되었습니다."
-        ));
+        return ApiResponse.success(new VacationApiDto.RejectVacationResp(processedApprovalId));
     }
 
     /**

@@ -333,7 +333,6 @@ public class VacationApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class RequestVacationResp {
         private Long vacationGrantId;
-        private String message;
     }
 
     @Getter
@@ -341,7 +340,6 @@ public class VacationApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class ApproveVacationResp {
         private Long approvalId;
-        private String message;
     }
 
     @Getter
@@ -356,7 +354,6 @@ public class VacationApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class RejectVacationResp {
         private Long approvalId;
-        private String message;
     }
 
     @Getter
