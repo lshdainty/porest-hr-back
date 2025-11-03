@@ -485,8 +485,6 @@ public class VacationApiController {
         ));
     }
 
-    // ========== 휴가 신청 및 승인 관련 API ==========
-
     /**
      * 휴가 신청 (ON_REQUEST 방식)
      * POST /api/v1/users/{userId}/vacation-requests

@@ -53,7 +53,7 @@ public class VacationApprovalCustomRepositoryImpl implements VacationApprovalCus
                 .where(vacationApproval.approver.id.eq(approverId)
                         .and(vacationApproval.approvalStatus.eq(ApprovalStatus.PENDING))
                         .and(vacationApproval.isDeleted.eq(YNType.N)))
-                .orderBy(vacationApproval.createdAt.desc())
+                .orderBy(vacationApproval.createDate.desc())
                 .fetch();
     }
 
