@@ -609,7 +609,7 @@ public class VacationApiController {
     public ApiResponse getUserRequestedVacationStats(@PathVariable("userId") String userId) {
         VacationServiceDto stats = vacationService.getRequestedVacationStatsByUserId(userId);
 
-        VacationApiDto.GetUserRequestedVacationStatsResp resp = new VacationApiDto.GetUserRequestedVacationStatsResp(
+        return ApiResponse.success(new VacationApiDto.GetUserRequestedVacationStatsResp(
                 stats.getTotalRequestCount(),
                 stats.getCurrentMonthRequestCount(),
                 stats.getChangeRate(),
@@ -621,8 +621,6 @@ public class VacationApiController {
                 stats.getRejectedCount(),
                 stats.getAcquiredVacationTimeStr(),
                 stats.getAcquiredVacationTime()
-        );
-
-        return ApiResponse.success(resp);
+        ));
     }
 }
