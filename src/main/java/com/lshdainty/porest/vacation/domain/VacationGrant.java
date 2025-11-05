@@ -8,6 +8,7 @@ import com.lshdainty.porest.vacation.type.VacationType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
+import org.springframework.cglib.core.Local;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -106,11 +107,30 @@ public class VacationGrant extends AuditingFields {
     private GrantStatus status;
 
     /**
-     * 신청일시<br>
-     * ON_REQUEST 방식으로 사용자가 휴가를 신청한 일시
+     * 신청 시작 일시<br>
+     * 사용자가 신청시 부여 타입으로 휴가를 신청할 때 시작 일시<br>
+     * - OT: OT 시작 시간 (예: 2025-09-14 18:00)<br>
+     * - 결혼/출산: 해당 일자 (예: 2025-09-14 00:00)<br>
+     * 모든 신청 타입에서 필수로 사용됨
      */
-    @Column(name = "request_date")
-    private LocalDateTime requestDate;
+    @Column(name = "request_start_time")
+    private LocalDateTime requestStartTime;
+
+    /**
+     * 신청 종료 일시<br>
+     * OT일 경우에만 값이 들어간다.<br>
+     * OT 종료 시간 (예: 2025-09-14 19:00)<br>
+     * 결혼/출산 등 OT가 아닌 경우는 null
+     */
+    @Column(name = "request_end_time")
+    private LocalDateTime requestEndTime;
+
+    /**
+     * 휴가 신청 사유<br>
+     * 신청 시 추가 타입으로 휴가를 신청할 때 휴가 신청 사유를 작성하는데 해당 컬럼에 값이 들어감
+     */
+    @Column(name = "request_desc")
+    private String requestDesc;
 
     /**
      * 삭제 여부
@@ -164,17 +184,22 @@ public class VacationGrant extends AuditingFields {
      *
      * @param user 사용자
      * @param policy 휴가 정책
-     * @param desc 휴가 신청 사유
+     * @param desc 휴가 부여 사유
      * @param type 휴가 타입
      * @param grantTime 부여 시간
+     * @param requestStartTime 신청 시작 일시 (OT/결혼/출산 등)
+     * @param requestEndTime 신청 종료 일시 (OT일 경우에만 사용, 나머지는 null)
+     * @param requestDesc 휴가 신청 상세 사유
      * @return VacationGrant
      */
-    public static VacationGrant createPendingVacationGrant(User user, VacationPolicy policy, String desc, VacationType type, BigDecimal grantTime) {
+    public static VacationGrant createPendingVacationGrant(User user, VacationPolicy policy, String desc, VacationType type, BigDecimal grantTime, LocalDateTime requestStartTime, LocalDateTime requestEndTime, String requestDesc) {
         VacationGrant vg = new VacationGrant();
         vg.addUser(user);
         vg.addPolicy(policy);
         vg.desc = desc;
-        vg.requestDate = LocalDateTime.now();
+        vg.requestStartTime = requestStartTime;
+        vg.requestEndTime = requestEndTime;
+        vg.requestDesc = requestDesc;
         vg.type = type;
         vg.grantTime = grantTime;
         vg.remainTime = grantTime;

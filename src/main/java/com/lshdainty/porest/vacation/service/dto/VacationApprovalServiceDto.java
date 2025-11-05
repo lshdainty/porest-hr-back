@@ -26,8 +26,10 @@ public class VacationApprovalServiceDto {
     private String policyName;
     // 휴가 사유 (신청 사유)
     private String desc;
-    // 신청일시
-    private LocalDateTime requestDate;
+    // 신청 시작 일시 (OT 시작 시간, 결혼/출산 일자 등)
+    private LocalDateTime requestStartTime;
+    // 신청 종료 일시 (OT 종료 시간, OT가 아니면 null)
+    private LocalDateTime requestEndTime;
     // 부여 시간
     private BigDecimal grantTime;
     // 휴가 타입
@@ -49,7 +51,8 @@ public class VacationApprovalServiceDto {
                 ", policyId=" + policyId +
                 ", policyName='" + policyName + '\'' +
                 ", desc='" + desc + '\'' +
-                ", requestDate=" + requestDate +
+                ", requestStartTime=" + requestStartTime +
+                ", requestEndTime=" + requestEndTime +
                 ", grantTime=" + grantTime +
                 ", vacationType=" + vacationType +
                 ", approvalStatus=" + approvalStatus +

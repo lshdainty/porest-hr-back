@@ -175,4 +175,46 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 )
                 .fetch();
     }
+
+    @Override
+    public List<Department> findApproversByUserId(String userId) {
+        // 1. 사용자의 메인 부서 조회
+        UserDepartment userDept = query
+                .selectFrom(userDepartment)
+                .join(userDepartment.department, department).fetchJoin()
+                .where(
+                        userDepartment.user.id.eq(userId),
+                        userDepartment.mainYN.eq(YNType.Y),
+                        userDepartment.isDeleted.eq(YNType.N)
+                )
+                .fetchOne();
+
+        if (userDept == null) {
+            return List.of();
+        }
+
+        // 2. 상위 부서들을 재귀적으로 조회
+        List<Department> approverDepartments = new java.util.ArrayList<>();
+        Department currentDept = userDept.getDepartment();
+
+        // 현재 부서의 parent부터 시작하여 최상위 부서까지 조회
+        while (currentDept != null && currentDept.getParentId() != null) {
+            // parent 부서 조회
+            Department parentDept = query
+                    .selectFrom(department)
+                    .where(
+                            department.id.eq(currentDept.getParentId()),
+                            department.isDeleted.eq(YNType.N)
+                    )
+                    .fetchOne();
+
+            if (parentDept != null && parentDept.getHeadUserId() != null) {
+                approverDepartments.add(parentDept);
+            }
+
+            currentDept = parentDept;
+        }
+
+        return approverDepartments;
+    }
 }

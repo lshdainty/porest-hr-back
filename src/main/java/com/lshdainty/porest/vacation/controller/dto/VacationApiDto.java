@@ -332,6 +332,9 @@ public class VacationApiDto {
         private Long policyId;
         private String desc;
         private List<String> approverIds;
+        private LocalDateTime requestStartTime;  // 신청 시작 일시 (OT 시작 시간, 결혼/출산 일자 등)
+        private LocalDateTime requestEndTime;    // 신청 종료 일시 (OT 종료 시간, OT가 아니면 null)
+        private String requestDesc;              // 신청 상세 사유
     }
 
     @Getter
@@ -379,7 +382,8 @@ public class VacationApiDto {
             private Long policyId;
             private String policyName;
             private String desc;
-            private LocalDateTime requestDate;
+            private LocalDateTime requestStartTime;
+            private LocalDateTime requestEndTime;
             private BigDecimal grantTime;
             private VacationType vacationType;
             private String vacationTypeName;
@@ -404,7 +408,9 @@ public class VacationApiDto {
         private String remainTimeStr;
         private LocalDateTime grantDate;
         private LocalDateTime expiryDate;
-        private LocalDateTime requestDate;
+        private LocalDateTime requestStartTime;
+        private LocalDateTime requestEndTime;
+        private String requestDesc;
         private GrantStatus grantStatus;
         private String grantStatusName;
     }

@@ -508,6 +508,9 @@ public class VacationApiController {
                 .policyId(data.getPolicyId())
                 .desc(data.getDesc())
                 .approverIds(data.getApproverIds())
+                .requestStartTime(data.getRequestStartTime())
+                .requestEndTime(data.getRequestEndTime())
+                .requestDesc(data.getRequestDesc())
                 .build());
 
         return ApiResponse.success(new VacationApiDto.RequestVacationResp(vacationGrantId));
@@ -565,7 +568,8 @@ public class VacationApiController {
                         a.getPolicyId(),
                         a.getPolicyName(),
                         a.getDesc(),
-                        a.getRequestDate(),
+                        a.getRequestStartTime(),
+                        a.getRequestEndTime(),
                         a.getGrantTime(),
                         a.getVacationType(),
                         a.getVacationType().getViewName(),
@@ -599,7 +603,9 @@ public class VacationApiController {
                         VacationTimeType.convertValueToDay(v.getRemainTime()),
                         v.getGrantDate(),
                         v.getExpiryDate(),
-                        v.getRequestDate(),
+                        v.getRequestStartTime(),
+                        v.getRequestEndTime(),
+                        v.getRequestDesc(),
                         v.getGrantStatus(),
                         v.getGrantStatus().getViewName()
                 ))

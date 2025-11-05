@@ -192,4 +192,19 @@ public class UserApiDto {
     public static class CheckMainDepartmentExistenceResp {
         private YNType hasMainDepartment;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class GetApproversResp {
+        private String userId;
+        private String userName;
+        private String userEmail;
+        private RoleType userRoleType;
+        private String userRoleName;
+        private Long departmentId;
+        private String departmentName;
+        private String departmentNameKr;
+        private Long departmentLevel;
+    }
 }

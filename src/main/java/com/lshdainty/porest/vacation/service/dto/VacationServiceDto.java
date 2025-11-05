@@ -84,8 +84,12 @@ public class VacationServiceDto {
     private List<String> approverIds;
     // 휴가 부여 상태
     private GrantStatus grantStatus;
-    // 휴가 신청일시 (ON_REQUEST 방식)
-    private LocalDateTime requestDate;
+    // 휴가 신청 시작 일시 (OT 시작 시간, 결혼/출산 일자 등)
+    private LocalDateTime requestStartTime;
+    // 휴가 신청 종료 일시 (OT 종료 시간, OT가 아니면 null)
+    private LocalDateTime requestEndTime;
+    // 휴가 신청 상세 사유 (ON_REQUEST 방식)
+    private String requestDesc;
 
     // ========== 휴가 신청 통계 관련 필드 ==========
     // 1. 전체 신청 건수

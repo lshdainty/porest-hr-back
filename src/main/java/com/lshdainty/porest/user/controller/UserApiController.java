@@ -234,4 +234,29 @@ public class UserApiController {
         YNType hasMainDepartment = userService.checkUserHasMainDepartment(userId);
         return ApiResponse.success(new UserApiDto.CheckMainDepartmentExistenceResp(hasMainDepartment));
     }
+
+    /**
+     * 특정 유저의 승인권자 목록 조회
+     * GET /api/v1/users/{userId}/approvers
+     */
+    @GetMapping("/api/v1/users/{userId}/approvers")
+    public ApiResponse getUserApprovers(@PathVariable("userId") String userId) {
+        List<UserServiceDto> approvers = userService.getUserApprovers(userId);
+
+        List<UserApiDto.GetApproversResp> resp = approvers.stream()
+                .map(approver -> new UserApiDto.GetApproversResp(
+                        approver.getId(),
+                        approver.getName(),
+                        approver.getEmail(),
+                        approver.getRole(),
+                        approver.getRole().name(),
+                        approver.getDepartmentId(),
+                        approver.getDepartmentName(),
+                        approver.getDepartmentNameKR(),
+                        approver.getDepartmentLevel()
+                ))
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(resp);
+    }
 }

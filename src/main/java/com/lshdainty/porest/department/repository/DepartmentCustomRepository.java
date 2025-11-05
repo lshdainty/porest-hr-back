@@ -32,4 +32,6 @@ public interface DepartmentCustomRepository {
     boolean hasMainDepartment(String userId);
     // 여러 유저 ID로 Department 조회 (부서장 확인용)
     List<Department> findByUserIds(List<String> userIds);
+    // 특정 유저의 승인권자 목록 조회 (상위 부서장들)
+    List<Department> findApproversByUserId(String userId);
 }

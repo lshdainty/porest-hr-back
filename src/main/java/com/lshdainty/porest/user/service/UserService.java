@@ -400,4 +400,46 @@ public class UserService {
 
         return hasMainDepartment ? YNType.Y : YNType.N;
     }
+
+    /**
+     * 특정 유저의 승인권자 목록 조회
+     *
+     * 사용자의 메인 부서 기준으로 상위 부서장들을 승인권자로 반환합니다.
+     *
+     * @param userId 유저 ID
+     * @return 승인권자 목록 (상위 부서장들)
+     */
+    public List<UserServiceDto> getUserApprovers(String userId) {
+        // 유저 존재 확인
+        checkUserExist(userId);
+
+        // 상위 부서장 목록 조회
+        List<com.lshdainty.porest.department.domain.Department> approverDepartments =
+                departmentRepository.findApproversByUserId(userId);
+
+        // Department 정보를 UserServiceDto로 변환
+        return approverDepartments.stream()
+                .map(dept -> {
+                    // headUserId로 User 조회
+                    User approver = userRepositoryImpl.findById(dept.getHeadUserId())
+                            .orElse(null);
+
+                    if (approver == null || approver.getIsDeleted() == YNType.Y) {
+                        return null;
+                    }
+
+                    return UserServiceDto.builder()
+                            .id(approver.getId())
+                            .name(approver.getName())
+                            .email(approver.getEmail())
+                            .role(approver.getRole())
+                            .departmentId(dept.getId())
+                            .departmentName(dept.getName())
+                            .departmentNameKR(dept.getNameKR())
+                            .departmentLevel(dept.getLevel())
+                            .build();
+                })
+                .filter(dto -> dto != null) // null 제거
+                .collect(Collectors.toList());
+    }
 }

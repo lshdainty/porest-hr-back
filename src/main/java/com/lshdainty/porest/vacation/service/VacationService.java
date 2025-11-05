@@ -1035,7 +1035,10 @@ public class VacationService {
                 policy,
                 data.getDesc(),
                 policy.getVacationType(),
-                policy.getGrantTime()
+                policy.getGrantTime(),  // overTime일 경우에 제한이 없어서 null 처리 되어있음 (계산하여 입력하도록 수정이 필요함)
+                data.getRequestStartTime(),
+                data.getRequestEndTime(),
+                data.getRequestDesc()
         );
 
         vacationGrantRepository.save(vacationGrant);
@@ -1220,7 +1223,8 @@ public class VacationService {
                         .policyId(approval.getVacationGrant().getPolicy().getId())
                         .policyName(approval.getVacationGrant().getPolicy().getName())
                         .desc(approval.getVacationGrant().getDesc())
-                        .requestDate(approval.getVacationGrant().getRequestDate())
+                        .requestStartTime(approval.getVacationGrant().getRequestStartTime())
+                        .requestEndTime(approval.getVacationGrant().getRequestEndTime())
                         .grantTime(approval.getVacationGrant().getGrantTime())
                         .vacationType(approval.getVacationGrant().getType())
                         .approvalStatus(approval.getApprovalStatus())
@@ -1254,7 +1258,9 @@ public class VacationService {
                         .remainTime(grant.getRemainTime())
                         .grantDate(grant.getGrantDate())
                         .expiryDate(grant.getExpiryDate())
-                        .requestDate(grant.getRequestDate())
+                        .requestStartTime(grant.getRequestStartTime())
+                        .requestEndTime(grant.getRequestEndTime())
+                        .requestDesc(grant.getRequestDesc())
                         .grantStatus(grant.getStatus())
                         .build())
                 .toList();
@@ -1283,15 +1289,15 @@ public class VacationService {
 
         // 2. 이번 달 신청 건수
         long currentMonthRequestCount = allGrants.stream()
-                .filter(grant -> grant.getRequestDate() != null &&
-                        grant.getRequestDate().isAfter(startOfCurrentMonth))
+                .filter(grant -> grant.getRequestStartTime() != null &&
+                        grant.getRequestStartTime().isAfter(startOfCurrentMonth))
                 .count();
 
         // 전월 신청 건수 (증감 비율 계산용)
         long previousMonthRequestCount = allGrants.stream()
-                .filter(grant -> grant.getRequestDate() != null &&
-                        grant.getRequestDate().isAfter(startOfPreviousMonth) &&
-                        grant.getRequestDate().isBefore(startOfCurrentMonth))
+                .filter(grant -> grant.getRequestStartTime() != null &&
+                        grant.getRequestStartTime().isAfter(startOfPreviousMonth) &&
+                        grant.getRequestStartTime().isBefore(startOfCurrentMonth))
                 .count();
 
         // 3. 증감 비율 계산
@@ -1310,7 +1316,7 @@ public class VacationService {
         // 5. 평균 처리 기간 (일수) - ACTIVE 또는 REJECTED 상태만 계산
         List<VacationGrant> processedGrants = allGrants.stream()
                 .filter(grant -> grant.getStatus() == GrantStatus.ACTIVE || grant.getStatus() == GrantStatus.REJECTED)
-                .filter(grant -> grant.getRequestDate() != null && grant.getModifyDate() != null)
+                .filter(grant -> grant.getRequestStartTime() != null && grant.getModifyDate() != null)
                 .toList();
 
         Double averageProcessingDays = 0.0;
@@ -1318,7 +1324,7 @@ public class VacationService {
             long totalProcessingSeconds = processedGrants.stream()
                     .mapToLong(grant -> {
                         java.time.Duration duration = java.time.Duration.between(
-                                grant.getRequestDate(),
+                                grant.getRequestStartTime(),
                                 grant.getModifyDate()
                         );
                         return duration.toDays();

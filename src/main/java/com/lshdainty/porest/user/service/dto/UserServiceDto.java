@@ -38,4 +38,10 @@ public class UserServiceDto {
 
     // 메인 부서 정보
     private String mainDepartmentNameKR; // 메인 부서의 한글명
+
+    // 승인권자 정보 (부서 정보 포함)
+    private Long departmentId; // 부서 ID
+    private String departmentName; // 부서명
+    private String departmentNameKR; // 부서 한글명
+    private Long departmentLevel; // 부서 레벨
 }
