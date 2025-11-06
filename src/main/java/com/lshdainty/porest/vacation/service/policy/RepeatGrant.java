@@ -29,6 +29,7 @@ public class RepeatGrant implements VacationPolicyStrategy {
                 data.getDesc(),
                 data.getVacationType(),
                 data.getGrantTime(),
+                data.getMinuteGrantYn(),
                 data.getRepeatUnit(),
                 data.getRepeatInterval(),
                 data.getSpecificMonths(),

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -65,12 +66,12 @@ public enum VacationTimeType implements DisplayType {
 
             // 넘어온 value에서 시간 분리
             int hours = value.remainder(BigDecimal.valueOf(1.0000)) // 0.1250 ~ 0.8750 분리
-                    .divide(BigDecimal.valueOf(0.1250), 0, java.math.RoundingMode.DOWN).intValue(); // 0 ~ 7로 변환
+                    .divide(BigDecimal.valueOf(0.1250), 0, RoundingMode.DOWN).intValue(); // 0 ~ 7로 변환
 
             // 넘어온 value에서 분 분리
             int minutes = value.remainder(BigDecimal.valueOf(1.0000)) // 0.1250 ~ 0.8750 분리
                     .remainder(BigDecimal.valueOf(0.1250)) // 0.0625 분리
-                    .divide(BigDecimal.valueOf(0.0625), 0, java.math.RoundingMode.DOWN).intValue() * 30; // 0 or 30
+                    .divide(BigDecimal.valueOf(0.0625), 0, RoundingMode.DOWN).intValue() * 30; // 0 or 30
 
             if (days > 0) {
                 builer.append(days).append("일");

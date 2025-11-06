@@ -19,6 +19,8 @@ public class VacationPolicyServiceDto {
     private VacationType vacationType;
     private GrantMethod grantMethod;
     private BigDecimal grantTime;
+    private YNType grantTimeExists;  // 휴가 부여 시간 존재 여부
+    private YNType minuteGrantYn;    // 분단위 부여 여부
     private RepeatUnit repeatUnit;
     private Integer repeatInterval;
     private Integer specificMonths;

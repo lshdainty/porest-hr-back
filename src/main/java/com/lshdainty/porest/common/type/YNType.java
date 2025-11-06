@@ -13,4 +13,12 @@ public enum YNType {
         this.upper = upper;
         this.bool = bool;
     }
+
+    public static boolean isY(YNType type) {
+        return type.equals(YNType.Y);
+    }
+
+    public static boolean isN(YNType type) {
+        return type.equals(YNType.N);
+    }
 }

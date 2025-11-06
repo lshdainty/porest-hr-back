@@ -28,6 +28,8 @@ public class ManualGrant implements VacationPolicyStrategy {
                 data.getDesc(),
                 data.getVacationType(),
                 data.getGrantTime(),
+                data.getGrantTimeExists(),
+                data.getMinuteGrantYn(),
                 data.getEffectiveType(),
                 data.getExpirationType()
         );

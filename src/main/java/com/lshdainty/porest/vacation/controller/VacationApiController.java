@@ -282,6 +282,8 @@ public class VacationApiController {
                 .vacationType(data.getVacationType())
                 .grantMethod(data.getGrantMethod())
                 .grantTime(data.getGrantTime())
+                .grantTimeExists(data.getGrantTimeExists())
+                .minuteGrantYn(data.getMinuteGrantYn())
                 .repeatUnit(data.getRepeatUnit())
                 .repeatInterval(data.getRepeatInterval())
                 .specificMonths(data.getSpecificMonths())
@@ -607,7 +609,10 @@ public class VacationApiController {
                         v.getRequestEndTime(),
                         v.getRequestDesc(),
                         v.getGrantStatus(),
-                        v.getGrantStatus().getViewName()
+                        v.getGrantStatus().getViewName(),
+                        v.getCreateDate(),
+                        v.getCurrentApproverId(),
+                        v.getCurrentApproverName()
                 ))
                 .toList();
 

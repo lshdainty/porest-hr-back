@@ -13,6 +13,7 @@ import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationApprovalServiceDto;
 import com.lshdainty.porest.vacation.service.policy.VacationPolicyStrategy;
 import com.lshdainty.porest.vacation.service.policy.RepeatGrant;
+import com.lshdainty.porest.vacation.service.policy.OnRequest;
 import com.lshdainty.porest.vacation.service.policy.factory.VacationPolicyStrategyFactory;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import com.lshdainty.porest.vacation.type.*;
@@ -1029,13 +1030,17 @@ public class VacationService {
             });
         }
 
-        // 7. VacationGrant 생성 (PENDING 상태)
+        // 7. 부여 시간 계산 (OnRequest 전략 사용)
+        OnRequest onRequestStrategy = (OnRequest) vacationPolicyStrategyFactory.getStrategy(GrantMethod.ON_REQUEST);
+        BigDecimal grantTime = onRequestStrategy.calculateGrantTime(policy, data.getRequestStartTime(), data.getRequestEndTime());
+
+        // 8. VacationGrant 생성 (PENDING 상태)
         VacationGrant vacationGrant = VacationGrant.createPendingVacationGrant(
                 user,
                 policy,
                 data.getDesc(),
                 policy.getVacationType(),
-                policy.getGrantTime(),  // overTime일 경우에 제한이 없어서 null 처리 되어있음 (계산하여 입력하도록 수정이 필요함)
+                grantTime,
                 data.getRequestStartTime(),
                 data.getRequestEndTime(),
                 data.getRequestDesc()
@@ -1043,7 +1048,7 @@ public class VacationService {
 
         vacationGrantRepository.save(vacationGrant);
 
-        // 8. 승인이 필요한 경우 VacationApproval 생성 (순서대로)
+        // 9. 승인이 필요한 경우 VacationApproval 생성 (순서대로)
         if (requiredCount != null && requiredCount > 0 && approverIds != null) {
             List<VacationApproval> approvals = new ArrayList<>();
             int order = 1;
@@ -1248,21 +1253,29 @@ public class VacationService {
         List<VacationGrant> grants = vacationGrantRepository.findAllRequestedVacationsByUserId(userId);
 
         return grants.stream()
-                .map(grant -> VacationServiceDto.builder()
-                        .id(grant.getId())
-                        .policyId(grant.getPolicy().getId())
-                        .policyName(grant.getPolicy().getName())
-                        .type(grant.getType())
-                        .desc(grant.getDesc())
-                        .grantTime(grant.getGrantTime())
-                        .remainTime(grant.getRemainTime())
-                        .grantDate(grant.getGrantDate())
-                        .expiryDate(grant.getExpiryDate())
-                        .requestStartTime(grant.getRequestStartTime())
-                        .requestEndTime(grant.getRequestEndTime())
-                        .requestDesc(grant.getRequestDesc())
-                        .grantStatus(grant.getStatus())
-                        .build())
+                .map(grant -> {
+                    // 현재 승인 대기 중인 승인자 조회
+                    User currentApprover = grant.getCurrentPendingApprover();
+
+                    return VacationServiceDto.builder()
+                            .id(grant.getId())
+                            .policyId(grant.getPolicy().getId())
+                            .policyName(grant.getPolicy().getName())
+                            .type(grant.getType())
+                            .desc(grant.getDesc())
+                            .grantTime(grant.getGrantTime())
+                            .remainTime(grant.getRemainTime())
+                            .grantDate(grant.getGrantDate())
+                            .expiryDate(grant.getExpiryDate())
+                            .requestStartTime(grant.getRequestStartTime())
+                            .requestEndTime(grant.getRequestEndTime())
+                            .requestDesc(grant.getRequestDesc())
+                            .grantStatus(grant.getStatus())
+                            .createDate(grant.getCreateDate())
+                            .currentApproverId(currentApprover != null ? currentApprover.getId() : null)
+                            .currentApproverName(currentApprover != null ? currentApprover.getName() : null)
+                            .build();
+                })
                 .toList();
     }
 

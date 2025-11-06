@@ -8,7 +8,6 @@ import com.lshdainty.porest.vacation.type.VacationType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
-import org.springframework.cglib.core.Local;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -305,5 +304,19 @@ public class VacationGrant extends AuditingFields {
             throw new IllegalStateException("대기 또는 진행 상태가 아닌 휴가는 거부할 수 없습니다.");
         }
         this.status = GrantStatus.REJECTED;
+    }
+
+    /**
+     * 현재 승인 대기 중인 승인자 조회<br>
+     * 승인 순서가 가장 빠른(approvalOrder가 가장 작은) PENDING 상태의 승인자를 반환
+     *
+     * @return 현재 승인 대기 중인 승인자 (없으면 null)
+     */
+    public User getCurrentPendingApprover() {
+        return vacationApprovals.stream()
+                .filter(approval -> approval.getApprovalStatus() == com.lshdainty.porest.vacation.type.ApprovalStatus.PENDING)
+                .min((a1, a2) -> Integer.compare(a1.getApprovalOrder(), a2.getApprovalOrder()))
+                .map(VacationApproval::getApprover)
+                .orElse(null);
     }
 }

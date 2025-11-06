@@ -51,6 +51,8 @@ public class VacationServiceDto {
     private Long policyId;
     // 휴가 정책명
     private String policyName;
+    // 신청일 (DB의 create_date)
+    private LocalDateTime createDate;
 
     // 휴가 사용 시작 시간
     private LocalDateTime startDate;
@@ -90,6 +92,10 @@ public class VacationServiceDto {
     private LocalDateTime requestEndTime;
     // 휴가 신청 상세 사유 (ON_REQUEST 방식)
     private String requestDesc;
+    // 현재 승인 대기 중인 승인자 ID
+    private String currentApproverId;
+    // 현재 승인 대기 중인 승인자 이름
+    private String currentApproverName;
 
     // ========== 휴가 신청 통계 관련 필드 ==========
     // 1. 전체 신청 건수

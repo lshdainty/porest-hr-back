@@ -202,6 +202,8 @@ public class VacationApiDto {
         private VacationType vacationType;
         private GrantMethod grantMethod;
         private BigDecimal grantTime;
+        private YNType grantTimeExists;        // 휴가 부여 시간 존재 여부
+        private YNType minuteGrantYn;          // 분단위 부여 여부
         private RepeatUnit repeatUnit;
         private Integer repeatInterval;
         private Integer specificMonths;
@@ -413,6 +415,9 @@ public class VacationApiDto {
         private String requestDesc;
         private GrantStatus grantStatus;
         private String grantStatusName;
+        private LocalDateTime createDate;  // 신청일
+        private String currentApproverId;  // 현재 승인 대기 중인 승인자 ID
+        private String currentApproverName;  // 현재 승인 대기 중인 승인자 이름
     }
 
     @Getter
