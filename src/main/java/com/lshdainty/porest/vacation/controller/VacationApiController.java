@@ -608,6 +608,8 @@ public class VacationApiController {
                         v.getDesc(),
                         v.getGrantTime(),
                         VacationTimeType.convertValueToDay(v.getGrantTime()),
+                        v.getPolicyGrantTime(),
+                        VacationTimeType.convertValueToDay(v.getPolicyGrantTime()),
                         v.getRemainTime(),
                         VacationTimeType.convertValueToDay(v.getRemainTime()),
                         v.getGrantDate(),

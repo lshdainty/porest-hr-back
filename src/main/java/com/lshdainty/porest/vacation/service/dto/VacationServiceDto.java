@@ -96,6 +96,8 @@ public class VacationServiceDto {
     private String currentApproverId;
     // 현재 승인 대기 중인 승인자 이름
     private String currentApproverName;
+    // 휴가 정책 기준 부여 시간
+    private BigDecimal policyGrantTime;
 
     // ========== 휴가 신청 통계 관련 필드 ==========
     // 1. 전체 신청 건수

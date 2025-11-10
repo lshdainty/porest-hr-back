@@ -411,6 +411,8 @@ public class VacationApiDto {
         private String desc;
         private BigDecimal grantTime;
         private String grantTimeStr;
+        private BigDecimal policyGrantTime;
+        private String policyGrantTimeStr;
         private BigDecimal remainTime;
         private String remainTimeStr;
         private LocalDateTime grantDate;

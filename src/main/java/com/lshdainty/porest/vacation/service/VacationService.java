@@ -1270,6 +1270,7 @@ public class VacationService {
                             .type(grant.getType())
                             .desc(grant.getDesc())
                             .grantTime(grant.getGrantTime())
+                            .policyGrantTime(grant.getPolicy().getGrantTime())
                             .remainTime(grant.getRemainTime())
                             .grantDate(grant.getGrantDate())
                             .expiryDate(grant.getExpiryDate())
