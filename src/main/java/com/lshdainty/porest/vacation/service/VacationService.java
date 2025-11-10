@@ -482,7 +482,9 @@ public class VacationService {
                 .desc(policy.getDesc())
                 .vacationType(policy.getVacationType())
                 .grantMethod(policy.getGrantMethod())
+                .isFlexibleGrant(policy.getIsFlexibleGrant())
                 .grantTime(policy.getGrantTime())
+                .minuteGrantYn(policy.getMinuteGrantYn())
                 .repeatUnit(policy.getRepeatUnit())
                 .repeatInterval(policy.getRepeatInterval())
                 .specificMonths(policy.getSpecificMonths())
@@ -509,7 +511,9 @@ public class VacationService {
                             .desc(p.getDesc())
                             .vacationType(p.getVacationType())
                             .grantMethod(p.getGrantMethod())
+                            .isFlexibleGrant(p.getIsFlexibleGrant())
                             .grantTime(p.getGrantTime())
+                            .minuteGrantYn(p.getMinuteGrantYn())
                             .repeatUnit(p.getRepeatUnit())
                             .repeatInterval(p.getRepeatInterval())
                             .specificMonths(p.getSpecificMonths())
@@ -687,6 +691,8 @@ public class VacationService {
                             .approvalRequiredCount(policy.getApprovalRequiredCount())
                             .effectiveType(policy.getEffectiveType())
                             .expirationType(policy.getExpirationType())
+                            .isFlexibleGrant(policy.getIsFlexibleGrant())
+                            .minuteGrantYn(policy.getMinuteGrantYn())
                             .repeatGrantDescription(repeatGrantDescription)
                             .build();
                 })
@@ -1032,7 +1038,7 @@ public class VacationService {
 
         // 7. 부여 시간 계산 (OnRequest 전략 사용)
         OnRequest onRequestStrategy = (OnRequest) vacationPolicyStrategyFactory.getStrategy(GrantMethod.ON_REQUEST);
-        BigDecimal grantTime = onRequestStrategy.calculateGrantTime(policy, data.getRequestStartTime(), data.getRequestEndTime());
+        BigDecimal grantTime = onRequestStrategy.calculateGrantTime(policy, data.getGrantTime());
 
         // 8. VacationGrant 생성 (PENDING 상태)
         VacationGrant vacationGrant = VacationGrant.createPendingVacationGrant(

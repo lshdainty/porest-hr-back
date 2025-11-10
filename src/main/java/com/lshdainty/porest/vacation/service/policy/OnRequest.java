@@ -103,13 +103,10 @@ public class OnRequest implements VacationPolicyStrategy {
      * ON_REQUEST 방식의 부여 시간 계산
      *
      * @param policy 휴가 정책
-     * @param requestStartTime 신청 시작 일시
-     * @param requestEndTime 신청 종료 일시
+     * @param userGrantTime 사용자가 입력한 부여 시간 (isFlexibleGrant=Y일 경우)
      * @return 계산된 부여 시간
      */
-    public BigDecimal calculateGrantTime(VacationPolicy policy, LocalDateTime requestStartTime, LocalDateTime requestEndTime) {
-        VacationType vacationType = policy.getVacationType();
-
+    public BigDecimal calculateGrantTime(VacationPolicy policy, BigDecimal userGrantTime) {
         // isFlexibleGrant가 N인 경우: 정책에 정의된 시간 사용 (고정 부여)
         if (YNType.isN(policy.getIsFlexibleGrant())) {
             BigDecimal policyGrantTime = policy.getGrantTime();
@@ -121,59 +118,20 @@ public class OnRequest implements VacationPolicyStrategy {
             return policyGrantTime;
         }
 
-        // isFlexibleGrant가 Y인 경우: 동적 계산 (가변 부여, OVERTIME 등)
-        // OVERTIME 타입인 경우: 시작/종료 시간 차이를 계산
-        if (vacationType == VacationType.OVERTIME) {
-            // 필수 값 검증
-            if (Objects.isNull(requestStartTime)) {
-                throw new IllegalArgumentException(
-                        ms.getMessage("error.validate.vacation.startTimeRequired", null, null)
-                );
-            }
-            if (Objects.isNull(requestEndTime)) {
-                throw new IllegalArgumentException(
-                        ms.getMessage("error.validate.vacation.endTimeRequired", null, null)
-                );
-            }
-
-            // 종료 시간이 시작 시간보다 이후인지 검증
-            if (!requestEndTime.isAfter(requestStartTime)) {
-                throw new IllegalArgumentException(
-                        ms.getMessage("error.validate.vacation.endTimeAfterStartTime", null, null)
-                );
-            }
-
-            // 시간 차이 계산 (분 단위)
-            long minutes = Duration.between(requestStartTime, requestEndTime).toMinutes();
-
-            // minuteGrantYn에 따라 분단위 부여 여부 결정
-            if (YNType.isY(policy.getMinuteGrantYn())) {
-                // 분단위 부여: 30분 단위로 계산
-                // 예: 90분 → 1.5시간 → 0.1875 (1시간 + 30분)
-                long hours = minutes / 60;
-                long remainingMinutes = minutes % 60;
-
-                // 30분 단위로 반올림
-                BigDecimal halfHours = remainingMinutes >= 30 ? BigDecimal.valueOf(0.5) : BigDecimal.ZERO;
-
-                return BigDecimal.valueOf(hours)
-                        .add(halfHours)
-                        .multiply(BigDecimal.valueOf(0.1250))
-                        .setScale(4, RoundingMode.DOWN);
-            } else {
-                // 시간 단위만 부여: 소수점 버림
-                // 예: 90분 → 1시간 → 0.1250
-                long hours = minutes / 60;
-
-                return BigDecimal.valueOf(hours)
-                        .multiply(BigDecimal.valueOf(0.1250))
-                        .setScale(4, RoundingMode.DOWN);
-            }
+        // isFlexibleGrant가 Y인 경우: 사용자가 입력한 시간 사용 (가변 부여)
+        if (Objects.isNull(userGrantTime)) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.userGrantTimeRequired", null, null)
+            );
         }
 
-        // 그 외의 경우는 에러
-        throw new IllegalArgumentException(
-                ms.getMessage("error.validate.vacation.cannotCalculateGrantTime", null, null)
-        );
+        // 사용자 입력값 양수 검증
+        if (userGrantTime.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException(
+                    ms.getMessage("error.validate.vacation.userGrantTimePositive", null, null)
+            );
+        }
+
+        return userGrantTime;
     }
 }

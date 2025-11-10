@@ -338,8 +338,9 @@ public class VacationApiDto {
         private Long policyId;
         private String desc;
         private List<String> approverIds;
-        private LocalDateTime requestStartTime;  // 신청 시작 일시 (OT 시작 시간, 결혼/출산 일자 등)
-        private LocalDateTime requestEndTime;    // 신청 종료 일시 (OT 종료 시간, OT가 아니면 null)
+        private BigDecimal grantTime;            // 부여 시간 (isFlexibleGrant=Y일 경우 필수, 사용자 입력값)
+        private LocalDateTime requestStartTime;  // 신청 시작 일시 (결혼/출산 일자 등)
+        private LocalDateTime requestEndTime;    // 신청 종료 일시 (필요시)
         private String requestDesc;              // 신청 상세 사유
     }
 

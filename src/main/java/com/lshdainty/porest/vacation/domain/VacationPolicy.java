@@ -67,7 +67,7 @@ public class VacationPolicy extends AuditingFields {
      * 해당 값이 N이면 무조건 grantTime은 0 이상이어야하고 Y이면 무조건 null이어야함
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "grant_time_exists")
+    @Column(name = "is_flexible_grant")
     private YNType isFlexibleGrant;
 
     /**

@@ -516,6 +516,7 @@ public class VacationApiController {
                 .policyId(data.getPolicyId())
                 .desc(data.getDesc())
                 .approverIds(data.getApproverIds())
+                .grantTime(data.getGrantTime())
                 .requestStartTime(data.getRequestStartTime())
                 .requestEndTime(data.getRequestEndTime())
                 .requestDesc(data.getRequestDesc())
