@@ -43,17 +43,13 @@ public class VacationApprovalCustomRepositoryImpl implements VacationApprovalCus
     }
 
     @Override
-    public List<VacationApproval> findPendingApprovalsByApproverId(String approverId) {
+    public List<Long> findAllVacationGrantIdsByApproverId(String approverId) {
         return query
-                .selectFrom(vacationApproval)
-                .join(vacationApproval.vacationGrant).fetchJoin()
-                .join(vacationApproval.vacationGrant.user).fetchJoin()
-                .join(vacationApproval.vacationGrant.policy).fetchJoin()
-                .join(vacationApproval.approver).fetchJoin()
+                .select(vacationApproval.vacationGrant.id)
+                .from(vacationApproval)
                 .where(vacationApproval.approver.id.eq(approverId)
-                        .and(vacationApproval.approvalStatus.eq(ApprovalStatus.PENDING))
                         .and(vacationApproval.isDeleted.eq(YNType.N)))
-                .orderBy(vacationApproval.createDate.desc())
+                .distinct()
                 .fetch();
     }
 

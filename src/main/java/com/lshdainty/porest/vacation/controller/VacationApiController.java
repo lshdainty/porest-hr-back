@@ -8,6 +8,7 @@ import com.lshdainty.porest.vacation.service.dto.VacationApprovalServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.type.GrantMethod;
+import com.lshdainty.porest.vacation.type.GrantStatus;
 import com.lshdainty.porest.vacation.type.VacationTimeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -575,33 +576,63 @@ public class VacationApiController {
     }
 
     /**
-     * 승인자의 대기 중인 승인 목록 조회
-     * GET /api/v1/users/{approverId}/pending-approvals
+     * 승인자에게 할당된 모든 휴가 신청 내역 조회 (상태 필터 옵션)
+     * GET /api/v1/users/{approverId}/vacation-approvals
      */
-    @GetMapping("/api/v1/users/{approverId}/pending-approvals")
-    public ApiResponse getPendingApprovalsByApprover(@PathVariable("approverId") String approverId) {
-        List<VacationApprovalServiceDto> approvals = vacationService.getPendingApprovalsByApprover(approverId);
+    @GetMapping("/api/v1/users/{approverId}/vacation-approvals")
+    public ApiResponse getAllVacationsByApprover(
+            @PathVariable("approverId") String approverId,
+            @RequestParam(value = "status", required = false) GrantStatus status) {
+        List<VacationServiceDto> vacations = vacationService.getAllVacationsByApprover(approverId, status);
 
-        List<VacationApiDto.GetPendingApprovalsByApproverResp.PendingApprovalInfo> approvalInfos = approvals.stream()
-                .map(a -> new VacationApiDto.GetPendingApprovalsByApproverResp.PendingApprovalInfo(
-                        a.getId(),
-                        a.getVacationGrantId(),
-                        a.getRequesterId(),
-                        a.getRequesterName(),
-                        a.getPolicyId(),
-                        a.getPolicyName(),
-                        a.getDesc(),
-                        a.getRequestStartTime(),
-                        a.getRequestEndTime(),
-                        a.getGrantTime(),
-                        a.getVacationType(),
-                        a.getVacationType().getViewName(),
-                        a.getApprovalStatus(),
-                        a.getApprovalStatus().getViewName()
-                ))
+        List<VacationApiDto.GetUserRequestedVacationsResp> resp = vacations.stream()
+                .map(v -> {
+                    // 승인자 목록을 ApproverInfo DTO로 변환
+                    List<VacationApiDto.GetUserRequestedVacationsResp.ApproverInfo> approvers = null;
+                    if (v.getApprovers() != null) {
+                        approvers = v.getApprovers().stream()
+                                .map(approver -> new VacationApiDto.GetUserRequestedVacationsResp.ApproverInfo(
+                                        approver.getId(),
+                                        approver.getApproverId(),
+                                        approver.getApproverName(),
+                                        approver.getApprovalOrder(),
+                                        approver.getApprovalStatus(),
+                                        approver.getApprovalStatus().getViewName(),
+                                        approver.getApprovalDate(),
+                                        approver.getRejectionReason()
+                                ))
+                                .toList();
+                    }
+
+                    return new VacationApiDto.GetUserRequestedVacationsResp(
+                            v.getId(),
+                            v.getPolicyId(),
+                            v.getPolicyName(),
+                            v.getType(),
+                            v.getType().getViewName(),
+                            v.getDesc(),
+                            v.getGrantTime(),
+                            VacationTimeType.convertValueToDay(v.getGrantTime()),
+                            v.getPolicyGrantTime(),
+                            VacationTimeType.convertValueToDay(v.getPolicyGrantTime()),
+                            v.getRemainTime(),
+                            VacationTimeType.convertValueToDay(v.getRemainTime()),
+                            v.getGrantDate(),
+                            v.getExpiryDate(),
+                            v.getRequestStartTime(),
+                            v.getRequestEndTime(),
+                            v.getRequestDesc(),
+                            v.getGrantStatus(),
+                            v.getGrantStatus().getViewName(),
+                            v.getCreateDate(),
+                            v.getCurrentApproverId(),
+                            v.getCurrentApproverName(),
+                            approvers
+                    );
+                })
                 .toList();
 
-        return ApiResponse.success(new VacationApiDto.GetPendingApprovalsByApproverResp(approvalInfos));
+        return ApiResponse.success(resp);
     }
 
     /**
@@ -625,7 +656,8 @@ public class VacationApiController {
                                         approver.getApprovalOrder(),
                                         approver.getApprovalStatus(),
                                         approver.getApprovalStatus().getViewName(),
-                                        approver.getApprovalDate()
+                                        approver.getApprovalDate(),
+                                        approver.getRejectionReason()
                                 ))
                                 .toList();
                     }

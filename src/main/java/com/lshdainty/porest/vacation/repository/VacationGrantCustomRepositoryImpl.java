@@ -163,4 +163,20 @@ public class VacationGrantCustomRepositoryImpl implements VacationGrantCustomRep
                 .orderBy(vacationGrant.requestStartTime.desc())
                 .fetch();
     }
+
+    @Override
+    public List<VacationGrant> findByIdsWithUserAndPolicy(List<Long> vacationGrantIds) {
+        if (vacationGrantIds == null || vacationGrantIds.isEmpty()) {
+            return List.of();
+        }
+
+        return query
+                .selectFrom(vacationGrant)
+                .join(vacationGrant.user).fetchJoin()
+                .join(vacationGrant.policy).fetchJoin()
+                .where(vacationGrant.id.in(vacationGrantIds)
+                        .and(vacationGrant.isDeleted.eq(YNType.N)))
+                .orderBy(vacationGrant.createDate.desc())
+                .fetch();
+    }
 }

@@ -5,7 +5,7 @@ import com.lshdainty.porest.common.type.DisplayType;
 public enum ApprovalStatus implements DisplayType {
     PENDING("대기중"),
     APPROVED("승인"),
-    REJECTED("거부");
+    REJECTED("반려");
 
     private String strName;
 

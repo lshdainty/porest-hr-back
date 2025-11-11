@@ -382,33 +382,6 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class GetPendingApprovalsByApproverResp {
-        private List<PendingApprovalInfo> pendingApprovals;
-
-        @Getter
-        @AllArgsConstructor
-        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-        public static class PendingApprovalInfo {
-            private Long approvalId;
-            private Long vacationGrantId;
-            private String requesterId;
-            private String requesterName;
-            private Long policyId;
-            private String policyName;
-            private String desc;
-            private LocalDateTime requestStartTime;
-            private LocalDateTime requestEndTime;
-            private BigDecimal grantTime;
-            private VacationType vacationType;
-            private String vacationTypeName;
-            private ApprovalStatus approvalStatus;
-            private String approvalStatusName;
-        }
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class GetUserRequestedVacationsResp {
         private Long vacationGrantId;
         private Long policyId;
@@ -445,6 +418,7 @@ public class VacationApiDto {
             private ApprovalStatus approvalStatus;
             private String approvalStatusName;
             private LocalDateTime approvalDate;
+            private String rejectionReason;
         }
     }
 

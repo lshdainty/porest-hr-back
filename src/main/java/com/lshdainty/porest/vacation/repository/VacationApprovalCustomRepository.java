@@ -25,12 +25,12 @@ public interface VacationApprovalCustomRepository {
     List<VacationApproval> findByVacationGrantId(Long vacationGrantId);
 
     /**
-     * 승인자 ID로 대기 중인 승인 목록 조회
+     * 승인자 ID로 모든 승인 목록 조회 (상태 필터 옵션)
      *
      * @param approverId 승인자 ID
-     * @return 대기 중인 VacationApproval 리스트
+     * @return VacationGrant 리스트 (중복 제거)
      */
-    List<VacationApproval> findPendingApprovalsByApproverId(String approverId);
+    List<Long> findAllVacationGrantIdsByApproverId(String approverId);
 
     /**
      * ID로 VacationApproval 조회

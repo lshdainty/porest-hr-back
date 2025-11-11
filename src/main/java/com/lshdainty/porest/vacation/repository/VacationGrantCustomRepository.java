@@ -107,4 +107,14 @@ public interface VacationGrantCustomRepository {
      * @return ON_REQUEST 방식의 모든 VacationGrant 리스트
      */
     List<VacationGrant> findAllRequestedVacationsByUserId(String userId);
+
+    /**
+     * VacationGrant ID 리스트로 VacationGrant 조회
+     * - User, Policy와 fetch join
+     * - 신청일시 최신순으로 정렬
+     *
+     * @param vacationGrantIds VacationGrant ID 리스트
+     * @return VacationGrant 리스트
+     */
+    List<VacationGrant> findByIdsWithUserAndPolicy(List<Long> vacationGrantIds);
 }

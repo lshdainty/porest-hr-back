@@ -1251,33 +1251,79 @@ public class VacationService {
     }
 
     /**
-     * 승인자의 대기 중인 승인 목록 조회
+     * 승인자에게 할당된 모든 휴가 신청 내역 조회 (상태 필터 옵션)
+     * - 승인자가 처리해야 하는/처리한 모든 휴가 신청 내역 조회
+     * - getUserRequestedVacations와 동일한 응답 형식
      *
      * @param approverId 승인자 ID
-     * @return 대기 중인 승인 목록
+     * @param status 휴가 부여 상태 필터 (Optional)
+     * @return 승인자에게 할당된 휴가 신청 내역 리스트
      */
-    public List<VacationApprovalServiceDto> getPendingApprovalsByApprover(String approverId) {
+    public List<VacationServiceDto> getAllVacationsByApprover(String approverId, GrantStatus status) {
         // 승인자 존재 확인
         userService.checkUserExist(approverId);
 
-        // 대기 중인 승인 조회
-        List<VacationApproval> approvals = vacationApprovalRepository.findPendingApprovalsByApproverId(approverId);
+        // 승인자가 포함된 모든 VacationGrant ID 조회
+        List<Long> vacationGrantIds = vacationApprovalRepository.findAllVacationGrantIdsByApproverId(approverId);
 
-        return approvals.stream()
-                .map(approval -> VacationApprovalServiceDto.builder()
-                        .id(approval.getId())
-                        .vacationGrantId(approval.getVacationGrant().getId())
-                        .requesterId(approval.getVacationGrant().getUser().getId())
-                        .requesterName(approval.getVacationGrant().getUser().getName())
-                        .policyId(approval.getVacationGrant().getPolicy().getId())
-                        .policyName(approval.getVacationGrant().getPolicy().getName())
-                        .desc(approval.getVacationGrant().getDesc())
-                        .requestStartTime(approval.getVacationGrant().getRequestStartTime())
-                        .requestEndTime(approval.getVacationGrant().getRequestEndTime())
-                        .grantTime(approval.getVacationGrant().getGrantTime())
-                        .vacationType(approval.getVacationGrant().getType())
-                        .approvalStatus(approval.getApprovalStatus())
-                        .build())
+        if (vacationGrantIds.isEmpty()) {
+            return List.of();
+        }
+
+        // VacationGrant 조회 (User, Policy 포함)
+        List<VacationGrant> grants = vacationGrantRepository.findByIdsWithUserAndPolicy(vacationGrantIds);
+
+        // 상태 필터링 (status가 null이 아닌 경우)
+        if (status != null) {
+            grants = grants.stream()
+                    .filter(grant -> grant.getStatus() == status)
+                    .toList();
+        }
+
+        // VacationServiceDto로 변환
+        return grants.stream()
+                .map(grant -> {
+                    // 현재 승인 대기 중인 승인자 조회
+                    User currentApprover = grant.getCurrentPendingApprover();
+
+                    // 승인자 목록 조회 (approvalOrder 순서대로 정렬됨)
+                    List<VacationApproval> approvals = vacationApprovalRepository.findByVacationGrantId(grant.getId());
+                    List<VacationApprovalServiceDto> approvers = approvals.stream()
+                            .sorted((a1, a2) -> Integer.compare(a1.getApprovalOrder(), a2.getApprovalOrder()))
+                            .map(approval -> VacationApprovalServiceDto.builder()
+                                    .id(approval.getId())
+                                    .approverId(approval.getApprover().getId())
+                                    .approverName(approval.getApprover().getName())
+                                    .approvalOrder(approval.getApprovalOrder())
+                                    .approvalStatus(approval.getApprovalStatus())
+                                    .approvalDate(approval.getApprovalDate())
+                                    .rejectionReason(approval.getRejectionReason())
+                                    .build())
+                            .toList();
+
+                    return VacationServiceDto.builder()
+                            .id(grant.getId())
+                            .userId(grant.getUser().getId())
+                            .user(grant.getUser())
+                            .policyId(grant.getPolicy().getId())
+                            .policyName(grant.getPolicy().getName())
+                            .type(grant.getType())
+                            .desc(grant.getDesc())
+                            .grantTime(grant.getGrantTime())
+                            .policyGrantTime(grant.getPolicy().getGrantTime())
+                            .remainTime(grant.getRemainTime())
+                            .grantDate(grant.getGrantDate())
+                            .expiryDate(grant.getExpiryDate())
+                            .requestStartTime(grant.getRequestStartTime())
+                            .requestEndTime(grant.getRequestEndTime())
+                            .requestDesc(grant.getRequestDesc())
+                            .grantStatus(grant.getStatus())
+                            .createDate(grant.getCreateDate())
+                            .currentApproverId(currentApprover != null ? currentApprover.getId() : null)
+                            .currentApproverName(currentApprover != null ? currentApprover.getName() : null)
+                            .approvers(approvers)
+                            .build();
+                })
                 .toList();
     }
 
@@ -1312,6 +1358,7 @@ public class VacationService {
                                     .approvalOrder(approval.getApprovalOrder())
                                     .approvalStatus(approval.getApprovalStatus())
                                     .approvalDate(approval.getApprovalDate())
+                                    .rejectionReason(approval.getRejectionReason())
                                     .build())
                             .toList();
 
