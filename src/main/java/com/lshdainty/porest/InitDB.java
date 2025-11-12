@@ -178,15 +178,15 @@ public class InitDB {
             saveSchedule("user1", "교육", ScheduleType.EDUCATION,
                     LocalDateTime.of(now.getYear(), 5, 1, 0, 0, 0),
                     LocalDateTime.of(now.getYear(), 5, 3, 23, 59, 59));
-            saveSchedule("user1", "예비군", ScheduleType.DEFENSE,
-                    LocalDateTime.of(now.getYear(), 2, 23, 0, 0, 0),
-                    LocalDateTime.of(now.getYear(), 2, 28, 23, 59, 59));
+//            saveSchedule("user1", "예비군", ScheduleType.DEFENSE,
+//                    LocalDateTime.of(now.getYear(), 2, 23, 0, 0, 0),
+//                    LocalDateTime.of(now.getYear(), 2, 28, 23, 59, 59));
             saveSchedule("user1", "출장", ScheduleType.BUSINESSTRIP,
                     LocalDateTime.of(now.getYear(), 3, 30, 0, 0, 0),
                     LocalDateTime.of(now.getYear(), 3, 31, 23, 59, 59));
-            saveSchedule("user1", "건강검진(반차)", ScheduleType.HEALTHCHECKHALF,
-                    LocalDateTime.of(now.getYear(), 5, 1, 9, 0, 0),
-                    LocalDateTime.of(now.getYear(), 5, 1, 14, 0, 0));
+//            saveSchedule("user1", "건강검진(반차)", ScheduleType.HEALTHCHECKHALF,
+//                    LocalDateTime.of(now.getYear(), 5, 1, 9, 0, 0),
+//                    LocalDateTime.of(now.getYear(), 5, 1, 14, 0, 0));
             saveSchedule("user1", "생일", ScheduleType.BIRTHDAY,
                     LocalDateTime.of(now.getYear(), 5, 1, 0, 0, 0),
                     LocalDateTime.of(now.getYear(), 5, 1, 23, 59, 59));

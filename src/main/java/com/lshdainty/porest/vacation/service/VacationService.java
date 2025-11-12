@@ -59,7 +59,7 @@ public class VacationService {
         }
 
         // 3. 연차가 아닌 시간단위 휴가인 경우 유연근무제 시간 체크
-        if (!data.getTimeType().equals(VacationTimeType.DAYOFF)) {
+        if (!(data.getTimeType().equals(VacationTimeType.DAYOFF) || !data.getTimeType().equals(VacationTimeType.DEFENSE))) {
             if (!user.isBetweenWorkTime(data.getStartDate().toLocalTime(), data.getEndDate().toLocalTime())) {
                 throw new IllegalArgumentException(ms.getMessage("error.validate.worktime.startEndTime", null, null));
             }
