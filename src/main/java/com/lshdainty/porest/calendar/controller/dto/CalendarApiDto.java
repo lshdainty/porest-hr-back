@@ -21,7 +21,6 @@ public class CalendarApiDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private String domainType;      // vacation or schedule
-        private List<Long> historyIds;  // vacation history ids
-        private Long scheduleId;
+        private Long calendarId;
     }
 }
