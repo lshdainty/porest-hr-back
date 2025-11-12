@@ -740,14 +740,12 @@ public class VacationService {
                     grant.revoke();
                     revokedGrantCount++;
 
-                    log.info("Revoked vacation grant {} from user {} (remainTime: {})",
-                            grant.getId(), userId, grant.getRemainTime());
+                    log.info("Revoked vacation grant {} from user {} (remainTime: {})", grant.getId(), userId, grant.getRemainTime());
                 }
             }
         }
 
-        log.info("Revoked vacation policy {} from user {} ({} grants revoked)",
-                vacationPolicyId, userId, revokedGrantCount);
+        log.info("Revoked vacation policy {} from user {} ({} grants revoked)", vacationPolicyId, userId, revokedGrantCount);
 
         return userVacationPolicy.getId();
     }
@@ -811,8 +809,7 @@ public class VacationService {
                 totalRevokedGrants += revokedGrantCount;
                 revokedIds.add(policyId);
 
-                log.info("Revoked vacation policy {} from user {} ({} grants revoked)",
-                        policyId, userId, revokedGrantCount);
+                log.info("Revoked vacation policy {} from user {} ({} grants revoked)", policyId, userId, revokedGrantCount);
 
             } catch (Exception e) {
                 log.error("Failed to revoke vacation policy {} from user {}: {}", policyId, userId, e.getMessage());
@@ -820,8 +817,7 @@ public class VacationService {
             }
         }
 
-        log.info("Revoked {} vacation policies from user {} ({} total grants revoked)",
-                revokedIds.size(), userId, totalRevokedGrants);
+        log.info("Revoked {} vacation policies from user {} ({} total grants revoked)", revokedIds.size(), userId, totalRevokedGrants);
 
         return revokedIds;
     }
@@ -848,19 +844,42 @@ public class VacationService {
             );
         }
 
-        // 4. 부여 시간 검증 (필수, 양수)
-        if (data.getGrantTime() == null || data.getGrantTime().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException(
-                    ms.getMessage("error.validate.vacation.grantTimeRequired", null, null)
-            );
+        // 4. 부여 시간 결정 (가변 부여 여부에 따라 분기)
+        BigDecimal grantTime;
+        if (YNType.isN(policy.getIsFlexibleGrant())) {
+            // 가변 부여 여부가 N인 경우: 정책에 정의된 grantTime 사용
+            grantTime = policy.getGrantTime();
+            if (grantTime == null || grantTime.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException(
+                        ms.getMessage("error.validate.vacation.policyGrantTimeInvalid", null, null)
+                );
+            }
+        } else {
+            // 가변 부여 여부가 Y인 경우: 사용자가 DTO로 넘긴 grantTime 사용
+            grantTime = data.getGrantTime();
+            if (grantTime == null || grantTime.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException(
+                        ms.getMessage("error.validate.vacation.grantTimeRequired", null, null)
+                );
+            }
         }
 
-        // 5. grantDate와 expiryDate 계산 (정책의 effectiveType, expirationType 사용)
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime grantDate = policy.getEffectiveType().calculateDate(now);
-        LocalDateTime expiryDate = policy.getExpirationType().calculateDate(grantDate);
+        // 5. grantDate와 expiryDate 결정 (사용자 입력 우선, 없으면 정책 기반 계산)
+        LocalDateTime grantDate;
+        LocalDateTime expiryDate;
 
-        log.info("Calculated dates using policy types - grantDate: {}, expiryDate: {}", grantDate, expiryDate);
+        if (data.getGrantDate() != null && data.getExpiryDate() != null) {
+            // 사용자가 입력한 부여일과 만료일 사용
+            grantDate = data.getGrantDate();
+            expiryDate = data.getExpiryDate();
+            log.info("Using user-provided dates - grantDate: {}, expiryDate: {}", grantDate, expiryDate);
+        } else {
+            // 정책의 effectiveType, expirationType을 사용하여 계산
+            LocalDateTime now = LocalDateTime.now();
+            grantDate = policy.getEffectiveType().calculateDate(now);
+            expiryDate = policy.getExpirationType().calculateDate(grantDate);
+            log.info("Calculated dates using policy types - grantDate: {}, expiryDate: {}", grantDate, expiryDate);
+        }
 
         // 6. 부여일과 만료일 검증 (부여일 < 만료일)
         if (PorestTime.isAfterThanEndDate(grantDate, expiryDate)) {
@@ -869,15 +888,13 @@ public class VacationService {
             );
         }
 
-        // TODO: 추후에 관리자가 주는 정책은 정책에서 날짜를 계산할 수도 있지만 관리자가 직접 발생일과 만료일을 설정할 수도 있다. 관련된 로직 추가 예정
-
         // 7. VacationGrant 생성
         VacationGrant vacationGrant = VacationGrant.createVacationGrant(
                 user,
                 policy,
                 data.getDesc() != null ? data.getDesc() : "관리자 직접 부여",
                 policy.getVacationType(),
-                data.getGrantTime(),
+                grantTime,
                 grantDate,
                 expiryDate
         );
@@ -886,7 +903,7 @@ public class VacationService {
         vacationGrantRepository.save(vacationGrant);
 
         log.info("Manually granted vacation: grantId={}, userId={}, policyId={}, grantTime={}, grantDate={}, expiryDate={}",
-                vacationGrant.getId(), userId, policy.getId(), data.getGrantTime(), grantDate, expiryDate);
+                vacationGrant.getId(), userId, policy.getId(), grantTime, grantDate, expiryDate);
 
         return vacationGrant;
     }

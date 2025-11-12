@@ -75,4 +75,47 @@ public class WorkHistory extends AuditingFields {
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted")
     private YNType isDeleted;
+
+    /**
+     * 업무 이력 생성 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 업무 이력 생성할 것
+     *
+     * @return WorkHistory
+     */
+    public static WorkHistory createWorkHistory(LocalDate date, User user, WorkCode group, WorkCode part, WorkCode classes, BigDecimal hours, String content) {
+        WorkHistory workHistory = new WorkHistory();
+        workHistory.date = date;
+        workHistory.user = user;
+        workHistory.group = group;
+        workHistory.part = part;
+        workHistory.classes = classes;
+        workHistory.hours = hours;
+        workHistory.content = content;
+        workHistory.isDeleted = YNType.N;
+        return workHistory;
+    }
+
+    /**
+     * 업무 이력 수정 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 업무 이력 수정할 것
+     */
+    public void updateWorkHistory(LocalDate date, User user, WorkCode group, WorkCode part, WorkCode classes, BigDecimal hours, String content) {
+        if (date != null) { this.date = date; }
+        if (user != null) { this.user = user; }
+        if (group != null) { this.group = group; }
+        if (part != null) { this.part = part; }
+        if (classes != null) { this.classes = classes; }
+        if (hours != null) { this.hours = hours; }
+        if (content != null) { this.content = content; }
+    }
+
+    /**
+     * 업무 이력 삭제 함수 (Soft Delete)<br>
+     * is_deleted 플래그를 Y로 설정
+     */
+    public void deleteWorkHistory() {
+        this.isDeleted = YNType.Y;
+    }
 }
