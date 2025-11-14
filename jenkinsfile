@@ -6,9 +6,9 @@ pipeline {
     }
     
     environment {
-        DEPLOY_PATH = '~/porest-back'
+        DEPLOY_PATH = '/home/porest/porest-back'
         JAR_NAME = 'porest-0.0.1-SNAPSHOT.jar'
-        CONFIG_PATH = '~/porest-back/config'
+        CONFIG_PATH = '/home/porest/porest-back/config'
     }
     
     stages {
@@ -36,8 +36,8 @@ pipeline {
             steps {
                 script {
                     // 배포 디렉토리 생성
-                    sh "mkdir -p ${DEPLOY_PATH}"
-                    sh "mkdir -p ${CONFIG_PATH}"
+                    sh "sudo mkdir -p ${DEPLOY_PATH}"
+                    sh "sudo mkdir -p ${CONFIG_PATH}"
                     
                     // 기존 프로세스 종료
                     sh """
@@ -47,17 +47,14 @@ pipeline {
                     
                     // JAR 파일 복사
                     sh """
-                        cp build/libs/*-SNAPSHOT.jar ${DEPLOY_PATH}/${JAR_NAME}
+                        sudo cp build/libs/*-SNAPSHOT.jar ${DEPLOY_PATH}/${JAR_NAME}
+                        sudo chown porest:porest ${DEPLOY_PATH}/${JAR_NAME}
                     """
                     
                     // 애플리케이션 재시작
                     sh """
-                        cd ${DEPLOY_PATH}
-                        nohup java -jar ${JAR_NAME} \\
-                            --spring.profiles.active=prod \\
-                            --spring.config.additional-location=file:${CONFIG_PATH}/application-secret.properties \\
-                            > app.log 2>&1 &
-                        echo "Spring Boot application started with prod profile"
+                        sudo -u porest bash -c 'cd ${DEPLOY_PATH} && nohup java -jar ${JAR_NAME} --spring.profiles.active=prod --spring.config.additional-location=file:${CONFIG_PATH}/application-secret.properties > app.log 2>&1 &'
+                        echo "Spring Boot application started as porest user with prod profile"
                     """
                     
                     // 프로세스 확인
