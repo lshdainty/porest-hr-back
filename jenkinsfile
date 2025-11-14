@@ -1,0 +1,88 @@
+pipeline {
+    agent any
+    
+    tools {
+        jdk 'jdk17'
+    }
+    
+    environment {
+        DEPLOY_PATH = '~/porest-back'
+        JAR_NAME = 'application.jar'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'vacation_edit',
+                    credentialsId: 'github-credentials',
+                    url: 'https://github.com/lshdainty/porest-back.git'
+            }
+        }
+        
+        stage('Grant Execute Permission') {
+            steps {
+                sh 'chmod +x gradlew'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh './gradlew clean build -x test'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh './gradlew test'
+            }
+            post {
+                always {
+                    junit '**/build/test-results/test/*.xml'
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    // 배포 디렉토리 생성
+                    sh "mkdir -p ${DEPLOY_PATH}"
+                    
+                    // 기존 프로세스 종료
+                    sh """
+                        sudo pkill -f "java -jar.*${JAR_NAME}" || true
+                        sleep 2
+                    """
+                    
+                    // JAR 파일 복사
+                    sh """
+                        cp build/libs/*.jar ${DEPLOY_PATH}/${JAR_NAME}
+                    """
+                    
+                    // 애플리케이션 재시작
+                    sh """
+                        cd ${DEPLOY_PATH}
+                        nohup java -jar ${JAR_NAME} > app.log 2>&1 &
+                        echo "Spring Boot application started on port 8000"
+                    """
+                    
+                    // 프로세스 확인
+                    sh "sleep 3 && pgrep -f 'java -jar' && echo '✅ Process running' || echo '⚠️ Warning: Process not found'"
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✅ Spring Boot 배포 성공!'
+        }
+        failure {
+            echo '❌ Spring Boot 배포 실패!'
+        }
+        cleanup {
+            cleanWs()
+        }
+    }
+}
+

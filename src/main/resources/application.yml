@@ -63,6 +63,6 @@ file:
 
 app:
   frontend:
-    base-url: ${FRONTEND_BASE_URL:http://localhost:3000/web}
+    base-url: ${FRONTEND_BASE_URL:http://localhost:3000}
   company:
     name: ${COMPANY_NAME:porest}
