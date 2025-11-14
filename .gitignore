@@ -9,6 +9,9 @@ build/
 ### Security
 **/src/main/resources/application-oauth.yml
 **/src/main/resources/application-mail.yml
+# 외부 설정 파일 (로컬에만)
+**/application-secret.properties
+**/application-local.yml
 
 ### STS ###
 .apt_generated

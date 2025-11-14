@@ -4,10 +4,6 @@ spring:
   messages:
     basename: message/messages
     encoding: utf-8
-  profiles:
-    include:
-      - oauth
-      - mail
 
   datasource:
     driver-class-name: org.h2.Driver
@@ -31,7 +27,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: ${DDL_AUTO:none}
     properties:
       hibernate:
         default_batch_fetch_size: 100
@@ -40,18 +36,18 @@ server:
   servlet:
     session:
       timeout: 8h
-  port: 8000
+  port: ${SERVER_PORT:8000}
 
 logging:
   level:
-    com.lshdainty.porest.api: debug
-    com.lshdainty.porest.repository: debug
-    com.lshdainty.porest.service: debug
-    com.lshdainty.porest.domain: debug
+    com.lshdainty.porest.api: ${LOG_LEVEL:info}
+    com.lshdainty.porest.repository: ${LOG_LEVEL:info}
+    com.lshdainty.porest.service: ${LOG_LEVEL:info}
+    com.lshdainty.porest.domain: ${LOG_LEVEL:info}
     p6spy: info
 
 file:
-  root-path: /Users/lshdainty/study/testimg
+  root-path: ${FILE_ROOT_PATH:/app/files}
   web-url-prefix: /media
   resource-handler: ${file.web-url-prefix}/**
   resource-locations: file:${file.root-path}/
