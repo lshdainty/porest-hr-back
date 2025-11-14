@@ -56,6 +56,7 @@ public class SecurityConfig {
                 // 인증 없이 접근 가능한 경로들
                 .requestMatchers(
                         "/",
+                        "/health",
                         "/login",                // 로그인
                         "/login/check",          // 현재 로그인된 유저정보
                         "/logout",               // 로그아웃
