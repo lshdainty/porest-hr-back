@@ -1,5 +1,6 @@
 package com.lshdainty.porest.user.service;
 
+import com.lshdainty.porest.common.config.properties.AppProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +17,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class EmailService {
     private final JavaMailSender mailSender;
-
-    @Value("${app.frontend.base-url}")
-    private String frontendBaseUrl;
-
-    @Value("${app.company.name}")
-    private String companyName;
+    private final AppProperties appProperties;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
-
-    @Value("${app.email.logo.path:templates/email/logo.png}")
-    private String logoPath;
 
     /**
      * 로고 이미지 파일 로드
@@ -36,11 +29,12 @@ public class EmailService {
      */
     private byte[] loadLogoImage() {
         try {
+            String logoPath = appProperties.getEmail().getLogo().getPath();
             ClassPathResource resource = new ClassPathResource(logoPath);
             // InputStream을 사용하여 파일 읽기 (JAR 내부에서도 작동)
             return resource.getInputStream().readAllBytes();
         } catch (Exception e) {
-            log.error("로고 이미지 파일 로드 실패: {}", logoPath, e);
+            log.error("로고 이미지 파일 로드 실패: {}", appProperties.getEmail().getLogo().getPath(), e);
             return null;
         }
     }
@@ -56,6 +50,9 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            String companyName = appProperties.getCompany().getName();
+            String frontendBaseUrl = appProperties.getFrontend().getBaseUrl();
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
@@ -95,6 +92,7 @@ public class EmailService {
             // 로고 이미지를 CID 첨부로 추가
             byte[] logoImageBytes = loadLogoImage();
             if (logoImageBytes != null) {
+                String logoPath = appProperties.getEmail().getLogo().getPath();
                 String fileName = logoPath.substring(logoPath.lastIndexOf("/") + 1);
                 String contentType = logoPath.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg";
                 helper.addInline("logo", new ByteArrayResource(logoImageBytes), contentType);

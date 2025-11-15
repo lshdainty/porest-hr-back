@@ -1,5 +1,6 @@
 package com.lshdainty.porest.common.config.web;
 
+import com.lshdainty.porest.common.config.properties.AppProperties;
 import com.lshdainty.porest.security.resolver.LoginUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
     private final LoginUserArgumentResolver loginUserArgumentResolver;
+    private final AppProperties appProperties;
 
     @Value("${file.resource-handler}")
     private String resourceHandler;
@@ -25,10 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns(
-                        "http://localhost:*",
-                        "http://porest.cloud"
-                )
+                .allowedOriginPatterns(appProperties.getFrontend().getBaseUrl())
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

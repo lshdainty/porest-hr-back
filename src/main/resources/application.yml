@@ -63,3 +63,6 @@ app:
     base-url: ${FRONTEND_BASE_URL:http://localhost:3000}
   company:
     name: ${COMPANY_NAME:porest}
+  email:
+    logo:
+      path: ${EMAIL_LOGO_PATH:templates/email/logo.png}

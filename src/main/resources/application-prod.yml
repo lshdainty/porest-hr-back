@@ -54,4 +54,4 @@ file:
 
 app:
   frontend:
-    base-url: ${FRONTEND_BASE_URL:http://porest.cloud}
+    base-url: ${FRONTEND_BASE_URL:https://porest.cloud}

@@ -1,5 +1,6 @@
 package com.lshdainty.porest.common.config.security;
 
+import com.lshdainty.porest.common.config.properties.AppProperties;
 import com.lshdainty.porest.security.handler.*;
 import com.lshdainty.porest.security.service.CustomOAuth2UserService;
 import com.lshdainty.porest.security.service.CustomUserDetailsService;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final RequestLoggingFilter requestLoggingFilter;
+    private final AppProperties appProperties;
 
     // password 암호화를 위한 bean 등록
     @Bean
@@ -126,8 +128,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                        "http://localhost:3000",
-                        "http://porest.cloud"
+                appProperties.getFrontend().getBaseUrl()
         ));
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");
