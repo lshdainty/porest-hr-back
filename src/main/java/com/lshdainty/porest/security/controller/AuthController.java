@@ -26,7 +26,7 @@ public class AuthController {
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @GetMapping("login/check")
+    @GetMapping("/api/v1/login/check")
     public ApiResponse<AuthApiDto.LoginUserInfo> getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -69,7 +69,7 @@ public class AuthController {
     /**
      * 비밀번호 인코딩 유틸리티 API (개발/테스트용)
      */
-    @PostMapping("/encode-password")
+    @PostMapping("/api/v1/encode-password")
     public ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(@RequestBody AuthApiDto.EncodePasswordReq data) {
         log.info("Password encoding request");
 

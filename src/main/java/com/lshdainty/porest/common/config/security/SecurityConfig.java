@@ -58,13 +58,12 @@ public class SecurityConfig {
                 // 인증 없이 접근 가능한 경로들
                 .requestMatchers(
                         "/",
-                        "/health",
-                        "/login",                // 로그인
-                        "/login/check",          // 현재 로그인된 유저정보
-                        "/logout",               // 로그아웃
+                        "/api/v1/login",                // 로그인
+                        "/api/v1/login/check",          // 현재 로그인된 유저정보
+                        "/api/v1/logout",               // 로그아웃
                         "/oauth2/**",            // OAuth2 시작 URL
                         "/login/oauth2/**",      // OAuth2 콜백 URL (중요!)
-                        "/encode-password",      // 비밀번호 인코딩 (개발용)
+                        "/api/v1/encode-password",      // 비밀번호 인코딩 (개발용)
                         "/css/**",               // css
                         "/images/**",            // images
                         "/js/**"                 // js
@@ -80,7 +79,7 @@ public class SecurityConfig {
         // Form 로그인 방식 설정
         http.formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/api/v1/login")
                         .usernameParameter("user_id")
                         .passwordParameter("user_pw")
                         .successHandler(customAuthenticationSuccessHandler)
@@ -102,7 +101,7 @@ public class SecurityConfig {
         //로그아웃 시 리다이렉트될 URL을 설정
         http.logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
+                .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/logout", "POST"))
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
