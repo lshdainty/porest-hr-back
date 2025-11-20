@@ -42,6 +42,7 @@ public class WorkCodeService {
                         .name(wc.getName())
                         .type(wc.getType())
                         .orderSeq(wc.getOrderSeq())
+                        .parentSeq(wc.getParent() != null ? wc.getParent().getSeq() : null)
                         .build())
                 .collect(Collectors.toList());
     }

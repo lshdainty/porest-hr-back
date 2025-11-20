@@ -12,4 +12,5 @@ public class WorkCodeServiceDto {
     private String name;
     private CodeType type;
     private Integer orderSeq;
+    private Long parentSeq;
 }

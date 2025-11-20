@@ -67,5 +67,6 @@ public class WorkHistoryApiDto {
         private String workCodeName;
         private CodeType codeType;
         private Integer orderSeq;
+        private Long parentSeq;
     }
 }

@@ -118,7 +118,8 @@ public class WorkHistoryApiController {
                 dto.getCode(),
                 dto.getName(),
                 dto.getType(),
-                dto.getOrderSeq()
+                dto.getOrderSeq(),
+                dto.getParentSeq()
         );
     }
 }
