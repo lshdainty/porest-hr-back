@@ -60,7 +60,9 @@ public class VacationApiController {
                         g.getType().getViewName(),
                         g.getDesc(),
                         g.getGrantTime(),
+                        VacationTimeType.convertValueToDay(g.getGrantTime()),
                         g.getRemainTime(),
+                        VacationTimeType.convertValueToDay(g.getRemainTime()),
                         g.getGrantDate(),
                         g.getExpiryDate()
                 ))
@@ -74,6 +76,7 @@ public class VacationApiController {
                         u.getType(),
                         u.getType().getStrName(),
                         u.getUsedTime(),
+                        VacationTimeType.convertValueToDay(u.getUsedTime()),
                         u.getStartDate(),
                         u.getEndDate()
                 ))
@@ -101,7 +104,9 @@ public class VacationApiController {
                                             g.getType().getViewName(),
                                             g.getDesc(),
                                             g.getGrantTime(),
+                                            VacationTimeType.convertValueToDay(g.getGrantTime()),
                                             g.getRemainTime(),
+                                            VacationTimeType.convertValueToDay(g.getRemainTime()),
                                             g.getGrantDate(),
                                             g.getExpiryDate()
                                     ))
@@ -116,6 +121,7 @@ public class VacationApiController {
                                             u.getType(),
                                             u.getType().getStrName(),
                                             u.getUsedTime(),
+                                            VacationTimeType.convertValueToDay(u.getUsedTime()),
                                             u.getStartDate(),
                                             u.getEndDate()
                                     ))

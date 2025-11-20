@@ -67,7 +67,9 @@ public class VacationApiDto {
             private String vacationTypeName;
             private String vacationGrantDesc;
             private BigDecimal grantTime;
+            private String grantTimeStr;
             private BigDecimal remainTime;
+            private String remainTimeStr;
             private LocalDateTime grantDate;
             private LocalDateTime expiryDate;
         }
@@ -81,6 +83,7 @@ public class VacationApiDto {
             private VacationTimeType vacationTimeType;
             private String vacationTimeTypeName;
             private BigDecimal usedTime;
+            private String usedTimeStr;
             private LocalDateTime startDate;
             private LocalDateTime endDate;
         }
@@ -104,7 +107,9 @@ public class VacationApiDto {
             private String vacationTypeName;
             private String vacationGrantDesc;
             private BigDecimal grantTime;
+            private String grantTimeStr;
             private BigDecimal remainTime;
+            private String remainTimeStr;
             private LocalDateTime grantDate;
             private LocalDateTime expiryDate;
         }
@@ -118,6 +123,7 @@ public class VacationApiDto {
             private VacationTimeType vacationTimeType;
             private String vacationTimeTypeName;
             private BigDecimal usedTime;
+            private String usedTimeStr;
             private LocalDateTime startDate;
             private LocalDateTime endDate;
         }
