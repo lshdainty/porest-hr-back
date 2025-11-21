@@ -38,6 +38,24 @@ public class WorkHistoryApiController {
         return ApiResponse.success(new WorkHistoryApiDto.CreateWorkHistoryResp(workHistorySeq));
     }
 
+    @PostMapping("/api/v1/work-histories/bulk")
+    public ApiResponse createWorkHistories(@RequestBody WorkHistoryApiDto.BulkCreateWorkHistoryReq data) {
+        List<WorkHistoryServiceDto> dtos = data.getWorkHistories().stream()
+                .map(req -> WorkHistoryServiceDto.builder()
+                        .date(req.getWorkDate())
+                        .userId(req.getWorkUserId())
+                        .groupCode(req.getWorkGroupCode())
+                        .partCode(req.getWorkPartCode())
+                        .classCode(req.getWorkClassCode())
+                        .hours(req.getWorkHour())
+                        .content(req.getWorkContent())
+                        .build())
+                .collect(Collectors.toList());
+
+        List<Long> workHistorySeqs = workHistoryService.createWorkHistories(dtos);
+        return ApiResponse.success(new WorkHistoryApiDto.BulkCreateWorkHistoryResp(workHistorySeqs));
+    }
+
     @GetMapping("/api/v1/work-histories")
     public ApiResponse findAllWorkHistories(@ModelAttribute WorkHistorySearchCondition condition) {
         List<WorkHistoryServiceDto> dtos = workHistoryService.findAllWorkHistories(condition);

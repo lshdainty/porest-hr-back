@@ -29,6 +29,13 @@ public class WorkHistoryCustomRepositoryImpl implements WorkHistoryCustomReposit
     }
 
     @Override
+    public void saveAll(List<WorkHistory> workHistories) {
+        for (WorkHistory workHistory : workHistories) {
+            em.persist(workHistory);
+        }
+    }
+
+    @Override
     public Optional<WorkHistory> findById(Long id) {
         return Optional.ofNullable(query
                 .selectFrom(workHistory)

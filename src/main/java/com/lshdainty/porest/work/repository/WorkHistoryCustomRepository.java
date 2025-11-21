@@ -10,6 +10,9 @@ public interface WorkHistoryCustomRepository {
     // 신규 업무 이력 저장
     void save(WorkHistory workHistory);
 
+    // 신규 업무 이력 다건 저장
+    void saveAll(List<WorkHistory> workHistories);
+
     // 단건 업무 이력 조회
     Optional<WorkHistory> findById(Long id);
 

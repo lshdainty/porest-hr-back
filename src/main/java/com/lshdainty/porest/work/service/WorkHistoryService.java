@@ -57,6 +57,31 @@ public class WorkHistoryService {
         return workHistory.getSeq();
     }
 
+    @Transactional
+    public List<Long> createWorkHistories(List<WorkHistoryServiceDto> dataList) {
+        List<WorkHistory> workHistories = dataList.stream().map(data -> {
+            User user = userService.checkUserExist(data.getUserId());
+            WorkCode group = checkWorkCodeExist(data.getGroupCode());
+            WorkCode part = checkWorkCodeExist(data.getPartCode());
+            WorkCode classes = checkWorkCodeExist(data.getClassCode());
+
+            return WorkHistory.createWorkHistory(
+                    data.getDate(),
+                    user,
+                    group,
+                    part,
+                    classes,
+                    data.getHours(),
+                    data.getContent());
+        }).collect(Collectors.toList());
+
+        workHistoryRepository.saveAll(workHistories);
+
+        return workHistories.stream()
+                .map(WorkHistory::getSeq)
+                .collect(Collectors.toList());
+    }
+
     public List<WorkHistoryServiceDto> findAllWorkHistories(WorkHistorySearchCondition condition) {
         List<WorkHistory> workHistories = workHistoryRepository.findAll(condition);
 

@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.lshdainty.porest.work.type.CodeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class WorkHistoryApiDto {
     @Getter
@@ -28,6 +30,21 @@ public class WorkHistoryApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class CreateWorkHistoryResp {
         private Long workHistorySeq;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class BulkCreateWorkHistoryReq {
+        private List<CreateWorkHistoryReq> workHistories;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class BulkCreateWorkHistoryResp {
+        private List<Long> workHistorySeqs;
     }
 
     @Getter
