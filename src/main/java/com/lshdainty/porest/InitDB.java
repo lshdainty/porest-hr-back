@@ -18,6 +18,7 @@ import com.lshdainty.porest.user.type.RoleType;
 import com.lshdainty.porest.vacation.domain.*;
 import com.lshdainty.porest.vacation.type.*;
 import com.lshdainty.porest.work.domain.WorkCode;
+import com.lshdainty.porest.work.domain.WorkHistory;
 import com.lshdainty.porest.work.type.CodeType;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -31,6 +32,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
@@ -50,6 +54,7 @@ public class InitDB {
                 initService.initSetUserVacationPolicy();
                 initService.initSetVacationGrant();
                 initService.initSetWorkCode();
+                initService.initSetWorkHistory();
         }
 
         @Component
@@ -63,6 +68,7 @@ public class InitDB {
                 private User user1, user2, user3, user4, user5, user6;
                 private Department dept, GMESJ, GMESM, DT, myDATA, tableau;
                 private final java.util.Map<String, java.util.List<VacationPolicy>> policyMap = new java.util.HashMap<>();
+                private final Map<String, WorkCode> workCodeMap = new HashMap<>();
 
                 public void initSetMember() {
                         user1 = saveMember("user1", "이서준", "aaa@naver.com", LocalDate.of(1970, 7, 23),
@@ -886,7 +892,61 @@ public class InitDB {
                                 Integer orderSeq) {
                         WorkCode workCode = WorkCode.createWorkCode(code, name, type, parent, orderSeq);
                         em.persist(workCode);
+                        workCodeMap.put(code, workCode);
                         return workCode;
+                }
+
+                private WorkHistory saveWorkHistory(LocalDate date, User user, WorkCode group, WorkCode part,
+                                WorkCode division, BigDecimal hours, String content) {
+                        WorkHistory workHistory = WorkHistory.createWorkHistory(date, user, group, part, division,
+                                        hours, content);
+                        em.persist(workHistory);
+                        return workHistory;
+                }
+
+                public void initSetWorkHistory() {
+                        // Group -> Part 관계 정의
+                        Map<String, List<String>> groupPartMap = new HashMap<>();
+                        groupPartMap.put("assignment", List.of("assignment_1", "assignment_2", "assignment_3"));
+                        groupPartMap.put("operation", List.of("operation_1", "operation_2", "operation_3",
+                                        "operation_4", "operation_5"));
+                        groupPartMap.put("project", List.of("project_1"));
+                        groupPartMap.put("etc", List.of("etc_1"));
+
+                        List<String> groups = List.of("assignment", "operation", "project", "etc");
+                        List<String> divisions = List.of("division_1", "division_2", "division_3", "division_4",
+                                        "division_5", "division_6");
+                        List<User> users = List.of(user1, user2, user3, user4, user5, user6);
+                        Random random = new Random();
+
+                        for (int i = 0; i < 100; i++) {
+                                // Random User
+                                User user = users.get(random.nextInt(users.size()));
+
+                                // Random Group
+                                String groupCodeStr = groups.get(random.nextInt(groups.size()));
+                                WorkCode group = workCodeMap.get(groupCodeStr);
+
+                                // Valid Part for Group
+                                List<String> parts = groupPartMap.get(groupCodeStr);
+                                String partCodeStr = parts.get(random.nextInt(parts.size()));
+                                WorkCode part = workCodeMap.get(partCodeStr);
+
+                                // Random Division
+                                String divisionCodeStr = divisions.get(random.nextInt(divisions.size()));
+                                WorkCode division = workCodeMap.get(divisionCodeStr);
+
+                                // Random Date (2025년 내)
+                                LocalDate date = LocalDate.of(2025, random.nextInt(12) + 1, random.nextInt(28) + 1);
+
+                                // Random Hours (1 ~ 8)
+                                BigDecimal hours = new BigDecimal(random.nextInt(8) + 1);
+
+                                // Content
+                                String content = "업무 이력 테스트 데이터 " + (i + 1);
+
+                                saveWorkHistory(date, user, group, part, division, hours, content);
+                        }
                 }
 
                 private UserVacationPolicy saveUserVacationPolicy(User user, VacationPolicy vacationPolicy) {
