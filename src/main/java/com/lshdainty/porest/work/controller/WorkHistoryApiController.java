@@ -2,6 +2,7 @@ package com.lshdainty.porest.work.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.work.controller.dto.WorkHistoryApiDto;
+import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import com.lshdainty.porest.work.service.WorkCodeService;
 import com.lshdainty.porest.work.service.WorkHistoryService;
 import com.lshdainty.porest.work.service.dto.WorkCodeServiceDto;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.io.IOException;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,14 +34,13 @@ public class WorkHistoryApiController {
                 .classCode(data.getWorkClassCode())
                 .hours(data.getWorkHour())
                 .content(data.getWorkContent())
-                .build()
-        );
+                .build());
         return ApiResponse.success(new WorkHistoryApiDto.CreateWorkHistoryResp(workHistorySeq));
     }
 
     @GetMapping("/api/v1/work-histories")
-    public ApiResponse findAllWorkHistories() {
-        List<WorkHistoryServiceDto> dtos = workHistoryService.findAllWorkHistories();
+    public ApiResponse findAllWorkHistories(@ModelAttribute WorkHistorySearchCondition condition) {
+        List<WorkHistoryServiceDto> dtos = workHistoryService.findAllWorkHistories(condition);
         return ApiResponse.success(dtos.stream()
                 .map(w -> new WorkHistoryApiDto.WorkHistoryResp(
                         w.getSeq(),
@@ -49,8 +51,7 @@ public class WorkHistoryApiController {
                         convertToWorkCodeResp(w.getPartInfo()),
                         convertToWorkCodeResp(w.getClassInfo()),
                         w.getHours(),
-                        w.getContent()
-                ))
+                        w.getContent()))
                 .collect(Collectors.toList()));
     }
 
@@ -66,12 +67,12 @@ public class WorkHistoryApiController {
                 convertToWorkCodeResp(w.getPartInfo()),
                 convertToWorkCodeResp(w.getClassInfo()),
                 w.getHours(),
-                w.getContent()
-        ));
+                w.getContent()));
     }
 
     @PutMapping("/api/v1/work-histories/{seq}")
-    public ApiResponse updateWorkHistory(@PathVariable("seq") Long seq, @RequestBody WorkHistoryApiDto.UpdateWorkHistoryReq data) {
+    public ApiResponse updateWorkHistory(@PathVariable("seq") Long seq,
+            @RequestBody WorkHistoryApiDto.UpdateWorkHistoryReq data) {
         workHistoryService.updateWorkHistory(WorkHistoryServiceDto.builder()
                 .seq(seq)
                 .date(data.getWorkDate())
@@ -81,8 +82,7 @@ public class WorkHistoryApiController {
                 .classCode(data.getWorkClassCode())
                 .hours(data.getWorkHour())
                 .content(data.getWorkContent())
-                .build()
-        );
+                .build());
         return ApiResponse.success();
     }
 
@@ -101,9 +101,9 @@ public class WorkHistoryApiController {
             @RequestParam(value = "parent_work_code", required = false) String parentWorkCode,
             @RequestParam(value = "parent_work_code_seq", required = false) Long parentWorkCodeSeq,
             @RequestParam(value = "parent_is_null", required = false) Boolean parentIsNull,
-            @RequestParam(value = "type", required = false) CodeType type
-    ) {
-        List<WorkCodeServiceDto> workCodes = workCodeService.findWorkCodes(parentWorkCode, parentWorkCodeSeq, parentIsNull, type);
+            @RequestParam(value = "type", required = false) CodeType type) {
+        List<WorkCodeServiceDto> workCodes = workCodeService.findWorkCodes(parentWorkCode, parentWorkCodeSeq,
+                parentIsNull, type);
         return ApiResponse.success(workCodes.stream()
                 .map(this::convertToWorkCodeResp)
                 .collect(Collectors.toList()));
@@ -119,7 +119,12 @@ public class WorkHistoryApiController {
                 dto.getName(),
                 dto.getType(),
                 dto.getOrderSeq(),
-                dto.getParentSeq()
-        );
+                dto.getParentSeq());
+    }
+
+    @GetMapping("/api/v1/work-histories/excel/download")
+    public void downloadWorkHistoryExcel(HttpServletResponse response,
+            @ModelAttribute WorkHistorySearchCondition condition) throws IOException {
+        workHistoryService.downloadWorkHistoryExcel(response, condition);
     }
 }

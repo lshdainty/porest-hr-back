@@ -3,6 +3,7 @@ package com.lshdainty.porest.repository;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.work.domain.WorkCode;
 import com.lshdainty.porest.work.domain.WorkHistory;
+import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import com.lshdainty.porest.work.repository.WorkHistoryCustomRepositoryImpl;
 import com.lshdainty.porest.work.type.CodeType;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@Import({WorkHistoryCustomRepositoryImpl.class, TestQuerydslConfig.class})
+@Import({ WorkHistoryCustomRepositoryImpl.class, TestQuerydslConfig.class })
 @Transactional
 @DisplayName("JPA 업무이력 레포지토리 테스트")
 class WorkHistoryRepositoryImplTest {
@@ -57,8 +58,7 @@ class WorkHistoryRepositoryImplTest {
     void save() {
         // given
         WorkHistory workHistory = WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "API 개발 업무 진행"
-        );
+                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "API 개발 업무 진행");
 
         // when
         workHistoryRepository.save(workHistory);
@@ -87,16 +87,14 @@ class WorkHistoryRepositoryImplTest {
     void findAll() {
         // given
         workHistoryRepository.save(WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "업무1"
-        ));
+                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "업무1"));
         workHistoryRepository.save(WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 16), user, group, part, division, new BigDecimal("4.0"), "업무2"
-        ));
+                LocalDate.of(2025, 1, 16), user, group, part, division, new BigDecimal("4.0"), "업무2"));
         em.flush();
         em.clear();
 
         // when
-        List<WorkHistory> histories = workHistoryRepository.findAll();
+        List<WorkHistory> histories = workHistoryRepository.findAll(new WorkHistorySearchCondition());
 
         // then
         assertThat(histories).hasSize(2);
@@ -107,7 +105,7 @@ class WorkHistoryRepositoryImplTest {
     @DisplayName("전체 업무이력이 없어도 Null이 반환되면 안된다.")
     void findAllEmpty() {
         // given & when
-        List<WorkHistory> histories = workHistoryRepository.findAll();
+        List<WorkHistory> histories = workHistoryRepository.findAll(new WorkHistorySearchCondition());
 
         // then
         assertThat(histories.isEmpty()).isTrue();
@@ -118,15 +116,15 @@ class WorkHistoryRepositoryImplTest {
     void updateWorkHistory() {
         // given
         WorkHistory history = WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "기존 업무"
-        );
+                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "기존 업무");
         workHistoryRepository.save(history);
         em.flush();
         em.clear();
 
         // when
         WorkHistory findHistory = workHistoryRepository.findById(history.getSeq()).orElseThrow();
-        findHistory.updateWorkHistory(LocalDate.of(2025, 1, 16), null, null, null, null, new BigDecimal("4.0"), "수정된 업무");
+        findHistory.updateWorkHistory(LocalDate.of(2025, 1, 16), null, null, null, null, new BigDecimal("4.0"),
+                "수정된 업무");
         em.flush();
         em.clear();
 
@@ -144,16 +142,14 @@ class WorkHistoryRepositoryImplTest {
         em.persist(user2);
 
         workHistoryRepository.save(WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "user1 업무"
-        ));
+                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "user1 업무"));
         workHistoryRepository.save(WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 15), user2, group, part, division, new BigDecimal("8.0"), "user2 업무"
-        ));
+                LocalDate.of(2025, 1, 15), user2, group, part, division, new BigDecimal("8.0"), "user2 업무"));
         em.flush();
         em.clear();
 
         // when
-        List<WorkHistory> histories = workHistoryRepository.findAll();
+        List<WorkHistory> histories = workHistoryRepository.findAll(new WorkHistorySearchCondition());
 
         // then
         assertThat(histories).hasSize(2);
@@ -164,8 +160,7 @@ class WorkHistoryRepositoryImplTest {
     void findByIdWithRelations() {
         // given
         WorkHistory history = WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "업무"
-        );
+                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "업무");
         workHistoryRepository.save(history);
         em.flush();
         em.clear();

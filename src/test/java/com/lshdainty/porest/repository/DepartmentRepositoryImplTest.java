@@ -278,4 +278,110 @@ class DepartmentRepositoryImplTest {
         // then
         assertThat(findDepartment.isEmpty()).isTrue();
     }
+
+    @Test
+    @DisplayName("특정 부서에 속한 UserDepartment 목록 조회")
+    void findUserDepartmentsInDepartment() {
+        // given
+        User user1 = User.createUser("user1");
+        User user2 = User.createUser("user2");
+        em.persist(user1);
+        em.persist(user2);
+
+        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
+        departmentRepository.save(department);
+
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user1, department, YNType.Y));
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user2, department, YNType.N));
+        em.flush();
+        em.clear();
+
+        // when
+        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getId());
+
+        // then
+        assertThat(userDepartments).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("headUserId로 부서 목록 조회")
+    void findByUserIds() {
+        // given
+        Department dept1 = Department.createDepartment("개발팀", "개발팀", null, "user1", 1L, "개발 부서", "#FF0000", company);
+        Department dept2 = Department.createDepartment("디자인팀", "디자인팀", null, "user2", 1L, "디자인 부서", "#00FF00", company);
+        Department dept3 = Department.createDepartment("기획팀", "기획팀", null, "user3", 1L, "기획 부서", "#0000FF", company);
+        departmentRepository.save(dept1);
+        departmentRepository.save(dept2);
+        departmentRepository.save(dept3);
+        em.flush();
+        em.clear();
+
+        // when
+        List<Department> departments = departmentRepository.findByUserIds(List.of("user1", "user2"));
+
+        // then
+        assertThat(departments).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("사용자의 상위 결재자 부서 목록 조회")
+    void findApproversByUserId() {
+        // given
+        User user = User.createUser("user1");
+        em.persist(user);
+
+        // 부서 계층 생성: 본부 -> 팀 -> 파트
+        Department headquarters = Department.createDepartment("본부", "본부", null, "head1", 1L, "본부", "#FF0000", company);
+        departmentRepository.save(headquarters);
+
+        Department team = Department.createDepartment("팀", "팀", headquarters, "head2", 2L, "팀", "#00FF00", company);
+        departmentRepository.save(team);
+
+        Department part = Department.createDepartment("파트", "파트", team, "head3", 3L, "파트", "#0000FF", company);
+        departmentRepository.save(part);
+
+        // user1을 파트에 메인 부서로 등록
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user, part, YNType.Y));
+        em.flush();
+        em.clear();
+
+        // when
+        List<Department> approvers = departmentRepository.findApproversByUserId("user1");
+
+        // then
+        assertThat(approvers).hasSize(2); // 팀, 본부
+        assertThat(approvers.get(0).getName()).isEqualTo("팀");
+        assertThat(approvers.get(1).getName()).isEqualTo("본부");
+    }
+
+    @Test
+    @DisplayName("메인 부서가 없는 사용자의 결재자 조회 시 빈 목록 반환")
+    void findApproversByUserIdNoMainDepartment() {
+        // given & when
+        List<Department> approvers = departmentRepository.findApproversByUserId("nonexistent");
+
+        // then
+        assertThat(approvers).isEmpty();
+    }
+
+    @Test
+    @DisplayName("최상위 부서인 경우 결재자가 없다")
+    void findApproversByUserIdTopLevel() {
+        // given
+        User user = User.createUser("user1");
+        em.persist(user);
+
+        Department topDept = Department.createDepartment("최상위", "최상위", null, "head1", 1L, "최상위", "#FF0000", company);
+        departmentRepository.save(topDept);
+
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user, topDept, YNType.Y));
+        em.flush();
+        em.clear();
+
+        // when
+        List<Department> approvers = departmentRepository.findApproversByUserId("user1");
+
+        // then
+        assertThat(approvers).isEmpty();
+    }
 }

@@ -1,567 +1,1026 @@
-//package com.lshdainty.porest.service;
-//
-//import com.lshdainty.porest.user.domain.User;
-//import com.lshdainty.porest.user.repository.UserRepositoryImpl;
-//import com.lshdainty.porest.user.service.UserService;
-//import com.lshdainty.porest.user.service.dto.UserServiceDto;
-//import com.lshdainty.porest.company.type.OriginCompanyType;
-//import com.lshdainty.porest.common.type.YNType;
-//import com.lshdainty.porest.common.util.PorestFile;
-//import lombok.extern.slf4j.Slf4j;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.MockedStatic;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.context.MessageSource;
-//import org.springframework.mock.web.MockMultipartFile;
-//import org.springframework.test.util.ReflectionTestUtils;
-//
-//import java.util.*;
-//
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.mockito.ArgumentMatchers.*;
-//import static org.mockito.BDDMockito.*;
-//import static org.mockito.Mockito.mockStatic;
-//
-//@Slf4j
-//@ExtendWith(MockitoExtension.class)
-//@DisplayName("유저 서비스 테스트")
-//class UserServiceTest {
-//
-//    @Mock
-//    private MessageSource ms;
-//
-//    @Mock
-//    private UserRepositoryImpl userRepositoryImpl;
-//
-//    @InjectMocks
-//    private UserService userService;
-//
-//    @BeforeEach
-//    void setUp() {
-//        // @Value로 주입되는 필드들을 테스트용으로 설정
-//        ReflectionTestUtils.setField(userService, "fileRootPath", "/var/www/media");
-//        ReflectionTestUtils.setField(userService, "webUrlPrefix", "/media");
-//        ReflectionTestUtils.setField(userService, "tempPath", "/var/www/media/temp/profile");
-//        ReflectionTestUtils.setField(userService, "originPath", "/var/www/media/origin/profile");
-//    }
-//
-//    @Test
-//    @DisplayName("회원 가입 테스트 - 성공")
-//    void signUpSuccessTest() {
-//        // Given
-//        UserServiceDto dto = UserServiceDto.builder()
-//                .id("user1")
-//                .name("테스트유저")
-//                .email("test@test.com")
-//                .build();
-//
-//        willDoNothing().given(userRepositoryImpl).save(any(User.class));
-//
-//        // When
-//        String result = userService.joinUser(dto);
-//
-//        // Then
-//        then(userRepositoryImpl).should().save(any(User.class));
-//        assertThat(result).isEqualTo("user1");
-//    }
-//
-//    @Test
-//    @DisplayName("회원 가입 테스트 - 성공 (프로필 포함)")
-//    void signUpWithProfileSuccessTest() {
-//        // Given
-//        UserServiceDto dto = UserServiceDto.builder()
-//                .id("user1")
-//                .name("테스트유저")
-//                .profileUrl("/media/temp/profile/test.jpg_some-uuid")
-//                .profileUUID("some-uuid")
-//                .build();
-//
-//        willDoNothing().given(userRepositoryImpl).save(any(User.class));
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            mocked.when(() -> PorestFile.copy(anyString(), anyString(), any(MessageSource.class)))
-//                    .thenReturn(true);
-//            mocked.when(() -> PorestFile.extractOriginalFilename(anyString(), isNull()))
-//                    .thenReturn("test.jpg");
-//
-//            // When
-//            String result = userService.joinUser(dto);
-//
-//            // Then
-//            then(userRepositoryImpl).should().save(argThat(user -> {
-//                assertThat(user.getProfileName()).isEqualTo("test.jpg");
-//                assertThat(user.getProfileUUID()).isEqualTo("some-uuid");
-//                return true;
-//            }));
-//
-//            assertThat(result).isEqualTo("user1");
-//
-//            // verify static method calls
-//            mocked.verify(() -> PorestFile.copy(anyString(), anyString(), eq(ms)));
-//            mocked.verify(() -> PorestFile.extractOriginalFilename(anyString(), isNull()));
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("회원 가입 테스트 - 프로필 복사 실패")
-//    void signUpWithProfileCopyFailTest() {
-//        // Given
-//        UserServiceDto dto = UserServiceDto.builder()
-//                .id("user1")
-//                .name("테스트유저")
-//                .profileUrl("/media/temp/profile/test.jpg_some-uuid")
-//                .profileUUID("some-uuid")
-//                .build();
-//
-//        willDoNothing().given(userRepositoryImpl).save(any(User.class));
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            mocked.when(() -> PorestFile.copy(anyString(), anyString(), any(MessageSource.class)))
-//                    .thenReturn(false); // 복사 실패
-//
-//            // When
-//            String result = userService.joinUser(dto);
-//
-//            // Then
-//            then(userRepositoryImpl).should().save(argThat(user -> {
-//                // 복사 실패 시 프로필 정보가 null이어야 함
-//                assertThat(user.getProfileName()).isNull();
-//                assertThat(user.getProfileUUID()).isNull();
-//                return true;
-//            }));
-//
-//            assertThat(result).isEqualTo("user1");
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("회원 가입 테스트 - 프로필 정보 없음")
-//    void signUpWithoutProfileTest() {
-//        // Given
-//        UserServiceDto dto = UserServiceDto.builder()
-//                .id("user1")
-//                .name("테스트유저")
-//                .build(); // 프로필 정보 없음
-//
-//        willDoNothing().given(userRepositoryImpl).save(any(User.class));
-//
-//        // When
-//        String result = userService.joinUser(dto);
-//
-//        // Then
-//        then(userRepositoryImpl).should().save(argThat(user -> {
-//            assertThat(user.getProfileName()).isNull();
-//            assertThat(user.getProfileUUID()).isNull();
-//            return true;
-//        }));
-//
-//        assertThat(result).isEqualTo("user1");
-//    }
-//
-//    @Test
-//    @DisplayName("단건 유저 조회 테스트 - 성공")
-//    void searchUserSuccessTest() {
-//        // Given
-//        String id = "user1";
-//        String name = "이서준";
-//        User user = User.createUser(id, "", name, "", "", OriginCompanyType.SKAX, "", YNType.N, null, null);
-//
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//
-//        // When
-//        UserServiceDto findUser = userService.searchUser(id);
-//
-//        // Then
-//        then(userRepositoryImpl).should().findById(id);
-//        assertThat(findUser).isNotNull();
-//        assertThat(findUser.getName()).isEqualTo(name);
-//        assertThat(findUser.getProfileUrl()).isNull();
-//    }
-//
-//    @Test
-//    @DisplayName("단건 유저 조회 테스트 - 성공 (프로필 포함)")
-//    void searchUserWithProfileSuccessTest() {
-//        // Given
-//        String id = "user1";
-//        String name = "이서준";
-//        String profileName = "profile.png";
-//        String profileUUID = "some-uuid-1234";
-//        User user = User.createUser(id, "", name, "", "", OriginCompanyType.SKAX, "", YNType.N, profileName, profileUUID);
-//
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            String physicalName = profileName + "_" + profileUUID;
-//            mocked.when(() -> PorestFile.generatePhysicalFilename(profileName, profileUUID))
-//                    .thenReturn(physicalName);
-//
-//            // When
-//            UserServiceDto findUser = userService.searchUser(id);
-//
-//            // Then
-//            then(userRepositoryImpl).should().findById(id);
-//            assertThat(findUser).isNotNull();
-//            assertThat(findUser.getProfileUrl()).isNotNull();
-//            assertThat(findUser.getProfileUrl()).contains(physicalName);
-//
-//            mocked.verify(() -> PorestFile.generatePhysicalFilename(profileName, profileUUID));
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("단건 유저 조회 테스트 - 실패 (유저 없음)")
-//    void searchUserFailTestNotFoundUser() {
-//        // Given
-//        String id = "nonexistent";
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.empty());
-//        given(ms.getMessage("error.notfound.user", null, null)).willReturn("User not found");
-//
-//        // When & Then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-//                () -> userService.searchUser(id));
-//
-//        assertThat(exception.getMessage()).isEqualTo("User not found");
-//        then(userRepositoryImpl).should().findById(id);
-//    }
-//
-//    @Test
-//    @DisplayName("단건 유저 조회 테스트 - 실패 (삭제된 유저 조회)")
-//    void searchUserFailTestDeletedUser() {
-//        // Given
-//        String id = "user1";
-//        User user = User.createUser(id, "", "", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null);
-//        user.deleteUser();
-//
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//        given(ms.getMessage("error.notfound.user", null, null)).willReturn("User not found");
-//
-//        // When & Then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-//                () -> userService.searchUser(id));
-//
-//        assertThat(exception.getMessage()).isEqualTo("User not found");
-//        then(userRepositoryImpl).should().findById(id);
-//    }
-//
-//    @Test
-//    @DisplayName("전체 유저 조회 테스트 - 성공")
-//    void searchUsersSuccessTest() {
-//        // Given
-//        given(userRepositoryImpl.findUsers()).willReturn(List.of(
-//                User.createUser("user1", "", "이서준", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null),
-//                User.createUser("user2", "", "김서연", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null),
-//                User.createUser("user3", "", "김지후", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null)
-//        ));
-//
-//        // When
-//        List<UserServiceDto> findUsers = userService.searchUsers();
-//
-//        // Then
-//        then(userRepositoryImpl).should().findUsers();
-//        assertThat(findUsers).hasSize(3);
-//        assertThat(findUsers)
-//                .extracting(UserServiceDto::getName)
-//                .containsExactlyInAnyOrder("이서준", "김서연", "김지후");
-//    }
-//
-//    @Test
-//    @DisplayName("전체 유저 조회 테스트 - 빈 결과")
-//    void searchUsersEmptyTest() {
-//        // Given
-//        given(userRepositoryImpl.findUsers()).willReturn(Collections.emptyList());
-//
-//        // When
-//        List<UserServiceDto> findUsers = userService.searchUsers();
-//
-//        // Then
-//        then(userRepositoryImpl).should().findUsers();
-//        assertThat(findUsers).isEmpty();
-//    }
-//
-//    @Test
-//    @DisplayName("유저 수정 테스트 - 성공")
-//    void editUserSuccessTest() {
-//        // Given
-//        String id = "user1";
-//        User user = User.createUser(id, "", "", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null);
-//
-//        setUserId(user, id);
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//
-//        UserServiceDto updateDto = UserServiceDto.builder()
-//                .id(id)
-//                .name("이하은")
-//                .workTime("10 ~ 7")
-//                .build();
-//
-//        // When
-//        userService.editUser(updateDto);
-//
-//        // Then
-//        then(userRepositoryImpl).should().findById(id);
-//        assertThat(user.getName()).isEqualTo("이하은");
-//        assertThat(user.getWorkTime()).isEqualTo("10 ~ 7");
-//    }
-//
-//    @Test
-//    @DisplayName("유저 수정 테스트 - 성공 (프로필 변경)")
-//    void editUserWithProfileSuccessTest() {
-//        // Given
-//        String id = "user1";
-//        User user = User.createUser(id, "", "", "", "", OriginCompanyType.SKAX, "", YNType.N, "old.jpg", "old-uuid");
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//
-//        UserServiceDto dto = UserServiceDto.builder()
-//                .id(id)
-//                .profileUrl("/media/temp/profile/new.jpg_new-uuid")
-//                .profileUUID("new-uuid")
-//                .build();
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            mocked.when(() -> PorestFile.copy(anyString(), anyString(), any(MessageSource.class)))
-//                    .thenReturn(true);
-//            mocked.when(() -> PorestFile.extractOriginalFilename(anyString(), isNull()))
-//                    .thenReturn("new.jpg");
-//
-//            // When
-//            userService.editUser(dto);
-//
-//            // Then
-//            then(userRepositoryImpl).should().findById(id);
-//            assertThat(user.getProfileName()).isEqualTo("new.jpg");
-//            assertThat(user.getProfileUUID()).isEqualTo("new-uuid");
-//
-//            // verify static method calls
-//            mocked.verify(() -> PorestFile.copy(anyString(), anyString(), eq(ms)));
-//            mocked.verify(() -> PorestFile.extractOriginalFilename(anyString(), isNull()));
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("유저 수정 테스트 - 성공 (같은 프로필 UUID)")
-//    void editUserWithSameProfileUUIDTest() {
-//        // Given
-//        String id = "user1";
-//        String existingUUID = "existing-uuid";
-//        User user = User.createUser(id, "", "", "", "", OriginCompanyType.SKAX, "", YNType.N, "old.jpg", existingUUID);
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//
-//        UserServiceDto dto = UserServiceDto.builder()
-//                .id(id)
-//                .name("변경된이름")
-//                .profileUUID(existingUUID) // 기존과 동일한 UUID
-//                .build();
-//
-//        // When
-//        userService.editUser(dto);
-//
-//        // Then
-//        then(userRepositoryImpl).should().findById(id);
-//        assertThat(user.getName()).isEqualTo("변경된이름");
-//        // 프로필은 변경되지 않아야 함
-//        assertThat(user.getProfileName()).isEqualTo("old.jpg");
-//        assertThat(user.getProfileUUID()).isEqualTo(existingUUID);
-//    }
-//
-//    @Test
-//    @DisplayName("유저 수정 테스트 - 실패 (유저 없음)")
-//    void editUserFailTestNotFoundUser() {
-//        // Given
-//        String id = "nonexistent";
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.empty());
-//        given(ms.getMessage("error.notfound.user", null, null)).willReturn("User not found");
-//
-//        UserServiceDto dto = UserServiceDto.builder().id(id).build();
-//
-//        // When & Then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-//                () -> userService.editUser(dto));
-//
-//        assertThat(exception.getMessage()).isEqualTo("User not found");
-//        then(userRepositoryImpl).should().findById(id);
-//    }
-//
-//    @Test
-//    @DisplayName("유저 삭제 테스트 - 성공")
-//    void deleteUserSuccessTest() {
-//        // Given
-//        String id = "user1";
-//        User user = User.createUser(id, "", "", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null);
-//
-//        setUserId(user, id);
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//
-//        // When
-//        userService.deleteUser(id);
-//
-//        // Then
-//        then(userRepositoryImpl).should().findById(id);
-//        assertThat(user.getDelYN()).isEqualTo("Y");
-//    }
-//
-//    @Test
-//    @DisplayName("유저 삭제 테스트 - 실패 (유저 없음)")
-//    void deleteUserFailTestNotFoundUser() {
-//        // Given
-//        String id = "nonexistent";
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.empty());
-//        given(ms.getMessage("error.notfound.user", null, null)).willReturn("User not found");
-//
-//        // When & Then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-//                () -> userService.deleteUser(id));
-//
-//        assertThat(exception.getMessage()).isEqualTo("User not found");
-//        then(userRepositoryImpl).should().findById(id);
-//    }
-//
-//    @Test
-//    @DisplayName("프로필 이미지 임시 저장 테스트 - 성공")
-//    void saveProfileImgInTempFolderSuccessTest() {
-//        // Given
-//        MockMultipartFile mockFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
-//        String physicalFilename = "test.jpg_some-uuid";
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            mocked.when(() -> PorestFile.generatePhysicalFilename(eq("test.jpg"), anyString()))
-//                    .thenReturn(physicalFilename);
-//            mocked.when(() -> PorestFile.save(eq(mockFile), anyString(), eq(physicalFilename), eq(ms)))
-//                    .thenReturn(true);
-//
-//            // When
-//            UserServiceDto result = userService.saveProfileImgInTempFolder(mockFile);
-//
-//            // Then
-//            assertThat(result).isNotNull();
-//            assertThat(result.getProfileUrl()).contains(physicalFilename);
-//            assertThat(result.getProfileUUID()).isNotNull();
-//
-//            // verify 호출 확인
-//            mocked.verify(() -> PorestFile.generatePhysicalFilename(eq("test.jpg"), anyString()));
-//            mocked.verify(() -> PorestFile.save(eq(mockFile), anyString(), eq(physicalFilename), eq(ms)));
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("프로필 이미지 임시 저장 테스트 - 실패 (파일 저장 실패)")
-//    void saveProfileImgInTempFolderFailTest() {
-//        // Given
-//        MockMultipartFile mockFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
-//        String physicalFilename = "test.jpg_some-uuid";
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            mocked.when(() -> PorestFile.generatePhysicalFilename(eq("test.jpg"), anyString()))
-//                    .thenReturn(physicalFilename);
-//            mocked.when(() -> PorestFile.save(eq(mockFile), anyString(), eq(physicalFilename), eq(ms)))
-//                    .thenReturn(false); // 저장 실패
-//
-//            // When
-//            UserServiceDto result = userService.saveProfileImgInTempFolder(mockFile);
-//
-//            // Then
-//            // 저장이 실패해도 URL은 생성되는지 확인 (서비스 로직에 따라)
-//            assertThat(result).isNotNull();
-//            assertThat(result.getProfileUrl()).contains(physicalFilename);
-//            assertThat(result.getProfileUUID()).isNotNull();
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("프로필 이미지 임시 저장 테스트 - 빈 파일명")
-//    void saveProfileImgInTempFolderEmptyFilenameTest() {
-//        // Given
-//        MockMultipartFile mockFile = new MockMultipartFile("file", "", "image/jpeg", "test image content".getBytes());
-//        String physicalFilename = "_some-uuid";
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            mocked.when(() -> PorestFile.generatePhysicalFilename(eq(""), anyString()))
-//                    .thenReturn(physicalFilename);
-//            mocked.when(() -> PorestFile.save(eq(mockFile), anyString(), eq(physicalFilename), eq(ms)))
-//                    .thenReturn(true);
-//
-//            // When
-//            UserServiceDto result = userService.saveProfileImgInTempFolder(mockFile);
-//
-//            // Then
-//            assertThat(result).isNotNull();
-//            assertThat(result.getProfileUUID()).isNotNull();
-//            assertThat(result.getProfileUrl()).contains(physicalFilename);
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("프로필 이미지 임시 저장 테스트 - null 파일명")
-//    void saveProfileImgInTempFolderNullFilenameTest() {
-//        // Given
-//        MockMultipartFile mockFile = new MockMultipartFile("file", null, "image/jpeg", "test image content".getBytes());
-//        String physicalFilename = "null_some-uuid";
-//
-//        try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-//            mocked.when(() -> PorestFile.generatePhysicalFilename(eq(""), anyString()))
-//                    .thenReturn(physicalFilename);
-//            mocked.when(() -> PorestFile.save(eq(mockFile), anyString(), eq(physicalFilename), eq(ms)))
-//                    .thenReturn(true);
-//
-//            // When
-//            UserServiceDto result = userService.saveProfileImgInTempFolder(mockFile);
-//
-//            // Then
-//            assertThat(result).isNotNull();
-//            assertThat(result.getProfileUUID()).isNotNull();
-//            assertThat(result.getProfileUrl()).contains(physicalFilename);
-//        }
-//    }
-//
-//    @Test
-//    @DisplayName("유저 존재 확인 테스트 - 성공")
-//    void checkUserExistSuccessTest() {
-//        // Given
-//        String id = "user1";
-//        User user = User.createUser(id, "", "테스트유저", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null);
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//
-//        // When
-//        User result = userService.checkUserExist(id);
-//
-//        // Then
-//        then(userRepositoryImpl).should().findById(id);
-//        assertThat(result).isEqualTo(user);
-//        assertThat(result.getName()).isEqualTo("테스트유저");
-//    }
-//
-//    @Test
-//    @DisplayName("유저 존재 확인 테스트 - 실패 (삭제된 유저)")
-//    void checkUserExistFailDeletedUserTest() {
-//        // Given
-//        String id = "user1";
-//        User user = User.createUser(id, "", "테스트유저", "", "", OriginCompanyType.SKAX, "", YNType.N, null, null);
-//        user.deleteUser(); // 유저 삭제
-//
-//        given(userRepositoryImpl.findById(id)).willReturn(Optional.of(user));
-//        given(ms.getMessage("error.notfound.user", null, null)).willReturn("User not found");
-//
-//        // When & Then
-//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-//                () -> userService.checkUserExist(id));
-//
-//        assertThat(exception.getMessage()).isEqualTo("User not found");
-//        then(userRepositoryImpl).should().findById(id);
-//    }
-//
-//    // 테스트 헬퍼 메서드
-//    private void setUserId(User user, String id) {
-//        try {
-//            java.lang.reflect.Field field = User.class.getDeclaredField("id");
-//            field.setAccessible(true);
-//            field.set(user, id);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to set user id", e);
-//        }
-//    }
-//}
+package com.lshdainty.porest.service;
+
+import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.common.util.PorestFile;
+import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.lshdainty.porest.department.repository.DepartmentCustomRepositoryImpl;
+import com.lshdainty.porest.user.domain.User;
+import com.lshdainty.porest.user.repository.UserRepositoryImpl;
+import com.lshdainty.porest.user.service.EmailService;
+import com.lshdainty.porest.user.service.UserService;
+import com.lshdainty.porest.user.service.dto.UserServiceDto;
+import com.lshdainty.porest.user.type.StatusType;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.lshdainty.porest.department.domain.Department;
+import com.lshdainty.porest.department.domain.UserDepartment;
+import com.lshdainty.porest.company.domain.Company;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mockStatic;
+
+@Slf4j
+@ExtendWith(MockitoExtension.class)
+@DisplayName("유저 서비스 테스트")
+class UserServiceTest {
+    @Mock
+    private MessageSource ms;
+    @Mock
+    private UserRepositoryImpl userRepositoryImpl;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private DepartmentCustomRepositoryImpl departmentRepository;
+
+    @InjectMocks
+    private UserService userService;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(userService, "fileRootPath", "/var/www/media");
+        ReflectionTestUtils.setField(userService, "webUrlPrefix", "/media");
+        ReflectionTestUtils.setField(userService, "tempPath", "/var/www/media/temp/profile");
+        ReflectionTestUtils.setField(userService, "originPath", "/var/www/media/origin/profile");
+    }
+
+    @Nested
+    @DisplayName("회원 가입")
+    class JoinUser {
+        @Test
+        @DisplayName("성공 - 유저가 정상적으로 저장된다")
+        void joinUserSuccess() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("user1")
+                    .name("테스트유저")
+                    .email("test@test.com")
+                    .build();
+            willDoNothing().given(userRepositoryImpl).save(any(User.class));
+
+            // when
+            String result = userService.joinUser(data);
+
+            // then
+            then(userRepositoryImpl).should().save(any(User.class));
+            assertThat(result).isEqualTo("user1");
+        }
+
+        @Test
+        @DisplayName("성공 - 프로필 이미지와 함께 저장된다")
+        void joinUserWithProfileSuccess() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("user1")
+                    .name("테스트유저")
+                    .profileUrl("/media/temp/profile/test.jpg_some-uuid")
+                    .profileUUID("some-uuid")
+                    .build();
+            willDoNothing().given(userRepositoryImpl).save(any(User.class));
+
+            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
+                mocked.when(() -> PorestFile.copy(anyString(), anyString(), any(MessageSource.class)))
+                        .thenReturn(true);
+                mocked.when(() -> PorestFile.extractOriginalFilename(anyString(), isNull()))
+                        .thenReturn("test.jpg");
+
+                // when
+                String result = userService.joinUser(data);
+
+                // then
+                then(userRepositoryImpl).should().save(any(User.class));
+                assertThat(result).isEqualTo("user1");
+            }
+        }
+
+        @Test
+        @DisplayName("성공 - profileUUID만 있으면 프로필 복사 없이 저장된다")
+        void joinUserWithOnlyProfileUUID() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("user1")
+                    .name("테스트유저")
+                    .profileUUID("some-uuid")
+                    .build();
+            willDoNothing().given(userRepositoryImpl).save(any(User.class));
+
+            // when
+            String result = userService.joinUser(data);
+
+            // then
+            then(userRepositoryImpl).should().save(any(User.class));
+            assertThat(result).isEqualTo("user1");
+        }
+
+        @Test
+        @DisplayName("성공 - profileUrl만 있으면 프로필 복사 없이 저장된다")
+        void joinUserWithOnlyProfileUrl() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("user1")
+                    .name("테스트유저")
+                    .profileUrl("/media/temp/profile/test.jpg")
+                    .build();
+            willDoNothing().given(userRepositoryImpl).save(any(User.class));
+
+            // when
+            String result = userService.joinUser(data);
+
+            // then
+            then(userRepositoryImpl).should().save(any(User.class));
+            assertThat(result).isEqualTo("user1");
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 조회")
+    class SearchUser {
+        @Test
+        @DisplayName("성공 - 존재하는 유저를 반환한다")
+        void searchUserSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            UserServiceDto result = userService.searchUser(userId);
+
+            // then
+            then(userRepositoryImpl).should().findById(userId);
+            assertThat(result.getName()).isEqualTo("이서준");
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void searchUserFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.empty());
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.searchUser(userId))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
+        void searchUserFailDeleted() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            user.deleteUser();
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.searchUser(userId))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("성공 - 프로필이 있는 유저를 반환한다")
+        void searchUserWithProfileSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, "test.jpg", "some-uuid");
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
+                mocked.when(() -> PorestFile.generatePhysicalFilename("test.jpg", "some-uuid"))
+                        .thenReturn("test.jpg_some-uuid");
+
+                // when
+                UserServiceDto result = userService.searchUser(userId);
+
+                // then
+                assertThat(result.getName()).isEqualTo("이서준");
+                assertThat(result.getProfileName()).isEqualTo("test.jpg");
+                assertThat(result.getProfileUrl()).contains("test.jpg_some-uuid");
+            }
+        }
+
+        @Test
+        @DisplayName("성공 - profileName만 있으면 profileUrl은 null이다")
+        void searchUserWithOnlyProfileName() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, "test.jpg", null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            UserServiceDto result = userService.searchUser(userId);
+
+            // then
+            assertThat(result.getProfileName()).isEqualTo("test.jpg");
+            assertThat(result.getProfileUrl()).isNull();
+        }
+
+        @Test
+        @DisplayName("성공 - 메인 부서가 있는 유저를 반환한다")
+        void searchUserWithMainDepartment() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+
+            Company company = Company.createCompany("회사", "Company", "desc");
+            Department dept = Department.createDepartment("부서", "개발팀", null, "head1", 1L, "desc", "#000", company);
+            UserDepartment userDept = UserDepartment.createUserDepartment(user, dept, YNType.Y);
+
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            UserServiceDto result = userService.searchUser(userId);
+
+            // then
+            assertThat(result.getName()).isEqualTo("이서준");
+            assertThat(result.getMainDepartmentNameKR()).isEqualTo("개발팀");
+        }
+
+        @Test
+        @DisplayName("성공 - 삭제된 메인 부서는 무시한다")
+        void searchUserWithDeletedMainDepartment() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+
+            Company company = Company.createCompany("회사", "Company", "desc");
+            Department dept = Department.createDepartment("부서", "개발팀", null, "head1", 1L, "desc", "#000", company);
+            UserDepartment userDept = UserDepartment.createUserDepartment(user, dept, YNType.Y);
+            userDept.deleteUserDepartment();
+
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            UserServiceDto result = userService.searchUser(userId);
+
+            // then
+            assertThat(result.getName()).isEqualTo("이서준");
+            assertThat(result.getMainDepartmentNameKR()).isNull();
+        }
+
+        @Test
+        @DisplayName("성공 - 메인이 아닌 부서는 무시한다")
+        void searchUserWithNonMainDepartment() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+
+            Company company = Company.createCompany("회사", "Company", "desc");
+            Department dept = Department.createDepartment("부서", "개발팀", null, "head1", 1L, "desc", "#000", company);
+            UserDepartment userDept = UserDepartment.createUserDepartment(user, dept, YNType.N);
+
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            UserServiceDto result = userService.searchUser(userId);
+
+            // then
+            assertThat(result.getName()).isEqualTo("이서준");
+            assertThat(result.getMainDepartmentNameKR()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("전체 유저 조회")
+    class SearchUsers {
+        @Test
+        @DisplayName("성공 - 유저 목록을 반환한다")
+        void searchUsersSuccess() {
+            // given
+            given(userRepositoryImpl.findUsers()).willReturn(List.of(
+                    User.createUser("user1", "", "이서준", "", LocalDate.now(), OriginCompanyType.SKAX, "", YNType.N, null, null),
+                    User.createUser("user2", "", "김서연", "", LocalDate.now(), OriginCompanyType.SKAX, "", YNType.N, null, null)
+            ));
+
+            // when
+            List<UserServiceDto> result = userService.searchUsers();
+
+            // then
+            then(userRepositoryImpl).should().findUsers();
+            assertThat(result).hasSize(2);
+            assertThat(result).extracting("name").containsExactly("이서준", "김서연");
+        }
+
+        @Test
+        @DisplayName("성공 - 유저가 없으면 빈 리스트를 반환한다")
+        void searchUsersEmptyList() {
+            // given
+            given(userRepositoryImpl.findUsers()).willReturn(List.of());
+
+            // when
+            List<UserServiceDto> result = userService.searchUsers();
+
+            // then
+            assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 수정")
+    class EditUser {
+        @Test
+        @DisplayName("성공 - 유저 정보가 수정된다")
+        void editUserSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .id(userId)
+                    .name("이하은")
+                    .workTime("10 ~ 7")
+                    .build();
+
+            // when
+            userService.editUser(data);
+
+            // then
+            then(userRepositoryImpl).should().findById(userId);
+            assertThat(user.getName()).isEqualTo("이하은");
+            assertThat(user.getWorkTime()).isEqualTo("10 ~ 7");
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저를 수정하려 하면 예외가 발생한다")
+        void editUserFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.empty());
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            UserServiceDto data = UserServiceDto.builder().id(userId).build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.editUser(data))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 삭제")
+    class DeleteUser {
+        @Test
+        @DisplayName("성공 - 유저가 삭제된다")
+        void deleteUserSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            userService.deleteUser(userId);
+
+            // then
+            then(userRepositoryImpl).should().findById(userId);
+            assertThat(user.getIsDeleted()).isEqualTo(YNType.Y);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저를 삭제하려 하면 예외가 발생한다")
+        void deleteUserFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.empty());
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.deleteUser(userId))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("프로필 이미지 임시 저장")
+    class SaveProfileImgInTempFolder {
+        @Test
+        @DisplayName("성공 - 프로필 이미지가 임시 폴더에 저장된다")
+        void saveProfileImgSuccess() {
+            // given
+            MockMultipartFile mockFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
+            String physicalFilename = "test.jpg_some-uuid";
+
+            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
+                mocked.when(() -> PorestFile.generatePhysicalFilename(eq("test.jpg"), anyString()))
+                        .thenReturn(physicalFilename);
+                mocked.when(() -> PorestFile.save(eq(mockFile), anyString(), eq(physicalFilename), eq(ms)))
+                        .thenReturn(true);
+
+                // when
+                UserServiceDto result = userService.saveProfileImgInTempFolder(mockFile);
+
+                // then
+                assertThat(result.getProfileUrl()).contains(physicalFilename);
+                assertThat(result.getProfileUUID()).isNotNull();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 초대")
+    class InviteUser {
+        @Test
+        @DisplayName("성공 - 유저가 초대되고 이메일이 발송된다")
+        void inviteUserSuccess() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("newuser")
+                    .name("신규유저")
+                    .email("new@test.com")
+                    .company(OriginCompanyType.SKAX)
+                    .workTime("9 ~ 6")
+                    .joinDate(LocalDate.now())
+                    .build();
+
+            given(userRepositoryImpl.findById("newuser")).willReturn(Optional.empty());
+            willDoNothing().given(userRepositoryImpl).save(any(User.class));
+            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
+
+            // when
+            UserServiceDto result = userService.inviteUser(data);
+
+            // then
+            then(userRepositoryImpl).should().save(any(User.class));
+            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("신규유저"), anyString());
+            assertThat(result.getId()).isEqualTo("newuser");
+            assertThat(result.getInvitationStatus()).isEqualTo(StatusType.PENDING);
+        }
+
+        @Test
+        @DisplayName("실패 - 중복된 ID로 초대하면 예외가 발생한다")
+        void inviteUserFailDuplicateId() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("existinguser")
+                    .name("신규유저")
+                    .email("new@test.com")
+                    .build();
+
+            User existingUser = User.createUser("existinguser");
+            given(userRepositoryImpl.findById("existinguser")).willReturn(Optional.of(existingUser));
+            given(ms.getMessage(eq("error.duplicate.userId"), any(), any()))
+                    .willReturn("이미 존재하는 아이디입니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.inviteUser(data))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("초대 재전송")
+    class ResendInvitation {
+        @Test
+        @DisplayName("성공 - 초대가 재전송된다")
+        void resendInvitationSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createInvitedUser(userId, "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now());
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
+
+            // when
+            UserServiceDto result = userService.resendInvitation(userId);
+
+            // then
+            then(emailService).should().sendInvitationEmail(eq("user@test.com"), eq("유저"), anyString());
+            assertThat(result.getInvitationStatus()).isEqualTo(StatusType.PENDING);
+        }
+    }
+
+    @Nested
+    @DisplayName("초대된 유저 정보 수정")
+    class EditInvitedUser {
+        @Test
+        @DisplayName("성공 - PENDING 상태 유저의 정보가 수정된다")
+        void editInvitedUserSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createInvitedUser(userId, "유저", "old@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now());
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .name("수정된유저")
+                    .email("old@test.com")
+                    .build();
+
+            // when
+            UserServiceDto result = userService.editInvitedUser(userId, data);
+
+            // then
+            assertThat(user.getName()).isEqualTo("수정된유저");
+        }
+
+        @Test
+        @DisplayName("성공 - 이메일 변경 시 초대 이메일이 재발송된다")
+        void editInvitedUserEmailChangedSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createInvitedUser(userId, "유저", "old@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now());
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .name("유저")
+                    .email("new@test.com")
+                    .build();
+
+            // when
+            userService.editInvitedUser(userId, data);
+
+            // then
+            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("유저"), anyString());
+        }
+
+        @Test
+        @DisplayName("실패 - PENDING 상태가 아닌 유저를 수정하면 예외가 발생한다")
+        void editInvitedUserFailNotPending() {
+            // given
+            String userId = "user1";
+            User user = User.createInvitedUser(userId, "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now());
+            user.completeRegistration(LocalDate.now(), YNType.N);
+
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            given(ms.getMessage(eq("error.validate.not.pending.user"), any(), any()))
+                    .willReturn("PENDING 상태가 아닙니다");
+
+            UserServiceDto data = UserServiceDto.builder().name("수정").build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.editInvitedUser(userId, data))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원가입 완료")
+    class CompleteInvitedUserRegistration {
+        @Test
+        @DisplayName("성공 - 초대된 유저가 회원가입을 완료한다")
+        void completeRegistrationSuccess() {
+            // given
+            User user = User.createInvitedUser("user1", "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now());
+            String token = user.getInvitationToken();
+
+            given(userRepositoryImpl.findByInvitationToken(token)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .invitationToken(token)
+                    .birth(LocalDate.of(1990, 1, 1))
+                    .lunarYN(YNType.N)
+                    .build();
+
+            // when
+            String result = userService.completeInvitedUserRegistration(data);
+
+            // then
+            assertThat(result).isEqualTo("user1");
+            assertThat(user.getInvitationStatus()).isEqualTo(StatusType.ACTIVE);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 토큰이면 예외가 발생한다")
+        void completeRegistrationFailInvalidToken() {
+            // given
+            given(userRepositoryImpl.findByInvitationToken("invalid-token")).willReturn(Optional.empty());
+            given(ms.getMessage(eq("error.notfound.invitation"), any(), any()))
+                    .willReturn("초대를 찾을 수 없습니다");
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .invitationToken("invalid-token")
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.completeInvitedUserRegistration(data))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 만료된 초대 토큰이면 예외가 발생한다")
+        void completeRegistrationFailExpiredToken() {
+            // given
+            User user = User.createInvitedUser("user1", "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now());
+            String token = user.getInvitationToken();
+
+            // 만료일을 과거로 설정
+            ReflectionTestUtils.setField(user, "invitationExpiresAt", LocalDateTime.now().minusDays(1));
+
+            given(userRepositoryImpl.findByInvitationToken(token)).willReturn(Optional.of(user));
+            given(ms.getMessage(eq("error.expired.invitation"), any(), any()))
+                    .willReturn("초대가 만료되었습니다");
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .invitationToken(token)
+                    .birth(LocalDate.of(1990, 1, 1))
+                    .lunarYN(YNType.N)
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.completeInvitedUserRegistration(data))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("아이디 중복 확인")
+    class CheckUserIdDuplicate {
+        @Test
+        @DisplayName("성공 - 중복이면 true를 반환한다")
+        void checkUserIdDuplicateTrue() {
+            // given
+            User user = User.createUser("user1");
+            given(userRepositoryImpl.findById("user1")).willReturn(Optional.of(user));
+
+            // when
+            boolean result = userService.checkUserIdDuplicate("user1");
+
+            // then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        @DisplayName("성공 - 중복이 아니면 false를 반환한다")
+        void checkUserIdDuplicateFalse() {
+            // given
+            given(userRepositoryImpl.findById("newuser")).willReturn(Optional.empty());
+
+            // when
+            boolean result = userService.checkUserIdDuplicate("newuser");
+
+            // then
+            assertThat(result).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("메인 부서 존재 확인")
+    class CheckUserHasMainDepartment {
+        @Test
+        @DisplayName("성공 - 메인 부서가 있으면 Y를 반환한다")
+        void checkUserHasMainDepartmentY() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            given(departmentRepository.hasMainDepartment(userId)).willReturn(true);
+
+            // when
+            YNType result = userService.checkUserHasMainDepartment(userId);
+
+            // then
+            assertThat(result).isEqualTo(YNType.Y);
+        }
+
+        @Test
+        @DisplayName("성공 - 메인 부서가 없으면 N을 반환한다")
+        void checkUserHasMainDepartmentN() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            given(departmentRepository.hasMainDepartment(userId)).willReturn(false);
+
+            // when
+            YNType result = userService.checkUserHasMainDepartment(userId);
+
+            // then
+            assertThat(result).isEqualTo(YNType.N);
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 존재 확인")
+    class CheckUserExist {
+        @Test
+        @DisplayName("성공 - 존재하는 유저를 반환한다")
+        void checkUserExistSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            User result = userService.checkUserExist(userId);
+
+            // then
+            assertThat(result).isEqualTo(user);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void checkUserExistFailNotFound() {
+            // given
+            given(userRepositoryImpl.findById("nonexistent")).willReturn(Optional.empty());
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.checkUserExist("nonexistent"))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
+        void checkUserExistFailDeleted() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            user.deleteUser();
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.checkUserExist(userId))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("프로필 URL에서 물리적 파일명 추출")
+    class ExtractPhysicalFileNameFromUrl {
+        @Test
+        @DisplayName("성공 - 물리적 파일명을 추출한다")
+        void extractPhysicalFileNameFromUrlSuccess() {
+            // given
+            String profileUrl = "/media/temp/profile/test.jpg_some-uuid";
+
+            // when
+            String result = userService.extractPhysicalFileNameFromUrl(profileUrl);
+
+            // then
+            assertThat(result).isEqualTo("test.jpg_some-uuid");
+        }
+
+        @Test
+        @DisplayName("성공 - profileUrl이 null이면 null을 반환한다")
+        void extractPhysicalFileNameFromUrlNull() {
+            // when
+            String result = userService.extractPhysicalFileNameFromUrl(null);
+
+            // then
+            assertThat(result).isNull();
+        }
+
+        @Test
+        @DisplayName("성공 - profileUrl이 빈 문자열이면 null을 반환한다")
+        void extractPhysicalFileNameFromUrlEmpty() {
+            // when
+            String result = userService.extractPhysicalFileNameFromUrl("");
+
+            // then
+            assertThat(result).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("프로필 URL 생성")
+    class GenerateProfileUrl {
+        @Test
+        @DisplayName("성공 - 프로필 URL을 생성한다")
+        void generateProfileUrlSuccess() {
+            // given
+            String originalFilename = "test.jpg";
+            String uuid = "some-uuid";
+
+            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
+                mocked.when(() -> PorestFile.generatePhysicalFilename(originalFilename, uuid))
+                        .thenReturn("test.jpg_some-uuid");
+
+                // when
+                String result = userService.generateProfileUrl(originalFilename, uuid);
+
+                // then
+                assertThat(result).contains("test.jpg_some-uuid");
+            }
+        }
+
+        @Test
+        @DisplayName("성공 - physicalFilename이 null이면 null을 반환한다")
+        void generateProfileUrlNull() {
+            // given
+            String originalFilename = null;
+            String uuid = "some-uuid";
+
+            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
+                mocked.when(() -> PorestFile.generatePhysicalFilename(originalFilename, uuid))
+                        .thenReturn(null);
+
+                // when
+                String result = userService.generateProfileUrl(originalFilename, uuid);
+
+                // then
+                assertThat(result).isNull();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("임시 프로필 이미지를 원본 폴더로 복사")
+    class CopyTempProfileToOrigin {
+        @Test
+        @DisplayName("성공 - 프로필 이미지가 복사된다")
+        void copyTempProfileToOriginSuccess() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .profileUrl("/media/temp/profile/test.jpg_some-uuid")
+                    .profileUUID("some-uuid")
+                    .build();
+
+            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
+                mocked.when(() -> PorestFile.copy(anyString(), anyString(), eq(ms)))
+                        .thenReturn(true);
+                mocked.when(() -> PorestFile.extractOriginalFilename(anyString(), isNull()))
+                        .thenReturn("test.jpg");
+
+                // when
+                UserServiceDto result = userService.copyTempProfileToOrigin(data);
+
+                // then
+                assertThat(result.getProfileName()).isEqualTo("test.jpg");
+                assertThat(result.getProfileUUID()).isEqualTo("some-uuid");
+            }
+        }
+
+        @Test
+        @DisplayName("성공 - profileUrl이 null이면 빈 결과를 반환한다")
+        void copyTempProfileToOriginNullUrl() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .profileUrl(null)
+                    .build();
+
+            // when
+            UserServiceDto result = userService.copyTempProfileToOrigin(data);
+
+            // then
+            assertThat(result.getProfileName()).isNull();
+            assertThat(result.getProfileUUID()).isNull();
+        }
+
+        @Test
+        @DisplayName("성공 - 파일 복사 실패 시 빈 결과를 반환한다")
+        void copyTempProfileToOriginCopyFail() {
+            // given
+            UserServiceDto data = UserServiceDto.builder()
+                    .profileUrl("/media/temp/profile/test.jpg_some-uuid")
+                    .profileUUID("some-uuid")
+                    .build();
+
+            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
+                mocked.when(() -> PorestFile.copy(anyString(), anyString(), eq(ms)))
+                        .thenReturn(false);
+
+                // when
+                UserServiceDto result = userService.copyTempProfileToOrigin(data);
+
+                // then
+                assertThat(result.getProfileName()).isNull();
+                assertThat(result.getProfileUUID()).isNull();
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("승인권자 목록 조회")
+    class GetUserApprovers {
+        @Test
+        @DisplayName("성공 - 승인권자 목록을 반환한다")
+        void getUserApproversSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            Company company = Company.createCompany("회사", "Company", "desc");
+            Department dept = Department.createDepartment("부서", "부서KR", null, "head1", 1L, "desc", "#000", company);
+            ReflectionTestUtils.setField(dept, "id", 1L);
+
+            User approver = User.createUser("head1", "", "부서장", "head@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+
+            given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of(dept));
+            given(userRepositoryImpl.findById("head1")).willReturn(Optional.of(approver));
+
+            // when
+            List<UserServiceDto> result = userService.getUserApprovers(userId);
+
+            // then
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getName()).isEqualTo("부서장");
+            assertThat(result.get(0).getDepartmentName()).isEqualTo("부서");
+        }
+
+        @Test
+        @DisplayName("성공 - 부서장이 없으면 해당 부서는 결과에서 제외된다")
+        void getUserApproversWithNullApprover() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            Company company = Company.createCompany("회사", "Company", "desc");
+            Department dept = Department.createDepartment("부서", "부서KR", null, "nonexistent", 1L, "desc", "#000", company);
+            ReflectionTestUtils.setField(dept, "id", 1L);
+
+            given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of(dept));
+            given(userRepositoryImpl.findById("nonexistent")).willReturn(Optional.empty());
+
+            // when
+            List<UserServiceDto> result = userService.getUserApprovers(userId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("성공 - 삭제된 부서장은 결과에서 제외된다")
+        void getUserApproversWithDeletedApprover() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            Company company = Company.createCompany("회사", "Company", "desc");
+            Department dept = Department.createDepartment("부서", "부서KR", null, "deleted", 1L, "desc", "#000", company);
+            ReflectionTestUtils.setField(dept, "id", 1L);
+
+            User deletedApprover = User.createUser("deleted", "", "삭제된부서장", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            deletedApprover.deleteUser();
+
+            given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of(dept));
+            given(userRepositoryImpl.findById("deleted")).willReturn(Optional.of(deletedApprover));
+
+            // when
+            List<UserServiceDto> result = userService.getUserApprovers(userId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("성공 - 빈 목록을 반환한다")
+        void getUserApproversEmpty() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of());
+
+            // when
+            List<UserServiceDto> result = userService.getUserApprovers(userId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+    }
+}

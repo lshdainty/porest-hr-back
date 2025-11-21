@@ -6,6 +6,7 @@ import com.lshdainty.porest.work.domain.WorkCode;
 import com.lshdainty.porest.work.domain.WorkHistory;
 import com.lshdainty.porest.work.repository.WorkCodeRepositoryImpl;
 import com.lshdainty.porest.work.repository.WorkHistoryCustomRepositoryImpl;
+import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import com.lshdainty.porest.work.service.dto.WorkCodeServiceDto;
 import com.lshdainty.porest.work.service.dto.WorkHistoryServiceDto;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.io.IOException;
+
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 @Service
 @RequiredArgsConstructor
@@ -42,14 +52,13 @@ public class WorkHistoryService {
                 part,
                 classes,
                 data.getHours(),
-                data.getContent()
-        );
+                data.getContent());
         workHistoryRepository.save(workHistory);
         return workHistory.getSeq();
     }
 
-    public List<WorkHistoryServiceDto> findAllWorkHistories() {
-        List<WorkHistory> workHistories = workHistoryRepository.findAll();
+    public List<WorkHistoryServiceDto> findAllWorkHistories(WorkHistorySearchCondition condition) {
+        List<WorkHistory> workHistories = workHistoryRepository.findAll(condition);
 
         return workHistories.stream()
                 .map(w -> WorkHistoryServiceDto.builder()
@@ -103,8 +112,7 @@ public class WorkHistoryService {
                 part,
                 classes,
                 data.getHours(),
-                data.getContent()
-        );
+                data.getContent());
     }
 
     @Transactional
@@ -115,7 +123,8 @@ public class WorkHistoryService {
 
     private WorkHistory checkWorkHistoryExist(Long seq) {
         Optional<WorkHistory> workHistory = workHistoryRepository.findById(seq);
-        workHistory.orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.work.history", null, null)));
+        workHistory.orElseThrow(
+                () -> new IllegalArgumentException(ms.getMessage("error.notfound.work.history", null, null)));
         return workHistory.get();
     }
 
@@ -139,5 +148,69 @@ public class WorkHistoryService {
                 .type(workCode.getType())
                 .orderSeq(workCode.getOrderSeq())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public void downloadWorkHistoryExcel(HttpServletResponse response, WorkHistorySearchCondition condition)
+            throws IOException {
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(100)) { // keep 100 rows in memory
+            Sheet sheet = workbook.createSheet("업무 이력");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            String[] headers = { "No", "일자", "담당자", "업무분류", "업무파트", "업무구분", "소요시간", "내용" };
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+
+            // Data Streaming
+            AtomicInteger rowNum = new AtomicInteger(1);
+            try (Stream<WorkHistory> workHistoryStream = workHistoryRepository.findAllStream(condition)) {
+                workHistoryStream.forEach(workHistory -> {
+                    Row row = sheet.createRow(rowNum.getAndIncrement());
+
+                    // No
+                    row.createCell(0).setCellValue(rowNum.get() - 1);
+
+                    // 일자
+                    row.createCell(1)
+                            .setCellValue(workHistory.getDate() != null ? workHistory.getDate().toString() : "");
+
+                    // 담당자
+                    row.createCell(2)
+                            .setCellValue(workHistory.getUser() != null ? workHistory.getUser().getName() : "");
+
+                    // 업무분류 (Group)
+                    row.createCell(3)
+                            .setCellValue(workHistory.getGroup() != null ? workHistory.getGroup().getName() : "");
+
+                    // 업무파트 (Part)
+                    row.createCell(4)
+                            .setCellValue(workHistory.getPart() != null ? workHistory.getPart().getName() : "");
+
+                    // 업무구분 (Division)
+                    row.createCell(5)
+                            .setCellValue(workHistory.getDivision() != null ? workHistory.getDivision().getName() : "");
+
+                    // 소요시간
+                    row.createCell(6)
+                            .setCellValue(workHistory.getHours() != null ? workHistory.getHours().toString() : "");
+
+                    // 내용
+                    row.createCell(7).setCellValue(workHistory.getContent() != null ? workHistory.getContent() : "");
+                });
+            }
+
+            // Response Header Setting
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=work_history.xlsx");
+
+            // Write to Output Stream
+            workbook.write(response.getOutputStream());
+
+            // Dispose of temporary files
+            workbook.dispose();
+        }
     }
 }

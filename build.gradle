@@ -59,30 +59,41 @@ dependencies {
     annotationProcessor 'io.github.openfeign.querydsl:querydsl-apt:6.10.1:jpa'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+
+    // Apache POI
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
 }
 
 tasks.named('test') {
     enabled = true
     useJUnitPlatform()
-//    finalizedBy jacocoTestReport
+    finalizedBy jacocoTestReport
 }
 
 def jacocoExcludes = [
     '**/Application*',
     '**/PorestApplication*',
     '**/InitDB*',
-    '**/api/**',    // 추후 제외대상
+    '**/controller/**',    // 추후 제외대상
+    '**/controller/dto/**',
     '**/domain/**',
     '**/Q*',
     '**/Config/**',
     '**/config/**',
     '**/lib/**',
     '**/type/**',
-    '**/api/dto/**',
-    '**/service/**',    // 추후 제외대상
+    '**/security/**',
+    '**/vacation/**',
+    '**/work/**',
     '**/service/dto/**',
     '**/repository/dto/**',
-    '**/SessionConst*'
+    '**/SessionConst*',
+    '**/util/PorestIP*',
+    '**/service/EmailService*',
+    '**/repository/UserProviderRepositoryImpl*',
+    '**/repository/DuesCustomRepositoryImpl*',
+    '**/exception/**'
 ]
 
 jacocoTestReport {
