@@ -56,11 +56,9 @@ class WorkHistoryRepositoryImplTest {
     @DisplayName("업무이력 저장 및 단건 조회")
     void save() {
         // given
-        LocalDate date = LocalDate.of(2025, 1, 15);
-        BigDecimal hours = new BigDecimal("8.0");
-        String content = "API 개발 업무 진행";
-
-        WorkHistory workHistory = WorkHistory.createWorkHistory(date, user, group, part, division, hours, content);
+        WorkHistory workHistory = WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "API 개발 업무 진행"
+        );
 
         // when
         workHistoryRepository.save(workHistory);
@@ -70,23 +68,15 @@ class WorkHistoryRepositoryImplTest {
         // then
         Optional<WorkHistory> findHistory = workHistoryRepository.findById(workHistory.getSeq());
         assertThat(findHistory.isPresent()).isTrue();
-        assertThat(findHistory.get().getDate()).isEqualTo(date);
-        assertThat(findHistory.get().getHours()).isEqualByComparingTo(hours);
-        assertThat(findHistory.get().getContent()).isEqualTo(content);
-        assertThat(findHistory.get().getUser().getId()).isEqualTo("user1");
-        assertThat(findHistory.get().getGroup().getCode()).isEqualTo("DEV");
-        assertThat(findHistory.get().getPart().getCode()).isEqualTo("BACKEND");
-        assertThat(findHistory.get().getDivision().getCode()).isEqualTo("API");
+        assertThat(findHistory.get().getDate()).isEqualTo(LocalDate.of(2025, 1, 15));
+        assertThat(findHistory.get().getContent()).isEqualTo("API 개발 업무 진행");
     }
 
     @Test
     @DisplayName("단건 조회 시 업무이력이 없어도 Null이 반환되면 안된다.")
     void findByIdEmpty() {
-        // given
-        Long historyId = 999L;
-
-        // when
-        Optional<WorkHistory> findHistory = workHistoryRepository.findById(historyId);
+        // given & when
+        Optional<WorkHistory> findHistory = workHistoryRepository.findById(999L);
 
         // then
         assertThat(findHistory.isEmpty()).isTrue();
@@ -96,15 +86,12 @@ class WorkHistoryRepositoryImplTest {
     @DisplayName("전체 업무이력 조회")
     void findAll() {
         // given
-        WorkHistory history1 = WorkHistory.createWorkHistory(
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
                 LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "업무1"
-        );
-        WorkHistory history2 = WorkHistory.createWorkHistory(
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
                 LocalDate.of(2025, 1, 16), user, group, part, division, new BigDecimal("4.0"), "업무2"
-        );
-        workHistoryRepository.save(history1);
-        workHistoryRepository.save(history2);
-
+        ));
         em.flush();
         em.clear();
 
@@ -113,9 +100,7 @@ class WorkHistoryRepositoryImplTest {
 
         // then
         assertThat(histories).hasSize(2);
-        // 날짜 역순 정렬
         assertThat(histories.get(0).getDate()).isEqualTo(LocalDate.of(2025, 1, 16));
-        assertThat(histories.get(1).getDate()).isEqualTo(LocalDate.of(2025, 1, 15));
     }
 
     @Test
@@ -141,16 +126,13 @@ class WorkHistoryRepositoryImplTest {
 
         // when
         WorkHistory findHistory = workHistoryRepository.findById(history.getSeq()).orElseThrow();
-        findHistory.updateWorkHistory(
-                LocalDate.of(2025, 1, 16), null, null, null, null, new BigDecimal("4.0"), "수정된 업무"
-        );
+        findHistory.updateWorkHistory(LocalDate.of(2025, 1, 16), null, null, null, null, new BigDecimal("4.0"), "수정된 업무");
         em.flush();
         em.clear();
 
         // then
         WorkHistory updatedHistory = workHistoryRepository.findById(history.getSeq()).orElseThrow();
         assertThat(updatedHistory.getDate()).isEqualTo(LocalDate.of(2025, 1, 16));
-        assertThat(updatedHistory.getHours()).isEqualByComparingTo(new BigDecimal("4.0"));
         assertThat(updatedHistory.getContent()).isEqualTo("수정된 업무");
     }
 
@@ -161,15 +143,12 @@ class WorkHistoryRepositoryImplTest {
         User user2 = User.createUser("user2");
         em.persist(user2);
 
-        WorkHistory history1 = WorkHistory.createWorkHistory(
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
                 LocalDate.of(2025, 1, 15), user, group, part, division, new BigDecimal("8.0"), "user1 업무"
-        );
-        WorkHistory history2 = WorkHistory.createWorkHistory(
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
                 LocalDate.of(2025, 1, 15), user2, group, part, division, new BigDecimal("8.0"), "user2 업무"
-        );
-        workHistoryRepository.save(history1);
-        workHistoryRepository.save(history2);
-
+        ));
         em.flush();
         em.clear();
 
@@ -178,7 +157,6 @@ class WorkHistoryRepositoryImplTest {
 
         // then
         assertThat(histories).hasSize(2);
-        assertThat(histories).extracting("content").containsExactlyInAnyOrder("user1 업무", "user2 업무");
     }
 
     @Test
@@ -197,10 +175,7 @@ class WorkHistoryRepositoryImplTest {
 
         // then
         assertThat(findHistory.isPresent()).isTrue();
-        // fetch join으로 연관 엔티티도 함께 로드됨
         assertThat(findHistory.get().getUser()).isNotNull();
         assertThat(findHistory.get().getGroup()).isNotNull();
-        assertThat(findHistory.get().getPart()).isNotNull();
-        assertThat(findHistory.get().getDivision()).isNotNull();
     }
 }

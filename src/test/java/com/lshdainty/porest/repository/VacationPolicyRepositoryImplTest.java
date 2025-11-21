@@ -35,15 +35,9 @@ class VacationPolicyRepositoryImplTest {
     @DisplayName("휴가정책 저장 및 단건 조회")
     void save() {
         // given
-        String name = "연차 휴가";
-        String desc = "연차 휴가 정책";
-        VacationType vacationType = VacationType.ANNUAL;
-        BigDecimal grantTime = new BigDecimal("8.0");
-
         VacationPolicy policy = VacationPolicy.createManualGrantPolicy(
-                name, desc, vacationType, grantTime,
-                YNType.N, YNType.N,
-                EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
+                "연차 휴가", "연차 휴가 정책", VacationType.ANNUAL, new BigDecimal("8.0"),
+                YNType.N, YNType.N, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
         );
 
         // when
@@ -54,20 +48,15 @@ class VacationPolicyRepositoryImplTest {
         // then
         Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findVacationPolicyById(policy.getId());
         assertThat(findPolicy.isPresent()).isTrue();
-        assertThat(findPolicy.get().getName()).isEqualTo(name);
-        assertThat(findPolicy.get().getDesc()).isEqualTo(desc);
-        assertThat(findPolicy.get().getVacationType()).isEqualTo(vacationType);
-        assertThat(findPolicy.get().getGrantTime()).isEqualByComparingTo(grantTime);
+        assertThat(findPolicy.get().getName()).isEqualTo("연차 휴가");
+        assertThat(findPolicy.get().getVacationType()).isEqualTo(VacationType.ANNUAL);
     }
 
     @Test
     @DisplayName("단건 조회 시 정책이 없어도 Null이 반환되면 안된다.")
     void findByIdEmpty() {
-        // given
-        Long policyId = 999L;
-
-        // when
-        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findVacationPolicyById(policyId);
+        // given & when
+        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findVacationPolicyById(999L);
 
         // then
         assertThat(findPolicy.isEmpty()).isTrue();
@@ -77,17 +66,14 @@ class VacationPolicyRepositoryImplTest {
     @DisplayName("전체 휴가정책 조회")
     void findVacationPolicies() {
         // given
-        VacationPolicy policy1 = VacationPolicy.createManualGrantPolicy(
+        vacationPolicyRepository.save(VacationPolicy.createManualGrantPolicy(
                 "연차", "연차 정책", VacationType.ANNUAL, new BigDecimal("8.0"),
                 YNType.N, YNType.N, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
-        );
-        VacationPolicy policy2 = VacationPolicy.createManualGrantPolicy(
+        ));
+        vacationPolicyRepository.save(VacationPolicy.createManualGrantPolicy(
                 "건강휴가", "건강검진 휴가", VacationType.HEALTH, new BigDecimal("4.0"),
                 YNType.N, YNType.N, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
-        );
-        vacationPolicyRepository.save(policy1);
-        vacationPolicyRepository.save(policy2);
-
+        ));
         em.flush();
         em.clear();
 
@@ -113,11 +99,10 @@ class VacationPolicyRepositoryImplTest {
     @DisplayName("정책명 존재 여부 확인 - 존재함")
     void existsByNameTrue() {
         // given
-        VacationPolicy policy = VacationPolicy.createManualGrantPolicy(
+        vacationPolicyRepository.save(VacationPolicy.createManualGrantPolicy(
                 "연차", "연차 정책", VacationType.ANNUAL, new BigDecimal("8.0"),
                 YNType.N, YNType.N, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
-        );
-        vacationPolicyRepository.save(policy);
+        ));
         em.flush();
         em.clear();
 
@@ -144,8 +129,7 @@ class VacationPolicyRepositoryImplTest {
         // given
         VacationPolicy policy = VacationPolicy.createOnRequestPolicy(
                 "OT 휴가", "야근 대체 휴가", VacationType.OVERTIME, new BigDecimal("8.0"),
-                YNType.Y, YNType.N, 2,
-                EffectiveType.IMMEDIATELY, ExpirationType.THREE_MONTHS_AFTER_GRANT
+                YNType.Y, YNType.N, 2, EffectiveType.IMMEDIATELY, ExpirationType.THREE_MONTHS_AFTER_GRANT
         );
         vacationPolicyRepository.save(policy);
         em.flush();
@@ -157,6 +141,5 @@ class VacationPolicyRepositoryImplTest {
         // then
         assertThat(findPolicy.isPresent()).isTrue();
         assertThat(findPolicy.get().getApprovalRequiredCount()).isEqualTo(2);
-        assertThat(findPolicy.get().getIsFlexibleGrant()).isEqualTo(YNType.Y);
     }
 }

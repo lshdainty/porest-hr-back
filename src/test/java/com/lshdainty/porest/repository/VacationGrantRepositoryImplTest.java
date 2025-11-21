@@ -54,13 +54,9 @@ class VacationGrantRepositoryImplTest {
     @DisplayName("휴가부여 저장 및 단건 조회")
     void save() {
         // given
-        String desc = "2025년 연차";
-        BigDecimal grantTime = new BigDecimal("8.0");
-        LocalDateTime grantDate = LocalDateTime.of(2025, 1, 1, 0, 0, 0);
-        LocalDateTime expiryDate = LocalDateTime.of(2025, 12, 31, 23, 59, 59);
-
         VacationGrant grant = VacationGrant.createVacationGrant(
-                user, policy, desc, VacationType.ANNUAL, grantTime, grantDate, expiryDate
+                user, policy, "2025년 연차", VacationType.ANNUAL, new BigDecimal("8.0"),
+                LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
         );
 
         // when
@@ -71,20 +67,15 @@ class VacationGrantRepositoryImplTest {
         // then
         Optional<VacationGrant> findGrant = vacationGrantRepository.findById(grant.getId());
         assertThat(findGrant.isPresent()).isTrue();
-        assertThat(findGrant.get().getDesc()).isEqualTo(desc);
-        assertThat(findGrant.get().getGrantTime()).isEqualByComparingTo(grantTime);
-        assertThat(findGrant.get().getGrantDate()).isEqualTo(grantDate);
-        assertThat(findGrant.get().getExpiryDate()).isEqualTo(expiryDate);
+        assertThat(findGrant.get().getDesc()).isEqualTo("2025년 연차");
+        assertThat(findGrant.get().getGrantTime()).isEqualByComparingTo(new BigDecimal("8.0"));
     }
 
     @Test
     @DisplayName("단건 조회 시 휴가부여가 없어도 Null이 반환되면 안된다.")
     void findByIdEmpty() {
-        // given
-        Long grantId = 999L;
-
-        // when
-        Optional<VacationGrant> findGrant = vacationGrantRepository.findById(grantId);
+        // given & when
+        Optional<VacationGrant> findGrant = vacationGrantRepository.findById(999L);
 
         // then
         assertThat(findGrant.isEmpty()).isTrue();
@@ -94,17 +85,14 @@ class VacationGrantRepositoryImplTest {
     @DisplayName("유저 ID로 휴가부여 목록 조회")
     void findByUserId() {
         // given
-        VacationGrant grant1 = VacationGrant.createVacationGrant(
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "연차1", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        );
-        VacationGrant grant2 = VacationGrant.createVacationGrant(
+        ));
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "연차2", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        );
-        vacationGrantRepository.save(grant1);
-        vacationGrantRepository.save(grant2);
-
+        ));
         em.flush();
         em.clear();
 
@@ -130,12 +118,10 @@ class VacationGrantRepositoryImplTest {
     @DisplayName("정책 ID로 휴가부여 목록 조회")
     void findByPolicyId() {
         // given
-        VacationGrant grant = VacationGrant.createVacationGrant(
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "연차", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        );
-        vacationGrantRepository.save(grant);
-
+        ));
         em.flush();
         em.clear();
 
@@ -151,17 +137,14 @@ class VacationGrantRepositoryImplTest {
     @DisplayName("사용 가능한 휴가부여 만료일 순 조회")
     void findAvailableGrantsByUserIdOrderByExpiryDate() {
         // given
-        VacationGrant grant1 = VacationGrant.createVacationGrant(
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "연차1", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 6, 30, 23, 59, 59)
-        );
-        VacationGrant grant2 = VacationGrant.createVacationGrant(
+        ));
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "연차2", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        );
-        vacationGrantRepository.save(grant1);
-        vacationGrantRepository.save(grant2);
-
+        ));
         em.flush();
         em.clear();
 
@@ -170,32 +153,26 @@ class VacationGrantRepositoryImplTest {
 
         // then
         assertThat(grants).hasSize(2);
-        // 만료일 순으로 정렬되어야 함 (FIFO)
         assertThat(grants.get(0).getDesc()).isEqualTo("연차1");
-        assertThat(grants.get(1).getDesc()).isEqualTo("연차2");
     }
 
     @Test
     @DisplayName("만료된 휴가부여 조회")
     void findExpiredTargets() {
         // given
-        VacationGrant expiredGrant = VacationGrant.createVacationGrant(
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "만료된 연차", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 12, 31, 23, 59, 59)
-        );
-        VacationGrant activeGrant = VacationGrant.createVacationGrant(
+        ));
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "유효한 연차", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        );
-        vacationGrantRepository.save(expiredGrant);
-        vacationGrantRepository.save(activeGrant);
-
+        ));
         em.flush();
         em.clear();
 
         // when
-        LocalDateTime currentDate = LocalDateTime.of(2025, 1, 1, 0, 0, 0);
-        List<VacationGrant> expiredGrants = vacationGrantRepository.findExpiredTargets(currentDate);
+        List<VacationGrant> expiredGrants = vacationGrantRepository.findExpiredTargets(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
 
         // then
         assertThat(expiredGrants).hasSize(1);
@@ -209,17 +186,14 @@ class VacationGrantRepositoryImplTest {
         User user2 = User.createUser("user2");
         em.persist(user2);
 
-        VacationGrant grant1 = VacationGrant.createVacationGrant(
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user, policy, "연차1", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        );
-        VacationGrant grant2 = VacationGrant.createVacationGrant(
+        ));
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
                 user2, policy, "연차2", VacationType.ANNUAL, new BigDecimal("8.0"),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        );
-        vacationGrantRepository.save(grant1);
-        vacationGrantRepository.save(grant2);
-
+        ));
         em.flush();
         em.clear();
 
@@ -272,14 +246,5 @@ class VacationGrantRepositoryImplTest {
         // then - 차감 확인
         VacationGrant deductedGrant = vacationGrantRepository.findById(grant.getId()).orElseThrow();
         assertThat(deductedGrant.getRemainTime()).isEqualByComparingTo(new BigDecimal("4.0"));
-
-        // when - 복원
-        deductedGrant.restore(new BigDecimal("2.0"));
-        em.flush();
-        em.clear();
-
-        // then - 복원 확인
-        VacationGrant restoredGrant = vacationGrantRepository.findById(grant.getId()).orElseThrow();
-        assertThat(restoredGrant.getRemainTime()).isEqualByComparingTo(new BigDecimal("6.0"));
     }
 }

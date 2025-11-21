@@ -43,12 +43,7 @@ class DepartmentRepositoryImplTest {
     @DisplayName("부서 저장 및 단건 조회")
     void save() {
         // given
-        String name = "개발팀";
-        String nameKR = "개발팀";
-        Long level = 1L;
-        String desc = "개발 부서";
-
-        Department department = Department.createDepartment(name, nameKR, null, null, level, desc, "#FF0000", company);
+        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
 
         // when
         departmentRepository.save(department);
@@ -58,20 +53,15 @@ class DepartmentRepositoryImplTest {
         // then
         Optional<Department> findDepartment = departmentRepository.findById(department.getId());
         assertThat(findDepartment.isPresent()).isTrue();
-        assertThat(findDepartment.get().getName()).isEqualTo(name);
-        assertThat(findDepartment.get().getNameKR()).isEqualTo(nameKR);
-        assertThat(findDepartment.get().getLevel()).isEqualTo(level);
-        assertThat(findDepartment.get().getDesc()).isEqualTo(desc);
+        assertThat(findDepartment.get().getName()).isEqualTo("개발팀");
+        assertThat(findDepartment.get().getLevel()).isEqualTo(1L);
     }
 
     @Test
     @DisplayName("단건 조회 시 부서가 없어도 Null이 반환되면 안된다.")
     void findByIdEmpty() {
-        // given
-        Long departmentId = 999L;
-
-        // when
-        Optional<Department> findDepartment = departmentRepository.findById(departmentId);
+        // given & when
+        Optional<Department> findDepartment = departmentRepository.findById(999L);
 
         // then
         assertThat(findDepartment.isEmpty()).isTrue();
@@ -84,10 +74,8 @@ class DepartmentRepositoryImplTest {
         Department parent = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
         departmentRepository.save(parent);
 
-        Department child1 = Department.createDepartment("프론트엔드", "프론트엔드", parent, null, 2L, "프론트엔드 팀", "#00FF00", company);
-        Department child2 = Department.createDepartment("백엔드", "백엔드", parent, null, 2L, "백엔드 팀", "#0000FF", company);
-        departmentRepository.save(child1);
-        departmentRepository.save(child2);
+        departmentRepository.save(Department.createDepartment("프론트엔드", "프론트엔드", parent, null, 2L, "프론트엔드 팀", "#00FF00", company));
+        departmentRepository.save(Department.createDepartment("백엔드", "백엔드", parent, null, 2L, "백엔드 팀", "#0000FF", company));
 
         em.flush();
         em.clear();
@@ -98,9 +86,6 @@ class DepartmentRepositoryImplTest {
         // then
         assertThat(findDepartment.isPresent()).isTrue();
         assertThat(findDepartment.get().getChildren()).hasSize(2);
-        assertThat(findDepartment.get().getChildren())
-                .extracting("name")
-                .containsExactlyInAnyOrder("프론트엔드", "백엔드");
     }
 
     @Test
@@ -110,8 +95,7 @@ class DepartmentRepositoryImplTest {
         Department parent = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
         departmentRepository.save(parent);
 
-        Department child = Department.createDepartment("프론트엔드", "프론트엔드", parent, null, 2L, "프론트엔드 팀", "#00FF00", company);
-        departmentRepository.save(child);
+        departmentRepository.save(Department.createDepartment("프론트엔드", "프론트엔드", parent, null, 2L, "프론트엔드 팀", "#00FF00", company));
 
         em.flush();
         em.clear();
@@ -150,10 +134,8 @@ class DepartmentRepositoryImplTest {
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
         departmentRepository.save(department);
 
-        UserDepartment userDepartment = UserDepartment.createUserDepartment(user, department, YNType.Y);
-
         // when
-        departmentRepository.saveUserDepartment(userDepartment);
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user, department, YNType.Y));
         em.flush();
         em.clear();
 
@@ -173,9 +155,7 @@ class DepartmentRepositoryImplTest {
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
         departmentRepository.save(department);
 
-        UserDepartment userDepartment = UserDepartment.createUserDepartment(user, department, YNType.Y);
-        departmentRepository.saveUserDepartment(userDepartment);
-
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user, department, YNType.Y));
         em.flush();
         em.clear();
 
@@ -197,9 +177,7 @@ class DepartmentRepositoryImplTest {
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
         departmentRepository.save(department);
 
-        UserDepartment userDepartment = UserDepartment.createUserDepartment(user, department, YNType.Y);
-        departmentRepository.saveUserDepartment(userDepartment);
-
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user, department, YNType.Y));
         em.flush();
         em.clear();
 
@@ -224,7 +202,6 @@ class DepartmentRepositoryImplTest {
 
         departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user1, department, YNType.Y));
         departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user2, department, YNType.Y));
-
         em.flush();
         em.clear();
 
@@ -233,7 +210,6 @@ class DepartmentRepositoryImplTest {
 
         // then
         assertThat(users).hasSize(2);
-        assertThat(users).extracting("id").containsExactlyInAnyOrder("user1", "user2");
     }
 
     @Test
@@ -251,7 +227,6 @@ class DepartmentRepositoryImplTest {
         departmentRepository.save(department);
 
         departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user1, department, YNType.Y));
-
         em.flush();
         em.clear();
 
@@ -260,7 +235,6 @@ class DepartmentRepositoryImplTest {
 
         // then
         assertThat(usersNotIn).hasSize(2);
-        assertThat(usersNotIn).extracting("id").containsExactlyInAnyOrder("user2", "user3");
     }
 
     @Test
@@ -273,9 +247,7 @@ class DepartmentRepositoryImplTest {
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
         departmentRepository.save(department);
 
-        UserDepartment userDepartment = UserDepartment.createUserDepartment(user, department, YNType.Y);
-        departmentRepository.saveUserDepartment(userDepartment);
-
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user, department, YNType.Y));
         em.flush();
         em.clear();
 

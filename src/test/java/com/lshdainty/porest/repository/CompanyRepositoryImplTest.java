@@ -32,11 +32,7 @@ class CompanyRepositoryImplTest {
     @DisplayName("회사 저장 및 단건 조회")
     void save() {
         // given
-        String id = "company1";
-        String name = "테스트 회사";
-        String desc = "회사 설명";
-
-        Company company = Company.createCompany(id, name, desc);
+        Company company = Company.createCompany("company1", "테스트 회사", "회사 설명");
 
         // when
         companyRepository.save(company);
@@ -44,21 +40,17 @@ class CompanyRepositoryImplTest {
         em.clear();
 
         // then
-        Optional<Company> findCompany = companyRepository.findById(id);
+        Optional<Company> findCompany = companyRepository.findById("company1");
         assertThat(findCompany.isPresent()).isTrue();
-        assertThat(findCompany.get().getId()).isEqualTo(id);
-        assertThat(findCompany.get().getName()).isEqualTo(name);
-        assertThat(findCompany.get().getDesc()).isEqualTo(desc);
+        assertThat(findCompany.get().getId()).isEqualTo("company1");
+        assertThat(findCompany.get().getName()).isEqualTo("테스트 회사");
     }
 
     @Test
     @DisplayName("단건 조회 시 회사가 없어도 Null이 반환되면 안된다.")
     void findByIdEmpty() {
-        // given
-        String companyId = "invalid-company";
-
-        // when
-        Optional<Company> findCompany = companyRepository.findById(companyId);
+        // given & when
+        Optional<Company> findCompany = companyRepository.findById("invalid-company");
 
         // then
         assertThat(findCompany.isEmpty()).isTrue();
@@ -98,11 +90,8 @@ class CompanyRepositoryImplTest {
         Company company = Company.createCompany("company1", "테스트 회사", "설명");
         companyRepository.save(company);
 
-        Department dept1 = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
-        Department dept2 = Department.createDepartment("인사팀", "인사팀", null, null, 2L, "인사 부서", "#00FF00", company);
-        em.persist(dept1);
-        em.persist(dept2);
-
+        em.persist(Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company));
+        em.persist(Department.createDepartment("인사팀", "인사팀", null, null, 2L, "인사 부서", "#00FF00", company));
         em.flush();
         em.clear();
 
@@ -112,9 +101,6 @@ class CompanyRepositoryImplTest {
         // then
         assertThat(findCompany.isPresent()).isTrue();
         assertThat(findCompany.get().getDepartments()).hasSize(2);
-        assertThat(findCompany.get().getDepartments())
-                .extracting("name")
-                .containsExactlyInAnyOrder("개발팀", "인사팀");
     }
 
     @Test

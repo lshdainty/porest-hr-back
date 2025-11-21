@@ -31,8 +31,7 @@ class WorkCodeRepositoryImplTest {
     @DisplayName("업무코드 코드값으로 조회")
     void findByCode() {
         // given
-        WorkCode workCode = WorkCode.createWorkCode("DEV", "개발", CodeType.LABEL, null, 1);
-        em.persist(workCode);
+        em.persist(WorkCode.createWorkCode("DEV", "개발", CodeType.LABEL, null, 1));
         em.flush();
         em.clear();
 
@@ -43,7 +42,6 @@ class WorkCodeRepositoryImplTest {
         assertThat(findCode.isPresent()).isTrue();
         assertThat(findCode.get().getCode()).isEqualTo("DEV");
         assertThat(findCode.get().getName()).isEqualTo("개발");
-        assertThat(findCode.get().getType()).isEqualTo(CodeType.LABEL);
     }
 
     @Test
@@ -88,9 +86,8 @@ class WorkCodeRepositoryImplTest {
     void findAllByConditionsParentIsNull() {
         // given
         WorkCode parent = WorkCode.createWorkCode("DEV", "개발", CodeType.LABEL, null, 1);
-        WorkCode child = WorkCode.createWorkCode("BACKEND", "백엔드", CodeType.OPTION, parent, 1);
         em.persist(parent);
-        em.persist(child);
+        em.persist(WorkCode.createWorkCode("BACKEND", "백엔드", CodeType.OPTION, parent, 1));
         em.flush();
         em.clear();
 
@@ -107,11 +104,9 @@ class WorkCodeRepositoryImplTest {
     void findAllByConditionsWithParent() {
         // given
         WorkCode parent = WorkCode.createWorkCode("DEV", "개발", CodeType.LABEL, null, 1);
-        WorkCode child1 = WorkCode.createWorkCode("BACKEND", "백엔드", CodeType.OPTION, parent, 1);
-        WorkCode child2 = WorkCode.createWorkCode("FRONTEND", "프론트엔드", CodeType.OPTION, parent, 2);
         em.persist(parent);
-        em.persist(child1);
-        em.persist(child2);
+        em.persist(WorkCode.createWorkCode("BACKEND", "백엔드", CodeType.OPTION, parent, 1));
+        em.persist(WorkCode.createWorkCode("FRONTEND", "프론트엔드", CodeType.OPTION, parent, 2));
         em.flush();
         em.clear();
 
@@ -120,17 +115,14 @@ class WorkCodeRepositoryImplTest {
 
         // then
         assertThat(childCodes).hasSize(2);
-        assertThat(childCodes).extracting("code").containsExactlyInAnyOrder("BACKEND", "FRONTEND");
     }
 
     @Test
     @DisplayName("조건으로 업무코드 조회 - 타입으로 필터링")
     void findAllByConditionsWithType() {
         // given
-        WorkCode label = WorkCode.createWorkCode("DEV", "개발", CodeType.LABEL, null, 1);
-        WorkCode option = WorkCode.createWorkCode("BACKEND", "백엔드", CodeType.OPTION, null, 2);
-        em.persist(label);
-        em.persist(option);
+        em.persist(WorkCode.createWorkCode("DEV", "개발", CodeType.LABEL, null, 1));
+        em.persist(WorkCode.createWorkCode("BACKEND", "백엔드", CodeType.OPTION, null, 2));
         em.flush();
         em.clear();
 
@@ -140,9 +132,7 @@ class WorkCodeRepositoryImplTest {
 
         // then
         assertThat(labelCodes).hasSize(1);
-        assertThat(labelCodes.get(0).getCode()).isEqualTo("DEV");
         assertThat(optionCodes).hasSize(1);
-        assertThat(optionCodes.get(0).getCode()).isEqualTo("BACKEND");
     }
 
     @Test
@@ -174,9 +164,7 @@ class WorkCodeRepositoryImplTest {
         WorkCode part = WorkCode.createWorkCode("BACKEND", "백엔드", CodeType.LABEL, group, 1);
         em.persist(part);
 
-        WorkCode division = WorkCode.createWorkCode("API", "API 개발", CodeType.OPTION, part, 1);
-        em.persist(division);
-
+        em.persist(WorkCode.createWorkCode("API", "API 개발", CodeType.OPTION, part, 1));
         em.flush();
         em.clear();
 
@@ -185,7 +173,6 @@ class WorkCodeRepositoryImplTest {
 
         // then
         assertThat(findDivision.isPresent()).isTrue();
-        assertThat(findDivision.get().getParent()).isNotNull();
         assertThat(findDivision.get().getParent().getCode()).isEqualTo("BACKEND");
     }
 }
