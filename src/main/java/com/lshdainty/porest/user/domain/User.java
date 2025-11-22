@@ -89,6 +89,9 @@ public class User extends AuditingFields {
     @Column(name = "is_deleted")
     private YNType isDeleted; // 삭제여부
 
+    @Column(name = "dashboard", columnDefinition = "json")
+    private String dashboard; // 대시보드 데이터
+
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)   // JPA에서는 mappedBy는 읽기 전용
     private List<UserProvider> providers = new ArrayList<>();
@@ -226,7 +229,7 @@ public class User extends AuditingFields {
      */
     public void updateUser(String name, String email, RoleType role, LocalDate birth,
                            OriginCompanyType company, String workTime,
-                           YNType lunarYN, String profileName, String profileUUID) {
+                           YNType lunarYN, String profileName, String profileUUID, String dashboard) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(email)) { this.email = email; }
         if (!Objects.isNull(role)) { this.role = role; }
@@ -236,6 +239,7 @@ public class User extends AuditingFields {
         if (!Objects.isNull(lunarYN)) { this.lunarYN = lunarYN; }
         if (!Objects.isNull(profileName)) { this.profileName = profileName; }
         if (!Objects.isNull(profileUUID)) { this.profileUUID = profileUUID; }
+        if (!Objects.isNull(dashboard)) { this.dashboard = dashboard; }
     }
 
     /**

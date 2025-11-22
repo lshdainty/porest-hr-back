@@ -118,7 +118,7 @@ class UserRepositoryImplTest {
         userRepositoryImpl.save(user);
 
         // when
-        user.updateUser("이서준", null, null, null, null, "10 ~ 7", null, null, null);
+        user.updateUser("이서준", null, null, null, null, "10 ~ 7", null, null, null, null);
         em.flush();
         em.clear();
         Optional<User> findUser = userRepositoryImpl.findById(user.getId());

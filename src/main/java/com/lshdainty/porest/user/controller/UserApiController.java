@@ -60,7 +60,8 @@ public class UserApiController {
                 user.getInvitationExpiresAt(),
                 user.getInvitationStatus(),
                 user.getRegisteredAt(),
-                user.getMainDepartmentNameKR()
+                user.getMainDepartmentNameKR(),
+                user.getDashboard()
         ));
     }
 
@@ -93,7 +94,8 @@ public class UserApiController {
                         u.getInvitationExpiresAt(),
                         u.getInvitationStatus(),
                         u.getRegisteredAt(),
-                        u.getMainDepartmentNameKR()
+                        u.getMainDepartmentNameKR(),
+                        u.getDashboard()
                 ))
                 .collect(Collectors.toList());
 
@@ -113,6 +115,7 @@ public class UserApiController {
                 .lunarYN(data.getLunarYn())
                 .profileUrl(data.getProfileUrl())
                 .profileUUID(data.getProfileUuid())
+                .dashboard(data.getDashboard())
                 .build()
         );
 
@@ -129,7 +132,8 @@ public class UserApiController {
                 findUser.getCompany(),
                 findUser.getCompany().getCompanyName(),
                 findUser.getLunarYN(),
-                findUser.getProfileUrl()
+                findUser.getProfileUrl(),
+                findUser.getDashboard()
         ));
     }
 

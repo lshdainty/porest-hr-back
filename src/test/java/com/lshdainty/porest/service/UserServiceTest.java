@@ -387,6 +387,28 @@ class UserServiceTest {
             assertThatThrownBy(() -> userService.editUser(data))
                     .isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test
+        @DisplayName("성공 - 대시보드 데이터가 수정된다")
+        void editUserDashboardSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .id(userId)
+                    .dashboard("{\"layout\": []}")
+                    .build();
+
+            // when
+            userService.editUser(data);
+
+            // then
+            then(userRepositoryImpl).should().findById(userId);
+            assertThat(user.getDashboard()).isEqualTo("{\"layout\": []}");
+        }
     }
 
     @Nested

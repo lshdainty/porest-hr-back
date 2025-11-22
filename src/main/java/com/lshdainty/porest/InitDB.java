@@ -85,9 +85,9 @@ public class InitDB {
                                         OriginCompanyType.SKAX, "8 ~ 5", YNType.N);
 
                         user1.updateUser(user1.getName(), user1.getEmail(), RoleType.ADMIN, user1.getBirth(),
-                                        user1.getCompany(), user1.getWorkTime(), user1.getLunarYN(), null, null);
+                                        user1.getCompany(), user1.getWorkTime(), user1.getLunarYN(), null, null, null);
                         user3.updateUser(user3.getName(), user3.getEmail(), RoleType.ADMIN, user3.getBirth(),
-                                        user3.getCompany(), user3.getWorkTime(), user3.getLunarYN(), null, null);
+                                        user3.getCompany(), user3.getWorkTime(), user3.getLunarYN(), null, null, null);
 
                         user1.completeRegistration(user1.getBirth(), user1.getLunarYN());
                         user2.completeRegistration(user2.getBirth(), user2.getLunarYN());

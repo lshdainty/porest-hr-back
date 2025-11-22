@@ -100,6 +100,7 @@ public class UserService {
                 .invitationStatus(user.getInvitationStatus())
                 .registeredAt(user.getRegisteredAt())
                 .mainDepartmentNameKR(mainDepartmentNameKR)
+                .dashboard(user.getDashboard())
                 .build();
     }
 
@@ -137,6 +138,7 @@ public class UserService {
                             .invitationStatus(user.getInvitationStatus())
                             .registeredAt(user.getRegisteredAt())
                             .mainDepartmentNameKR(mainDepartmentNameKR)
+                            .dashboard(user.getDashboard())
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -160,7 +162,8 @@ public class UserService {
                 data.getWorkTime(),
                 data.getLunarYN(),
                 profileDto.getProfileName(),
-                profileDto.getProfileUUID()
+                profileDto.getProfileUUID(),
+                data.getDashboard()
         );
     }
 

@@ -58,7 +58,9 @@ public class UserApiDto {
         private LocalDateTime invitationExpiresAt;
         private StatusType invitationStatus;
         private LocalDateTime registeredAt;
+
         private String mainDepartmentNameKr;
+        private String dashboard;
     }
 
     @Getter
@@ -73,7 +75,9 @@ public class UserApiDto {
         private String userWorkTime;
         private YNType lunarYn;
         private String profileUrl;
+
         private String profileUuid;
+        private String dashboard;
     }
 
     @Getter
@@ -90,7 +94,9 @@ public class UserApiDto {
         private OriginCompanyType userOriginCompanyType;
         private String userOriginCompanyName;
         private YNType lunarYn;
+
         private String profileUrl;
+        private String dashboard;
     }
 
     @Getter

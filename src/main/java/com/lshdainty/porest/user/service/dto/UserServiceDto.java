@@ -28,6 +28,7 @@ public class UserServiceDto {
     private String profileName;
     private String profileUrl;
     private String profileUUID;
+    private String dashboard;
 
     // 초대 관련 필드
     private String invitationToken;
