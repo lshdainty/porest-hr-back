@@ -240,6 +240,20 @@ public class UserApiController {
     }
 
     /**
+     * 유저 대시보드 수정
+     * PATCH /api/v1/users/{userId}/dashboard
+     */
+    @PatchMapping("/api/v1/users/{userId}/dashboard")
+    public ApiResponse updateDashboard(@PathVariable("userId") String userId, @RequestBody UserApiDto.UpdateDashboardReq data) {
+        UserServiceDto result = userService.updateDashboard(userId, data.getDashboard());
+
+        return ApiResponse.success(new UserApiDto.UpdateDashboardResp(
+                result.getId(),
+                result.getDashboard()
+        ));
+    }
+
+    /**
      * 특정 유저의 승인권자 목록 조회
      * GET /api/v1/users/{userId}/approvers
      */

@@ -405,6 +405,20 @@ public class UserService {
     }
 
     /**
+     * 대시보드 데이터 수정
+     */
+    @Transactional
+    public UserServiceDto updateDashboard(String userId, String dashboard) {
+        User user = checkUserExist(userId);
+        user.updateDashboard(dashboard);
+
+        return UserServiceDto.builder()
+                .id(user.getId())
+                .dashboard(user.getDashboard())
+                .build();
+    }
+
+    /**
      * 특정 유저의 승인권자 목록 조회
      *
      * 사용자의 메인 부서 기준으로 상위 부서장들을 승인권자로 반환합니다.

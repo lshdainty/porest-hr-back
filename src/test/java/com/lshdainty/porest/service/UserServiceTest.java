@@ -948,6 +948,80 @@ class UserServiceTest {
     }
 
     @Nested
+    @DisplayName("대시보드 수정")
+    class UpdateDashboard {
+        @Test
+        @DisplayName("성공 - 대시보드 데이터가 수정된다")
+        void updateDashboardSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            String dashboardData = "{\"widgets\": [{\"type\": \"chart\", \"position\": 1}]}";
+
+            // when
+            UserServiceDto result = userService.updateDashboard(userId, dashboardData);
+
+            // then
+            then(userRepositoryImpl).should().findById(userId);
+            assertThat(result.getId()).isEqualTo(userId);
+            assertThat(result.getDashboard()).isEqualTo(dashboardData);
+            assertThat(user.getDashboard()).isEqualTo(dashboardData);
+        }
+
+        @Test
+        @DisplayName("성공 - null로 대시보드를 초기화한다")
+        void updateDashboardWithNull() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            user.updateDashboard("{\"old\": \"data\"}");
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+
+            // when
+            UserServiceDto result = userService.updateDashboard(userId, null);
+
+            // then
+            assertThat(result.getDashboard()).isNull();
+            assertThat(user.getDashboard()).isNull();
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void updateDashboardFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.empty());
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.updateDashboard(userId, "{\"test\": true}"))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
+        void updateDashboardFailDeleted() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null);
+            user.deleteUser();
+            given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
+            given(ms.getMessage(eq("error.notfound.user"), any(), any()))
+                    .willReturn("유저를 찾을 수 없습니다");
+
+            // when & then
+            assertThatThrownBy(() -> userService.updateDashboard(userId, "{\"test\": true}"))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
     @DisplayName("승인권자 목록 조회")
     class GetUserApprovers {
         @Test

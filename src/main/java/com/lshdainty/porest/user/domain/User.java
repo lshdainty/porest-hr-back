@@ -251,6 +251,15 @@ public class User extends AuditingFields {
         this.isDeleted = YNType.Y;
     }
 
+    /**
+     * 대시보드 데이터 수정 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 대시보드 수정할 것
+     */
+    public void updateDashboard(String dashboard) {
+        this.dashboard = dashboard;
+    }
+
     /* 비즈니스 편의 메소드 */
     /**
      * 사용자의 workTime에 맞춰<br>

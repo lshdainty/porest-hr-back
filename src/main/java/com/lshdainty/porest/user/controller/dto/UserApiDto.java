@@ -213,4 +213,19 @@ public class UserApiDto {
         private String departmentNameKr;
         private Long departmentLevel;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class UpdateDashboardReq {
+        private String dashboard;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class UpdateDashboardResp {
+        private String userId;
+        private String dashboard;
+    }
 }
