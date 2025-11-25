@@ -9,6 +9,7 @@ import com.lshdainty.porest.common.util.PorestFile;
 import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.permission.repository.RoleRepository;
 import com.lshdainty.porest.user.type.StatusType;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final EmailService emailService;
     private final DepartmentCustomRepositoryImpl departmentRepository;
+    private final EntityManager em;
 
     @Value("${file.root-path}")
     private String fileRootPath;
@@ -464,5 +466,79 @@ public class UserService {
                 })
                 .filter(dto -> dto != null) // null 제거
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Spring Security용: 사용자 ID로 User 조회 (역할 및 권한 포함)
+     * 2단계 쿼리로 MultipleBagFetchException 방지
+     */
+    public Optional<User> getUserWithRolesById(String userId) {
+        // 1단계: User + userRoles + role 조회
+        List<User> result = em.createQuery(
+                "select distinct u from User u " +
+                "left join fetch u.userRoles ur " +
+                "left join fetch ur.role r " +
+                "where u.id = :userId and u.isDeleted = :isDeleted",
+                User.class)
+                .setParameter("userId", userId)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = result.get(0);
+
+        // 2단계: rolePermissions + permission 초기화
+        if (!user.getUserRoles().isEmpty()) {
+            em.createQuery(
+                "select distinct r from Role r " +
+                "left join fetch r.rolePermissions rp " +
+                "left join fetch rp.permission p " +
+                "where r in :roles",
+                Role.class)
+                .setParameter("roles", user.getRoles())
+                .getResultList();
+        }
+
+        return Optional.of(user);
+    }
+
+    /**
+     * Spring Security용: 초대 토큰으로 User 조회 (역할 및 권한 포함)
+     * 2단계 쿼리로 MultipleBagFetchException 방지
+     */
+    public Optional<User> getUserWithRolesByInvitationToken(String token) {
+        // 1단계: User + userRoles + role 조회
+        List<User> result = em.createQuery(
+                "select distinct u from User u " +
+                "left join fetch u.userRoles ur " +
+                "left join fetch ur.role r " +
+                "where u.invitationToken = :token and u.isDeleted = :isDeleted",
+                User.class)
+                .setParameter("token", token)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = result.get(0);
+
+        // 2단계: rolePermissions + permission 초기화
+        if (!user.getUserRoles().isEmpty()) {
+            em.createQuery(
+                "select distinct r from Role r " +
+                "left join fetch r.rolePermissions rp " +
+                "left join fetch rp.permission p " +
+                "where r in :roles",
+                Role.class)
+                .setParameter("roles", user.getRoles())
+                .getResultList();
+        }
+
+        return Optional.of(user);
     }
 }

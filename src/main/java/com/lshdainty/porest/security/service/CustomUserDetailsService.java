@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("Attempting to load user: {}", username);
 
-        Optional<User> userOptional = userRepository.findById(username);
+        Optional<User> userOptional = userRepository.findByIdWithRoles(username);
 
         if (userOptional.isEmpty()) {
             log.warn("User not found: {}", username);
@@ -37,7 +37,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         User user = userOptional.get();
-        log.info("User found: {}, Roles: {}", user.getId(), user.getRoles().stream().map(Role::getName).collect(Collectors.joining(", ")));
+        log.info("User found: {}, Roles: {}, Authorities: {}",
+                user.getId(),
+                user.getRoles().stream().map(Role::getCode).collect(Collectors.joining(", ")),
+                String.join(", ", user.getAllAuthorities()));
 
         return new CustomUserDetails(user);
     }
@@ -52,8 +55,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
-            return user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+            // User의 모든 권한 조회 (Role 코드 + Permission 코드)
+            // 예: ["ADMIN", "USER:READ", "USER:EDIT", "VACATION:REQUEST", ...]
+            return user.getAllAuthorities().stream()
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
         }
 

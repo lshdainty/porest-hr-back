@@ -54,11 +54,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         User user = processOAuth2User(attributes);
 
+        log.info("OAuth2 User loaded: {}, Roles: {}, Authorities: {}",
+                user.getId(),
+                user.getRoles().stream().map(role -> role.getCode()).collect(Collectors.joining(", ")),
+                String.join(", ", user.getAllAuthorities()));
+
         return new CustomOAuth2User(
                 user,
                 attributes.getAttributes(),
-                user.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                user.getAllAuthorities().stream()
+                        .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toSet()),
                 attributes.getNameAttributeKey());
     }
@@ -76,8 +81,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 2. 3가지의 값이 다 있다면 회원가입 아니면 로그인으로 간주
         if (invitationToken != null && "signup".equals(oauthStep) && invitedUserId != null) {
             // 회원 가입 부분
-            // 2-1. 초대 토큰으로 사용자 찾기
-            User user = userRepository.findByInvitationToken(invitationToken)
+            // 2-1. 초대 토큰으로 사용자 찾기 (역할 포함)
+            User user = userRepository.findByInvitationTokenWithRoles(invitationToken)
                     .orElseThrow(() -> new OAuth2AuthenticationException("유효하지 않은 초대 토큰입니다."));
 
             // 2-2. 토큰 재검증
@@ -106,7 +111,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     .findByProviderTypeAndProviderId(attributes.getProvider(), attributes.getProviderId())
                     .orElseThrow(() -> new OAuth2AuthenticationException("등록되지 않은 소셜 계정입니다. 먼저 회원가입을 진행해주세요."));
 
-            User user = userProvider.getUser();
+            // 역할 및 권한 정보를 포함하여 사용자 재조회
+            String userId = userProvider.getUser().getId();
+            User user = userRepository.findByIdWithRoles(userId)
+                    .orElseThrow(() -> new OAuth2AuthenticationException("사용자 정보를 찾을 수 없습니다."));
 
             log.info("OAuth2 로그인 성공: userId={}, provider={}", user.getId(), attributes.getProvider());
             return user;

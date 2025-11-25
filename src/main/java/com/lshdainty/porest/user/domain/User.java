@@ -373,4 +373,29 @@ public class User extends AuditingFields {
                 .filter(ur -> ur.getIsDeleted() == YNType.N)
                 .anyMatch(ur -> ur.getRole().getCode().equals(roleCode));
     }
+
+    /**
+     * 모든 권한 코드 조회 (Spring Security용)<br>
+     * 사용자의 역할(Role)과 해당 역할의 모든 권한(Permission)을 포함하여 반환
+     *
+     * @return 권한 코드 리스트 (예: ["ADMIN", "USER:READ", "USER:EDIT", ...])
+     */
+    public List<String> getAllAuthorities() {
+        return this.userRoles.stream()
+                .filter(ur -> ur.getIsDeleted() == YNType.N)
+                .flatMap(ur -> {
+                    List<String> authorities = new java.util.ArrayList<>();
+                    // 1. 역할 코드 추가 (예: "ADMIN", "MANAGER", "USER")
+                    authorities.add(ur.getRole().getCode());
+
+                    // 2. 역할의 모든 권한 코드 추가 (예: "USER:READ", "USER:EDIT", ...)
+                    ur.getRole().getPermissions().stream()
+                            .map(permission -> permission.getCode())
+                            .forEach(authorities::add);
+
+                    return authorities.stream();
+                })
+                .distinct()
+                .toList();
+    }
 }

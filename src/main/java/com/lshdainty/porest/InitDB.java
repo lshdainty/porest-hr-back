@@ -80,6 +80,9 @@ public class InitDB {
                 private final Map<String, WorkCode> workCodeMap = new HashMap<>();
 
                 public void initSetMember() {
+                        // ==========================================
+                        // 1. 사용자 생성
+                        // ==========================================
                         user1 = saveMember("user1", "이서준", "aaa@naver.com", LocalDate.of(1970, 7, 23),
                                         OriginCompanyType.SKAX, "9 ~ 6", YNType.N);
                         user2 = saveMember("user2", "김서연", "bbb@naver.com", LocalDate.of(1970, 10, 26),
@@ -93,12 +96,46 @@ public class InitDB {
                         user6 = saveMember("user6", "이하은", "fff@naver.com", LocalDate.of(1885, 9, 2),
                                         OriginCompanyType.SKAX, "8 ~ 5", YNType.N);
 
-                        Role adminRole = roleRepository.findByCode("ADMIN").orElseThrow();
+                        // ==========================================
+                        // 2. 역할 조회
+                        // ==========================================
+                        Role adminRole = roleRepository.findByCode("ADMIN")
+                                        .orElseThrow(() -> new IllegalStateException("ADMIN role not found"));
+                        Role managerRole = roleRepository.findByCode("MANAGER")
+                                        .orElseThrow(() -> new IllegalStateException("MANAGER role not found"));
+                        Role userRole = roleRepository.findByCode("USER")
+                                        .orElseThrow(() -> new IllegalStateException("USER role not found"));
+
+                        // ==========================================
+                        // 3. 사용자에게 역할 부여
+                        // ==========================================
+                        // user1: 관리자 (이서준) - ADMIN 역할
                         user1.updateUser(user1.getName(), user1.getEmail(), List.of(adminRole), user1.getBirth(),
                                         user1.getCompany(), user1.getWorkTime(), user1.getLunarYN(), null, null, null);
+
+                        // user2: 일반 사용자 (김서연) - USER 역할
+                        user2.updateUser(user2.getName(), user2.getEmail(), List.of(userRole), user2.getBirth(),
+                                        user2.getCompany(), user2.getWorkTime(), user2.getLunarYN(), null, null, null);
+
+                        // user3: 관리자 (김지후) - ADMIN 역할
                         user3.updateUser(user3.getName(), user3.getEmail(), List.of(adminRole), user3.getBirth(),
                                         user3.getCompany(), user3.getWorkTime(), user3.getLunarYN(), null, null, null);
 
+                        // user4: 매니저 (이준우) - MANAGER 역할
+                        user4.updateUser(user4.getName(), user4.getEmail(), List.of(managerRole), user4.getBirth(),
+                                        user4.getCompany(), user4.getWorkTime(), user4.getLunarYN(), null, null, null);
+
+                        // user5: 일반 사용자 (조민서) - USER 역할
+                        user5.updateUser(user5.getName(), user5.getEmail(), List.of(userRole), user5.getBirth(),
+                                        user5.getCompany(), user5.getWorkTime(), user5.getLunarYN(), null, null, null);
+
+                        // user6: 매니저 (이하은) - MANAGER 역할
+                        user6.updateUser(user6.getName(), user6.getEmail(), List.of(managerRole), user6.getBirth(),
+                                        user6.getCompany(), user6.getWorkTime(), user6.getLunarYN(), null, null, null);
+
+                        // ==========================================
+                        // 4. 회원가입 완료 처리
+                        // ==========================================
                         user1.completeRegistration(user1.getBirth(), user1.getLunarYN());
                         user2.completeRegistration(user2.getBirth(), user2.getLunarYN());
                         user3.completeRegistration(user3.getBirth(), user3.getLunarYN());
