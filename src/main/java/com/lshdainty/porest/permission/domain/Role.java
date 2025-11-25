@@ -25,10 +25,17 @@ import java.util.Objects;
 public class Role extends AuditingFields {
 
     /**
-     * 역할 이름 (Primary Key)<br>
-     * 예: ADMIN, MANAGER, EMPLOYEE
+     * 역할 ID (Primary Key)<br>
+     * 예: ADMIN, MANAGER, USER
      */
     @Id
+    @Column(name = "role_id")
+    private String id;
+
+    /**
+     * 역할 이름 (한글명)<br>
+     * 예: 관리자, 매니저, 일반 사용자
+     */
     @Column(name = "role_name")
     private String name;
 
@@ -61,12 +68,14 @@ public class Role extends AuditingFields {
      * Entity의 경우 Setter 없이 Getter만 사용<br>
      * 해당 메소드를 통해 역할 생성할 것
      *
-     * @param name 역할 이름
+     * @param id 역할 ID
+     * @param name 역할 이름 (한글명)
      * @param description 역할 설명
      * @return Role
      */
-    public static Role createRole(String name, String description) {
+    public static Role createRole(String id, String name, String description) {
         Role role = new Role();
+        role.id = id;
         role.name = name;
         role.description = description;
         role.rolePermissions = new ArrayList<>();
@@ -78,13 +87,15 @@ public class Role extends AuditingFields {
      * 역할 생성 함수 (권한 포함)<br>
      * 권한 리스트와 함께 역할을 생성
      *
-     * @param name 역할 이름
+     * @param id 역할 ID
+     * @param name 역할 이름 (한글명)
      * @param description 역할 설명
      * @param permissions 권한 리스트
      * @return Role
      */
-    public static Role createRoleWithPermissions(String name, String description, List<Permission> permissions) {
+    public static Role createRoleWithPermissions(String id, String name, String description, List<Permission> permissions) {
         Role role = new Role();
+        role.id = id;
         role.name = name;
         role.description = description;
         role.rolePermissions = new ArrayList<>();
@@ -104,10 +115,12 @@ public class Role extends AuditingFields {
      * Entity의 경우 Setter 없이 Getter만 사용<br>
      * 해당 메소드를 통해 역할 수정할 것
      *
+     * @param name 역할 이름 (한글명)
      * @param description 역할 설명
      * @param permissions 권한 리스트
      */
-    public void updateRole(String description, List<Permission> permissions) {
+    public void updateRole(String name, String description, List<Permission> permissions) {
+        if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(description)) { this.description = description; }
         if (!Objects.isNull(permissions)) {
             this.rolePermissions.clear();

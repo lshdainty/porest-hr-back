@@ -32,7 +32,7 @@ public class RolePermission extends AuditingFields {
      * 어떤 역할에 권한이 부여되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_name")
+    @JoinColumn(name = "role_id")
     private Role role;
 
     /**

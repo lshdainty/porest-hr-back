@@ -26,13 +26,13 @@ public class RoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    public Optional<Role> findByName(String name) {
+    public Optional<Role> findById(String id) {
         QRole role = QRole.role;
 
         Role result = queryFactory
                 .selectFrom(role)
                 .where(
-                        role.name.eq(name),
+                        role.id.eq(id),
                         role.isDeleted.eq(YNType.N)
                 )
                 .fetchOne();
@@ -41,7 +41,7 @@ public class RoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    public Optional<Role> findByNameWithPermissions(String name) {
+    public Optional<Role> findByIdWithPermissions(String id) {
         QRole role = QRole.role;
         QRolePermission rolePermission = QRolePermission.rolePermission;
         QPermission permission = QPermission.permission;
@@ -51,7 +51,7 @@ public class RoleRepositoryImpl implements RoleRepository {
                 .leftJoin(role.rolePermissions, rolePermission).fetchJoin()
                 .leftJoin(rolePermission.permission, permission).fetchJoin()
                 .where(
-                        role.name.eq(name),
+                        role.id.eq(id),
                         role.isDeleted.eq(YNType.N),
                         rolePermission.isDeleted.eq(YNType.N).or(rolePermission.isNull())
                 )
@@ -67,7 +67,7 @@ public class RoleRepositoryImpl implements RoleRepository {
         return queryFactory
                 .selectFrom(role)
                 .where(role.isDeleted.eq(YNType.N))
-                .orderBy(role.name.asc())
+                .orderBy(role.id.asc())
                 .fetch();
     }
 
@@ -86,7 +86,7 @@ public class RoleRepositoryImpl implements RoleRepository {
                         role.isDeleted.eq(YNType.N),
                         rolePermission.isDeleted.eq(YNType.N).or(rolePermission.isNull())
                 )
-                .orderBy(role.name.asc())
+                .orderBy(role.id.asc())
                 .fetch();
     }
 }
