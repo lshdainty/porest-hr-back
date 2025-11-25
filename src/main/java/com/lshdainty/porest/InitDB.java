@@ -49,12 +49,15 @@ public class InitDB {
         @PostConstruct
         public void init() {
                 initService.initSetRole();
+                initService.initSetDepartment();
                 initService.initSetMember();
+                initService.initSetUserDepartment();
                 initService.initSetSchedule();
                 initService.initSetDues();
                 initService.initSetVacationPolicy();
                 initService.initSetUserVacationPolicy();
                 initService.initSetVacationGrant();
+                initService.initSetHoliday();
                 initService.initSetWorkCode();
                 initService.initSetWorkHistory();
         }
@@ -88,7 +91,7 @@ public class InitDB {
                         user6 = saveMember("user6", "이하은", "fff@naver.com", LocalDate.of(1885, 9, 2),
                                         OriginCompanyType.SKAX, "8 ~ 5", YNType.N);
 
-                        Role adminRole = roleRepository.findById("ADMIN").orElseThrow();
+                        Role adminRole = roleRepository.findByName("ADMIN").orElseThrow();
                         user1.updateUser(user1.getName(), user1.getEmail(), List.of(adminRole), user1.getBirth(),
                                         user1.getCompany(), user1.getWorkTime(), user1.getLunarYN(), null, null, null);
                         user3.updateUser(user3.getName(), user3.getEmail(), List.of(adminRole), user3.getBirth(),
@@ -205,65 +208,95 @@ public class InitDB {
                 }
 
                 public void initSetRole() {
-                        if (roleRepository.count() == 0) {
+                        if (roleRepository.findAllRoles().isEmpty()) {
                                 // ==========================================
                                 // 1. Create Permissions
                                 // ==========================================
 
                                 // User Management
-                                Permission userRead = permissionRepository.save(Permission.create("USER_READ", "유저 정보 조회", "USER", "READ"));
-                                Permission userCreate = permissionRepository.save(Permission.create("USER_CREATE", "유저 생성(초대)", "USER", "CREATE"));
-                                Permission userUpdate = permissionRepository.save(Permission.create("USER_UPDATE", "유저 정보 수정", "USER", "UPDATE"));
-                                Permission userDelete = permissionRepository.save(Permission.create("USER_DELETE", "유저 삭제", "USER", "DELETE"));
-                                Permission userPromote = permissionRepository.save(Permission.create("USER_PROMOTE", "유저 권한 승격", "USER", "PROMOTE"));
+                                Permission userRead = Permission.createPermission("USER_READ", "유저 정보 조회", "USER", "READ");
+                                permissionRepository.save(userRead);
+                                Permission userCreate = Permission.createPermission("USER_CREATE", "유저 생성(초대)", "USER", "CREATE");
+                                permissionRepository.save(userCreate);
+                                Permission userUpdate = Permission.createPermission("USER_UPDATE", "유저 정보 수정", "USER", "UPDATE");
+                                permissionRepository.save(userUpdate);
+                                Permission userDelete = Permission.createPermission("USER_DELETE", "유저 삭제", "USER", "DELETE");
+                                permissionRepository.save(userDelete);
+                                Permission userPromote = Permission.createPermission("USER_PROMOTE", "유저 권한 승격", "USER", "PROMOTE");
+                                permissionRepository.save(userPromote);
 
                                 // Vacation Management
-                                Permission vacationRead = permissionRepository.save(Permission.create("VACATION_READ", "휴가 내역 조회", "VACATION", "READ"));
-                                Permission vacationRequest = permissionRepository.save(Permission.create("VACATION_REQUEST", "휴가 신청", "VACATION", "REQUEST"));
-                                Permission vacationCancel = permissionRepository.save(Permission.create("VACATION_CANCEL", "휴가 취소", "VACATION", "CANCEL"));
-                                Permission vacationManage = permissionRepository.save(Permission.create("VACATION_MANAGE", "전체 휴가 내역 관리", "VACATION", "MANAGE"));
-                                Permission vacationApprove = permissionRepository.save(Permission.create("VACATION_APPROVE", "휴가 승인/반려", "VACATION", "APPROVE"));
-                                Permission vacationGrant = permissionRepository.save(Permission.create("VACATION_GRANT", "휴가 강제 부여", "VACATION", "GRANT"));
-                                Permission vacationPolicyManage = permissionRepository.save(Permission.create("VACATION_POLICY_MANAGE", "휴가 정책 관리", "VACATION", "POLICY_MANAGE"));
+                                Permission vacationRead = Permission.createPermission("VACATION_READ", "휴가 내역 조회", "VACATION", "READ");
+                                permissionRepository.save(vacationRead);
+                                Permission vacationRequest = Permission.createPermission("VACATION_REQUEST", "휴가 신청", "VACATION", "REQUEST");
+                                permissionRepository.save(vacationRequest);
+                                Permission vacationCancel = Permission.createPermission("VACATION_CANCEL", "휴가 취소", "VACATION", "CANCEL");
+                                permissionRepository.save(vacationCancel);
+                                Permission vacationManage = Permission.createPermission("VACATION_MANAGE", "전체 휴가 내역 관리", "VACATION", "MANAGE");
+                                permissionRepository.save(vacationManage);
+                                Permission vacationApprove = Permission.createPermission("VACATION_APPROVE", "휴가 승인/반려", "VACATION", "APPROVE");
+                                permissionRepository.save(vacationApprove);
+                                Permission vacationGrant = Permission.createPermission("VACATION_GRANT", "휴가 강제 부여", "VACATION", "GRANT");
+                                permissionRepository.save(vacationGrant);
+                                Permission vacationPolicyManage = Permission.createPermission("VACATION_POLICY_MANAGE", "휴가 정책 관리", "VACATION", "POLICY_MANAGE");
+                                permissionRepository.save(vacationPolicyManage);
 
                                 // Work Management
-                                Permission workRead = permissionRepository.save(Permission.create("WORK_READ", "근무 내역 조회", "WORK", "READ"));
-                                Permission workManage = permissionRepository.save(Permission.create("WORK_MANAGE", "전체 근무 내역 관리", "WORK", "MANAGE"));
-                                Permission workCreate = permissionRepository.save(Permission.create("WORK_CREATE", "출퇴근 기록 생성", "WORK", "CREATE"));
-                                Permission workUpdate = permissionRepository.save(Permission.create("WORK_UPDATE", "근무 기록 수정", "WORK", "UPDATE"));
+                                Permission workRead = Permission.createPermission("WORK_READ", "근무 내역 조회", "WORK", "READ");
+                                permissionRepository.save(workRead);
+                                Permission workManage = Permission.createPermission("WORK_MANAGE", "전체 근무 내역 관리", "WORK", "MANAGE");
+                                permissionRepository.save(workManage);
+                                Permission workCreate = Permission.createPermission("WORK_CREATE", "출퇴근 기록 생성", "WORK", "CREATE");
+                                permissionRepository.save(workCreate);
+                                Permission workUpdate = Permission.createPermission("WORK_UPDATE", "근무 기록 수정", "WORK", "UPDATE");
+                                permissionRepository.save(workUpdate);
 
                                 // Department Management
-                                Permission departmentRead = permissionRepository.save(Permission.create("DEPARTMENT_READ", "부서 정보 조회", "DEPARTMENT", "READ"));
-                                Permission departmentManage = permissionRepository.save(Permission.create("DEPARTMENT_MANAGE", "부서 관리", "DEPARTMENT", "MANAGE"));
+                                Permission departmentRead = Permission.createPermission("DEPARTMENT_READ", "부서 정보 조회", "DEPARTMENT", "READ");
+                                permissionRepository.save(departmentRead);
+                                Permission departmentManage = Permission.createPermission("DEPARTMENT_MANAGE", "부서 관리", "DEPARTMENT", "MANAGE");
+                                permissionRepository.save(departmentManage);
 
                                 // Holiday Management
-                                Permission holidayRead = permissionRepository.save(Permission.create("HOLIDAY_READ", "공휴일 조회", "HOLIDAY", "READ"));
-                                Permission holidayManage = permissionRepository.save(Permission.create("HOLIDAY_MANAGE", "공휴일 관리", "HOLIDAY", "MANAGE"));
+                                Permission holidayRead = Permission.createPermission("HOLIDAY_READ", "공휴일 조회", "HOLIDAY", "READ");
+                                permissionRepository.save(holidayRead);
+                                Permission holidayManage = Permission.createPermission("HOLIDAY_MANAGE", "공휴일 관리", "HOLIDAY", "MANAGE");
+                                permissionRepository.save(holidayManage);
 
                                 // Schedule Management
-                                Permission scheduleRead = permissionRepository.save(Permission.create("SCHEDULE_READ", "일정 조회", "SCHEDULE", "READ"));
-                                Permission scheduleCreate = permissionRepository.save(Permission.create("SCHEDULE_CREATE", "일정 생성", "SCHEDULE", "CREATE"));
-                                Permission scheduleUpdate = permissionRepository.save(Permission.create("SCHEDULE_UPDATE", "일정 수정", "SCHEDULE", "UPDATE"));
-                                Permission scheduleDelete = permissionRepository.save(Permission.create("SCHEDULE_DELETE", "일정 삭제", "SCHEDULE", "DELETE"));
+                                Permission scheduleRead = Permission.createPermission("SCHEDULE_READ", "일정 조회", "SCHEDULE", "READ");
+                                permissionRepository.save(scheduleRead);
+                                Permission scheduleCreate = Permission.createPermission("SCHEDULE_CREATE", "일정 생성", "SCHEDULE", "CREATE");
+                                permissionRepository.save(scheduleCreate);
+                                Permission scheduleUpdate = Permission.createPermission("SCHEDULE_UPDATE", "일정 수정", "SCHEDULE", "UPDATE");
+                                permissionRepository.save(scheduleUpdate);
+                                Permission scheduleDelete = Permission.createPermission("SCHEDULE_DELETE", "일정 삭제", "SCHEDULE", "DELETE");
+                                permissionRepository.save(scheduleDelete);
 
                                 // Dues Management
-                                Permission duesRead = permissionRepository.save(Permission.create("DUES_READ", "회비 내역 조회", "DUES", "READ"));
-                                Permission duesManage = permissionRepository.save(Permission.create("DUES_MANAGE", "회비 관리", "DUES", "MANAGE"));
+                                Permission duesRead = Permission.createPermission("DUES_READ", "회비 내역 조회", "DUES", "READ");
+                                permissionRepository.save(duesRead);
+                                Permission duesManage = Permission.createPermission("DUES_MANAGE", "회비 관리", "DUES", "MANAGE");
+                                permissionRepository.save(duesManage);
 
                                 // Company Management
-                                Permission companyRead = permissionRepository.save(Permission.create("COMPANY_READ", "회사 정보 조회", "COMPANY", "READ"));
-                                Permission companyManage = permissionRepository.save(Permission.create("COMPANY_MANAGE", "회사 정보 관리", "COMPANY", "MANAGE"));
+                                Permission companyRead = Permission.createPermission("COMPANY_READ", "회사 정보 조회", "COMPANY", "READ");
+                                permissionRepository.save(companyRead);
+                                Permission companyManage = Permission.createPermission("COMPANY_MANAGE", "회사 정보 관리", "COMPANY", "MANAGE");
+                                permissionRepository.save(companyManage);
 
                                 // Role/Permission Management
-                                Permission roleRead = permissionRepository.save(Permission.create("ROLE_READ", "역할/권한 조회", "ROLE", "READ"));
-                                Permission roleManage = permissionRepository.save(Permission.create("ROLE_MANAGE", "역할/권한 관리", "ROLE", "MANAGE"));
+                                Permission roleRead = Permission.createPermission("ROLE_READ", "역할/권한 조회", "ROLE", "READ");
+                                permissionRepository.save(roleRead);
+                                Permission roleManage = Permission.createPermission("ROLE_MANAGE", "역할/권한 관리", "ROLE", "MANAGE");
+                                permissionRepository.save(roleManage);
 
                                 // ==========================================
                                 // 2. Create Roles
                                 // ==========================================
 
                                 // ADMIN Role (All Permissions)
-                                Role adminRole = Role.create("ADMIN", "Administrator - Full Access");
+                                Role adminRole = Role.createRole("ADMIN", "Administrator - Full Access");
                                 adminRole.addPermission(userRead); adminRole.addPermission(userCreate); adminRole.addPermission(userUpdate); adminRole.addPermission(userDelete); adminRole.addPermission(userPromote);
                                 adminRole.addPermission(vacationRead); adminRole.addPermission(vacationRequest); adminRole.addPermission(vacationCancel); adminRole.addPermission(vacationManage); adminRole.addPermission(vacationApprove); adminRole.addPermission(vacationGrant); adminRole.addPermission(vacationPolicyManage);
                                 adminRole.addPermission(workRead); adminRole.addPermission(workManage); adminRole.addPermission(workCreate); adminRole.addPermission(workUpdate);
@@ -276,7 +309,7 @@ public class InitDB {
                                 roleRepository.save(adminRole);
 
                                 // MANAGER Role
-                                Role managerRole = Role.create("MANAGER", "Manager - Department & Approval Access");
+                                Role managerRole = Role.createRole("MANAGER", "Manager - Department & Approval Access");
                                 // User: Read
                                 managerRole.addPermission(userRead);
                                 // Vacation: Read, Request, Cancel, Manage, Approve
@@ -296,7 +329,7 @@ public class InitDB {
                                 roleRepository.save(managerRole);
 
                                 // USER Role
-                                Role userRole = Role.create("USER", "General User - Standard Access");
+                                Role userRole = Role.createRole("USER", "General User - Standard Access");
                                 // User: Read
                                 userRole.addPermission(userRead);
                                 // Vacation: Read, Request, Cancel

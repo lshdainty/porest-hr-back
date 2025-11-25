@@ -159,7 +159,7 @@ public class UserService {
         List<Role> roles = null;
         if (data.getRoleNames() != null) {
             roles = data.getRoleNames().stream()
-                    .map(name -> roleRepository.findById(name).orElseThrow(() -> new IllegalArgumentException("Role not found: " + name)))
+                    .map(name -> roleRepository.findByName(name).orElseThrow(() -> new IllegalArgumentException("Role not found: " + name)))
                     .collect(Collectors.toList());
         }
 

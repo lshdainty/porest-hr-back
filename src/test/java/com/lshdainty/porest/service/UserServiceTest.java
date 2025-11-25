@@ -424,7 +424,7 @@ class UserServiceTest {
             given(userRepositoryImpl.findById(userId)).willReturn(Optional.of(user));
 
             Role role = Role.createRole("ADMIN", "관리자");
-            given(roleRepository.findById("ADMIN")).willReturn(Optional.of(role));
+            given(roleRepository.findByName("ADMIN")).willReturn(Optional.of(role));
 
             UserServiceDto data = UserServiceDto.builder()
                     .id(userId)
@@ -436,7 +436,7 @@ class UserServiceTest {
 
             // then
             then(userRepositoryImpl).should().findById(userId);
-            then(roleRepository).should().findById("ADMIN");
+            then(roleRepository).should().findByName("ADMIN");
             assertThat(user.getRoles()).contains(role);
         }
     }

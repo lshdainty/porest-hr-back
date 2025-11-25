@@ -2,6 +2,12 @@ spring:
   application:
     name: porest
 
+  mail:
+    username: test@example.com
+    password: testpassword
+    host: smtp.example.com
+    port: 587
+
   jpa:
     hibernate:
     properties:
