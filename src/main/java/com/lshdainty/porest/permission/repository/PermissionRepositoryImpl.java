@@ -29,13 +29,28 @@ public class PermissionRepositoryImpl implements PermissionRepository {
     }
 
     @Override
-    public Optional<Permission> findById(String id) {
+    public Optional<Permission> findById(Long id) {
         QPermission permission = QPermission.permission;
 
         Permission result = queryFactory
                 .selectFrom(permission)
                 .where(
                         permission.id.eq(id),
+                        permission.isDeleted.eq(YNType.N)
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public Optional<Permission> findByCode(String code) {
+        QPermission permission = QPermission.permission;
+
+        Permission result = queryFactory
+                .selectFrom(permission)
+                .where(
+                        permission.code.eq(code),
                         permission.isDeleted.eq(YNType.N)
                 )
                 .fetchOne();

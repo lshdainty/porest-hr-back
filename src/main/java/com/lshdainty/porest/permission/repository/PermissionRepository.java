@@ -23,7 +23,15 @@ public interface PermissionRepository {
      * @param id 권한 ID
      * @return Optional<Permission>
      */
-    Optional<Permission> findById(String id);
+    Optional<Permission> findById(Long id);
+
+    /**
+     * 권한 코드로 권한 조회
+     *
+     * @param code 권한 코드
+     * @return Optional<Permission>
+     */
+    Optional<Permission> findByCode(String code);
 
     /**
      * 전체 권한 목록 조회 (삭제되지 않은 것만)

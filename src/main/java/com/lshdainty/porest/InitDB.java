@@ -93,7 +93,7 @@ public class InitDB {
                         user6 = saveMember("user6", "이하은", "fff@naver.com", LocalDate.of(1885, 9, 2),
                                         OriginCompanyType.SKAX, "8 ~ 5", YNType.N);
 
-                        Role adminRole = roleRepository.findByName("ADMIN").orElseThrow();
+                        Role adminRole = roleRepository.findByCode("ADMIN").orElseThrow();
                         user1.updateUser(user1.getName(), user1.getEmail(), List.of(adminRole), user1.getBirth(),
                                         user1.getCompany(), user1.getWorkTime(), user1.getLunarYN(), null, null, null);
                         user3.updateUser(user3.getName(), user3.getEmail(), List.of(adminRole), user3.getBirth(),
@@ -274,7 +274,7 @@ public class InitDB {
                                 // ==========================================
 
                                 // ADMIN Role (모든 권한)
-                                Role adminRole = Role.createRole("ADMIN", "관리자 - 전체 권한");
+                                Role adminRole = Role.createRole("ADMIN", "관리자", "전체 권한");
                                 adminRole.addPermission(userRead); adminRole.addPermission(userEdit); adminRole.addPermission(userManage);
                                 adminRole.addPermission(vacationRead); adminRole.addPermission(vacationRequest); adminRole.addPermission(vacationApprove);
                                 adminRole.addPermission(vacationGrant); adminRole.addPermission(vacationManage);
@@ -285,16 +285,16 @@ public class InitDB {
                                 roleRepository.save(adminRole);
 
                                 // MANAGER Role (팀장/관리자 권한)
-                                Role managerRole = Role.createRole("MANAGER", "매니저 - 승인 및 조회 권한");
+                                Role managerRole = Role.createRole("MANAGER", "매니저", "승인 및 조회 권한");
                                 managerRole.addPermission(userRead);
                                 managerRole.addPermission(vacationRead); managerRole.addPermission(vacationRequest); managerRole.addPermission(vacationApprove);
-                                managerRole.addPermission(workRead); managerRole.addPermission(workWrite);
-                                managerRole.addPermission(scheduleRead); managerRole.addPermission(scheduleWrite);
+                                managerRole.addPermission(workRead); managerRole.addPermission(workWrite); managerRole.addPermission(workManage);
+                                managerRole.addPermission(scheduleRead); managerRole.addPermission(scheduleWrite); adminRole.addPermission(scheduleManage);
                                 managerRole.addPermission(duesRead);
                                 roleRepository.save(managerRole);
 
                                 // USER Role (일반 사용자 권한)
-                                Role userRole = Role.createRole("USER", "일반 사용자 - 기본 권한");
+                                Role userRole = Role.createRole("USER", "일반 사용자", "기본 권한");
                                 userRole.addPermission(userRead); userRole.addPermission(userEdit);
                                 userRole.addPermission(vacationRead); userRole.addPermission(vacationRequest);
                                 userRole.addPermission(workRead); userRole.addPermission(workWrite);

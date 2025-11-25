@@ -22,6 +22,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class RoleResp {
+        private String roleCode;
         private String roleName;
         private String description;
         private List<String> permissions;
@@ -34,6 +35,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class RoleSimpleResp {
+        private String roleCode;
         private String roleName;
         private String description;
     }
@@ -48,9 +50,10 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class CreateRoleReq {
+        private String roleCode;
         private String roleName;
         private String description;
-        private List<String> permissionNames; // optional
+        private List<String> permissionCodes; // optional
     }
 
     /**
@@ -62,7 +65,7 @@ public class RoleApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class UpdateRoleReq {
         private String description;
-        private List<String> permissionNames; // optional
+        private List<String> permissionCodes; // optional
     }
 
     /**
@@ -73,7 +76,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class UpdateRolePermissionsReq {
-        private List<String> permissionNames;
+        private List<String> permissionCodes;
     }
 
     /**
@@ -84,7 +87,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class RolePermissionReq {
-        private String permissionName;
+        private String permissionCode;
     }
 
     /* ==================== Permission Response DTO ==================== */
@@ -96,7 +99,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class PermissionResp {
-        private String id;
+        private String code;
         private String name;
         private String description;
         private String resource;
@@ -113,7 +116,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class CreatePermissionReq {
-        private String id;
+        private String code;
         private String name;
         private String description;
         private String resource;

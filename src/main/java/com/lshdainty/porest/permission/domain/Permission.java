@@ -24,11 +24,19 @@ public class Permission extends AuditingFields {
 
     /**
      * 권한 ID (Primary Key)<br>
-     * 예: USER:READ, VACATION:REQUEST
+     * 자동 생성되는 고유 식별자
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "permission_id")
-    private String id;
+    private Long id;
+
+    /**
+     * 권한 코드 (고유 식별 코드)<br>
+     * 예: USER:READ, VACATION:REQUEST
+     */
+    @Column(name = "permission_code", unique = true, nullable = false)
+    private String code;
 
     /**
      * 권한 이름 (한글명)<br>
@@ -75,16 +83,16 @@ public class Permission extends AuditingFields {
      * Entity의 경우 Setter 없이 Getter만 사용<br>
      * 해당 메소드를 통해 권한 생성할 것
      *
-     * @param id 권한 ID
+     * @param code 권한 코드
      * @param name 권한 이름 (한글명)
      * @param description 권한 설명
      * @param resource 리소스
      * @param action 액션
      * @return Permission
      */
-    public static Permission createPermission(String id, String name, String description, ResourceType resource, ActionType action) {
+    public static Permission createPermission(String code, String name, String description, ResourceType resource, ActionType action) {
         Permission permission = new Permission();
-        permission.id = id;
+        permission.code = code;
         permission.name = name;
         permission.description = description;
         permission.resource = resource;

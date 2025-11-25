@@ -26,11 +26,19 @@ public class Role extends AuditingFields {
 
     /**
      * 역할 ID (Primary Key)<br>
-     * 예: ADMIN, MANAGER, USER
+     * 자동 생성되는 고유 식별자
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")
-    private String id;
+    private Long id;
+
+    /**
+     * 역할 코드 (고유 식별 코드)<br>
+     * 예: ADMIN, MANAGER, USER
+     */
+    @Column(name = "role_code", unique = true, nullable = false)
+    private String code;
 
     /**
      * 역할 이름 (한글명)<br>
@@ -68,14 +76,14 @@ public class Role extends AuditingFields {
      * Entity의 경우 Setter 없이 Getter만 사용<br>
      * 해당 메소드를 통해 역할 생성할 것
      *
-     * @param id 역할 ID
+     * @param code 역할 코드
      * @param name 역할 이름 (한글명)
      * @param description 역할 설명
      * @return Role
      */
-    public static Role createRole(String id, String name, String description) {
+    public static Role createRole(String code, String name, String description) {
         Role role = new Role();
-        role.id = id;
+        role.code = code;
         role.name = name;
         role.description = description;
         role.rolePermissions = new ArrayList<>();
@@ -87,15 +95,15 @@ public class Role extends AuditingFields {
      * 역할 생성 함수 (권한 포함)<br>
      * 권한 리스트와 함께 역할을 생성
      *
-     * @param id 역할 ID
+     * @param code 역할 코드
      * @param name 역할 이름 (한글명)
      * @param description 역할 설명
      * @param permissions 권한 리스트
      * @return Role
      */
-    public static Role createRoleWithPermissions(String id, String name, String description, List<Permission> permissions) {
+    public static Role createRoleWithPermissions(String code, String name, String description, List<Permission> permissions) {
         Role role = new Role();
-        role.id = id;
+        role.code = code;
         role.name = name;
         role.description = description;
         role.rolePermissions = new ArrayList<>();
@@ -163,7 +171,7 @@ public class Role extends AuditingFields {
      */
     public void addPermission(Permission permission) {
         boolean exists = this.rolePermissions.stream()
-                .anyMatch(rp -> rp.getPermission().getId().equals(permission.getId())
+                .anyMatch(rp -> rp.getPermission().getCode().equals(permission.getCode())
                         && rp.getIsDeleted() == YNType.N);
 
         if (!exists) {
@@ -180,7 +188,7 @@ public class Role extends AuditingFields {
      */
     public void removePermission(Permission permission) {
         this.rolePermissions.stream()
-                .filter(rp -> rp.getPermission().getId().equals(permission.getId())
+                .filter(rp -> rp.getPermission().getCode().equals(permission.getCode())
                         && rp.getIsDeleted() == YNType.N)
                 .forEach(RolePermission::deleteRolePermission);
     }
@@ -197,12 +205,12 @@ public class Role extends AuditingFields {
      * 특정 권한 보유 여부 확인<br>
      * 역할이 특정 권한을 가지고 있는지 확인
      *
-     * @param permissionId 확인할 권한 ID
+     * @param permissionCode 확인할 권한 코드
      * @return 권한 보유 여부
      */
-    public boolean hasPermission(String permissionId) {
+    public boolean hasPermission(String permissionCode) {
         return this.rolePermissions.stream()
                 .filter(rp -> rp.getIsDeleted() == YNType.N)
-                .anyMatch(rp -> rp.getPermission().getId().equals(permissionId));
+                .anyMatch(rp -> rp.getPermission().getCode().equals(permissionCode));
     }
 }

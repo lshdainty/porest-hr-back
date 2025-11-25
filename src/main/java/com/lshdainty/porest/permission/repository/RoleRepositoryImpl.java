@@ -26,7 +26,7 @@ public class RoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    public Optional<Role> findById(String id) {
+    public Optional<Role> findById(Long id) {
         QRole role = QRole.role;
 
         Role result = queryFactory
@@ -41,7 +41,37 @@ public class RoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    public Optional<Role> findByIdWithPermissions(String id) {
+    public Optional<Role> findByCode(String code) {
+        QRole role = QRole.role;
+
+        Role result = queryFactory
+                .selectFrom(role)
+                .where(
+                        role.code.eq(code),
+                        role.isDeleted.eq(YNType.N)
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public Optional<Role> findByName(String name) {
+        QRole role = QRole.role;
+
+        Role result = queryFactory
+                .selectFrom(role)
+                .where(
+                        role.name.eq(name),
+                        role.isDeleted.eq(YNType.N)
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public Optional<Role> findByIdWithPermissions(Long id) {
         QRole role = QRole.role;
         QRolePermission rolePermission = QRolePermission.rolePermission;
         QPermission permission = QPermission.permission;
@@ -61,13 +91,33 @@ public class RoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
+    public Optional<Role> findByCodeWithPermissions(String code) {
+        QRole role = QRole.role;
+        QRolePermission rolePermission = QRolePermission.rolePermission;
+        QPermission permission = QPermission.permission;
+
+        Role result = queryFactory
+                .selectFrom(role)
+                .leftJoin(role.rolePermissions, rolePermission).fetchJoin()
+                .leftJoin(rolePermission.permission, permission).fetchJoin()
+                .where(
+                        role.code.eq(code),
+                        role.isDeleted.eq(YNType.N),
+                        rolePermission.isDeleted.eq(YNType.N).or(rolePermission.isNull())
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
     public List<Role> findAllRoles() {
         QRole role = QRole.role;
 
         return queryFactory
                 .selectFrom(role)
                 .where(role.isDeleted.eq(YNType.N))
-                .orderBy(role.id.asc())
+                .orderBy(role.code.asc())
                 .fetch();
     }
 
@@ -86,7 +136,7 @@ public class RoleRepositoryImpl implements RoleRepository {
                         role.isDeleted.eq(YNType.N),
                         rolePermission.isDeleted.eq(YNType.N).or(rolePermission.isNull())
                 )
-                .orderBy(role.id.asc())
+                .orderBy(role.code.asc())
                 .fetch();
     }
 }

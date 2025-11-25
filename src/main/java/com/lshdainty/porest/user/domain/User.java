@@ -4,6 +4,7 @@ import com.lshdainty.porest.common.domain.AuditingFields;
 import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.department.domain.UserDepartment;
 import com.lshdainty.porest.permission.domain.Role;
+import com.lshdainty.porest.permission.domain.UserRole;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.user.type.StatusType;
 import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
@@ -42,13 +43,9 @@ public class User extends AuditingFields {
     @Column(name = "user_email")
     private String email; // 유저 이메일
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_name")
-    )
-    private List<Role> roles = new ArrayList<>();
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRole> userRoles = new ArrayList<>();
 
     @Column(name = "user_birth")
     private LocalDate birth; // 유저 생일
@@ -234,7 +231,13 @@ public class User extends AuditingFields {
                            YNType lunarYN, String profileName, String profileUUID, String dashboard) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(email)) { this.email = email; }
-        if (!Objects.isNull(roles)) { this.roles = roles; }
+        if (!Objects.isNull(roles)) {
+            this.userRoles.clear();
+            for (Role role : roles) {
+                UserRole userRole = UserRole.createUserRole(this, role);
+                this.userRoles.add(userRole);
+            }
+        }
         if (!Objects.isNull(birth)) { this.birth = birth; }
         if (!Objects.isNull(company)) { this.company = company; }
         if (!Objects.isNull(workTime)) { this.workTime = workTime; }
@@ -303,5 +306,71 @@ public class User extends AuditingFields {
         List<LocalTime> workTimes = convertWorkTimeToLocalTime();
         return ((startTime.isAfter(workTimes.get(0)) || startTime.equals(workTimes.get(0))) && startTime.isBefore(workTimes.get(1))) &&
                 (endTime.isAfter(workTimes.get(0)) && (endTime.isBefore(workTimes.get(1)) || endTime.equals(workTimes.get(1))));
+    }
+
+    /* 역할 관리 편의 메소드 */
+
+    /**
+     * 역할 목록 조회<br>
+     * UserRole에서 Role만 추출하여 반환
+     *
+     * @return 역할 리스트
+     */
+    public List<Role> getRoles() {
+        return this.userRoles.stream()
+                .filter(ur -> ur.getIsDeleted() == YNType.N)
+                .map(UserRole::getRole)
+                .toList();
+    }
+
+    /**
+     * 역할 추가<br>
+     * 사용자에게 새로운 역할을 추가
+     *
+     * @param role 추가할 역할
+     */
+    public void addRole(Role role) {
+        boolean exists = this.userRoles.stream()
+                .anyMatch(ur -> ur.getRole().getCode().equals(role.getCode())
+                        && ur.getIsDeleted() == YNType.N);
+
+        if (!exists) {
+            UserRole userRole = UserRole.createUserRole(this, role);
+            this.userRoles.add(userRole);
+        }
+    }
+
+    /**
+     * 역할 제거<br>
+     * 사용자에서 특정 역할을 제거 (Soft Delete)
+     *
+     * @param role 제거할 역할
+     */
+    public void removeRole(Role role) {
+        this.userRoles.stream()
+                .filter(ur -> ur.getRole().getCode().equals(role.getCode())
+                        && ur.getIsDeleted() == YNType.N)
+                .forEach(UserRole::deleteUserRole);
+    }
+
+    /**
+     * 모든 역할 제거<br>
+     * 사용자의 모든 역할을 제거
+     */
+    public void clearRoles() {
+        this.userRoles.clear();
+    }
+
+    /**
+     * 특정 역할 보유 여부 확인<br>
+     * 사용자가 특정 역할을 가지고 있는지 확인
+     *
+     * @param roleCode 확인할 역할 코드
+     * @return 역할 보유 여부
+     */
+    public boolean hasRole(String roleCode) {
+        return this.userRoles.stream()
+                .filter(ur -> ur.getIsDeleted() == YNType.N)
+                .anyMatch(ur -> ur.getRole().getCode().equals(roleCode));
     }
 }
