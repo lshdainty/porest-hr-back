@@ -18,12 +18,12 @@ public interface PermissionRepository {
     void save(Permission permission);
 
     /**
-     * 권한 이름으로 권한 조회
+     * 권한 ID로 권한 조회
      *
-     * @param name 권한 이름
+     * @param id 권한 ID
      * @return Optional<Permission>
      */
-    Optional<Permission> findByName(String name);
+    Optional<Permission> findById(String id);
 
     /**
      * 전체 권한 목록 조회 (삭제되지 않은 것만)

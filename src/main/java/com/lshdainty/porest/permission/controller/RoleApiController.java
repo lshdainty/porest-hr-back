@@ -236,10 +236,11 @@ public class RoleApiController {
         List<Permission> permissions = roleService.getAllPermissions();
         List<RoleApiDto.PermissionResp> resp = permissions.stream()
                 .map(p -> new RoleApiDto.PermissionResp(
+                        p.getId(),
                         p.getName(),
                         p.getDescription(),
-                        p.getResource(),
-                        p.getAction()
+                        p.getResource().name(),
+                        p.getAction().name()
                 ))
                 .collect(Collectors.toList());
         return ApiResponse.success(resp);
@@ -247,20 +248,21 @@ public class RoleApiController {
 
     /**
      * 특정 권한 조회
-     * GET /api/v1/permissions/{permissionName}
+     * GET /api/v1/permissions/{permissionId}
      *
-     * @param permissionName 권한 이름
+     * @param permissionId 권한 ID
      * @return PermissionResp
      */
-    @GetMapping("/api/v1/permissions/{permissionName}")
+    @GetMapping("/api/v1/permissions/{permissionId}")
     @PreAuthorize("hasAuthority('ROLE_READ')")
-    public ApiResponse<RoleApiDto.PermissionResp> getPermission(@PathVariable String permissionName) {
-        Permission permission = roleService.getPermission(permissionName);
+    public ApiResponse<RoleApiDto.PermissionResp> getPermission(@PathVariable String permissionId) {
+        Permission permission = roleService.getPermission(permissionId);
         return ApiResponse.success(new RoleApiDto.PermissionResp(
+                permission.getId(),
                 permission.getName(),
                 permission.getDescription(),
-                permission.getResource(),
-                permission.getAction()
+                permission.getResource().name(),
+                permission.getAction().name()
         ));
     }
 
@@ -277,10 +279,11 @@ public class RoleApiController {
         List<Permission> permissions = roleService.getPermissionsByResource(resource);
         List<RoleApiDto.PermissionResp> resp = permissions.stream()
                 .map(p -> new RoleApiDto.PermissionResp(
+                        p.getId(),
                         p.getName(),
                         p.getDescription(),
-                        p.getResource(),
-                        p.getAction()
+                        p.getResource().name(),
+                        p.getAction().name()
                 ))
                 .collect(Collectors.toList());
         return ApiResponse.success(resp);
@@ -291,36 +294,38 @@ public class RoleApiController {
      * POST /api/v1/permissions
      *
      * @param req CreatePermissionReq
-     * @return 생성된 권한 이름
+     * @return 생성된 권한 ID
      */
     @PostMapping("/api/v1/permissions")
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     public ApiResponse<String> createPermission(@RequestBody RoleApiDto.CreatePermissionReq req) {
         Permission permission = roleService.createPermission(
+                req.getId(),
                 req.getName(),
                 req.getDescription(),
                 req.getResource(),
                 req.getAction()
         );
-        return ApiResponse.success(permission.getName());
+        return ApiResponse.success(permission.getId());
     }
 
     /**
      * 권한 수정
-     * PUT /api/v1/permissions/{permissionName}
+     * PUT /api/v1/permissions/{permissionId}
      *
-     * @param permissionName 권한 이름
+     * @param permissionId 권한 ID
      * @param req UpdatePermissionReq
      * @return void
      */
-    @PutMapping("/api/v1/permissions/{permissionName}")
+    @PutMapping("/api/v1/permissions/{permissionId}")
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     public ApiResponse<Void> updatePermission(
-            @PathVariable String permissionName,
+            @PathVariable String permissionId,
             @RequestBody RoleApiDto.UpdatePermissionReq req
     ) {
         roleService.updatePermission(
-                permissionName,
+                permissionId,
+                req.getName(),
                 req.getDescription(),
                 req.getResource(),
                 req.getAction()
@@ -330,15 +335,15 @@ public class RoleApiController {
 
     /**
      * 권한 삭제 (Soft Delete)
-     * DELETE /api/v1/permissions/{permissionName}
+     * DELETE /api/v1/permissions/{permissionId}
      *
-     * @param permissionName 권한 이름
+     * @param permissionId 권한 ID
      * @return void
      */
-    @DeleteMapping("/api/v1/permissions/{permissionName}")
+    @DeleteMapping("/api/v1/permissions/{permissionId}")
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> deletePermission(@PathVariable String permissionName) {
-        roleService.deletePermission(permissionName);
+    public ApiResponse<Void> deletePermission(@PathVariable String permissionId) {
+        roleService.deletePermission(permissionId);
         return ApiResponse.success();
     }
 }

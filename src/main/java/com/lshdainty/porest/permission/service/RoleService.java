@@ -4,6 +4,8 @@ import com.lshdainty.porest.permission.domain.Permission;
 import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.permission.repository.PermissionRepository;
 import com.lshdainty.porest.permission.repository.RoleRepository;
+import com.lshdainty.porest.permission.type.ActionType;
+import com.lshdainty.porest.permission.type.ResourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -78,7 +80,7 @@ public class RoleService {
         }
 
         List<Permission> permissions = permissionNames.stream()
-                .map(name -> permissionRepository.findByName(name)
+                .map(id -> permissionRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.permission", null, null))))
                 .collect(Collectors.toList());
 
@@ -112,7 +114,7 @@ public class RoleService {
         Role role = getRole(roleName);
 
         List<Permission> permissions = permissionNames.stream()
-                .map(name -> permissionRepository.findByName(name)
+                .map(id -> permissionRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.permission", null, null))))
                 .collect(Collectors.toList());
 
@@ -130,7 +132,7 @@ public class RoleService {
         Role role = getRole(roleName);
 
         List<Permission> permissions = permissionNames.stream()
-                .map(name -> permissionRepository.findByName(name)
+                .map(id -> permissionRepository.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.permission", null, null))))
                 .collect(Collectors.toList());
 
@@ -142,12 +144,12 @@ public class RoleService {
      * 역할에 권한 추가
      *
      * @param roleName 역할 이름
-     * @param permissionName 권한 이름
+     * @param permissionId 권한 ID
      */
     @Transactional
-    public void addPermissionToRole(String roleName, String permissionName) {
+    public void addPermissionToRole(String roleName, String permissionId) {
         Role role = getRole(roleName);
-        Permission permission = permissionRepository.findByName(permissionName)
+        Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.permission", null, null)));
         role.addPermission(permission);
     }
@@ -156,12 +158,12 @@ public class RoleService {
      * 역할에서 권한 제거
      *
      * @param roleName 역할 이름
-     * @param permissionName 권한 이름
+     * @param permissionId 권한 ID
      */
     @Transactional
-    public void removePermissionFromRole(String roleName, String permissionName) {
+    public void removePermissionFromRole(String roleName, String permissionId) {
         Role role = getRole(roleName);
-        Permission permission = permissionRepository.findByName(permissionName)
+        Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.permission", null, null)));
         role.removePermission(permission);
     }
@@ -192,11 +194,11 @@ public class RoleService {
     /**
      * 특정 권한 조회
      *
-     * @param permissionName 권한 이름
+     * @param permissionId 권한 ID
      * @return Permission
      */
-    public Permission getPermission(String permissionName) {
-        return permissionRepository.findByName(permissionName)
+    public Permission getPermission(String permissionId) {
+        return permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.permission", null, null)));
     }
 
@@ -213,18 +215,21 @@ public class RoleService {
     /**
      * 권한 생성
      *
-     * @param name 권한 이름
+     * @param id 권한 ID
+     * @param name 권한 이름 (한글명)
      * @param description 권한 설명
      * @param resource 리소스
      * @param action 액션
      * @return Permission
      */
     @Transactional
-    public Permission createPermission(String name, String description, String resource, String action) {
-        if (permissionRepository.findByName(name).isPresent()) {
+    public Permission createPermission(String id, String name, String description, String resource, String action) {
+        if (permissionRepository.findById(id).isPresent()) {
             throw new IllegalArgumentException(ms.getMessage("error.validate.permission.already.exists", null, null));
         }
-        Permission permission = Permission.createPermission(name, description, resource, action);
+        ResourceType resourceType = ResourceType.valueOf(resource);
+        ActionType actionType = ActionType.valueOf(action);
+        Permission permission = Permission.createPermission(id, name, description, resourceType, actionType);
         permissionRepository.save(permission);
         return permission;
     }
@@ -232,25 +237,28 @@ public class RoleService {
     /**
      * 권한 수정
      *
-     * @param name 권한 이름
+     * @param id 권한 ID
+     * @param name 권한 이름 (한글명)
      * @param description 권한 설명
      * @param resource 리소스
      * @param action 액션
      */
     @Transactional
-    public void updatePermission(String name, String description, String resource, String action) {
-        Permission permission = getPermission(name);
-        permission.updatePermission(description, resource, action);
+    public void updatePermission(String id, String name, String description, String resource, String action) {
+        Permission permission = getPermission(id);
+        ResourceType resourceType = resource != null ? ResourceType.valueOf(resource) : null;
+        ActionType actionType = action != null ? ActionType.valueOf(action) : null;
+        permission.updatePermission(name, description, resourceType, actionType);
     }
 
     /**
      * 권한 삭제 (Soft Delete)
      *
-     * @param permissionName 권한 이름
+     * @param permissionId 권한 ID
      */
     @Transactional
-    public void deletePermission(String permissionName) {
-        Permission permission = permissionRepository.findByName(permissionName)
+    public void deletePermission(String permissionId) {
+        Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new IllegalArgumentException(ms.getMessage("error.notfound.permission", null, null)));
         permission.deletePermission();
     }

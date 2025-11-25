@@ -3,6 +3,8 @@ package com.lshdainty.porest.permission.repository;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.permission.domain.Permission;
 import com.lshdainty.porest.permission.domain.QPermission;
+import com.lshdainty.porest.permission.type.ActionType;
+import com.lshdainty.porest.permission.type.ResourceType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +29,13 @@ public class PermissionRepositoryImpl implements PermissionRepository {
     }
 
     @Override
-    public Optional<Permission> findByName(String name) {
+    public Optional<Permission> findById(String id) {
         QPermission permission = QPermission.permission;
 
         Permission result = queryFactory
                 .selectFrom(permission)
                 .where(
-                        permission.name.eq(name),
+                        permission.id.eq(id),
                         permission.isDeleted.eq(YNType.N)
                 )
                 .fetchOne();
@@ -55,11 +57,12 @@ public class PermissionRepositoryImpl implements PermissionRepository {
     @Override
     public List<Permission> findByResource(String resource) {
         QPermission permission = QPermission.permission;
+        ResourceType resourceType = ResourceType.valueOf(resource);
 
         return queryFactory
                 .selectFrom(permission)
                 .where(
-                        permission.resource.eq(resource),
+                        permission.resource.eq(resourceType),
                         permission.isDeleted.eq(YNType.N)
                 )
                 .orderBy(permission.action.asc())
@@ -69,12 +72,14 @@ public class PermissionRepositoryImpl implements PermissionRepository {
     @Override
     public Optional<Permission> findByResourceAndAction(String resource, String action) {
         QPermission permission = QPermission.permission;
+        ResourceType resourceType = ResourceType.valueOf(resource);
+        ActionType actionType = ActionType.valueOf(action);
 
         Permission result = queryFactory
                 .selectFrom(permission)
                 .where(
-                        permission.resource.eq(resource),
-                        permission.action.eq(action),
+                        permission.resource.eq(resourceType),
+                        permission.action.eq(actionType),
                         permission.isDeleted.eq(YNType.N)
                 )
                 .fetchOne();

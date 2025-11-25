@@ -96,6 +96,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class PermissionResp {
+        private String id;
         private String name;
         private String description;
         private String resource;
@@ -112,6 +113,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class CreatePermissionReq {
+        private String id;
         private String name;
         private String description;
         private String resource;
@@ -126,6 +128,7 @@ public class RoleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class UpdatePermissionReq {
+        private String name;
         private String description;
         private String resource;
         private String action;

@@ -2,6 +2,8 @@ package com.lshdainty.porest.permission.domain;
 
 import com.lshdainty.porest.common.domain.AuditingFields;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.permission.type.ActionType;
+import com.lshdainty.porest.permission.type.ResourceType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,10 +23,17 @@ import java.util.Objects;
 public class Permission extends AuditingFields {
 
     /**
-     * 권한 이름 (Primary Key)<br>
-     * 예: VACATION_VIEW, VACATION_CREATE, VACATION_APPROVE
+     * 권한 ID (Primary Key)<br>
+     * 예: USER:READ, VACATION:REQUEST
      */
     @Id
+    @Column(name = "permission_id")
+    private String id;
+
+    /**
+     * 권한 이름 (한글명)<br>
+     * 예: 사용자 조회, 휴가 신청
+     */
     @Column(name = "permission_name")
     private String name;
 
@@ -38,18 +47,20 @@ public class Permission extends AuditingFields {
     /**
      * 리소스<br>
      * 권한이 적용되는 대상 리소스<br>
-     * 예: VACATION, USER, DEPARTMENT
+     * 예: USER, VACATION, WORK, SCHEDULE
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "resource")
-    private String resource;
+    private ResourceType resource;
 
     /**
      * 액션<br>
      * 리소스에 대해 수행할 수 있는 작업<br>
-     * 예: VIEW, CREATE, UPDATE, DELETE, APPROVE
+     * 예: READ, WRITE, MANAGE, APPROVE
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "action")
-    private String action;
+    private ActionType action;
 
     /**
      * 삭제 여부<br>
@@ -64,14 +75,16 @@ public class Permission extends AuditingFields {
      * Entity의 경우 Setter 없이 Getter만 사용<br>
      * 해당 메소드를 통해 권한 생성할 것
      *
-     * @param name 권한 이름
+     * @param id 권한 ID
+     * @param name 권한 이름 (한글명)
      * @param description 권한 설명
      * @param resource 리소스
      * @param action 액션
      * @return Permission
      */
-    public static Permission createPermission(String name, String description, String resource, String action) {
+    public static Permission createPermission(String id, String name, String description, ResourceType resource, ActionType action) {
         Permission permission = new Permission();
+        permission.id = id;
         permission.name = name;
         permission.description = description;
         permission.resource = resource;
@@ -85,11 +98,13 @@ public class Permission extends AuditingFields {
      * Entity의 경우 Setter 없이 Getter만 사용<br>
      * 해당 메소드를 통해 권한 수정할 것
      *
+     * @param name 권한 이름 (한글명)
      * @param description 권한 설명
      * @param resource 리소스
      * @param action 액션
      */
-    public void updatePermission(String description, String resource, String action) {
+    public void updatePermission(String name, String description, ResourceType resource, ActionType action) {
+        if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(description)) { this.description = description; }
         if (!Objects.isNull(resource)) { this.resource = resource; }
         if (!Objects.isNull(action)) { this.action = action; }
