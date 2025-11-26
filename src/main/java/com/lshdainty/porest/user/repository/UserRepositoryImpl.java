@@ -32,6 +32,39 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByIdWithRolesAndPermissions(String userId) {
+        // 1단계: User + UserRole + Role 조회
+        List<User> result = em.createQuery(
+                "select distinct u from User u " +
+                "left join fetch u.userRoles ur " +
+                "left join fetch ur.role r " +
+                "where u.id = :userId and u.isDeleted = :isDeleted", User.class)
+                .setParameter("userId", userId)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = result.get(0);
+
+        // 2단계: Role의 RolePermission + Permission 조회
+        // Role 목록이 있는 경우에만 실행
+        if (!user.getRoles().isEmpty()) {
+            em.createQuery(
+                    "select distinct r from Role r " +
+                    "left join fetch r.rolePermissions rp " +
+                    "left join fetch rp.permission p " +
+                    "where r in :roles", com.lshdainty.porest.permission.domain.Role.class)
+                    .setParameter("roles", user.getRoles())
+                    .getResultList();
+        }
+
+        return Optional.of(user);
+    }
+
+    @Override
     public Optional<User> findByInvitationToken(String token) {
         List<User> result = em.createQuery("select u from User u where u.invitationToken = :token and u.isDeleted = :isDeleted", User.class)
                 .setParameter("token", token)

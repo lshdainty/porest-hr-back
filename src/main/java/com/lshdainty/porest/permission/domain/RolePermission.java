@@ -22,8 +22,7 @@ public class RolePermission extends AuditingFields {
      * 역할-권한 매핑 ID<br>
      * 테이블 관리용 seq
      */
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     @Column(name = "role_permission_id")
     private Long id;
 

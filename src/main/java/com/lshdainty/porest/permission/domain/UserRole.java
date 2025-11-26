@@ -23,8 +23,7 @@ public class UserRole extends AuditingFields {
      * 사용자-역할 매핑 ID<br>
      * 테이블 관리용 seq
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     @Column(name = "user_role_id")
     private Long id;
 

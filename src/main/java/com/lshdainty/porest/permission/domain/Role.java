@@ -28,8 +28,7 @@ public class Role extends AuditingFields {
      * 역할 ID (Primary Key)<br>
      * 자동 생성되는 고유 식별자
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     @Column(name = "role_id")
     private Long id;
 
@@ -60,7 +59,7 @@ public class Role extends AuditingFields {
      * 중간 엔티티를 통해 생성/수정 이력 추적 가능
      */
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private List<RolePermission> rolePermissions = new ArrayList<>();
 
     /**

@@ -26,8 +26,7 @@ public class Permission extends AuditingFields {
      * 권한 ID (Primary Key)<br>
      * 자동 생성되는 고유 식별자
      */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     @Column(name = "permission_id")
     private Long id;
 

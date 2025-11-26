@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -26,17 +27,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepositoryImpl userRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("Attempting to load user: {}", username);
 
-        Optional<User> userOptional = userRepository.findByIdWithRoles(username);
+        // 사용자 id를 기반으로 한 유저 권한 정보 및 역할 조회
+        User user = userRepository.findByIdWithRolesAndPermissions(username)
+                .orElseThrow(() -> {
+                    log.warn("User not found: {}", username);
+                    return new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username);
+                });
 
-        if (userOptional.isEmpty()) {
-            log.warn("User not found: {}", username);
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username);
-        }
-
-        User user = userOptional.get();
         log.info("User found: {}, Roles: {}, Authorities: {}",
                 user.getId(),
                 user.getRoles().stream().map(Role::getCode).collect(Collectors.joining(", ")),

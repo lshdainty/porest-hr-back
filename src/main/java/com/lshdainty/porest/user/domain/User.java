@@ -43,10 +43,6 @@ public class User extends AuditingFields {
     @Column(name = "user_email")
     private String email; // 유저 이메일
 
-    @BatchSize(size = 100)
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserRole> userRoles = new ArrayList<>();
-
     @Column(name = "user_birth")
     private LocalDate birth; // 유저 생일
 
@@ -116,6 +112,10 @@ public class User extends AuditingFields {
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "approver", cascade = CascadeType.ALL)
     private List<VacationApproval> vacationApprovals = new ArrayList<>();
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserRole> userRoles = new ArrayList<>();
 
     /**
      * 유저 생성 함수<br>

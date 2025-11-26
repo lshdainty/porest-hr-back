@@ -4,7 +4,6 @@ import com.lshdainty.porest.security.dto.OAuthAttributes;
 import com.lshdainty.porest.security.principal.CustomOAuth2User;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.domain.UserProvider;
-import com.lshdainty.porest.user.repository.UserRepository;
 import com.lshdainty.porest.user.repository.UserRepositoryImpl;
 import com.lshdainty.porest.user.repository.UserProviderRepository;
 import jakarta.servlet.http.HttpSession;
@@ -16,7 +15,6 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -81,8 +79,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 2. 3가지의 값이 다 있다면 회원가입 아니면 로그인으로 간주
         if (invitationToken != null && "signup".equals(oauthStep) && invitedUserId != null) {
             // 회원 가입 부분
-            // 2-1. 초대 토큰으로 사용자 찾기 (역할 포함)
-            User user = userRepository.findByInvitationTokenWithRoles(invitationToken)
+            // 2-1. 초대 토큰으로 사용자 찾기
+            User user = userRepository.findByInvitationToken(invitationToken)
                     .orElseThrow(() -> new OAuth2AuthenticationException("유효하지 않은 초대 토큰입니다."));
 
             // 2-2. 토큰 재검증
@@ -111,9 +109,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     .findByProviderTypeAndProviderId(attributes.getProvider(), attributes.getProviderId())
                     .orElseThrow(() -> new OAuth2AuthenticationException("등록되지 않은 소셜 계정입니다. 먼저 회원가입을 진행해주세요."));
 
-            // 역할 및 권한 정보를 포함하여 사용자 재조회
+            // 사용자 id를 기반으로 한 유저 권한 정보 및 역할 조회 (역할 및 권한 정보 포함)
             String userId = userProvider.getUser().getId();
-            User user = userRepository.findByIdWithRoles(userId)
+            User user = userRepository.findByIdWithRolesAndPermissions(userId)
                     .orElseThrow(() -> new OAuth2AuthenticationException("사용자 정보를 찾을 수 없습니다."));
 
             log.info("OAuth2 로그인 성공: userId={}, provider={}", user.getId(), attributes.getProvider());
