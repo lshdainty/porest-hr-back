@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 import java.util.stream.Collectors;
 import com.lshdainty.porest.permission.domain.Role;
 import org.springframework.web.bind.annotation.*;
@@ -45,25 +47,43 @@ public class AuthController {
         }
 
         UserPrincipal userPrincipal = (UserPrincipal) principal;
-        User user = userPrincipal.getUser();
 
-        /*
-        * TODO : 프로파일 이미지를 추후에 변경하면 세션에 적용안됨
-        *  수정 필요
-        * */
+        // 최신 사용자 정보 재조회 (프로필 이미지 변경 등 세션 외 데이터 반영)
+        User user = userService.findUserById(userPrincipal.getUser().getId());
+
+        // 역할 상세 정보 생성
+        List<AuthApiDto.RoleInfo> roleInfos = user.getRoles().stream()
+                .map(role -> new AuthApiDto.RoleInfo(
+                        role.getCode(),
+                        role.getName(),
+                        role.getPermissions().stream()
+                                .map(permission -> new AuthApiDto.PermissionInfo(
+                                        permission.getCode(),
+                                        permission.getName()
+                                ))
+                                .collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+
+        // 모든 권한 코드 목록 (중복 제거)
+        List<String> allPermissions = user.getAllAuthorities();
 
         AuthApiDto.LoginUserInfo result = new AuthApiDto.LoginUserInfo(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRoles().stream().map(Role::getName).collect(Collectors.toList()),
-                user.getRoles().isEmpty() ? null : user.getRoles().get(0).getName(),
+                roleInfos,  // 역할 상세 정보
+                user.getRoles().stream().map(Role::getName).collect(Collectors.toList()),  // 역할 이름 목록 (기존 호환)
+                user.getRoles().isEmpty() ? null : user.getRoles().get(0).getName(),  // 첫 번째 역할 (기존 호환)
+                allPermissions,  // 모든 권한 코드
                 YNType.Y,
                 StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
                         userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null
         );
 
-        log.info("user info : {}, {}, {}, {}, {}, {}", result.getUserId(), result.getUserName(), result.getUserEmail(), result.getUserRoles(), result.getUserRoleName(), result.getProfileUrl());
+        log.info("user info : {}, {}, {}, roles: {}, permissions: {}, {}",
+                result.getUserId(), result.getUserName(), result.getUserEmail(),
+                result.getUserRoles(), result.getPermissions(), result.getProfileUrl());
 
         return ApiResponse.success(result);
     }

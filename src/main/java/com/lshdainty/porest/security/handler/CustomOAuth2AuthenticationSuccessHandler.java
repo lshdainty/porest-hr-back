@@ -93,6 +93,23 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         User user = customOAuth2User.getUser();
 
+        // 역할 상세 정보 생성
+        java.util.List<AuthApiDto.RoleInfo> roleInfos = user.getRoles().stream()
+                .map(role -> new AuthApiDto.RoleInfo(
+                        role.getCode(),
+                        role.getName(),
+                        role.getPermissions().stream()
+                                .map(permission -> new AuthApiDto.PermissionInfo(
+                                        permission.getCode(),
+                                        permission.getName()
+                                ))
+                                .collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+
+        // 모든 권한 코드 목록 (중복 제거)
+        java.util.List<String> allPermissions = user.getAllAuthorities();
+
         // 세션에 사용자 정보 저장
         HttpSession session = request.getSession();
 
@@ -100,8 +117,10 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRoles().stream().map(Role::getName).collect(Collectors.toList()),
-                user.getRoles().isEmpty() ? null : user.getRoles().get(0).getName(),
+                roleInfos,  // 역할 상세 정보
+                user.getRoles().stream().map(Role::getName).collect(Collectors.toList()),  // 역할 이름 목록 (기존 호환)
+                user.getRoles().isEmpty() ? null : user.getRoles().get(0).getName(),  // 첫 번째 역할 (기존 호환)
+                allPermissions,  // 모든 권한 코드
                 YNType.Y,
                 StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
                         userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null

@@ -211,6 +211,21 @@ public class UserService {
     }
 
     /**
+     * 사용자 조회 (역할 및 권한 정보 포함)
+     * 로그인 체크 시 최신 사용자 정보를 조회하기 위한 메서드
+     *
+     * @param userId 사용자 ID
+     * @return User 엔티티 (역할 및 권한 정보 포함)
+     */
+    public User findUserById(String userId) {
+        Optional<User> findUser = userRepositoryImpl.findByIdWithRolesAndPermissions(userId);
+        if ((findUser.isEmpty()) || findUser.get().getIsDeleted().equals(YNType.Y)) {
+            throw new IllegalArgumentException(ms.getMessage("error.notfound.user", null, null));
+        }
+        return findUser.get();
+    }
+
+    /**
      * 프로필 URL에서 물리적 파일명을 추출하는 헬퍼 메소드
      */
     public String extractPhysicalFileNameFromUrl(String profileUrl) {
