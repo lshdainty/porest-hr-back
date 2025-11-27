@@ -36,7 +36,7 @@ public class CalendarApiController {
                 .map(s -> new CalendarApiDto.searchEventsByPeriodResp(
                         s.getUser().getId(),
                         s.getUser().getName(),
-                        s.getType().getStrName(),
+                        s.getType().getViewName(),
                         s.getType().name(),
                         s.getDesc(),
                         s.getStartDate(),

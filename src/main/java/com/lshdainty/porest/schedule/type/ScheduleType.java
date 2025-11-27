@@ -1,23 +1,28 @@
 package com.lshdainty.porest.schedule.type;
 
 import com.lshdainty.porest.common.type.DisplayType;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public enum ScheduleType implements DisplayType {
-    EDUCATION("교육"),
-    BIRTHDAY("생일"),
-    BUSINESSTRIP("출장"),
-    BIRTHPARTY("생일파티");
+    EDUCATION("교육", 1L),
+    BIRTHDAY("생일", 2L),
+    BUSINESSTRIP("출장", 3L),
+    BIRTHPARTY("생일파티", 4L);
 
     private String strName;
+    private Long orderSeq;
 
-    ScheduleType(String typeName) {
-        this.strName = typeName;
+    ScheduleType(String strName, Long orderSeq) {
+        this.strName = strName;
+        this.orderSeq = orderSeq;
     }
 
     @Override
-    public String getViewName() {return this.strName;}
+    public String getViewName() {
+        return strName;
+    }
+
+    @Override
+    public Long getOrderSeq() {
+        return orderSeq;
+    }
 }

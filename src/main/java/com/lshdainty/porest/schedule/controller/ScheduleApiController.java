@@ -71,7 +71,7 @@ public class ScheduleApiController {
                 .map(s -> new ScheduleApiDto.SearchSchedulesByUserResp(
                         s.getId(),
                         s.getType(),
-                        s.getType().getStrName(),
+                        s.getType().getViewName(),
                         s.getDesc(),
                         s.getStartDate(),
                         s.getEndDate()
@@ -95,7 +95,7 @@ public class ScheduleApiController {
                         s.getUser().getId(),
                         s.getUser().getName(),
                         s.getType(),
-                        s.getType().getStrName(),
+                        s.getType().getViewName(),
                         s.getDesc(),
                         s.getStartDate(),
                         s.getEndDate()

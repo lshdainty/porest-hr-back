@@ -1,16 +1,14 @@
-package com.lshdainty.porest.vacation.type;
+package com.lshdainty.porest.work.type;
 
 import com.lshdainty.porest.common.type.DisplayType;
 
-public enum GrantMethod implements DisplayType {
-    ON_REQUEST("신청시 부여", 1L),
-    MANUAL_GRANT("관리자 직접 부여", 2L),
-    REPEAT_GRANT("반복 부여", 3L);
+public enum SystemType implements DisplayType {
+    SYSTEM1("system1", 1L);
 
     private String strName;
     private Long orderSeq;
 
-    GrantMethod(String strName, Long orderSeq) {
+    SystemType(String strName, Long orderSeq) {
         this.strName = strName;
         this.orderSeq = orderSeq;
     }

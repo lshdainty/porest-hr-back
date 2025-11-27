@@ -5,23 +5,30 @@ import com.lshdainty.porest.common.type.DisplayType;
 import java.time.LocalDateTime;
 
 public enum ExpirationType implements DisplayType {
-    ONE_MONTHS_AFTER_GRANT("부여일 + 1개월"),
-    TWO_MONTHS_AFTER_GRANT("부여일 + 2개월"),
-    THREE_MONTHS_AFTER_GRANT("부여일 + 3개월"),
-    FOUR_MONTHS_AFTER_GRANT("부여일 + 4개월"),
-    FIVE_MONTHS_AFTER_GRANT("부여일 + 5개월"),
-    SIX_MONTHS_AFTER_GRANT("부여일 + 6개월"),
-    END_OF_YEAR("당해년도 12월 31일");
+    ONE_MONTHS_AFTER_GRANT("부여일 + 1개월", 1L),
+    TWO_MONTHS_AFTER_GRANT("부여일 + 2개월", 2L),
+    THREE_MONTHS_AFTER_GRANT("부여일 + 3개월", 3L),
+    FOUR_MONTHS_AFTER_GRANT("부여일 + 4개월", 4L),
+    FIVE_MONTHS_AFTER_GRANT("부여일 + 5개월", 5L),
+    SIX_MONTHS_AFTER_GRANT("부여일 + 6개월", 6L),
+    END_OF_YEAR("당해년도 12월 31일", 7L);
 
     private String strName;
+    private Long orderSeq;
 
-    ExpirationType(String strName) {
+    ExpirationType(String strName, Long orderSeq) {
         this.strName = strName;
+        this.orderSeq = orderSeq;
     }
 
     @Override
     public String getViewName() {
         return strName;
+    }
+
+    @Override
+    public Long getOrderSeq() {
+        return orderSeq;
     }
 
     /**

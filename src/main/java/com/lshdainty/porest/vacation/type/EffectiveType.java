@@ -5,18 +5,25 @@ import com.lshdainty.porest.common.type.DisplayType;
 import java.time.LocalDateTime;
 
 public enum EffectiveType implements DisplayType {
-    IMMEDIATELY("부여 즉시"),
-    START_OF_YEAR("당해년도 1월 1일");
+    IMMEDIATELY("부여 즉시", 1L),
+    START_OF_YEAR("당해년도 1월 1일", 2L);
 
     private String strName;
+    private Long orderSeq;
 
-    EffectiveType(String strName) {
+    EffectiveType(String strName, Long orderSeq) {
         this.strName = strName;
+        this.orderSeq = orderSeq;
     }
 
     @Override
     public String getViewName() {
         return strName;
+    }
+
+    @Override
+    public Long getOrderSeq() {
+        return orderSeq;
     }
 
     /**

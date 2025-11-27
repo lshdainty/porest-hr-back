@@ -2,4 +2,5 @@ package com.lshdainty.porest.common.type;
 
 public interface DisplayType {
     String getViewName();
+    Long getOrderSeq();
 }
