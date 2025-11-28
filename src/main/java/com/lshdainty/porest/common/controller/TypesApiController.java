@@ -21,7 +21,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class TypesApiController {
+public class TypesApiController implements TypesApi {
     private final MessageSource ms;
 
     private final Map<String, Class<? extends DisplayType>> enumMap = Map.ofEntries(
@@ -39,8 +39,8 @@ public class TypesApiController {
             Map.entry("system-type", SystemType.class)
     );
 
-    @GetMapping("/api/v1/types/{enumName}")
-    public ApiResponse<List<TypesDto>> getEnumValues(@PathVariable String enumName) {
+    @Override
+    public ApiResponse<List<TypesDto>> getEnumValues(String enumName) {
         Class<? extends DisplayType> enumClass = enumMap.get(enumName.toLowerCase());
 
         if (enumClass == null) {

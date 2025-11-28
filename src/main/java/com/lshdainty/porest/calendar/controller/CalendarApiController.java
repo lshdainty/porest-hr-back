@@ -20,15 +20,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class CalendarApiController {
+public class CalendarApiController implements CalendarApi {
     private final ScheduleService scheduleService;
     private final VacationService vacationService;
 
-    @GetMapping("/api/v1/calendar/period")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    public ApiResponse searchEventsByPeriod(
-            @RequestParam("startDate") LocalDateTime startDate,
-            @RequestParam("endDate") LocalDateTime endDate) {
+    @Override
+    public ApiResponse searchEventsByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         List<CalendarApiDto.searchEventsByPeriodResp> resp = new ArrayList<>();
 
         List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(startDate, endDate);
