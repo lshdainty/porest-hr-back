@@ -1,4 +1,5 @@
 spring:
+  # DB 연결 드라이버 설정
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${DB_URL}
@@ -9,6 +10,7 @@ spring:
       minimum-idle: 5
       connection-timeout: 30000
 
+  # JPA 설정
   jpa:
     hibernate:
       ddl-auto: create
@@ -40,6 +42,7 @@ spring:
           timeout: 5000
           write-timeout: 5000
 
+# LOG 설정
 logging:
   level:
     com.lshdainty.porest: info
@@ -49,9 +52,21 @@ logging:
     max-size: 10MB
     max-history: 30
 
+# 파일 업로드 경로 설정
 file:
   root-path: /home/ubuntu/porest-back/file
 
+# 어플리케이션 정보
 app:
   frontend:
     base-url: ${FRONTEND_BASE_URL}
+
+# Prometheus 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info, metrics
+  metrics:
+    tags:
+      application: porest  # Grafana에서 구분할 앱 이름

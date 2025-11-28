@@ -5,6 +5,7 @@ spring:
     basename: message/messages
     encoding: utf-8
 
+  # DB 연결 드라이버 설정
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${DB_URL}
@@ -25,6 +26,7 @@ spring:
       tracing:
         include-parameter-values: true
 
+  # JPA 설정
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO:none}
@@ -38,6 +40,7 @@ server:
       timeout: 8h
   port: ${SERVER_PORT:8000}
 
+# LOG 설정
 logging:
   level:
     com.lshdainty.porest.api: ${LOG_LEVEL:info}
@@ -46,6 +49,7 @@ logging:
     com.lshdainty.porest.domain: ${LOG_LEVEL:info}
     p6spy: info
 
+# 파일 업로드 경로 설정
 file:
   root-path: ${FILE_ROOT_PATH:/app/files}
   web-url-prefix: /media
@@ -58,6 +62,7 @@ file:
     path:
       profile: ${file.root-path}/origin/profile
 
+# 어플리케이션 정보
 app:
   frontend:
     base-url: ${FRONTEND_BASE_URL:http://localhost:3000}
@@ -67,6 +72,7 @@ app:
     logo:
       path: ${EMAIL_LOGO_PATH:templates/email/logo.png}
 
+# Swagger 설정
 springdoc:
   api-docs:
     path: /v3/api-docs
