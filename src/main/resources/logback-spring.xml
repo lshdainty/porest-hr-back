@@ -14,7 +14,7 @@
         </http>
         <format>
             <label>
-                <pattern>app=my-spring-app,host=${HOSTNAME},level=%level</pattern>
+                <pattern>app=porest,host=${HOSTNAME},level=%level</pattern>
             </label>
             <message>
                 <pattern>l=%level c=%logger{20} t=%thread | %msg %ex</pattern>
