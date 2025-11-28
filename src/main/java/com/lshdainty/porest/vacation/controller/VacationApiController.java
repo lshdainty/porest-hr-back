@@ -23,16 +23,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class VacationApiController {
+public class VacationApiController implements VacationApi {
     private final VacationService vacationService;
 
-    /**
-     * 휴가 사용
-     * POST /api/v1/vacation-usages
-     */
-    @PostMapping("/api/v1/vacation-usages")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_REQUEST')")
-    public ApiResponse useVacation(@RequestBody VacationApiDto.UseVacationReq data) {
+    public ApiResponse useVacation(VacationApiDto.UseVacationReq data) {
         Long vacationUsageId = vacationService.useVacation(VacationServiceDto.builder()
                         .userId(data.getUserId())
                         .type(data.getVacationType())
@@ -46,13 +42,9 @@ public class VacationApiController {
         return ApiResponse.success(new VacationApiDto.UseVacationResp(vacationUsageId));
     }
 
-    /**
-     * 특정 유저의 휴가 정보 조회 (부여/사용 내역)
-     * GET /api/v1/users/{userId}/vacations
-     */
-    @GetMapping("/api/v1/users/{userId}/vacations")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserVacationHistory(@PathVariable("userId") String userId) {
+    public ApiResponse getUserVacationHistory(String userId) {
         VacationServiceDto vacationInfo = vacationService.getUserVacationHistory(userId);
 
         // VacationGrant 정보 변환
@@ -88,11 +80,7 @@ public class VacationApiController {
         return ApiResponse.success(new VacationApiDto.GetUserVacationHistoryResp(grantInfos, usageInfos));
     }
 
-    /**
-     * 모든 유저의 휴가 정보 조회
-     * GET /api/v1/vacations
-     */
-    @GetMapping("/api/v1/vacations")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_MANAGE')")
     public ApiResponse getAllUsersVacationHistory() {
         List<VacationServiceDto> usersVacations = vacationService.getAllUsersVacationHistory();
@@ -143,15 +131,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 특정 유저의 사용 가능한 휴가 조회
-     * GET /api/v1/users/{userId}/vacations/available
-     */
-    @GetMapping("/api/v1/users/{userId}/vacations/available")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getAvailableVacations(@PathVariable("userId") String userId,
-                                                @RequestParam("startDate") LocalDateTime startDate) {
+    public ApiResponse getAvailableVacations(String userId, LocalDateTime startDate) {
         List<VacationServiceDto> availableVacations = vacationService.getAvailableVacations(userId, startDate);
 
         List<VacationApiDto.GetAvailableVacationsResp> resp = availableVacations.stream()
@@ -166,15 +148,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 휴가 사용 내역 수정
-     * PUT /api/v1/vacation-usages/{id}
-     */
-    @PutMapping("/api/v1/vacation-usages/{id}")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_REQUEST')")
-    public ApiResponse updateVacationUsage(
-            @PathVariable("id") Long vacationUsageId,
-            @RequestBody VacationApiDto.UpdateVacationUsageReq data) {
+    public ApiResponse updateVacationUsage(Long vacationUsageId, VacationApiDto.UpdateVacationUsageReq data) {
         Long newVacationUsageId = vacationService.updateVacationUsage(
                 vacationUsageId,
                 VacationServiceDto.builder()
@@ -190,27 +166,16 @@ public class VacationApiController {
         return ApiResponse.success(new VacationApiDto.UpdateVacationUsageResp(newVacationUsageId));
     }
 
-    /**
-     * 휴가 사용 내역 삭제
-     * DELETE /api/v1/vacation-usages/{id}
-     */
-    @DeleteMapping("/api/v1/vacation-usages/{id}")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_CANCEL')")
-    public ApiResponse cancelVacationUsage(@PathVariable("id") Long vacationUsageId) {
+    public ApiResponse cancelVacationUsage(Long vacationUsageId) {
         vacationService.cancelVacationUsage(vacationUsageId);
         return ApiResponse.success();
     }
 
-    /**
-     * 기간별 휴가 사용 내역 조회 (전체 유저)
-     * GET /api/v1/vacation-usages
-     */
-    @GetMapping("/api/v1/vacation-usages")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_MANAGE')")
-    public ApiResponse getVacationUsagesByPeriod(
-            @RequestParam("startDate") LocalDateTime startDate,
-            @RequestParam("endDate") LocalDateTime endDate) {
+    public ApiResponse getVacationUsagesByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         List<VacationServiceDto> histories = vacationService.getVacationUsagesByPeriod(startDate, endDate);
 
         List<VacationApiDto.GetVacationUsagesByPeriodResp> resp = histories.stream()
@@ -230,17 +195,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 특정 유저의 기간별 휴가 사용 내역 조회
-     * GET /api/v1/users/{userId}/vacation-usages
-     */
-    @GetMapping("/api/v1/users/{userId}/vacation-usages")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserVacationUsagesByPeriod(
-            @PathVariable("userId") String userId,
-            @RequestParam("startDate") LocalDateTime startDate,
-            @RequestParam("endDate") LocalDateTime endDate) {
+    public ApiResponse getUserVacationUsagesByPeriod(String userId, LocalDateTime startDate, LocalDateTime endDate) {
         List<VacationServiceDto> histories = vacationService.getUserVacationUsagesByPeriod(userId, startDate, endDate);
 
         List<VacationApiDto.GetUserVacationUsagesByPeriodResp> resp = histories.stream()
@@ -258,15 +215,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 특정 유저의 월별 휴가 사용 통계 조회
-     * GET /api/v1/users/{userId}/vacation-usages/monthly-stats
-     */
-    @GetMapping("/api/v1/users/{userId}/vacation-usages/monthly-stats")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserMonthlyVacationStats(
-            @PathVariable("userId") String userId,
-            @RequestParam("year") String year) {
+    public ApiResponse getUserMonthlyVacationStats(String userId, String year) {
         List<VacationServiceDto> histories = vacationService.getUserMonthlyVacationStats(userId, year);
 
         List<VacationApiDto.GetUserMonthlyVacationStatsResp> resp = histories.stream()
@@ -280,16 +231,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 특정 유저의 휴가 사용 통계 조회
-     * GET /api/v1/users/{userId}/vacations/stats
-     */
-    @GetMapping("/api/v1/users/{userId}/vacations/stats")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserVacationStats(
-            @PathVariable("userId") String userId,
-            @RequestParam("baseDate") LocalDateTime baseDate) {
+    public ApiResponse getUserVacationStats(String userId, LocalDateTime baseDate) {
         VacationServiceDto stats = vacationService.getUserVacationStats(userId, baseDate);
 
         return ApiResponse.success(new VacationApiDto.GetUserVacationStatsResp(
@@ -312,13 +256,9 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 휴가 정책 등록
-     * POST /api/v1/vacation-policies
-     */
-    @PostMapping("/api/v1/vacation-policies")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_POLICY_MANAGE')")
-    public ApiResponse createVacationPolicy(@RequestBody VacationApiDto.CreateVacationPolicyReq data) {
+    public ApiResponse createVacationPolicy(VacationApiDto.CreateVacationPolicyReq data) {
         Long vacationPolicyId = vacationService.createVacationPolicy(VacationPolicyServiceDto.builder()
                 .name(data.getVacationPolicyName())
                 .desc(data.getVacationPolicyDesc())
@@ -343,13 +283,9 @@ public class VacationApiController {
         return ApiResponse.success(new VacationApiDto.CreateVacationPolicyResp(vacationPolicyId));
     }
 
-    /**
-     * 특정 휴가 정책 조회
-     * GET /api/v1/vacation-policies/{id}
-     */
-    @GetMapping("/api/v1/vacation-policies/{id}")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getVacationPolicy(@PathVariable("id") Long vacationPolicyId) {
+    public ApiResponse getVacationPolicy(Long vacationPolicyId) {
         VacationPolicyServiceDto policy = vacationService.getVacationPolicy(vacationPolicyId);
 
         return ApiResponse.success(new VacationApiDto.GetVacationPolicyResp(
@@ -372,11 +308,7 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 휴가 정책 목록 조회
-     * GET /api/v1/vacation-policies
-     */
-    @GetMapping("/api/v1/vacation-policies")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
     public ApiResponse getVacationPolicies() {
         List<VacationPolicyServiceDto> policies = vacationService.getVacationPolicies();
@@ -405,27 +337,17 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 휴가 정책 삭제
-     * DELETE /api/v1/vacation-policies/{id}
-     */
-    @DeleteMapping("/api/v1/vacation-policies/{id}")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_POLICY_MANAGE')")
-    public ApiResponse deleteVacationPolicy(@PathVariable("id") Long vacationPolicyId) {
+    public ApiResponse deleteVacationPolicy(Long vacationPolicyId) {
         Long deletedPolicyId = vacationService.deleteVacationPolicy(vacationPolicyId);
 
         return ApiResponse.success(new VacationApiDto.DeleteVacationPolicyResp(deletedPolicyId));
     }
 
-    /**
-     * 유저에게 여러 휴가 정책을 일괄 할당
-     * POST /api/v1/users/{userId}/vacation-policies
-     */
-    @PostMapping("/api/v1/users/{userId}/vacation-policies")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_POLICY_MANAGE')")
-    public ApiResponse assignVacationPoliciesToUser(
-            @PathVariable("userId") String userId,
-            @RequestBody VacationApiDto.AssignVacationPoliciesToUserReq data) {
+    public ApiResponse assignVacationPoliciesToUser(String userId, VacationApiDto.AssignVacationPoliciesToUserReq data) {
         List<Long> assignedPolicyIds = vacationService.assignVacationPoliciesToUser(userId, data.getVacationPolicyIds());
 
         return ApiResponse.success(new VacationApiDto.AssignVacationPoliciesToUserResp(
@@ -434,15 +356,9 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 유저에게 할당된 휴가 정책 조회
-     * GET /api/v1/users/{userId}/vacation-policies
-     */
-    @GetMapping("/api/v1/users/{userId}/vacation-policies")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserAssignedVacationPolicies(
-            @PathVariable("userId") String userId,
-            @RequestParam(value = "grantMethod", required = false) GrantMethod grantMethod) {
+    public ApiResponse getUserAssignedVacationPolicies(String userId, GrantMethod grantMethod) {
         List<VacationPolicyServiceDto> policies = vacationService.getUserAssignedVacationPolicies(userId, grantMethod);
 
         List<VacationApiDto.GetUserAssignedVacationPoliciesResp> resp = policies.stream()
@@ -474,16 +390,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 유저에게 부여된 휴가 정책 조회 (필터링 옵션 포함)
-     * GET /api/v1/users/{userId}/vacation-policies/assigned
-     */
-    @GetMapping("/api/v1/users/{userId}/vacation-policies/assigned")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserAssignedVacationPoliciesWithFilters(
-            @PathVariable("userId") String userId,
-            @RequestParam(value = "vacationType", required = false) VacationType vacationType,
-            @RequestParam(value = "grantMethod", required = false) GrantMethod grantMethod) {
+    public ApiResponse getUserAssignedVacationPoliciesWithFilters(String userId, VacationType vacationType, GrantMethod grantMethod) {
         List<VacationPolicyServiceDto> policies = vacationService.getUserAssignedVacationPoliciesWithFilters(
                 userId, vacationType, grantMethod);
 
@@ -511,15 +420,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 유저에게 부여된 휴가 정책 회수 (단일)
-     * DELETE /api/v1/users/{userId}/vacation-policies/{vacationPolicyId}
-     */
-    @DeleteMapping("/api/v1/users/{userId}/vacation-policies/{vacationPolicyId}")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_POLICY_MANAGE')")
-    public ApiResponse revokeVacationPolicyFromUser(
-            @PathVariable("userId") String userId,
-            @PathVariable("vacationPolicyId") Long vacationPolicyId) {
+    public ApiResponse revokeVacationPolicyFromUser(String userId, Long vacationPolicyId) {
         Long userVacationPolicyId = vacationService.revokeVacationPolicyFromUser(userId, vacationPolicyId);
 
         return ApiResponse.success(new VacationApiDto.RevokeVacationPolicyFromUserResp(
@@ -529,15 +432,9 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 유저에게 부여된 여러 휴가 정책 일괄 회수
-     * DELETE /api/v1/users/{userId}/vacation-policies
-     */
-    @DeleteMapping("/api/v1/users/{userId}/vacation-policies")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_POLICY_MANAGE')")
-    public ApiResponse revokeVacationPoliciesFromUser(
-            @PathVariable("userId") String userId,
-            @RequestBody VacationApiDto.RevokeVacationPoliciesFromUserReq data) {
+    public ApiResponse revokeVacationPoliciesFromUser(String userId, VacationApiDto.RevokeVacationPoliciesFromUserReq data) {
         List<Long> revokedPolicyIds = vacationService.revokeVacationPoliciesFromUser(userId, data.getVacationPolicyIds());
 
         return ApiResponse.success(new VacationApiDto.RevokeVacationPoliciesFromUserResp(
@@ -546,15 +443,9 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 관리자가 특정 사용자에게 휴가를 직접 부여
-     * POST /api/v1/users/{userId}/vacation-grants
-     */
-    @PostMapping("/api/v1/users/{userId}/vacation-grants")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_GRANT')")
-    public ApiResponse manualGrantVacation(
-            @PathVariable("userId") String userId,
-            @RequestBody VacationApiDto.ManualGrantVacationReq data) {
+    public ApiResponse manualGrantVacation(String userId, VacationApiDto.ManualGrantVacationReq data) {
 
         // DTO 변환
         VacationServiceDto serviceDto = VacationServiceDto.builder()
@@ -577,13 +468,9 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 특정 휴가 부여 회수 (관리자가 직접 부여한 휴가를 취소)
-     * DELETE /api/v1/vacation-grants/{vacationGrantId}
-     */
-    @DeleteMapping("/api/v1/vacation-grants/{vacationGrantId}")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_GRANT')")
-    public ApiResponse revokeVacationGrant(@PathVariable("vacationGrantId") Long vacationGrantId) {
+    public ApiResponse revokeVacationGrant(Long vacationGrantId) {
         VacationGrant grant = vacationService.revokeVacationGrant(vacationGrantId);
 
         return ApiResponse.success(new VacationApiDto.RevokeVacationGrantResp(
@@ -592,15 +479,9 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 휴가 신청 (ON_REQUEST 방식)
-     * POST /api/v1/users/{userId}/vacation-requests
-     */
-    @PostMapping("/api/v1/users/{userId}/vacation-requests")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_REQUEST')")
-    public ApiResponse requestVacation(
-            @PathVariable("userId") String userId,
-            @RequestBody VacationApiDto.RequestVacationReq data) {
+    public ApiResponse requestVacation(String userId, VacationApiDto.RequestVacationReq data) {
 
         Long vacationGrantId = vacationService.requestVacation(userId, VacationServiceDto.builder()
                 .policyId(data.getPolicyId())
@@ -615,31 +496,18 @@ public class VacationApiController {
         return ApiResponse.success(new VacationApiDto.RequestVacationResp(vacationGrantId));
     }
 
-    /**
-     * 휴가 승인
-     * POST /api/v1/vacation-approvals/{approvalId}/approve
-     */
-    @PostMapping("/api/v1/vacation-approvals/{approvalId}/approve")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_APPROVE')")
-    public ApiResponse approveVacation(
-            @PathVariable("approvalId") Long approvalId,
-            @RequestParam("approverId") String approverId) {
+    public ApiResponse approveVacation(Long approvalId, String approverId) {
 
         Long processedApprovalId = vacationService.approveVacation(approvalId, approverId);
 
         return ApiResponse.success(new VacationApiDto.ApproveVacationResp(processedApprovalId));
     }
 
-    /**
-     * 휴가 거부
-     * POST /api/v1/vacation-approvals/{approvalId}/reject
-     */
-    @PostMapping("/api/v1/vacation-approvals/{approvalId}/reject")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_APPROVE')")
-    public ApiResponse rejectVacation(
-            @PathVariable("approvalId") Long approvalId,
-            @RequestParam("approverId") String approverId,
-            @RequestBody VacationApiDto.RejectVacationReq data) {
+    public ApiResponse rejectVacation(Long approvalId, String approverId, VacationApiDto.RejectVacationReq data) {
 
         Long processedApprovalId = vacationService.rejectVacation(
                 approvalId,
@@ -652,30 +520,18 @@ public class VacationApiController {
         return ApiResponse.success(new VacationApiDto.RejectVacationResp(processedApprovalId));
     }
 
-    /**
-     * 휴가 신청 취소
-     * POST /api/v1/vacation-requests/{vacationGrantId}/cancel
-     */
-    @PostMapping("/api/v1/vacation-requests/{vacationGrantId}/cancel")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_CANCEL')")
-    public ApiResponse cancelVacationRequest(
-            @PathVariable("vacationGrantId") Long vacationGrantId,
-            @RequestParam("userId") String userId) {
+    public ApiResponse cancelVacationRequest(Long vacationGrantId, String userId) {
 
         Long canceledVacationGrantId = vacationService.cancelVacationRequest(vacationGrantId, userId);
 
         return ApiResponse.success(new VacationApiDto.CancelVacationRequestResp(canceledVacationGrantId));
     }
 
-    /**
-     * 승인자에게 할당된 모든 휴가 신청 내역 조회 (상태 필터 옵션)
-     * GET /api/v1/users/{approverId}/vacation-approvals
-     */
-    @GetMapping("/api/v1/users/{approverId}/vacation-approvals")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_APPROVE')")
-    public ApiResponse getAllVacationsByApprover(
-            @PathVariable("approverId") String approverId,
-            @RequestParam(value = "status", required = false) GrantStatus status) {
+    public ApiResponse getAllVacationsByApprover(String approverId, GrantStatus status) {
         List<VacationServiceDto> vacations = vacationService.getAllVacationsByApprover(approverId, status);
 
         List<VacationApiDto.GetUserRequestedVacationsResp> resp = vacations.stream()
@@ -728,13 +584,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 특정 유저의 휴가 신청 내역 조회 (ON_REQUEST 방식, 모든 상태 포함)
-     * GET /api/v1/users/{userId}/vacation-requests
-     */
-    @GetMapping("/api/v1/users/{userId}/vacation-requests")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserRequestedVacations(@PathVariable("userId") String userId) {
+    public ApiResponse getUserRequestedVacations(String userId) {
         List<VacationServiceDto> requestedVacations = vacationService.getAllRequestedVacationsByUserId(userId);
 
         List<VacationApiDto.GetUserRequestedVacationsResp> resp = requestedVacations.stream()
@@ -787,13 +639,9 @@ public class VacationApiController {
         return ApiResponse.success(resp);
     }
 
-    /**
-     * 특정 유저의 휴가 신청 통계 조회 (ON_REQUEST 방식)
-     * GET /api/v1/users/{userId}/vacation-requests/stats
-     */
-    @GetMapping("/api/v1/users/{userId}/vacation-requests/stats")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_READ')")
-    public ApiResponse getUserRequestedVacationStats(@PathVariable("userId") String userId) {
+    public ApiResponse getUserRequestedVacationStats(String userId) {
         VacationServiceDto stats = vacationService.getRequestedVacationStatsByUserId(userId);
 
         return ApiResponse.success(new VacationApiDto.GetUserRequestedVacationStatsResp(
@@ -812,13 +660,9 @@ public class VacationApiController {
         ));
     }
 
-    /**
-     * 유저의 휴가 정책 할당 상태 조회 (할당된 정책 + 할당되지 않은 정책)
-     * GET /api/v1/users/{userId}/vacation-policies/assignment-status
-     */
-    @GetMapping("/api/v1/users/{userId}/vacation-policies/assignment-status")
+    @Override
     @PreAuthorize("hasAuthority('VACATION_MANAGE')")
-    public ApiResponse getVacationPolicyAssignmentStatus(@PathVariable("userId") String userId) {
+    public ApiResponse getVacationPolicyAssignmentStatus(String userId) {
         VacationServiceDto result = vacationService.getVacationPolicyAssignmentStatus(userId);
 
         // 할당된 정책 변환

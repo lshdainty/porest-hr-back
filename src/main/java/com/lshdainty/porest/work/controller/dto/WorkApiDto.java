@@ -1,0 +1,245 @@
+package com.lshdainty.porest.work.controller.dto;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.lshdainty.porest.work.type.CodeType;
+import com.lshdainty.porest.work.type.SystemType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+public class WorkApiDto {
+
+    // ========== 업무 내역 DTO ==========
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 내역 등록 요청")
+    public static class CreateWorkHistoryReq {
+        @Schema(description = "업무 날짜", example = "2024-01-15")
+        private LocalDate workDate;
+
+        @Schema(description = "업무 담당자 ID", example = "user123")
+        private String workUserId;
+
+        @Schema(description = "업무 그룹 코드", example = "GROUP_A")
+        private String workGroupCode;
+
+        @Schema(description = "업무 파트 코드", example = "PART_A")
+        private String workPartCode;
+
+        @Schema(description = "업무 분류 코드", example = "CLASS_A")
+        private String workClassCode;
+
+        @Schema(description = "업무 시간", example = "8.0")
+        private BigDecimal workHour;
+
+        @Schema(description = "업무 내용", example = "프로젝트 개발")
+        private String workContent;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 내역 등록 응답")
+    public static class CreateWorkHistoryResp {
+        @Schema(description = "생성된 업무 내역 시퀀스", example = "1")
+        private Long workHistorySeq;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 내역 일괄 등록 요청")
+    public static class BulkCreateWorkHistoryReq {
+        @Schema(description = "업무 내역 목록")
+        private List<CreateWorkHistoryReq> workHistories;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 내역 일괄 등록 응답")
+    public static class BulkCreateWorkHistoryResp {
+        @Schema(description = "생성된 업무 내역 시퀀스 목록", example = "[1, 2, 3]")
+        private List<Long> workHistorySeqs;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 내역 수정 요청")
+    public static class UpdateWorkHistoryReq {
+        @Schema(description = "업무 날짜", example = "2024-01-15")
+        private LocalDate workDate;
+
+        @Schema(description = "업무 담당자 ID", example = "user123")
+        private String workUserId;
+
+        @Schema(description = "업무 그룹 코드", example = "GROUP_A")
+        private String workGroupCode;
+
+        @Schema(description = "업무 파트 코드", example = "PART_A")
+        private String workPartCode;
+
+        @Schema(description = "업무 분류 코드", example = "CLASS_A")
+        private String workClassCode;
+
+        @Schema(description = "업무 시간", example = "8.0")
+        private BigDecimal workHour;
+
+        @Schema(description = "업무 내용", example = "프로젝트 개발")
+        private String workContent;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 내역 응답")
+    public static class WorkHistoryResp {
+        @Schema(description = "업무 내역 시퀀스", example = "1")
+        private Long workHistorySeq;
+
+        @Schema(description = "업무 날짜", example = "2024-01-15")
+        private LocalDate workDate;
+
+        @Schema(description = "업무 담당자 ID", example = "user123")
+        private String workUserId;
+
+        @Schema(description = "업무 담당자 이름", example = "홍길동")
+        private String workUserName;
+
+        @Schema(description = "업무 그룹 정보")
+        private WorkCodeResp workGroup;
+
+        @Schema(description = "업무 파트 정보")
+        private WorkCodeResp workPart;
+
+        @Schema(description = "업무 분류 정보")
+        private WorkCodeResp workClass;
+
+        @Schema(description = "업무 시간", example = "8.0")
+        private BigDecimal workHour;
+
+        @Schema(description = "업무 내용", example = "프로젝트 개발")
+        private String workContent;
+    }
+
+    // ========== 업무 코드 DTO ==========
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 코드 생성 요청")
+    public static class CreateWorkCodeReq {
+        @Schema(description = "업무 코드", example = "GROUP_A")
+        private String workCode;
+
+        @Schema(description = "업무 코드 이름", example = "그룹A")
+        private String workCodeName;
+
+        @Schema(description = "코드 타입", example = "GROUP")
+        private CodeType codeType;
+
+        @Schema(description = "부모 업무 코드 시퀀스", example = "1")
+        private Long parentWorkCodeSeq;
+
+        @Schema(description = "정렬 순서", example = "1")
+        private Integer orderSeq;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 코드 생성 응답")
+    public static class CreateWorkCodeResp {
+        @Schema(description = "생성된 업무 코드 시퀀스", example = "1")
+        private Long workCodeSeq;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 코드 수정 요청")
+    public static class UpdateWorkCodeReq {
+        @Schema(description = "업무 코드", example = "GROUP_A")
+        private String workCode;
+
+        @Schema(description = "업무 코드 이름", example = "그룹A")
+        private String workCodeName;
+
+        @Schema(description = "부모 업무 코드 시퀀스", example = "1")
+        private Long parentWorkCodeSeq;
+
+        @Schema(description = "정렬 순서", example = "1")
+        private Integer orderSeq;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "업무 코드 응답")
+    public static class WorkCodeResp {
+        @Schema(description = "업무 코드 시퀀스", example = "1")
+        private Long workCodeSeq;
+
+        @Schema(description = "업무 코드", example = "GROUP_A")
+        private String workCode;
+
+        @Schema(description = "업무 코드 이름", example = "그룹A")
+        private String workCodeName;
+
+        @Schema(description = "코드 타입", example = "GROUP")
+        private CodeType codeType;
+
+        @Schema(description = "정렬 순서", example = "1")
+        private Integer orderSeq;
+
+        @Schema(description = "부모 업무 코드 시퀀스", example = "1")
+        private Long parentWorkCodeSeq;
+    }
+
+    // ========== 시스템 로그 DTO ==========
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "시스템 체크 토글 요청")
+    public static class ToggleSystemCheckReq {
+        @Schema(description = "시스템 코드", example = "ERP")
+        private SystemType systemCode;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "시스템 체크 토글 응답")
+    public static class ToggleSystemCheckResp {
+        @Schema(description = "체크 여부 (true: 체크됨, false: 체크 해제됨)", example = "true")
+        private boolean checked;
+
+        @Schema(description = "메시지", example = "시스템 체크가 등록되었습니다.")
+        private String message;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "시스템 체크 상태 조회 응답")
+    public static class CheckSystemStatusResp {
+        @Schema(description = "시스템 코드", example = "ERP")
+        private SystemType systemCode;
+
+        @Schema(description = "오늘 체크 여부", example = "true")
+        private boolean checked;
+    }
+}

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.vacation.type.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,38 +17,66 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 사용 요청")
     public static class UseVacationReq {
+        @Schema(description = "사용자 ID", example = "user123")
         private String userId;
+
+        @Schema(description = "휴가 유형", example = "ANNUAL")
         private VacationType vacationType;
+
+        @Schema(description = "휴가 사용 설명", example = "개인 사유")
         private String vacationDesc;
+
+        @Schema(description = "휴가 시간 유형", example = "ALL_DAY")
         private VacationTimeType vacationTimeType;
+
+        @Schema(description = "시작 날짜", example = "2024-01-15T09:00:00")
         private LocalDateTime startDate;
+
+        @Schema(description = "종료 날짜", example = "2024-01-15T18:00:00")
         private LocalDateTime endDate;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 사용 응답")
     public static class UseVacationResp {
+        @Schema(description = "휴가 사용 ID", example = "1")
         private Long vacationUsageId;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 사용 수정 요청")
     public static class UpdateVacationUsageReq {
+        @Schema(description = "사용자 ID", example = "user123")
         private String userId;
+
+        @Schema(description = "휴가 유형", example = "ANNUAL")
         private VacationType vacationType;
+
+        @Schema(description = "휴가 사용 설명", example = "개인 사유")
         private String vacationDesc;
+
+        @Schema(description = "휴가 시간 유형", example = "ALL_DAY")
         private VacationTimeType vacationTimeType;
+
+        @Schema(description = "시작 날짜", example = "2024-01-15T09:00:00")
         private LocalDateTime startDate;
+
+        @Schema(description = "종료 날짜", example = "2024-01-15T18:00:00")
         private LocalDateTime endDate;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 사용 수정 응답")
     public static class UpdateVacationUsageResp {
+        @Schema(description = "휴가 사용 ID", example = "1")
         private Long vacationUsageId;
     }
 
@@ -223,45 +252,87 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 정책 생성 요청")
     public static class CreateVacationPolicyReq {
+        @Schema(description = "휴가 정책 이름", example = "연차")
         private String vacationPolicyName;
+
+        @Schema(description = "휴가 정책 설명", example = "연간 부여되는 기본 연차")
         private String vacationPolicyDesc;
+
+        @Schema(description = "휴가 유형", example = "ANNUAL")
         private VacationType vacationType;
+
+        @Schema(description = "부여 방식", example = "AUTO")
         private GrantMethod grantMethod;
+
+        @Schema(description = "부여 시간", example = "15.0")
         private BigDecimal grantTime;
-        private YNType isFlexibleGrant;        // 가변 부여 여부 (Y: 가변, N: 고정)
-        private YNType minuteGrantYn;          // 분단위 부여 여부
+
+        @Schema(description = "가변 부여 여부 (Y: 가변, N: 고정)", example = "N")
+        private YNType isFlexibleGrant;
+
+        @Schema(description = "분단위 부여 여부", example = "N")
+        private YNType minuteGrantYn;
+
+        @Schema(description = "반복 단위", example = "YEAR")
         private RepeatUnit repeatUnit;
+
+        @Schema(description = "반복 간격", example = "1")
         private Integer repeatInterval;
+
+        @Schema(description = "특정 월", example = "1")
         private Integer specificMonths;
+
+        @Schema(description = "특정 일", example = "1")
         private Integer specificDays;
-        private LocalDateTime firstGrantDate;  // 첫 부여 시점 (반복 부여 방식에서 필수)
-        private YNType isRecurring;            // 반복 여부 (Y: 반복, N: 1회)
-        private Integer maxGrantCount;         // 최대 부여 횟수 (1회성 정책용)
-        private EffectiveType effectiveType;   // 유효기간 발효일 타입
-        private ExpirationType expirationType; // 유효기간 만료일 타입
+
+        @Schema(description = "첫 부여 시점 (반복 부여 방식에서 필수)", example = "2024-01-01T00:00:00")
+        private LocalDateTime firstGrantDate;
+
+        @Schema(description = "반복 여부 (Y: 반복, N: 1회)", example = "Y")
+        private YNType isRecurring;
+
+        @Schema(description = "최대 부여 횟수 (1회성 정책용)", example = "1")
+        private Integer maxGrantCount;
+
+        @Schema(description = "유효기간 발효일 타입", example = "GRANT_DATE")
+        private EffectiveType effectiveType;
+
+        @Schema(description = "유효기간 만료일 타입", example = "ONE_YEAR")
+        private ExpirationType expirationType;
+
+        @Schema(description = "승인 필요 횟수", example = "2")
         private Integer approvalRequiredCount;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 정책 생성 응답")
     public static class CreateVacationPolicyResp {
+        @Schema(description = "휴가 정책 ID", example = "1")
         private Long vacationPolicyId;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 정책 할당 요청")
     public static class AssignVacationPoliciesToUserReq {
+        @Schema(description = "할당할 휴가 정책 ID 목록", example = "[1, 2, 3]")
         private List<Long> vacationPolicyIds;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 정책 할당 응답")
     public static class AssignVacationPoliciesToUserResp {
+        @Schema(description = "사용자 ID", example = "user123")
         private String userId;
+
+        @Schema(description = "할당된 휴가 정책 ID 목록", example = "[1, 2, 3]")
         private List<Long> assignedVacationPolicyIds;
     }
 
@@ -326,23 +397,45 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 수동 부여 요청")
     public static class ManualGrantVacationReq {
+        @Schema(description = "휴가 정책 ID", example = "1")
         private Long vacationPolicyId;
+
+        @Schema(description = "부여 시간", example = "15.0")
         private BigDecimal grantTime;
+
+        @Schema(description = "부여 날짜", example = "2024-01-01T00:00:00")
         private LocalDateTime grantDate;
+
+        @Schema(description = "만료 날짜", example = "2024-12-31T23:59:59")
         private LocalDateTime expiryDate;
+
+        @Schema(description = "부여 설명", example = "특별 부여")
         private String grantDesc;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 수동 부여 응답")
     public static class ManualGrantVacationResp {
+        @Schema(description = "휴가 부여 ID", example = "1")
         private Long vacationGrantId;
+
+        @Schema(description = "사용자 ID", example = "user123")
         private String userId;
+
+        @Schema(description = "휴가 정책 ID", example = "1")
         private Long vacationPolicyId;
+
+        @Schema(description = "부여 시간", example = "15.0")
         private BigDecimal grantTime;
+
+        @Schema(description = "부여 날짜", example = "2024-01-01T00:00:00")
         private LocalDateTime grantDate;
+
+        @Schema(description = "만료 날짜", example = "2024-12-31T23:59:59")
         private LocalDateTime expiryDate;
     }
 
@@ -359,20 +452,36 @@ public class VacationApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 신청 요청")
     public static class RequestVacationReq {
+        @Schema(description = "휴가 정책 ID", example = "1")
         private Long policyId;
+
+        @Schema(description = "설명", example = "연차 신청")
         private String desc;
+
+        @Schema(description = "승인자 ID 목록", example = "[\"admin1\", \"admin2\"]")
         private List<String> approverIds;
-        private BigDecimal grantTime;            // 부여 시간 (isFlexibleGrant=Y일 경우 필수, 사용자 입력값)
-        private LocalDateTime requestStartTime;  // 신청 시작 일시 (결혼/출산 일자 등)
-        private LocalDateTime requestEndTime;    // 신청 종료 일시 (필요시)
-        private String requestDesc;              // 신청 상세 사유
+
+        @Schema(description = "부여 시간 (isFlexibleGrant=Y일 경우 필수)", example = "15.0")
+        private BigDecimal grantTime;
+
+        @Schema(description = "신청 시작 일시", example = "2024-01-15T00:00:00")
+        private LocalDateTime requestStartTime;
+
+        @Schema(description = "신청 종료 일시", example = "2024-01-20T00:00:00")
+        private LocalDateTime requestEndTime;
+
+        @Schema(description = "신청 상세 사유", example = "가족 행사")
+        private String requestDesc;
     }
 
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "휴가 신청 응답")
     public static class RequestVacationResp {
+        @Schema(description = "휴가 부여 ID", example = "1")
         private Long vacationGrantId;
     }
 

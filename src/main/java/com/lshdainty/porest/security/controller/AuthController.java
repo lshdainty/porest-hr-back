@@ -25,12 +25,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class AuthController {
+public class AuthController implements AuthApi {
     private final SecurityService securityService;
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @GetMapping("/api/v1/login/check")
+    @Override
     public ApiResponse<AuthApiDto.LoginUserInfo> getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -88,11 +88,8 @@ public class AuthController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 비밀번호 인코딩 유틸리티 API (개발/테스트용)
-     */
-    @PostMapping("/api/v1/encode-password")
-    public ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(@RequestBody AuthApiDto.EncodePasswordReq data) {
+    @Override
+    public ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(AuthApiDto.EncodePasswordReq data) {
         log.info("Password encoding request");
 
         String encodedPassword = passwordEncoder.encode(data.getUserPwd());
@@ -103,13 +100,8 @@ public class AuthController {
         ));
     }
 
-    /**
-     * 초대 토큰 유효성 검증
-     */
-    @GetMapping("/oauth2/signup/validate")
-    public ApiResponse<AuthApiDto.ValidateInvitationResp> validateInvitationToken(@RequestParam("token") String token, HttpSession session) {
-        // 토큰 빈값이면 토큰 없다고 에러 반환
-
+    @Override
+    public ApiResponse<AuthApiDto.ValidateInvitationResp> validateInvitationToken(String token, HttpSession session) {
         UserServiceDto user = securityService.validateInvitationToken(token);
 
         // ✅ 검증 성공 시 세션에 초대 토큰과 사용자 정보 저장
@@ -131,11 +123,8 @@ public class AuthController {
         ));
     }
 
-    /**
-     * 초대받은 사용자의 회원가입 완료
-     */
-    @PostMapping("/oauth2/signup/invitation/complete")
-    public ApiResponse<AuthApiDto.CompleteInvitationResp> completeInvitedUserRegistration(@RequestBody AuthApiDto.CompleteInvitationReq data, HttpSession session) {
+    @Override
+    public ApiResponse<AuthApiDto.CompleteInvitationResp> completeInvitedUserRegistration(AuthApiDto.CompleteInvitationReq data, HttpSession session) {
         String userId = userService.completeInvitedUserRegistration(UserServiceDto.builder()
                 .invitationToken(data.getInvitationToken())
                 .birth(data.getUserBirth())

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequiredArgsConstructor
-public class RoleApiController {
+public class RoleApiController implements RoleApi {
     private final RoleService roleService;
 
     /* ==================== Role API ==================== */
@@ -33,7 +33,7 @@ public class RoleApiController {
      *
      * @return List<RoleResp>
      */
-    @GetMapping("/api/v1/roles")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_READ')")
     public ApiResponse<List<RoleApiDto.RoleResp>> getAllRoles() {
         List<Role> roles = roleService.getAllRoles();
@@ -57,9 +57,9 @@ public class RoleApiController {
      * @param roleCode 역할 코드
      * @return RoleResp
      */
-    @GetMapping("/api/v1/roles/{roleCode}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_READ')")
-    public ApiResponse<RoleApiDto.RoleResp> getRole(@PathVariable String roleCode) {
+    public ApiResponse<RoleApiDto.RoleResp> getRole(String roleCode) {
         Role role = roleService.getRole(roleCode);
         return ApiResponse.success(new RoleApiDto.RoleResp(
                 role.getCode(),
@@ -78,9 +78,9 @@ public class RoleApiController {
      * @param req CreateRoleReq
      * @return 생성된 역할 코드
      */
-    @PostMapping("/api/v1/roles")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<String> createRole(@RequestBody RoleApiDto.CreateRoleReq req) {
+    public ApiResponse<String> createRole(RoleApiDto.CreateRoleReq req) {
         Role role;
         if (req.getPermissionCodes() != null && !req.getPermissionCodes().isEmpty()) {
             role = roleService.createRoleWithPermissions(
@@ -103,12 +103,9 @@ public class RoleApiController {
      * @param req UpdateRoleReq
      * @return void
      */
-    @PutMapping("/api/v1/roles/{roleCode}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> updateRole(
-            @PathVariable String roleCode,
-            @RequestBody RoleApiDto.UpdateRoleReq req
-    ) {
+    public ApiResponse<Void> updateRole(String roleCode, RoleApiDto.UpdateRoleReq req) {
         if (req.getPermissionCodes() != null && !req.getPermissionCodes().isEmpty()) {
             // 설명 + 권한 둘 다 수정
             roleService.updateRoleWithPermissions(
@@ -130,9 +127,9 @@ public class RoleApiController {
      * @param roleCode 역할 코드
      * @return void
      */
-    @DeleteMapping("/api/v1/roles/{roleCode}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> deleteRole(@PathVariable String roleCode) {
+    public ApiResponse<Void> deleteRole(String roleCode) {
         roleService.deleteRole(roleCode);
         return ApiResponse.success();
     }
@@ -146,9 +143,9 @@ public class RoleApiController {
      * @param roleCode 역할 코드
      * @return List<String>
      */
-    @GetMapping("/api/v1/roles/{roleCode}/permissions")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_READ')")
-    public ApiResponse<List<String>> getRolePermissions(@PathVariable String roleCode) {
+    public ApiResponse<List<String>> getRolePermissions(String roleCode) {
         Role role = roleService.getRole(roleCode);
         List<String> permissions = role.getPermissions().stream()
                 .map(Permission::getCode)
@@ -164,12 +161,9 @@ public class RoleApiController {
      * @param req UpdateRolePermissionsReq
      * @return void
      */
-    @PutMapping("/api/v1/roles/{roleCode}/permissions")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> updateRolePermissions(
-            @PathVariable String roleCode,
-            @RequestBody RoleApiDto.UpdateRolePermissionsReq req
-    ) {
+    public ApiResponse<Void> updateRolePermissions(String roleCode, RoleApiDto.UpdateRolePermissionsReq req) {
         roleService.updateRolePermissions(roleCode, req.getPermissionCodes());
         return ApiResponse.success();
     }
@@ -182,12 +176,9 @@ public class RoleApiController {
      * @param req RolePermissionReq
      * @return void
      */
-    @PostMapping("/api/v1/roles/{roleCode}/permissions")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> addPermissionToRole(
-            @PathVariable String roleCode,
-            @RequestBody RoleApiDto.RolePermissionReq req
-    ) {
+    public ApiResponse<Void> addPermissionToRole(String roleCode, RoleApiDto.RolePermissionReq req) {
         roleService.addPermissionToRole(roleCode, req.getPermissionCode());
         return ApiResponse.success();
     }
@@ -200,12 +191,9 @@ public class RoleApiController {
      * @param permissionCode 권한 코드
      * @return void
      */
-    @DeleteMapping("/api/v1/roles/{roleCode}/permissions/{permissionCode}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> removePermissionFromRole(
-            @PathVariable String roleCode,
-            @PathVariable String permissionCode
-    ) {
+    public ApiResponse<Void> removePermissionFromRole(String roleCode, String permissionCode) {
         roleService.removePermissionFromRole(roleCode, permissionCode);
         return ApiResponse.success();
     }
@@ -218,7 +206,7 @@ public class RoleApiController {
      *
      * @return List<String>
      */
-    @GetMapping("/api/v1/permissions/my")
+    @Override
     public ApiResponse<List<String>> getMyPermissions() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<String> permissions = authentication.getAuthorities().stream()
@@ -233,7 +221,7 @@ public class RoleApiController {
      *
      * @return List<PermissionResp>
      */
-    @GetMapping("/api/v1/permissions")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_READ')")
     public ApiResponse<List<RoleApiDto.PermissionResp>> getAllPermissions() {
         List<Permission> permissions = roleService.getAllPermissions();
@@ -256,9 +244,9 @@ public class RoleApiController {
      * @param permissionCode 권한 코드
      * @return PermissionResp
      */
-    @GetMapping("/api/v1/permissions/{permissionCode}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_READ')")
-    public ApiResponse<RoleApiDto.PermissionResp> getPermission(@PathVariable String permissionCode) {
+    public ApiResponse<RoleApiDto.PermissionResp> getPermission(String permissionCode) {
         Permission permission = roleService.getPermission(permissionCode);
         return ApiResponse.success(new RoleApiDto.PermissionResp(
                 permission.getCode(),
@@ -276,9 +264,9 @@ public class RoleApiController {
      * @param resource 리소스명
      * @return List<PermissionResp>
      */
-    @GetMapping("/api/v1/permissions/resource/{resource}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_READ')")
-    public ApiResponse<List<RoleApiDto.PermissionResp>> getPermissionsByResource(@PathVariable String resource) {
+    public ApiResponse<List<RoleApiDto.PermissionResp>> getPermissionsByResource(String resource) {
         List<Permission> permissions = roleService.getPermissionsByResource(resource);
         List<RoleApiDto.PermissionResp> resp = permissions.stream()
                 .map(p -> new RoleApiDto.PermissionResp(
@@ -299,9 +287,9 @@ public class RoleApiController {
      * @param req CreatePermissionReq
      * @return 생성된 권한 코드
      */
-    @PostMapping("/api/v1/permissions")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<String> createPermission(@RequestBody RoleApiDto.CreatePermissionReq req) {
+    public ApiResponse<String> createPermission(RoleApiDto.CreatePermissionReq req) {
         Permission permission = roleService.createPermission(
                 req.getCode(),
                 req.getName(),
@@ -320,12 +308,9 @@ public class RoleApiController {
      * @param req UpdatePermissionReq
      * @return void
      */
-    @PutMapping("/api/v1/permissions/{permissionCode}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> updatePermission(
-            @PathVariable String permissionCode,
-            @RequestBody RoleApiDto.UpdatePermissionReq req
-    ) {
+    public ApiResponse<Void> updatePermission(String permissionCode, RoleApiDto.UpdatePermissionReq req) {
         roleService.updatePermission(
                 permissionCode,
                 req.getName(),
@@ -343,9 +328,9 @@ public class RoleApiController {
      * @param permissionCode 권한 코드
      * @return void
      */
-    @DeleteMapping("/api/v1/permissions/{permissionCode}")
+    @Override
     @PreAuthorize("hasAuthority('ROLE_MANAGE')")
-    public ApiResponse<Void> deletePermission(@PathVariable String permissionCode) {
+    public ApiResponse<Void> deletePermission(String permissionCode) {
         roleService.deletePermission(permissionCode);
         return ApiResponse.success();
     }

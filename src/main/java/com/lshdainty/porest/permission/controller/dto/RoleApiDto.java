@@ -2,6 +2,7 @@ package com.lshdainty.porest.permission.controller.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,10 +22,18 @@ public class RoleApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "역할 응답")
     public static class RoleResp {
+        @Schema(description = "역할 코드", example = "ADMIN")
         private String roleCode;
+
+        @Schema(description = "역할 이름", example = "관리자")
         private String roleName;
+
+        @Schema(description = "설명", example = "시스템 관리자 역할")
         private String description;
+
+        @Schema(description = "권한 목록", example = "[\"USER_READ\", \"USER_MANAGE\"]")
         private List<String> permissions;
     }
 
@@ -49,11 +58,19 @@ public class RoleApiDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "역할 생성 요청")
     public static class CreateRoleReq {
+        @Schema(description = "역할 코드", example = "ADMIN", required = true)
         private String roleCode;
+
+        @Schema(description = "역할 이름", example = "관리자", required = true)
         private String roleName;
+
+        @Schema(description = "설명", example = "시스템 관리자 역할")
         private String description;
-        private List<String> permissionCodes; // optional
+
+        @Schema(description = "권한 코드 목록 (선택)", example = "[\"USER_READ\", \"USER_MANAGE\"]")
+        private List<String> permissionCodes;
     }
 
     /**
@@ -63,9 +80,13 @@ public class RoleApiDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "역할 수정 요청")
     public static class UpdateRoleReq {
+        @Schema(description = "설명", example = "시스템 관리자 역할")
         private String description;
-        private List<String> permissionCodes; // optional
+
+        @Schema(description = "권한 코드 목록 (선택)", example = "[\"USER_READ\", \"USER_MANAGE\"]")
+        private List<String> permissionCodes;
     }
 
     /**
@@ -98,11 +119,21 @@ public class RoleApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "권한 응답")
     public static class PermissionResp {
+        @Schema(description = "권한 코드", example = "USER_READ")
         private String code;
+
+        @Schema(description = "권한 이름", example = "사용자 조회")
         private String name;
+
+        @Schema(description = "설명", example = "사용자 정보를 조회할 수 있는 권한")
         private String description;
+
+        @Schema(description = "리소스", example = "USER")
         private String resource;
+
+        @Schema(description = "액션", example = "READ")
         private String action;
     }
 
@@ -115,11 +146,21 @@ public class RoleApiDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "권한 생성 요청")
     public static class CreatePermissionReq {
+        @Schema(description = "권한 코드", example = "USER_READ", required = true)
         private String code;
+
+        @Schema(description = "권한 이름", example = "사용자 조회", required = true)
         private String name;
+
+        @Schema(description = "설명", example = "사용자 정보를 조회할 수 있는 권한")
         private String description;
+
+        @Schema(description = "리소스", example = "USER", required = true)
         private String resource;
+
+        @Schema(description = "액션", example = "READ", required = true)
         private String action;
     }
 

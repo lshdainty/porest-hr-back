@@ -8,9 +8,8 @@ import com.lshdainty.porest.schedule.service.dto.ScheduleServiceDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,12 +17,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class ScheduleApiController {
+public class ScheduleApiController implements ScheduleApi {
     private final ScheduleService scheduleService;
 
-    @PostMapping("/api/v1/schedule")
+    @Override
     @PreAuthorize("hasAuthority('SCHEDULE_CREATE')")
-    public ApiResponse registSchedule(@RequestBody ScheduleApiDto.RegistScheduleReq data, HttpServletRequest req) {
+    public ApiResponse registSchedule(ScheduleApiDto.RegistScheduleReq data, HttpServletRequest req) {
         Long scheduleId = scheduleService.registSchedule(ScheduleServiceDto.builder()
                 .userId(data.getUserId())
                 .type(data.getScheduleType())
@@ -36,11 +35,9 @@ public class ScheduleApiController {
         return ApiResponse.success(new ScheduleApiDto.RegistScheduleResp(scheduleId));
     }
 
-    @PutMapping("/api/v1/schedule/{id}")
+    @Override
     @PreAuthorize("hasAuthority('SCHEDULE_UPDATE')")
-    public ApiResponse updateSchedule(
-            @PathVariable("id") Long scheduleId,
-            @RequestBody ScheduleApiDto.UpdateScheduleReq data) {
+    public ApiResponse updateSchedule(Long scheduleId, ScheduleApiDto.UpdateScheduleReq data) {
         Long newScheduleId = scheduleService.updateSchedule(
                 scheduleId,
                 ScheduleServiceDto.builder()
@@ -55,16 +52,16 @@ public class ScheduleApiController {
         return ApiResponse.success(new ScheduleApiDto.UpdateScheduleResp(newScheduleId));
     }
 
-    @DeleteMapping("/api/v1/schedule/{id}")
+    @Override
     @PreAuthorize("hasAuthority('SCHEDULE_DELETE')")
-    public ApiResponse deleteSchedule(@PathVariable("id") Long scheduleId) {
+    public ApiResponse deleteSchedule(Long scheduleId) {
         scheduleService.deleteSchedule(scheduleId);
         return ApiResponse.success();
     }
 
-    @GetMapping("/api/v1/schedules/user/{userNo}")
+    @Override
     @PreAuthorize("hasAuthority('SCHEDULE_READ')")
-    public ApiResponse searchSchedulesByUser(@PathVariable("userNo") String userId) {
+    public ApiResponse searchSchedulesByUser(String userId) {
         List<Schedule> schedules = scheduleService.searchSchedulesByUser(userId);
 
         List<ScheduleApiDto.SearchSchedulesByUserResp> resp = schedules.stream()
@@ -81,12 +78,9 @@ public class ScheduleApiController {
         return ApiResponse.success(resp);
     }
 
-    @GetMapping("/api/v1/schedules/period")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Override
     @PreAuthorize("hasAuthority('SCHEDULE_READ')")
-    public ApiResponse searchSchedulesByPeriod(
-            @RequestParam("startDate") LocalDateTime startDate,
-            @RequestParam("endDate") LocalDateTime endDate) {
+    public ApiResponse searchSchedulesByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(startDate, endDate);
 
         List<ScheduleApiDto.SearchSchedulesByPeriodResp> resp = schedules.stream()

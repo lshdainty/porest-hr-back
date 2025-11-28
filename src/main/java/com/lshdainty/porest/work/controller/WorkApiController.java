@@ -1,33 +1,38 @@
 package com.lshdainty.porest.work.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.work.controller.dto.WorkHistoryApiDto;
+import com.lshdainty.porest.work.controller.dto.WorkApiDto;
 import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import com.lshdainty.porest.work.service.WorkCodeService;
 import com.lshdainty.porest.work.service.WorkHistoryService;
+import com.lshdainty.porest.work.service.WorkSystemLogService;
 import com.lshdainty.porest.work.service.dto.WorkCodeServiceDto;
 import com.lshdainty.porest.work.service.dto.WorkHistoryServiceDto;
 import com.lshdainty.porest.work.type.CodeType;
+import com.lshdainty.porest.work.type.SystemType;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.io.IOException;
-import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class WorkHistoryApiController {
+public class WorkApiController implements WorkApi {
     private final WorkHistoryService workHistoryService;
     private final WorkCodeService workCodeService;
+    private final WorkSystemLogService workSystemLogService;
 
-    @PostMapping("/api/v1/work-histories")
+    // ========== 업무 내역 관리 ==========
+
+    @Override
     @PreAuthorize("hasAuthority('WORK_CREATE')")
-    public ApiResponse createWorkHistory(@RequestBody WorkHistoryApiDto.CreateWorkHistoryReq data) {
+    public ApiResponse createWorkHistory(WorkApiDto.CreateWorkHistoryReq data) {
         Long workHistorySeq = workHistoryService.createWorkHistory(WorkHistoryServiceDto.builder()
                 .date(data.getWorkDate())
                 .userId(data.getWorkUserId())
@@ -37,12 +42,12 @@ public class WorkHistoryApiController {
                 .hours(data.getWorkHour())
                 .content(data.getWorkContent())
                 .build());
-        return ApiResponse.success(new WorkHistoryApiDto.CreateWorkHistoryResp(workHistorySeq));
+        return ApiResponse.success(new WorkApiDto.CreateWorkHistoryResp(workHistorySeq));
     }
 
-    @PostMapping("/api/v1/work-histories/bulk")
+    @Override
     @PreAuthorize("hasAuthority('WORK_CREATE')")
-    public ApiResponse createWorkHistories(@RequestBody WorkHistoryApiDto.BulkCreateWorkHistoryReq data) {
+    public ApiResponse createWorkHistories(WorkApiDto.BulkCreateWorkHistoryReq data) {
         List<WorkHistoryServiceDto> dtos = data.getWorkHistories().stream()
                 .map(req -> WorkHistoryServiceDto.builder()
                         .date(req.getWorkDate())
@@ -56,15 +61,15 @@ public class WorkHistoryApiController {
                 .collect(Collectors.toList());
 
         List<Long> workHistorySeqs = workHistoryService.createWorkHistories(dtos);
-        return ApiResponse.success(new WorkHistoryApiDto.BulkCreateWorkHistoryResp(workHistorySeqs));
+        return ApiResponse.success(new WorkApiDto.BulkCreateWorkHistoryResp(workHistorySeqs));
     }
 
-    @GetMapping("/api/v1/work-histories")
+    @Override
     @PreAuthorize("hasAuthority('WORK_MANAGE')")
-    public ApiResponse findAllWorkHistories(@ModelAttribute WorkHistorySearchCondition condition) {
+    public ApiResponse findAllWorkHistories(WorkHistorySearchCondition condition) {
         List<WorkHistoryServiceDto> dtos = workHistoryService.findAllWorkHistories(condition);
         return ApiResponse.success(dtos.stream()
-                .map(w -> new WorkHistoryApiDto.WorkHistoryResp(
+                .map(w -> new WorkApiDto.WorkHistoryResp(
                         w.getSeq(),
                         w.getDate(),
                         w.getUserId(),
@@ -77,11 +82,11 @@ public class WorkHistoryApiController {
                 .collect(Collectors.toList()));
     }
 
-    @GetMapping("/api/v1/work-histories/{seq}")
+    @Override
     @PreAuthorize("hasAuthority('WORK_READ')")
-    public ApiResponse findWorkHistory(@PathVariable("seq") Long seq) {
+    public ApiResponse findWorkHistory(Long seq) {
         WorkHistoryServiceDto w = workHistoryService.findWorkHistory(seq);
-        return ApiResponse.success(new WorkHistoryApiDto.WorkHistoryResp(
+        return ApiResponse.success(new WorkApiDto.WorkHistoryResp(
                 w.getSeq(),
                 w.getDate(),
                 w.getUserId(),
@@ -93,10 +98,9 @@ public class WorkHistoryApiController {
                 w.getContent()));
     }
 
-    @PutMapping("/api/v1/work-histories/{seq}")
+    @Override
     @PreAuthorize("hasAuthority('WORK_UPDATE')")
-    public ApiResponse updateWorkHistory(@PathVariable("seq") Long seq,
-            @RequestBody WorkHistoryApiDto.UpdateWorkHistoryReq data) {
+    public ApiResponse updateWorkHistory(Long seq, WorkApiDto.UpdateWorkHistoryReq data) {
         workHistoryService.updateWorkHistory(WorkHistoryServiceDto.builder()
                 .seq(seq)
                 .date(data.getWorkDate())
@@ -110,56 +114,96 @@ public class WorkHistoryApiController {
         return ApiResponse.success();
     }
 
-    @DeleteMapping("/api/v1/work-histories/{seq}")
+    @Override
     @PreAuthorize("hasAuthority('WORK_UPDATE')")
-    public ApiResponse deleteWorkHistory(@PathVariable("seq") Long seq) {
+    public ApiResponse deleteWorkHistory(Long seq) {
         workHistoryService.deleteWorkHistory(seq);
         return ApiResponse.success();
     }
 
-    /**
-     * 업무 코드 통합 조회 API
-     * GET /api/v1/work-codes
-     */
-    @GetMapping("/api/v1/work-codes")
+    @Override
+    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    public void downloadWorkHistoryExcel(HttpServletResponse response, WorkHistorySearchCondition condition) throws IOException {
+        workHistoryService.downloadWorkHistoryExcel(response, condition);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    public void downloadUnregisteredWorkHistoryExcel(HttpServletResponse response, Integer year, Integer month) throws IOException {
+        workHistoryService.downloadUnregisteredWorkHistoryExcel(response, year, month);
+    }
+
+    // ========== 업무 코드 관리 ==========
+
+    @Override
+    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    public ApiResponse createWorkCode(WorkApiDto.CreateWorkCodeReq data) {
+        Long workCodeSeq = workCodeService.createWorkCode(
+                data.getWorkCode(),
+                data.getWorkCodeName(),
+                data.getCodeType(),
+                data.getParentWorkCodeSeq(),
+                data.getOrderSeq()
+        );
+        return ApiResponse.success(new WorkApiDto.CreateWorkCodeResp(workCodeSeq));
+    }
+
+    @Override
     @PreAuthorize("hasAuthority('WORK_READ')")
-    public ApiResponse getWorkCodes(
-            @RequestParam(value = "parent_work_code", required = false) String parentWorkCode,
-            @RequestParam(value = "parent_work_code_seq", required = false) Long parentWorkCodeSeq,
-            @RequestParam(value = "parent_is_null", required = false) Boolean parentIsNull,
-            @RequestParam(value = "type", required = false) CodeType type) {
-        List<WorkCodeServiceDto> workCodes = workCodeService.findWorkCodes(parentWorkCode, parentWorkCodeSeq,
-                parentIsNull, type);
+    public ApiResponse getWorkCodes(String parentWorkCode, Long parentWorkCodeSeq, Boolean parentIsNull, CodeType type) {
+        List<WorkCodeServiceDto> workCodes = workCodeService.findWorkCodes(parentWorkCode, parentWorkCodeSeq, parentIsNull, type);
         return ApiResponse.success(workCodes.stream()
                 .map(this::convertToWorkCodeResp)
                 .collect(Collectors.toList()));
     }
 
-    private WorkHistoryApiDto.WorkCodeResp convertToWorkCodeResp(WorkCodeServiceDto dto) {
+    @Override
+    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    public ApiResponse updateWorkCode(Long seq, WorkApiDto.UpdateWorkCodeReq data) {
+        workCodeService.updateWorkCode(
+                seq,
+                data.getWorkCode(),
+                data.getWorkCodeName(),
+                data.getParentWorkCodeSeq(),
+                data.getOrderSeq()
+        );
+        return ApiResponse.success();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    public ApiResponse deleteWorkCode(Long seq) {
+        workCodeService.deleteWorkCode(seq);
+        return ApiResponse.success();
+    }
+
+    // ========== 시스템 로그 관리 ==========
+
+    @Override
+    public ApiResponse toggleSystemCheck(WorkApiDto.ToggleSystemCheckReq req) {
+        boolean checked = workSystemLogService.toggleSystemCheck(req.getSystemCode());
+        String message = checked ? "시스템 체크가 등록되었습니다." : "시스템 체크가 해제되었습니다.";
+        return ApiResponse.success(new WorkApiDto.ToggleSystemCheckResp(checked, message));
+    }
+
+    @Override
+    public ApiResponse checkSystemStatus(SystemType systemCode) {
+        boolean checked = workSystemLogService.isCheckedToday(systemCode);
+        return ApiResponse.success(new WorkApiDto.CheckSystemStatusResp(systemCode, checked));
+    }
+
+    // ========== Private Helper Methods ==========
+
+    private WorkApiDto.WorkCodeResp convertToWorkCodeResp(WorkCodeServiceDto dto) {
         if (dto == null) {
             return null;
         }
-        return new WorkHistoryApiDto.WorkCodeResp(
+        return new WorkApiDto.WorkCodeResp(
                 dto.getSeq(),
                 dto.getCode(),
                 dto.getName(),
                 dto.getType(),
                 dto.getOrderSeq(),
                 dto.getParentSeq());
-    }
-
-    @GetMapping("/api/v1/work-histories/excel/download")
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
-    public void downloadWorkHistoryExcel(HttpServletResponse response,
-            @ModelAttribute WorkHistorySearchCondition condition) throws IOException {
-        workHistoryService.downloadWorkHistoryExcel(response, condition);
-    }
-
-    @GetMapping("/api/v1/work-histories/unregistered-hours/download")
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
-    public void downloadUnregisteredWorkHistoryExcel(HttpServletResponse response,
-            @RequestParam("year") Integer year,
-            @RequestParam("month") Integer month) throws IOException {
-        workHistoryService.downloadUnregisteredWorkHistoryExcel(response, year, month);
     }
 }

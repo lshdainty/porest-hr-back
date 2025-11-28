@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class UserApiController {
+public class UserApiController implements UserApi {
     private final UserService userService;
 
-    @PostMapping("/api/v1/users")
-    public ApiResponse joinUser(@RequestBody UserApiDto.JoinUserReq data) {
+    @Override
+    public ApiResponse joinUser(UserApiDto.JoinUserReq data) {
         String userId = userService.joinUser(UserServiceDto.builder()
                 .id(data.getUserId())
                 .pwd(data.getUserPwd())
@@ -39,9 +39,9 @@ public class UserApiController {
         return ApiResponse.success(new UserApiDto.JoinUserResp(userId));
     }
 
-    @GetMapping("/api/v1/users/{id}")
+    @Override
     @PreAuthorize("hasAuthority('USER_READ')")
-    public ApiResponse searchUser(@PathVariable("id") String userId) {
+    public ApiResponse searchUser(String userId) {
         UserServiceDto user = userService.searchUser(userId);
 
         // 역할 상세 정보 변환 (null 체크)
@@ -91,13 +91,13 @@ public class UserApiController {
         ));
     }
 
-    @GetMapping("/api/v1/users/check-duplicate")
-    public ApiResponse checkUserIdDuplicate(@RequestParam("user_id") String userId) {
+    @Override
+    public ApiResponse checkUserIdDuplicate(String userId) {
         boolean isDuplicate = userService.checkUserIdDuplicate(userId);
         return ApiResponse.success(new UserApiDto.CheckUserIdDuplicateResp(isDuplicate));
     }
 
-    @GetMapping("/api/v1/users")
+    @Override
     @PreAuthorize("hasAuthority('USER_READ')")
     public ApiResponse searchUsers() {
         List<UserServiceDto> users = userService.searchUsers();
@@ -155,9 +155,9 @@ public class UserApiController {
         return ApiResponse.success(resps);
     }
 
-    @PutMapping("/api/v1/users/{id}")
+    @Override
     @PreAuthorize("hasAuthority('USER_UPDATE')")
-    public ApiResponse editUser(@PathVariable("id") String userId, @RequestBody UserApiDto.EditUserReq data) {
+    public ApiResponse editUser(String userId, UserApiDto.EditUserReq data) {
         userService.editUser(UserServiceDto.builder()
                 .id(userId)
                 .name(data.getUserName())
@@ -215,15 +215,15 @@ public class UserApiController {
         ));
     }
 
-    @DeleteMapping("/api/v1/users/{id}")
+    @Override
     @PreAuthorize("hasAuthority('USER_DELETE')")
-    public ApiResponse deleteUser(@PathVariable("id") String userId) {
+    public ApiResponse deleteUser(String userId) {
         userService.deleteUser(userId);
         return ApiResponse.success();
     }
 
-    @PostMapping(value = "/api/v1/users/profiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse uploadProfile(@ModelAttribute UserApiDto.UploadProfileReq data) {
+    @Override
+    public ApiResponse uploadProfile(UserApiDto.UploadProfileReq data) {
         UserServiceDto dto = userService.saveProfileImgInTempFolder(data.getProfile());
         return ApiResponse.success(new UserApiDto.UploadProfileResp(
                 dto.getProfileUrl(),
@@ -234,9 +234,9 @@ public class UserApiController {
     /**
      * 관리자가 사용자 초대
      */
-    @PostMapping("/api/v1/users/invitations")
+    @Override
     @PreAuthorize("hasAuthority('USER_CREATE')")
-    public ApiResponse inviteUser(@RequestBody UserApiDto.InviteUserReq data) {
+    public ApiResponse inviteUser(UserApiDto.InviteUserReq data) {
         UserServiceDto result = userService.inviteUser(UserServiceDto.builder()
                 .id(data.getUserId())
                 .name(data.getUserName())
@@ -264,9 +264,9 @@ public class UserApiController {
     /**
      * 초대된 사용자 정보 수정
      */
-    @PutMapping("/api/v1/users/{id}/invitations")
+    @Override
     @PreAuthorize("hasAuthority('USER_UPDATE')")
-    public ApiResponse editInvitedUser(@PathVariable("id") String userId, @RequestBody UserApiDto.EditInvitedUserReq data) {
+    public ApiResponse editInvitedUser(String userId, UserApiDto.EditInvitedUserReq data) {
         UserServiceDto result = userService.editInvitedUser(userId, UserServiceDto.builder()
                 .name(data.getUserName())
                 .email(data.getUserEmail())
@@ -293,9 +293,9 @@ public class UserApiController {
     /**
      * 초대 이메일 재전송
      */
-    @PostMapping("/api/v1/users/{id}/invitations/resend")
+    @Override
     @PreAuthorize("hasAuthority('USER_CREATE')")
-    public ApiResponse resendInvitation(@PathVariable("id") String userId) {
+    public ApiResponse resendInvitation(String userId) {
         UserServiceDto result = userService.resendInvitation(userId);
 
         return ApiResponse.success(new UserApiDto.ResendInvitationResp(
@@ -315,8 +315,8 @@ public class UserApiController {
     /**
      * 사용자의 메인 부서 존재 여부 확인
      */
-    @GetMapping("/api/v1/users/{userId}/main-department/existence")
-    public ApiResponse checkUserMainDepartmentExistence(@PathVariable("userId") String userId) {
+    @Override
+    public ApiResponse checkUserMainDepartmentExistence(String userId) {
         YNType hasMainDepartment = userService.checkUserHasMainDepartment(userId);
         return ApiResponse.success(new UserApiDto.CheckMainDepartmentExistenceResp(hasMainDepartment));
     }
@@ -325,9 +325,9 @@ public class UserApiController {
      * 유저 대시보드 수정
      * PATCH /api/v1/users/{userId}/dashboard
      */
-    @PatchMapping("/api/v1/users/{userId}/dashboard")
+    @Override
     @PreAuthorize("hasAuthority('USER_UPDATE')")
-    public ApiResponse updateDashboard(@PathVariable("userId") String userId, @RequestBody UserApiDto.UpdateDashboardReq data) {
+    public ApiResponse updateDashboard(String userId, UserApiDto.UpdateDashboardReq data) {
         UserServiceDto result = userService.updateDashboard(userId, data.getDashboard());
 
         return ApiResponse.success(new UserApiDto.UpdateDashboardResp(
@@ -340,8 +340,8 @@ public class UserApiController {
      * 특정 유저의 승인권자 목록 조회
      * GET /api/v1/users/{userId}/approvers
      */
-    @GetMapping("/api/v1/users/{userId}/approvers")
-    public ApiResponse getUserApprovers(@PathVariable("userId") String userId) {
+    @Override
+    public ApiResponse getUserApprovers(String userId) {
         List<UserServiceDto> approvers = userService.getUserApprovers(userId);
 
         List<UserApiDto.GetApproversResp> resp = approvers.stream()
