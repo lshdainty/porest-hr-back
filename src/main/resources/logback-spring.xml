@@ -20,7 +20,7 @@
                     <pattern>app=porest,host=${HOSTNAME},level=%level,env=prod</pattern>
                 </label>
                 <message>
-                    <pattern>l=%level c=%logger{20} t=%thread | %msg %ex</pattern>
+                    <pattern>[%-5level][%d{yyyy.MM.dd HH:mm:ss.SSS}][%-8(%X{requestId})] - [%logger{0}.%M\(%L\)] - %msg%n</pattern>
                 </message>
             </format>
         </appender>
