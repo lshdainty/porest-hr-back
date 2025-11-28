@@ -48,13 +48,13 @@ logging:
     com.lshdainty.porest: info
     root: warn
   file:
-    name: /home/ubuntu/porest-back/logs/application.log
+    name: /home/porest/porest-back/logs/application.log
     max-size: 10MB
     max-history: 30
 
 # 파일 업로드 경로 설정
 file:
-  root-path: /home/ubuntu/porest-back/file
+  root-path: /home/porest/porest-back/file
 
 # 어플리케이션 정보
 app:
