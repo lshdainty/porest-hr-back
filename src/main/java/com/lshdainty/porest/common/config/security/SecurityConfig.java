@@ -66,11 +66,10 @@ public class SecurityConfig {
                         "/api/v1/encode-password",      // 비밀번호 인코딩 (개발용)
                         "/css/**",               // css
                         "/images/**",            // images
-                        "/js/**"                 // js
+                        "/js/**",                // js
+                        "/swagger-ui/**",        // Swagger UI
+                        "/v3/api-docs/**"        // OpenAPI docs
                 ).permitAll() // 해당 URL 패턴들은 모든 사용자가 접근 가능
-
-                // "/api/v1/**" 패턴의 URL은 USER 권한을 가진 사용자만 접근 가능
-//                .requestMatchers("/api/v1/**").hasRole(Role.USER.name())
 
                 // 그 외 모든 요청은 인증 필요
                 .anyRequest().authenticated()

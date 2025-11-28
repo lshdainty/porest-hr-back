@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class DuesApiController {
+public class DuesApiController implements DuesApi {
     private final DuesService duesService;
 
-    @PostMapping("/api/v1/dues")
+    @Override
     @PreAuthorize("hasAuthority('DUES_MANAGE')")
-    public ApiResponse registDues(@RequestBody DuesApiDto.RegistDuesReq data) {
+    public ApiResponse registDues(DuesApiDto.RegistDuesReq data) {
         Long duesSeq = duesService.registDues(DuesServiceDto.builder()
                 .userName(data.getDuesUserName())
                 .amount(data.getDuesAmount())
@@ -37,9 +37,9 @@ public class DuesApiController {
         return ApiResponse.success(new DuesApiDto.RegistDuesResp(duesSeq));
     }
 
-    @GetMapping("/api/v1/dues")
+    @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchYearDues(@RequestParam("year") String year) {
+    public ApiResponse searchYearDues(String year) {
         List<DuesServiceDto> dtos = duesService.searchYearDues(year);
         return ApiResponse.success(dtos.stream()
                 .map(d -> new DuesApiDto.SearchYearDuesResp(
@@ -55,9 +55,9 @@ public class DuesApiController {
                 .collect(Collectors.toList()));
     }
 
-    @GetMapping("/api/v1/dues/operation")
+    @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchYearOperationDues(@RequestParam("year") String year) {
+    public ApiResponse searchYearOperationDues(String year) {
         DuesServiceDto serviceDto = duesService.searchYearOperationDues(year);
         return ApiResponse.success(new DuesApiDto.SearchYearOperationDuesResp(
                 serviceDto.getTotalDues(),
@@ -66,16 +66,16 @@ public class DuesApiController {
         ));
     }
 
-    @GetMapping("/api/v1/dues/birth/month")
+    @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchMonthBirthDues(@RequestParam("year") String year, @RequestParam("month") String month) {
+    public ApiResponse searchMonthBirthDues(String year, String month) {
         Long birthDues = duesService.searchMonthBirthDues(year, month);
         return ApiResponse.success(new DuesApiDto.SearchMonthBirthDuesResp(birthDues));
     }
 
-    @GetMapping("/api/v1/dues/users/birth/month")
+    @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchUsersMonthBirthDues(@RequestParam("year") String year) {
+    public ApiResponse searchUsersMonthBirthDues(String year) {
         List<DuesServiceDto> serviceDtos = duesService.searchUsersMonthBirthDues(year);
 
         Map<String, List<DuesServiceDto>> duesByUserName = serviceDtos.stream()
@@ -101,9 +101,9 @@ public class DuesApiController {
         return ApiResponse.success(resp);
     }
 
-    @PutMapping("/api/v1/dues/{seq}")
+    @Override
     @PreAuthorize("hasAuthority('DUES_MANAGE')")
-    public ApiResponse editDues(@PathVariable("seq") Long seq, @RequestBody DuesApiDto.EditDuesReq data) {
+    public ApiResponse editDues(Long seq, DuesApiDto.EditDuesReq data) {
         duesService.editDues(DuesServiceDto.builder()
                 .seq(seq)
                 .userName(data.getDuesUserName())
@@ -117,9 +117,9 @@ public class DuesApiController {
         return ApiResponse.success();
     }
 
-    @DeleteMapping("/api/v1/dues/{seq}")
+    @Override
     @PreAuthorize("hasAuthority('DUES_MANAGE')")
-    public ApiResponse deleteDues(@PathVariable("seq") Long seq) {
+    public ApiResponse deleteDues(Long seq) {
         duesService.deleteDues(seq);
         return ApiResponse.success();
     }
