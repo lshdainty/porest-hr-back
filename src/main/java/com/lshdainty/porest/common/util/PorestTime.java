@@ -1,5 +1,7 @@
 package com.lshdainty.porest.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 
 import java.time.DayOfWeek;
@@ -9,6 +11,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PorestTime {
+
+    private static final Logger log = LoggerFactory.getLogger(PorestTime.class);
 
     // 유틸리티 클래스는 인스턴스화 방지
     private PorestTime() {}
@@ -36,7 +40,11 @@ public class PorestTime {
      * @return start ~ end 사이의 모든 날짜들
      */
     public static List<LocalDate> getBetweenDates(LocalDateTime start, LocalDateTime end, MessageSource ms) {
-        if (start.isAfter(end)) throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null));
+        if (start.isAfter(end)) {
+            log.warn("Start date is after end date. start: {}, end: {}", start, end);
+            throw new IllegalArgumentException(ms.getMessage("error.validate.startIsAfterThanEnd", null, null));
+        }
+        log.debug("Getting dates between {} and {}", start, end);
         return start.toLocalDate().datesUntil(end.toLocalDate().plusDays(1))
                 .collect(Collectors.toList());
     }
@@ -52,9 +60,11 @@ public class PorestTime {
      * @return 요일에 해당하는 모든 날짜들
      */
     public static List<LocalDate> getBetweenDatesByDayOfWeek(LocalDateTime start, LocalDateTime end, int[] daysOfWeek, MessageSource ms) {
+        log.debug("Getting dates between {} and {} for days of week: {}", start, end, daysOfWeek);
         List<DayOfWeek> targetDays = new ArrayList<>();
         for (int day : daysOfWeek) {
             if (day < 1 || day > 7) {
+                log.warn("Invalid day of week: {}", day);
                 throw new IllegalArgumentException(ms.getMessage("error.validate.dayOfWeek", null, null));
             }
             targetDays.add(DayOfWeek.of(day));
@@ -116,12 +126,17 @@ public class PorestTime {
      */
     public static LocalDateTime findMaxDateTime(List<LocalDateTime> dateTimes, MessageSource ms) {
         if (dateTimes == null || dateTimes.isEmpty()) {
+            log.warn("DateTime list is null or empty");
             throw new IllegalArgumentException(ms.getMessage("error.validate.parameter.null", null, null));
         }
 
+        log.debug("Finding max datetime from {} entries", dateTimes.size());
         return dateTimes.stream()
                 .max(LocalDateTime::compareTo)
-                .orElseThrow(() -> new NoSuchElementException(ms.getMessage("error.notfound.max", null, null)));
+                .orElseThrow(() -> {
+                    log.error("Failed to find max datetime");
+                    return new NoSuchElementException(ms.getMessage("error.notfound.max", null, null));
+                });
     }
 
     /**
@@ -134,11 +149,16 @@ public class PorestTime {
      */
     public static LocalDateTime findMinDateTime(List<LocalDateTime> dateTimes, MessageSource ms) {
         if (dateTimes == null || dateTimes.isEmpty()) {
+            log.warn("DateTime list is null or empty");
             throw new IllegalArgumentException(ms.getMessage("error.validate.parameter.null", null, null));
         }
 
+        log.debug("Finding min datetime from {} entries", dateTimes.size());
         return dateTimes.stream()
                 .min(LocalDateTime::compareTo)
-                .orElseThrow(() -> new NoSuchElementException(ms.getMessage("error.notfound.min", null, null)));
+                .orElseThrow(() -> {
+                    log.error("Failed to find min datetime");
+                    return new NoSuchElementException(ms.getMessage("error.notfound.min", null, null));
+                });
     }
 }

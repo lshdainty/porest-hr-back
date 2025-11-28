@@ -32,6 +32,7 @@ public class PorestFile {
      */
     public static boolean save(MultipartFile multipartFile, String path, String fileName, MessageSource ms) {
         if (multipartFile == null || multipartFile.isEmpty()) {
+            log.warn("MultipartFile is null or empty");
             return false;
         }
 
@@ -42,10 +43,11 @@ public class PorestFile {
         }
 
         if (fileName.isEmpty()) {
-            log.warn("Could not registHoliday file with empty name.");
+            log.warn("Could not save file with empty name");
             return false;
         }
 
+        log.debug("Saving file. path: {}, fileName: {}", path, fileName);
         try {
             // 파일 저장 경로가 없을 경우 생성
             Path directory = Paths.get(path);
@@ -56,9 +58,10 @@ public class PorestFile {
 
             // 파일 저장
             multipartFile.transferTo(filePath.toFile());
+            log.info("File saved successfully. path: {}, fileName: {}", path, fileName);
             return true;
         } catch (IOException e) {
-            log.error("File registHoliday failed. path: {}, fileName: {}", path, fileName, e);
+            log.error("File save failed. path: {}, fileName: {}", path, fileName, e);
             throw new RuntimeException(ms.getMessage("error.file.registHoliday", new String[]{fileName}, null), e);
         }
     }
@@ -73,6 +76,7 @@ public class PorestFile {
      * @return byte[] 파일 내용
      */
     public static byte[] read(String fullPath, MessageSource ms) {
+        log.debug("Reading file. fullPath: {}", fullPath);
         try {
             // 파일을 읽어올 전체 경로
             Path filePath = Paths.get(fullPath);
@@ -80,9 +84,11 @@ public class PorestFile {
             // 파일이 존재하고, 일반 파일이며, 읽기 가능한지 확인
             if (Files.exists(filePath) && Files.isRegularFile(filePath) && Files.isReadable(filePath)) {
                 // 파일 내용을 byte 배열로 읽어옴
-                return Files.readAllBytes(filePath);
+                byte[] fileBytes = Files.readAllBytes(filePath);
+                log.info("File read successfully. fullPath: {}, size: {} bytes", fullPath, fileBytes.length);
+                return fileBytes;
             } else {
-                log.warn("File not found. fullPath: {}", fullPath);
+                log.warn("File not found or not readable. fullPath: {}", fullPath);
                 throw new NoSuchElementException(ms.getMessage("error.file.notfound", new String[]{fullPath}, null));
             }
         } catch (IOException e) {
@@ -100,6 +106,7 @@ public class PorestFile {
      * @return boolean 복사 성공 여부
      */
     public static boolean copy(String sourcePath, String targetPath, MessageSource ms) {
+        log.debug("Copying file. source: {}, target: {}", sourcePath, targetPath);
         Path source = Paths.get(sourcePath);
         Path target = Paths.get(targetPath);
 
@@ -118,6 +125,7 @@ public class PorestFile {
 
             // 파일 복사 (이미 파일이 존재하면 예외 발생)
             Files.copy(source, target);
+            log.info("File copied successfully. source: {}, target: {}", sourcePath, targetPath);
             return true;
         } catch (IOException e) {
             log.error("File copy failed. source: {}, target: {}", sourcePath, targetPath, e);
@@ -134,6 +142,7 @@ public class PorestFile {
      * @return boolean 이동 성공 여부
      */
     public static boolean move(String sourcePath, String targetPath, MessageSource ms) {
+        log.debug("Moving file. source: {}, target: {}", sourcePath, targetPath);
         Path source = Paths.get(sourcePath);
         Path target = Paths.get(targetPath);
 
@@ -152,6 +161,7 @@ public class PorestFile {
 
             // 파일 이동
             Files.move(source, target);
+            log.info("File moved successfully. source: {}, target: {}", sourcePath, targetPath);
             return true;
         } catch (IOException e) {
             log.error("File move failed. source: {}, target: {}", sourcePath, targetPath, e);
