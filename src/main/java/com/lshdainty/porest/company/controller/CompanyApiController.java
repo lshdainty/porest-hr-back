@@ -13,12 +13,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class CompanyApiController {
+public class CompanyApiController implements CompanyApi {
     private final CompanyService companyService;
 
-    @PostMapping("/api/v1/company")
+    @Override
     @PreAuthorize("hasAuthority('COMPANY_MANAGE')")
-    public ApiResponse registCompany(@RequestBody CompanyApiDto.RegistCompanyReq data) {
+    public ApiResponse registCompany(CompanyApiDto.RegistCompanyReq data) {
         String companyId = companyService.regist(CompanyServiceDto.builder()
                 .id(data.getCompanyId())
                 .name(data.getCompanyName())
@@ -29,7 +29,7 @@ public class CompanyApiController {
         return ApiResponse.success(new CompanyApiDto.RegistCompanyResp(companyId));
     }
 
-    @GetMapping("/api/v1/company")
+    @Override
     @PreAuthorize("hasAuthority('COMPANY_READ')")
     public ApiResponse searchCompany() {
         CompanyServiceDto company = companyService.searchCompany();
@@ -45,9 +45,9 @@ public class CompanyApiController {
         ));
     }
 
-    @PutMapping("/api/v1/company/{id}")
+    @Override
     @PreAuthorize("hasAuthority('COMPANY_MANAGE')")
-    public ApiResponse editCompany(@PathVariable("id") String companyId, @RequestBody CompanyApiDto.EditCompanyReq data) {
+    public ApiResponse editCompany(String companyId, CompanyApiDto.EditCompanyReq data) {
         companyService.edit(CompanyServiceDto.builder()
                 .id(companyId)
                 .name(data.getCompanyName())
@@ -57,16 +57,16 @@ public class CompanyApiController {
         return ApiResponse.success();
     }
 
-    @DeleteMapping("/api/v1/company/{id}")
+    @Override
     @PreAuthorize("hasAuthority('COMPANY_MANAGE')")
-    public ApiResponse deleteCompany(@PathVariable("id") String companyId) {
+    public ApiResponse deleteCompany(String companyId) {
         companyService.delete(companyId);
         return ApiResponse.success();
     }
 
-    @GetMapping("/api/v1/company/{id}/departments")
+    @Override
     @PreAuthorize("hasAuthority('COMPANY_READ')")
-    public ApiResponse searchCompanyWithDepartments(@PathVariable("id") String companyId) {
+    public ApiResponse searchCompanyWithDepartments(String companyId) {
         CompanyServiceDto company = companyService.searchCompanyWithDepartments(companyId);
 
         return ApiResponse.success(new CompanyApiDto.SearchCompanyWithDepartmentsResp(

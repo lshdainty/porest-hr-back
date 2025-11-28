@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class HolidayApiController {
+public class HolidayApiController implements HolidayApi {
     private final HolidayService holidayService;
 
-    @PostMapping("api/v1/holiday")
+    @Override
     @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
-    public ApiResponse registHoliday(@RequestBody HolidayApiDto.RegistHolidayReq data) {
+    public ApiResponse registHoliday(HolidayApiDto.RegistHolidayReq data) {
         Long holidaySeq = holidayService.registHoliday(HolidayServiceDto.builder()
                 .name(data.getHolidayName())
                 .date(data.getHolidayDate())
@@ -38,9 +38,9 @@ public class HolidayApiController {
         return ApiResponse.success(new HolidayApiDto.RegistHolidayResp(holidaySeq));
     }
 
-    @GetMapping("api/v1/holidays/date")
+    @Override
     @PreAuthorize("hasAuthority('HOLIDAY_READ')")
-    public ApiResponse searchHolidaysByStartEndDate(@RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("country_code") CountryCode countryCode) {
+    public ApiResponse searchHolidaysByStartEndDate(String start, String end, CountryCode countryCode) {
         List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(start, end, countryCode);
 
         List<HolidayApiDto.SearchHolidaysResp> resp = holidays.stream()
@@ -60,9 +60,9 @@ public class HolidayApiController {
         return ApiResponse.success(resp);
     }
 
-    @GetMapping("api/v1/holidays/type/{type}")
+    @Override
     @PreAuthorize("hasAuthority('HOLIDAY_READ')")
-    public ApiResponse searchHolidaysByType(@PathVariable("type") HolidayType type) {
+    public ApiResponse searchHolidaysByType(HolidayType type) {
         List<Holiday> holidays = holidayService.searchHolidaysByType(type);
 
         List<HolidayApiDto.SearchHolidaysResp> resp = holidays.stream()
@@ -82,9 +82,9 @@ public class HolidayApiController {
         return ApiResponse.success(resp);
     }
 
-    @PutMapping("/api/v1/holiday/{seq}")
+    @Override
     @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
-    public ApiResponse editHoliday(@PathVariable("seq") Long seq, @RequestBody HolidayApiDto.EditHolidayReq data) {
+    public ApiResponse editHoliday(Long seq, HolidayApiDto.EditHolidayReq data) {
         holidayService.editHoliday(HolidayServiceDto.builder()
                 .seq(seq)
                 .name(data.getHolidayName())
@@ -112,9 +112,9 @@ public class HolidayApiController {
         ));
     }
 
-    @DeleteMapping("/api/v1/holiday/{seq}")
+    @Override
     @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
-    public ApiResponse deleteHoliday(@PathVariable("seq") Long seq) {
+    public ApiResponse deleteHoliday(Long seq) {
         holidayService.deleteHoliday(seq);
         return ApiResponse.success();
     }
