@@ -68,7 +68,9 @@ public class SecurityConfig {
                         "/images/**",            // images
                         "/js/**",                // js
                         "/swagger-ui/**",        // Swagger UI
-                        "/v3/api-docs/**"        // OpenAPI docs
+                        "/v3/api-docs/**",       // OpenAPI docs
+                        "/actuator/health",      // Health check
+                        "/actuator/prometheus"   // Prometheus metrics
                 ).permitAll() // 해당 URL 패턴들은 모든 사용자가 접근 가능
 
                 // 그 외 모든 요청은 인증 필요
