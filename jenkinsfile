@@ -59,10 +59,9 @@ pipeline {
 
                             # 임시 파일 생성 후 sudo로 이동
                             cat > /tmp/ip-blacklist.txt << 'EOF'
-                            # IP Blacklist File (Auto-generated)
-                            # Add one IP address or CIDR notation per line
-                            EOF
-
+# IP Blacklist File (Auto-generated)
+# Add one IP address or CIDR notation per line
+EOF
                             sudo mv /tmp/ip-blacklist.txt "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
                             sudo chown porest:porest "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
                             sudo chmod 644 "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
