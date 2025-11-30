@@ -9,6 +9,7 @@ pipeline {
         DEPLOY_PATH = '/home/porest/porest-back'
         JAR_NAME = 'porest-0.0.1-SNAPSHOT.jar'
         CONFIG_PATH = '/home/porest/porest-back/config'
+        IP_BLACKLIST_FILE = 'ip-blacklist.txt'
     }
     
     stages {
@@ -38,25 +39,39 @@ pipeline {
                     // 배포 디렉토리 생성
                     sh "sudo mkdir -p ${DEPLOY_PATH}"
                     sh "sudo mkdir -p ${CONFIG_PATH}"
-                    
+
                     // 기존 프로세스 종료
                     sh """
                         sudo pkill -f "java -jar.*${JAR_NAME}" || true
                         sleep 2
                     """
-                    
+
                     // JAR 파일 복사
                     sh """
                         sudo cp build/libs/*-SNAPSHOT.jar ${DEPLOY_PATH}/${JAR_NAME}
                         sudo chown porest:porest ${DEPLOY_PATH}/${JAR_NAME}
                     """
-                    
-                    // 애플리케이션 재시작
+
+                    // IP 블랙리스트 파일이 존재하지 않으면 빈 파일 생성
                     sh """
-                        sudo -u porest bash -c 'cd ${DEPLOY_PATH} && nohup java -jar ${JAR_NAME} --spring.profiles.active=prod --spring.config.additional-location=file:${CONFIG_PATH}/application-secret.properties > app.log 2>&1 &'
-                        echo "Spring Boot application started as porest user with prod profile"
+                        if [ ! -f ${CONFIG_PATH}/${IP_BLACKLIST_FILE} ]; then
+                            echo "# IP Blacklist File (Auto-generated)" | sudo tee ${CONFIG_PATH}/${IP_BLACKLIST_FILE}
+                            echo "# Add one IP address or CIDR notation per line" | sudo tee -a ${CONFIG_PATH}/${IP_BLACKLIST_FILE}
+                            echo "# Example: 192.168.1.100 or 10.0.0.0/8" | sudo tee -a ${CONFIG_PATH}/${IP_BLACKLIST_FILE}
+                            sudo chown porest:porest ${CONFIG_PATH}/${IP_BLACKLIST_FILE}
+                            echo "✅ Created empty IP blacklist file: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
+                        else
+                            echo "✅ IP blacklist file already exists: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
+                        fi
                     """
-                    
+
+                    // 애플리케이션 재시작 (IP 블랙리스트 파일 경로 환경변수 전달)
+                    sh """
+                        sudo -u porest bash -c 'cd ${DEPLOY_PATH} && nohup java -jar ${JAR_NAME} --spring.profiles.active=prod --spring.config.additional-location=file:${CONFIG_PATH}/application-secret.properties -DIP_BLACKLIST_FILE_PATH=${CONFIG_PATH}/${IP_BLACKLIST_FILE} > app.log 2>&1 &'
+                        echo "Spring Boot application started as porest user with prod profile"
+                        echo "IP Blacklist file: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
+                    """
+
                     // 프로세스 확인
                     sh "sleep 3 && pgrep -f 'java -jar' && echo '✅ Process running' || echo '⚠️ Warning: Process not found'"
                 }

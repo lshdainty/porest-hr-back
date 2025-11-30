@@ -31,11 +31,11 @@ public class SecurityProperties {
         private boolean enabled = true;
 
         /**
-         * 차단할 IP 목록
-         * 예: ["192.168.1.100", "10.0.0.5"]
-         * CIDR 표기법도 지원: ["192.168.1.0/24"]
+         * IP 블랙리스트 파일 경로
+         * 파일이 존재하지 않으면 경고만 로그에 남기고 계속 진행
+         * 예: "config/ip-blacklist.txt", "/etc/porest/ip-blacklist.txt"
          */
-        private List<String> blockedIps = new ArrayList<>();
+        private String filePath;
 
         /**
          * 차단 시 로그 레벨 (WARN 또는 ERROR)

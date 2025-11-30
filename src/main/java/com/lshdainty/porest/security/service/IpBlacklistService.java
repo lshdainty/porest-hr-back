@@ -1,18 +1,28 @@
 package com.lshdainty.porest.security.service;
 
 import com.lshdainty.porest.common.config.properties.SecurityProperties;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * IP 블랙리스트 관리 서비스
  * - 설정 파일 기반 블랙리스트
+ * - 외부 파일 기반 블랙리스트
  * - 런타임 동적 추가/제거
  * - CIDR 표기법 지원
  */
@@ -28,6 +38,116 @@ public class IpBlacklistService {
      * ConcurrentHashMap으로 스레드 안전성 보장
      */
     private final Set<String> runtimeBlockedIps = ConcurrentHashMap.newKeySet();
+
+    /**
+     * 외부 파일에서 로드된 블랙리스트
+     */
+    private final List<String> fileBasedBlockedIps = new ArrayList<>();
+
+    /**
+     * 애플리케이션 시작 시 외부 파일에서 IP 블랙리스트 로드
+     */
+    @PostConstruct
+    public void init() {
+        if (!securityProperties.getIpBlacklist().isEnabled()) {
+            log.info("IP blacklist is disabled");
+            return;
+        }
+
+        loadBlockedIpsFromFile();
+        logBlacklistSummary();
+    }
+
+    /**
+     * 외부 파일에서 IP 블랙리스트 로드
+     */
+    private void loadBlockedIpsFromFile() {
+        String filePath = securityProperties.getIpBlacklist().getFilePath();
+
+        if (!StringUtils.hasText(filePath)) {
+            log.debug("No IP blacklist file configured");
+            return;
+        }
+
+        try {
+            Path path = Paths.get(filePath);
+
+            if (!Files.exists(path)) {
+                log.warn("⚠️ IP blacklist file not found: {} (continuing without file-based blacklist)", filePath);
+                return;
+            }
+
+            if (!Files.isReadable(path)) {
+                log.error("❌ IP blacklist file is not readable: {}", filePath);
+                return;
+            }
+
+            int loadedCount = 0;
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
+                String line;
+                int lineNumber = 0;
+
+                while ((line = reader.readLine()) != null) {
+                    lineNumber++;
+                    String ip = parseLine(line);
+
+                    if (ip != null) {
+                        fileBasedBlockedIps.add(ip);
+                        loadedCount++;
+                    }
+                }
+            }
+
+            log.info("✅ Loaded {} IP addresses from blacklist file: {}", loadedCount, filePath);
+
+        } catch (IOException e) {
+            log.error("❌ Failed to read IP blacklist file: {}", filePath, e);
+        }
+    }
+
+    /**
+     * 파일의 한 줄을 파싱하여 유효한 IP 주소 추출
+     * - 빈 줄 무시
+     * - # 으로 시작하는 주석 무시
+     * - 앞뒤 공백 제거
+     *
+     * @param line 파일의 한 줄
+     * @return 유효한 IP 주소 또는 null
+     */
+    private String parseLine(String line) {
+        if (line == null) {
+            return null;
+        }
+
+        // 주석 제거 (# 이후 모두 제거)
+        int commentIndex = line.indexOf('#');
+        if (commentIndex >= 0) {
+            line = line.substring(0, commentIndex);
+        }
+
+        // 앞뒤 공백 제거
+        line = line.trim();
+
+        // 빈 줄 무시
+        if (line.isEmpty()) {
+            return null;
+        }
+
+        return line;
+    }
+
+    /**
+     * 블랙리스트 로딩 결과 요약 로그
+     */
+    private void logBlacklistSummary() {
+        int fileCount = fileBasedBlockedIps.size();
+
+        if (fileCount > 0) {
+            log.info("📋 IP Blacklist loaded: {} IPs from file", fileCount);
+        } else {
+            log.info("📋 IP Blacklist is empty (no IPs configured in file)");
+        }
+    }
 
     /**
      * IP가 블랙리스트에 있는지 확인
@@ -53,10 +173,10 @@ public class IpBlacklistService {
             return true;
         }
 
-        // 2. 설정 파일 블랙리스트 확인 (CIDR 포함)
-        for (String blockedIp : securityProperties.getIpBlacklist().getBlockedIps()) {
+        // 2. 외부 파일 블랙리스트 확인 (CIDR 포함)
+        for (String blockedIp : fileBasedBlockedIps) {
             if (matchesIpPattern(normalizedIp, blockedIp)) {
-                log.debug("IP {} matches blacklist pattern: {}", normalizedIp, blockedIp);
+                log.debug("IP {} matches file-based blacklist pattern: {}", normalizedIp, blockedIp);
                 return true;
             }
         }

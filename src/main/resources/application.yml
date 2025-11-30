@@ -92,9 +92,4 @@ security:
   ip-blacklist:
     enabled: true  # IP 블랙리스트 기능 활성화 여부
     log-level: WARN  # 차단 로그 레벨 (WARN 또는 ERROR)
-    blocked-ips:
-      # 차단할 IP 목록 (예시)
-      # - "192.168.1.100"        # 특정 IP 차단
-      # - "10.0.0.0/8"           # CIDR 표기법으로 대역 차단
-      # - "172.16.0.0/12"        # 내부망 대역 차단
-      # 실제 차단할 IP는 환경변수나 프로파일별 설정으로 관리 권장
+    file-path: ${IP_BLACKLIST_FILE_PATH:config/ip-blacklist.txt}  # IP 블랙리스트 파일 경로
