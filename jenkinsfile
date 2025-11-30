@@ -57,11 +57,15 @@ pipeline {
                         if ! ls "${CONFIG_PATH}/${IP_BLACKLIST_FILE}" > /dev/null 2>&1; then
                             echo "File not found. Creating new one..."
 
-                            echo "# IP Blacklist File (Auto-generated)" | sudo tee "${CONFIG_PATH}/${IP_BLACKLIST_FILE}" > /dev/null
-                            echo "# Add one IP address or CIDR notation per line" | sudo tee -a "${CONFIG_PATH}/${IP_BLACKLIST_FILE}" > /dev/null
+                            # 임시 파일 생성 후 sudo로 이동
+                            cat > /tmp/ip-blacklist.txt << 'EOF'
+                            # IP Blacklist File (Auto-generated)
+                            # Add one IP address or CIDR notation per line
+                            EOF
 
-                            # 소유권 변경
+                            sudo mv /tmp/ip-blacklist.txt "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
                             sudo chown porest:porest "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
+                            sudo chmod 644 "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
                             echo "✅ Created empty IP blacklist file: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
                         else
                             echo "✅ IP blacklist file already exists: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
