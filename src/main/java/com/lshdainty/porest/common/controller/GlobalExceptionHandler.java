@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -82,6 +83,25 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
+                .body(response);
+    }
+
+    /**
+     * NoResourceFoundException 처리 (존재하지 않는 리소스)
+     * 정적 리소스 요청 시 파일이 없을 때 발생 (Spring 6.0+)
+     * - 500 에러 대신 404로 응답하여 해커에게 서버 에러 정보 노출 방지
+     * - 스택 트레이스 로그 제거로 디스크 용량 절약 및 로그 가독성 향상
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(NoResourceFoundException e) {
+        // 스택 트레이스 없이 간단한 warn 로그만 남김 (보안 + 디스크 절약)
+        log.warn("Invalid resource access: {}", e.getResourcePath());
+
+        String message = messageResolver.getMessage("error.common.404");
+        ApiResponse<Void> response = ApiResponse.error("COMMON_404", message);
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .body(response);
     }
 

@@ -5,19 +5,26 @@ import com.lshdainty.porest.common.exception.UnauthorizedException;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.security.controller.dto.AuthApiDto;
 import com.lshdainty.porest.security.principal.UserPrincipal;
+import com.lshdainty.porest.security.service.IpBlacklistService;
 import com.lshdainty.porest.security.service.SecurityService;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import com.lshdainty.porest.permission.domain.Role;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +32,40 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Auth", description = "인증/보안 API")
 public class AuthController implements AuthApi {
     private final SecurityService securityService;
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final IpBlacklistService ipBlacklistService;
+
+    /**
+     * CSRF 토큰 발급
+     * 이 메서드가 호출되면 Spring Security가 자동으로 CSRF 토큰을 생성하고
+     * XSRF-TOKEN 쿠키에 담아 응답합니다.
+     */
+    @Override
+    public void getCsrfToken(HttpServletRequest request) {
+        // Spring Security가 자동으로 CSRF 토큰을 생성하고 쿠키에 담아줍니다.
+        log.debug("CSRF token requested from: {}", request.getRemoteAddr());
+    }
+
+    /**
+     * 비밀번호 인코딩 (개발/테스트 환경 전용)
+     * Production 환경에서는 404 에러가 발생합니다.
+     */
+    @Override
+    @Profile({"local", "dev"})  // local, dev 프로파일에서만 활성화
+    public ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(AuthApiDto.EncodePasswordReq data) {
+        log.warn("⚠️ Development tool accessed - Password encoding request");
+
+        String encodedPassword = passwordEncoder.encode(data.getUserPwd());
+
+        return ApiResponse.success(new AuthApiDto.EncodePasswordResp(
+                data.getUserPwd(),
+                encodedPassword
+        ));
+    }
 
     @Override
     public ApiResponse<AuthApiDto.LoginUserInfo> getUserInfo() {
@@ -89,18 +126,6 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    public ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(AuthApiDto.EncodePasswordReq data) {
-        log.info("Password encoding request");
-
-        String encodedPassword = passwordEncoder.encode(data.getUserPwd());
-
-        return ApiResponse.success(new AuthApiDto.EncodePasswordResp(
-                data.getUserPwd(),
-                encodedPassword
-        ));
-    }
-
-    @Override
     public ApiResponse<AuthApiDto.ValidateInvitationResp> validateInvitationToken(String token, HttpSession session) {
         UserServiceDto user = securityService.validateInvitationToken(token);
 
@@ -140,5 +165,63 @@ public class AuthController implements AuthApi {
         }
 
         return ApiResponse.success(new AuthApiDto.CompleteInvitationResp(userId));
+    }
+
+    // ========== IP 블랙리스트 관리 (개발 환경 전용) ==========
+
+    @Operation(
+            summary = "런타임 블랙리스트 조회",
+            description = "현재 런타임에 추가된 IP 블랙리스트를 조회합니다. (설정 파일 기반 블랙리스트는 제외)"
+    )
+    @GetMapping("/api/v1/security/ip-blacklist")
+    @Profile({"local", "dev"})
+    public ApiResponse<Set<String>> getRuntimeBlacklist() {
+        Set<String> blacklist = ipBlacklistService.getRuntimeBlacklist();
+        log.info("Runtime blacklist retrieved: {} IPs", blacklist.size());
+        return ApiResponse.success(blacklist);
+    }
+
+    @Operation(
+            summary = "IP 블랙리스트에 추가",
+            description = "런타임에 특정 IP를 블랙리스트에 추가합니다. 즉시 차단이 적용됩니다."
+    )
+    @PostMapping("/api/v1/security/ip-blacklist")
+    @Profile({"local", "dev"})
+    public ApiResponse<String> addToBlacklist(
+            @Parameter(description = "차단할 IP 주소", example = "192.168.1.100", required = true)
+            @RequestParam String ip
+    ) {
+        ipBlacklistService.addToBlacklist(ip);
+        log.warn("⚠️ IP manually added to blacklist: {}", ip);
+        return ApiResponse.success("IP " + ip + " has been added to blacklist");
+    }
+
+    @Operation(
+            summary = "IP 블랙리스트에서 제거",
+            description = "런타임 블랙리스트에서 특정 IP를 제거합니다."
+    )
+    @DeleteMapping("/api/v1/security/ip-blacklist")
+    @Profile({"local", "dev"})
+    public ApiResponse<String> removeFromBlacklist(
+            @Parameter(description = "차단 해제할 IP 주소", example = "192.168.1.100", required = true)
+            @RequestParam String ip
+    ) {
+        ipBlacklistService.removeFromBlacklist(ip);
+        log.info("IP removed from blacklist: {}", ip);
+        return ApiResponse.success("IP " + ip + " has been removed from blacklist");
+    }
+
+    @Operation(
+            summary = "IP 차단 상태 확인",
+            description = "특정 IP가 현재 블랙리스트에 있는지 확인합니다."
+    )
+    @GetMapping("/api/v1/security/ip-blacklist/check")
+    @Profile({"local", "dev"})
+    public ApiResponse<Boolean> checkIpStatus(
+            @Parameter(description = "확인할 IP 주소", example = "192.168.1.100", required = true)
+            @RequestParam String ip
+    ) {
+        boolean isBlocked = ipBlacklistService.isBlocked(ip);
+        return ApiResponse.success(isBlocked);
     }
 }

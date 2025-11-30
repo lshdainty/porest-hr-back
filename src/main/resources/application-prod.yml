@@ -61,6 +61,13 @@ app:
   frontend:
     base-url: ${FRONTEND_BASE_URL}
 
+# Swagger 설정 - Production 환경에서는 비활성화
+springdoc:
+  api-docs:
+    enabled: false  # API 문서 비활성화
+  swagger-ui:
+    enabled: false  # Swagger UI 비활성화
+
 # Prometheus 설정
 management:
   endpoints:

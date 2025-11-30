@@ -8,11 +8,51 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Auth", description = "인증 및 회원가입 API")
+@Tag(name = "Auth", description = "인증 및 보안 API")
 public interface AuthApi {
+
+    @Operation(
+            summary = "CSRF 토큰 발급",
+            description = "앱 시작 시 CSRF 토큰을 쿠키로 발급받습니다. " +
+                    "이후 모든 변경 요청(POST/PUT/DELETE)에는 X-XSRF-TOKEN 헤더로 토큰을 전송해야 합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "CSRF 토큰이 XSRF-TOKEN 쿠키에 설정됨"
+            )
+    })
+    @GetMapping("/api/v1/csrf-token")
+    void getCsrfToken(HttpServletRequest request);
+
+    @Operation(
+            summary = "비밀번호 인코딩 (개발/테스트용)",
+            description = "⚠️ 개발 및 테스트 환경에서만 사용 가능합니다. Production 환경에서는 비활성화됩니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "비밀번호 인코딩 성공",
+                    content = @Content(schema = @Schema(implementation = AuthApiDto.EncodePasswordResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Production 환경에서는 사용 불가"
+            )
+    })
+    @PostMapping("/api/v1/encode-password")
+    ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "인코딩할 비밀번호 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = AuthApiDto.EncodePasswordReq.class))
+            )
+            @RequestBody AuthApiDto.EncodePasswordReq data
+    );
 
     @Operation(
             summary = "로그인 사용자 정보 조회",
@@ -31,27 +71,6 @@ public interface AuthApi {
     })
     @GetMapping("/api/v1/login/check")
     ApiResponse<AuthApiDto.LoginUserInfo> getUserInfo();
-
-    @Operation(
-            summary = "비밀번호 인코딩 (개발/테스트용)",
-            description = "평문 비밀번호를 BCrypt로 인코딩합니다. 개발 및 테스트 환경에서만 사용하세요."
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "비밀번호 인코딩 성공",
-                    content = @Content(schema = @Schema(implementation = AuthApiDto.EncodePasswordResp.class))
-            )
-    })
-    @PostMapping("/api/v1/encode-password")
-    ApiResponse<AuthApiDto.EncodePasswordResp> encodePassword(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "인코딩할 비밀번호 정보",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = AuthApiDto.EncodePasswordReq.class))
-            )
-            @RequestBody AuthApiDto.EncodePasswordReq data
-    );
 
     @Operation(
             summary = "초대 토큰 유효성 검증",
