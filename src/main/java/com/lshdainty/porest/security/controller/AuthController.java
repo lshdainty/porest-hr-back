@@ -10,8 +10,6 @@ import com.lshdainty.porest.security.service.SecurityService;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -169,11 +167,7 @@ public class AuthController implements AuthApi {
 
     // ========== IP 블랙리스트 관리 (개발 환경 전용) ==========
 
-    @Operation(
-            summary = "런타임 블랙리스트 조회",
-            description = "현재 런타임에 추가된 IP 블랙리스트를 조회합니다. (설정 파일 기반 블랙리스트는 제외)"
-    )
-    @GetMapping("/api/v1/security/ip-blacklist")
+    @Override
     @Profile({"local", "dev"})
     public ApiResponse<Set<String>> getRuntimeBlacklist() {
         Set<String> blacklist = ipBlacklistService.getRuntimeBlacklist();
@@ -181,46 +175,25 @@ public class AuthController implements AuthApi {
         return ApiResponse.success(blacklist);
     }
 
-    @Operation(
-            summary = "IP 블랙리스트에 추가",
-            description = "런타임에 특정 IP를 블랙리스트에 추가합니다. 즉시 차단이 적용됩니다."
-    )
-    @PostMapping("/api/v1/security/ip-blacklist")
+    @Override
     @Profile({"local", "dev"})
-    public ApiResponse<String> addToBlacklist(
-            @Parameter(description = "차단할 IP 주소", example = "192.168.1.100", required = true)
-            @RequestParam String ip
-    ) {
+    public ApiResponse<String> addToBlacklist(String ip) {
         ipBlacklistService.addToBlacklist(ip);
         log.warn("⚠️ IP manually added to blacklist: {}", ip);
         return ApiResponse.success("IP " + ip + " has been added to blacklist");
     }
 
-    @Operation(
-            summary = "IP 블랙리스트에서 제거",
-            description = "런타임 블랙리스트에서 특정 IP를 제거합니다."
-    )
-    @DeleteMapping("/api/v1/security/ip-blacklist")
+    @Override
     @Profile({"local", "dev"})
-    public ApiResponse<String> removeFromBlacklist(
-            @Parameter(description = "차단 해제할 IP 주소", example = "192.168.1.100", required = true)
-            @RequestParam String ip
-    ) {
+    public ApiResponse<String> removeFromBlacklist(String ip) {
         ipBlacklistService.removeFromBlacklist(ip);
         log.info("IP removed from blacklist: {}", ip);
         return ApiResponse.success("IP " + ip + " has been removed from blacklist");
     }
 
-    @Operation(
-            summary = "IP 차단 상태 확인",
-            description = "특정 IP가 현재 블랙리스트에 있는지 확인합니다."
-    )
-    @GetMapping("/api/v1/security/ip-blacklist/check")
+    @Override
     @Profile({"local", "dev"})
-    public ApiResponse<Boolean> checkIpStatus(
-            @Parameter(description = "확인할 IP 주소", example = "192.168.1.100", required = true)
-            @RequestParam String ip
-    ) {
+    public ApiResponse<Boolean> checkIpStatus(String ip) {
         boolean isBlocked = ipBlacklistService.isBlocked(ip);
         return ApiResponse.success(isBlocked);
     }
