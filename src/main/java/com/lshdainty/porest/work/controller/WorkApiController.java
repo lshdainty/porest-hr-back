@@ -1,6 +1,8 @@
 package com.lshdainty.porest.work.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
+import com.lshdainty.porest.security.annotation.LoginUser;
+import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.work.controller.dto.WorkApiDto;
 import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import com.lshdainty.porest.work.service.WorkCodeService;
@@ -196,6 +198,19 @@ public class WorkApiController implements WorkApi {
                 .collect(Collectors.toList());
 
         return ApiResponse.success(new WorkApiDto.CheckSystemStatusBatchResp(statuses));
+    }
+
+    // ========== 오늘 업무 시간 확인 ==========
+
+    @Override
+    public ApiResponse getTodayWorkStatus(@LoginUser User user) {
+        WorkHistoryService.TodayWorkStatus status = workHistoryService.checkTodayWorkStatus(user.getId());
+
+        return ApiResponse.success(new WorkApiDto.TodayWorkStatusResp(
+                status.getTotalHours(),
+                status.getRequiredHours(),
+                status.isCompleted()
+        ));
     }
 
     // ========== Private Helper Methods ==========

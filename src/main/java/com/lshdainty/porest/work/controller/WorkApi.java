@@ -1,6 +1,8 @@
 package com.lshdainty.porest.work.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
+import com.lshdainty.porest.security.annotation.LoginUser;
+import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.work.controller.dto.WorkApiDto;
 import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import com.lshdainty.porest.work.type.CodeType;
@@ -356,5 +358,27 @@ public interface WorkApi {
     ApiResponse checkSystemStatus(
             @Parameter(description = "시스템 코드 목록", example = "ERP,MES,WMS", required = true)
             @RequestParam("system_codes") List<SystemType> systemCodes
+    );
+
+    // ========== 오늘 업무 시간 확인 ==========
+
+    @Operation(
+            summary = "오늘 업무 시간 확인",
+            description = "오늘 날짜 기준 로그인한 사용자의 업무 시간을 확인합니다. 8시간 이상 작성했는지 여부를 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "업무 시간 확인 성공",
+                    content = @Content(schema = @Schema(implementation = WorkApiDto.TodayWorkStatusResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 필요 (로그인되지 않음)"
+            )
+    })
+    @GetMapping("/api/v1/work-histories/today/status")
+    ApiResponse getTodayWorkStatus(
+            @Parameter(hidden = true) @LoginUser User user
     );
 }

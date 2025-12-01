@@ -425,4 +425,50 @@ public class WorkHistoryService {
         public BigDecimal getVacationHours() { return vacationHours; }
         public BigDecimal getMissingHours() { return missingHours; }
     }
+
+    /**
+     * 오늘 날짜 기준 로그인한 사용자의 업무 시간 확인<br>
+     * 8시간 이상 작성했는지 여부 반환
+     *
+     * @param userId 사용자 ID
+     * @return 업무 시간 정보 (총 업무 시간, 8시간 달성 여부)
+     */
+    public TodayWorkStatus checkTodayWorkStatus(String userId) {
+        LocalDate today = LocalDate.now();
+
+        // 오늘 날짜의 업무 내역 리스트 조회
+        List<WorkHistory> todayWorkHistories = workHistoryRepository.findByUserAndDate(userId, today);
+
+        // 업무 시간 합계 계산
+        BigDecimal totalHours = todayWorkHistories.stream()
+                .map(WorkHistory::getHours)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal requiredHours = new BigDecimal("8.0");
+        boolean isCompleted = totalHours.compareTo(requiredHours) >= 0;
+
+        log.info("Today work status checked - userId: {}, date: {}, totalHours: {}, isCompleted: {}",
+                userId, today, totalHours, isCompleted);
+
+        return new TodayWorkStatus(totalHours, requiredHours, isCompleted);
+    }
+
+    /**
+     * 오늘 업무 시간 상태 DTO
+     */
+    public static class TodayWorkStatus {
+        private final BigDecimal totalHours;
+        private final BigDecimal requiredHours;
+        private final boolean isCompleted;
+
+        public TodayWorkStatus(BigDecimal totalHours, BigDecimal requiredHours, boolean isCompleted) {
+            this.totalHours = totalHours;
+            this.requiredHours = requiredHours;
+            this.isCompleted = isCompleted;
+        }
+
+        public BigDecimal getTotalHours() { return totalHours; }
+        public BigDecimal getRequiredHours() { return requiredHours; }
+        public boolean isCompleted() { return isCompleted; }
+    }
 }

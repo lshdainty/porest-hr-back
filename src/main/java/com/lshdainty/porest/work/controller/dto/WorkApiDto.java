@@ -251,4 +251,21 @@ public class WorkApiDto {
         @Schema(description = "시스템 체크 상태 목록")
         private List<CheckSystemStatusResp> statuses;
     }
+
+    // ========== 오늘 업무 시간 확인 DTO ==========
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "오늘 업무 시간 상태 조회 응답")
+    public static class TodayWorkStatusResp {
+        @Schema(description = "작성한 총 업무 시간", example = "8.5")
+        private BigDecimal totalHours;
+
+        @Schema(description = "필요한 업무 시간 (기준: 8시간)", example = "8.0")
+        private BigDecimal requiredHours;
+
+        @Schema(description = "8시간 달성 여부", example = "true")
+        private boolean isCompleted;
+    }
 }

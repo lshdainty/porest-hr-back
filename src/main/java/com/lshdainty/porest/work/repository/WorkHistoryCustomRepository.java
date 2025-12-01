@@ -3,6 +3,8 @@ package com.lshdainty.porest.work.repository;
 import com.lshdainty.porest.work.domain.WorkHistory;
 import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +27,7 @@ public interface WorkHistoryCustomRepository {
 
     // 전체 업무 이력 스트림 조회
     java.util.stream.Stream<WorkHistory> findAllStream(WorkHistorySearchCondition condition);
+
+    // 특정 사용자의 특정 날짜 업무 내역 목록 조회
+    List<WorkHistory> findByUserAndDate(String userId, LocalDate date);
 }

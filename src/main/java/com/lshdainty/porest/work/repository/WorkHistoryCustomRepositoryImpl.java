@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -129,5 +131,17 @@ public class WorkHistoryCustomRepositoryImpl implements WorkHistoryCustomReposit
 
     private BooleanExpression divisionEq(Long divisionSeq) {
         return divisionSeq != null ? workHistory.division.seq.eq(divisionSeq) : null;
+    }
+
+    @Override
+    public List<WorkHistory> findByUserAndDate(String userId, LocalDate date) {
+        return query
+                .selectFrom(workHistory)
+                .where(
+                        workHistory.user.id.eq(userId),
+                        workHistory.date.eq(date),
+                        workHistory.isDeleted.eq(YNType.N)
+                )
+                .fetch();
     }
 }
