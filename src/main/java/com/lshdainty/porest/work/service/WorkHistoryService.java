@@ -12,6 +12,7 @@ import com.lshdainty.porest.work.service.dto.WorkCodeServiceDto;
 import com.lshdainty.porest.work.service.dto.WorkHistoryServiceDto;
 import com.lshdainty.porest.holiday.service.HolidayService;
 import com.lshdainty.porest.holiday.domain.Holiday;
+import com.lshdainty.porest.holiday.type.HolidayType;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.user.repository.UserRepositoryImpl;
 import com.lshdainty.porest.vacation.domain.VacationUsage;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -266,10 +268,11 @@ public class WorkHistoryService {
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
 
-        // 해당 기간의 공휴일 조회
+        // 해당 기간의 공휴일 조회 (PUBLIC, SUBSTITUTE만 - ETC 제외)
         List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(startDate, endDate, null);
         Set<LocalDate> holidayDates = holidays.stream()
-                .map(h -> h.getDate())
+                .filter(h -> h.getType() == HolidayType.PUBLIC || h.getType() == HolidayType.SUBSTITUTE)
+                .map(Holiday::getDate)
                 .collect(Collectors.toSet());
 
         // 주말과 공휴일을 제외한 근무일 리스트 생성
@@ -291,58 +294,27 @@ public class WorkHistoryService {
         List<User> deletedUsersInMonth = findDeletedUsersInYearMonth(year, month);
         users.addAll(deletedUsersInMonth);
 
-        // 미등록 이력 데이터 수집
-        List<UnregisteredWorkData> unregisteredList = new ArrayList<>();
+        // 유저 ID 리스트 추출
+        List<String> userIds = users.stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
 
-        for (User user : users) {
-            for (LocalDate workDate : workingDays) {
-                // 해당 유저의 해당 날짜 업무 이력 조회
-                WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
-                condition.setUserId(user.getId());
-                condition.setStartDate(workDate);
-                condition.setEndDate(workDate);
+        // 벌크 조회: 모든 유저의 해당 기간 업무 시간 (단일 쿼리)
+        Map<String, Map<LocalDate, BigDecimal>> workHoursMap = workHistoryRepository
+                .findDailyWorkHoursByUsersAndPeriod(userIds, startDate, endDate);
 
-                List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+        // 벌크 조회: 모든 유저의 해당 기간 휴가 사용 시간 (단일 쿼리)
+        Map<String, Map<LocalDate, BigDecimal>> vacationUsedTimeMap = vacationUsageRepository
+                .findDailyVacationHoursByUsersAndPeriod(userIds, startDate, endDate);
 
-                // 해당 날짜의 총 업무 시간 계산
-                BigDecimal totalWorkHours = histories.stream()
-                        .map(WorkHistory::getHours)
-                        .filter(Objects::nonNull)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 유저 정보 Map 생성 (스트림 처리 시 사용)
+        Map<String, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, user -> user, (existing, replacement) -> existing));
 
-                // 해당 유저의 해당 날짜 휴가 사용 내역 조회
-                java.time.LocalDateTime dayStart = workDate.atStartOfDay();
-                java.time.LocalDateTime dayEnd = workDate.plusDays(1).atStartOfDay();
-                List<VacationUsage> vacationUsages = vacationUsageRepository
-                        .findByUserIdAndPeriodWithUser(user.getId(), dayStart, dayEnd);
+        BigDecimal requiredHours = new BigDecimal("8.0");
+        BigDecimal vacationMultiplier = new BigDecimal("8.0");
 
-                // 해당 날짜의 총 휴가 사용 시간 계산 (usedTime * 8시간)
-                BigDecimal totalVacationHours = vacationUsages.stream()
-                        .map(VacationUsage::getUsedTime)
-                        .filter(Objects::nonNull)
-                        .map(usedTime -> usedTime.multiply(new BigDecimal("8.0")))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                // 업무 시간 + 휴가 시간
-                BigDecimal totalHours = totalWorkHours.add(totalVacationHours);
-
-                // 8시간 미만인 경우 미등록 리스트에 추가
-                BigDecimal requiredHours = new BigDecimal("8.0");
-                if (totalHours.compareTo(requiredHours) < 0) {
-                    BigDecimal missingHours = requiredHours.subtract(totalHours);
-                    unregisteredList.add(new UnregisteredWorkData(
-                            user.getId(),
-                            user.getName(),
-                            workDate,
-                            totalWorkHours,
-                            totalVacationHours,
-                            missingHours
-                    ));
-                }
-            }
-        }
-
-        // 엑셀 파일 생성
+        // 엑셀 파일 생성 (스트림 방식)
         try (SXSSFWorkbook workbook = new SXSSFWorkbook(100)) {
             Sheet sheet = workbook.createSheet("업무 이력 미등록 리스트");
 
@@ -354,19 +326,52 @@ public class WorkHistoryService {
                 cell.setCellValue(headers[i]);
             }
 
-            // Data
-            int rowNum = 1;
-            for (UnregisteredWorkData data : unregisteredList) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(rowNum - 1);
-                row.createCell(1).setCellValue(data.getUserId());
-                row.createCell(2).setCellValue(data.getUserName());
-                row.createCell(3).setCellValue(data.getWorkDate().toString());
-                row.createCell(4).setCellValue(data.getWorkHours().toString());
-                row.createCell(5).setCellValue(data.getVacationHours().toString());
-                row.createCell(6).setCellValue(data.getWorkHours().add(data.getVacationHours()).toString());
-                row.createCell(7).setCellValue(data.getMissingHours().toString());
-            }
+            // 스트림을 사용하여 미등록 데이터 생성 및 엑셀 작성
+            AtomicInteger rowNum = new AtomicInteger(1);
+            userIds.stream()
+                    .flatMap(userId -> workingDays.stream()
+                            .map(workDate -> {
+                                // 해당 유저의 해당 날짜 업무 시간 조회
+                                BigDecimal workHours = workHoursMap
+                                        .getOrDefault(userId, Collections.emptyMap())
+                                        .getOrDefault(workDate, BigDecimal.ZERO);
+
+                                // 해당 유저의 해당 날짜 휴가 사용 시간 조회 (usedTime * 8시간)
+                                BigDecimal vacationUsedTime = vacationUsedTimeMap
+                                        .getOrDefault(userId, Collections.emptyMap())
+                                        .getOrDefault(workDate, BigDecimal.ZERO);
+                                BigDecimal vacationHours = vacationUsedTime.multiply(vacationMultiplier);
+
+                                // 총 시간 계산
+                                BigDecimal totalHours = workHours.add(vacationHours);
+
+                                // 8시간 미만인 경우에만 반환
+                                if (totalHours.compareTo(requiredHours) < 0) {
+                                    User user = userMap.get(userId);
+                                    BigDecimal missingHours = requiredHours.subtract(totalHours);
+                                    return new UnregisteredWorkData(
+                                            userId,
+                                            user != null ? user.getName() : "",
+                                            workDate,
+                                            workHours,
+                                            vacationHours,
+                                            missingHours
+                                    );
+                                }
+                                return null;
+                            }))
+                    .filter(Objects::nonNull)
+                    .forEach(data -> {
+                        Row row = sheet.createRow(rowNum.getAndIncrement());
+                        row.createCell(0).setCellValue(rowNum.get() - 1);
+                        row.createCell(1).setCellValue(data.getUserId());
+                        row.createCell(2).setCellValue(data.getUserName());
+                        row.createCell(3).setCellValue(data.getWorkDate().toString());
+                        row.createCell(4).setCellValue(data.getWorkHours().toString());
+                        row.createCell(5).setCellValue(data.getVacationHours().toString());
+                        row.createCell(6).setCellValue(data.getWorkHours().add(data.getVacationHours()).toString());
+                        row.createCell(7).setCellValue(data.getMissingHours().toString());
+                    });
 
             // Response Header Setting
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -389,8 +394,8 @@ public class WorkHistoryService {
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth().plusDays(1); // 마지막 날 포함을 위해 +1일
 
-        java.time.LocalDateTime startDateTime = startDate.atStartOfDay();
-        java.time.LocalDateTime endDateTime = endDate.atStartOfDay();
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atStartOfDay();
 
         return userRepository.findDeletedUsersByModifyDateBetween(startDateTime, endDateTime);
     }
@@ -474,9 +479,10 @@ public class WorkHistoryService {
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
 
-        // 해당 기간의 공휴일 조회
+        // 해당 기간의 공휴일 조회 (PUBLIC, SUBSTITUTE만 - ETC 제외)
         List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(startDate, endDate, CountryCode.KR);
         Set<LocalDate> holidayDates = holidays.stream()
+                .filter(h -> h.getType() == HolidayType.PUBLIC || h.getType() == HolidayType.SUBSTITUTE)
                 .map(Holiday::getDate)
                 .collect(Collectors.toSet());
 

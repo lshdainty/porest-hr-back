@@ -145,4 +145,35 @@ public class VacationUsageCustomRepositoryImpl implements VacationUsageCustomRep
         }
         return dailyHoursMap;
     }
+
+    @Override
+    public Map<String, Map<LocalDate, BigDecimal>> findDailyVacationHoursByUsersAndPeriod(List<String> userIds, LocalDate startDate, LocalDate endDate) {
+        if (userIds == null || userIds.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+
+        List<VacationUsage> usages = query
+                .selectFrom(vacationUsage)
+                .where(
+                        vacationUsage.user.id.in(userIds),
+                        vacationUsage.startDate.goe(startDateTime),
+                        vacationUsage.startDate.lt(endDateTime),
+                        vacationUsage.isDeleted.eq(YNType.N)
+                )
+                .fetch();
+
+        Map<String, Map<LocalDate, BigDecimal>> result = new HashMap<>();
+        for (VacationUsage usage : usages) {
+            String usrId = usage.getUser().getId();
+            LocalDate date = usage.getStartDate().toLocalDate();
+            BigDecimal usedTime = usage.getUsedTime() != null ? usage.getUsedTime() : BigDecimal.ZERO;
+
+            result.computeIfAbsent(usrId, k -> new HashMap<>())
+                    .merge(date, usedTime, BigDecimal::add);
+        }
+        return result;
+    }
 }

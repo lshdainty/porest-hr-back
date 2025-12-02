@@ -34,4 +34,7 @@ public interface WorkHistoryCustomRepository {
 
     // 특정 사용자의 기간 내 날짜별 업무 시간 합계 조회
     Map<LocalDate, BigDecimal> findDailyWorkHoursByUserAndPeriod(String userId, LocalDate startDate, LocalDate endDate);
+
+    // 여러 사용자의 기간 내 (사용자ID, 날짜)별 업무 시간 합계 조회 (벌크 조회)
+    Map<String, Map<LocalDate, BigDecimal>> findDailyWorkHoursByUsersAndPeriod(List<String> userIds, LocalDate startDate, LocalDate endDate);
 }

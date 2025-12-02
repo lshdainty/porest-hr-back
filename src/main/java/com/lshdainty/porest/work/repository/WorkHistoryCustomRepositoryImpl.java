@@ -166,4 +166,31 @@ public class WorkHistoryCustomRepositoryImpl implements WorkHistoryCustomReposit
         }
         return dailyHoursMap;
     }
+
+    @Override
+    public Map<String, Map<LocalDate, BigDecimal>> findDailyWorkHoursByUsersAndPeriod(List<String> userIds, LocalDate startDate, LocalDate endDate) {
+        if (userIds == null || userIds.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        List<WorkHistory> histories = query
+                .selectFrom(workHistory)
+                .where(
+                        workHistory.user.id.in(userIds),
+                        workHistory.date.between(startDate, endDate),
+                        workHistory.isDeleted.eq(YNType.N)
+                )
+                .fetch();
+
+        Map<String, Map<LocalDate, BigDecimal>> result = new HashMap<>();
+        for (WorkHistory history : histories) {
+            String usrId = history.getUser().getId();
+            LocalDate date = history.getDate();
+            BigDecimal hours = history.getHours() != null ? history.getHours() : BigDecimal.ZERO;
+
+            result.computeIfAbsent(usrId, k -> new HashMap<>())
+                    .merge(date, hours, BigDecimal::add);
+        }
+        return result;
+    }
 }

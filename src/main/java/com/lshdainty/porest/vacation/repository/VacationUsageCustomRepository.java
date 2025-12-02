@@ -4,6 +4,7 @@ import com.lshdainty.porest.vacation.domain.VacationUsage;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public interface VacationUsageCustomRepository {
      * @param endDate 조회 종료일
      * @return 기간 내 VacationUsage 리스트
      */
-    List<VacationUsage> findByPeriodWithUser(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
+    List<VacationUsage> findByPeriodWithUser(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
      * 유저별 기간별 VacationUsage 조회 (User 정보 포함)
@@ -56,7 +57,7 @@ public interface VacationUsageCustomRepository {
      * @param endDate 조회 종료일
      * @return 기간 내 VacationUsage 리스트
      */
-    List<VacationUsage> findByUserIdAndPeriodWithUser(String userId, java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
+    List<VacationUsage> findByUserIdAndPeriodWithUser(String userId, LocalDateTime startDate, LocalDateTime endDate);
 
     /**
      * baseTime 이전에 사용한 VacationUsage 조회
@@ -66,7 +67,7 @@ public interface VacationUsageCustomRepository {
      * @param baseTime 기준 시간
      * @return baseTime 이전 VacationUsage 리스트
      */
-    List<VacationUsage> findUsedByUserIdAndBaseTime(String userId, java.time.LocalDateTime baseTime);
+    List<VacationUsage> findUsedByUserIdAndBaseTime(String userId, LocalDateTime baseTime);
 
     /**
      * baseTime 이후 사용 예정인 VacationUsage 조회
@@ -76,7 +77,7 @@ public interface VacationUsageCustomRepository {
      * @param baseTime 기준 시간
      * @return baseTime 이후 VacationUsage 리스트
      */
-    List<VacationUsage> findExpectedByUserIdAndBaseTime(String userId, java.time.LocalDateTime baseTime);
+    List<VacationUsage> findExpectedByUserIdAndBaseTime(String userId, LocalDateTime baseTime);
 
     /**
      * 특정 사용자의 특정 기간 내 VacationUsage 조회
@@ -87,7 +88,7 @@ public interface VacationUsageCustomRepository {
      * @param endOfPeriod 조회 기간 종료일
      * @return 해당 기간 내 VacationUsage 리스트
      */
-    List<VacationUsage> findByUserIdAndPeriod(String userId, java.time.LocalDateTime startOfPeriod, java.time.LocalDateTime endOfPeriod);
+    List<VacationUsage> findByUserIdAndPeriod(String userId, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod);
 
     /**
      * 특정 사용자의 기간 내 날짜별 휴가 사용 시간 합계 조회
@@ -99,4 +100,15 @@ public interface VacationUsageCustomRepository {
      * @return 날짜별 휴가 사용 시간 Map (key: 날짜, value: usedTime 합계)
      */
     Map<LocalDate, BigDecimal> findDailyVacationHoursByUserAndPeriod(String userId, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * 여러 사용자의 기간 내 (사용자ID, 날짜)별 휴가 사용 시간 합계 조회 (벌크 조회)
+     * startDate의 날짜 부분을 기준으로 그룹핑하여 usedTime 합계 반환
+     *
+     * @param userIds 사용자 ID 리스트
+     * @param startDate 조회 기간 시작일
+     * @param endDate 조회 기간 종료일
+     * @return 사용자ID별, 날짜별 휴가 사용 시간 Map (key: 사용자ID, value: Map(key: 날짜, value: usedTime 합계))
+     */
+    Map<String, Map<LocalDate, BigDecimal>> findDailyVacationHoursByUsersAndPeriod(List<String> userIds, LocalDate startDate, LocalDate endDate);
 }
