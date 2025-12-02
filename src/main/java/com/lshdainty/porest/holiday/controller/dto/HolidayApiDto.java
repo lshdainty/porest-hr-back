@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 public class HolidayApiDto {
     @Getter
     @AllArgsConstructor
@@ -19,7 +21,7 @@ public class HolidayApiDto {
         private String holidayName;
 
         @Schema(description = "공휴일 날짜 (YYYY-MM-DD)", example = "2024-02-10")
-        private String holidayDate;
+        private LocalDate holidayDate;
 
         @Schema(description = "공휴일 타입", example = "NATIONAL")
         private HolidayType holidayType;
@@ -30,8 +32,8 @@ public class HolidayApiDto {
         @Schema(description = "음력 여부", example = "Y")
         private YNType lunarYn;
 
-        @Schema(description = "음력 날짜 (MM-DD)", example = "01-01")
-        private String lunarDate;
+        @Schema(description = "음력 날짜 (YYYY-MM-DD)", example = "2024-01-01")
+        private LocalDate lunarDate;
 
         @Schema(description = "매년 반복 여부", example = "Y")
         private YNType isRecurring;
@@ -58,7 +60,7 @@ public class HolidayApiDto {
         private String holidayName;
 
         @Schema(description = "공휴일 날짜 (YYYY-MM-DD)", example = "2024-02-10")
-        private String holidayDate;
+        private LocalDate holidayDate;
 
         @Schema(description = "공휴일 타입", example = "NATIONAL")
         private HolidayType holidayType;
@@ -69,8 +71,8 @@ public class HolidayApiDto {
         @Schema(description = "음력 여부", example = "Y")
         private YNType lunarYn;
 
-        @Schema(description = "음력 날짜 (MM-DD)", example = "01-01")
-        private String lunarDate;
+        @Schema(description = "음력 날짜 (YYYY-MM-DD)", example = "2024-01-01")
+        private LocalDate lunarDate;
 
         @Schema(description = "매년 반복 여부", example = "Y")
         private YNType isRecurring;
@@ -91,7 +93,7 @@ public class HolidayApiDto {
         private String holidayName;
 
         @Schema(description = "공휴일 날짜 (YYYY-MM-DD)", example = "2024-02-10")
-        private String holidayDate;
+        private LocalDate holidayDate;
 
         @Schema(description = "공휴일 타입", example = "NATIONAL")
         private HolidayType holidayType;
@@ -102,8 +104,8 @@ public class HolidayApiDto {
         @Schema(description = "음력 여부", example = "Y")
         private YNType lunarYn;
 
-        @Schema(description = "음력 날짜 (MM-DD)", example = "01-01")
-        private String lunarDate;
+        @Schema(description = "음력 날짜 (YYYY-MM-DD)", example = "2024-01-01")
+        private LocalDate lunarDate;
 
         @Schema(description = "매년 반복 여부", example = "Y")
         private YNType isRecurring;
@@ -124,7 +126,7 @@ public class HolidayApiDto {
         private String holidayName;
 
         @Schema(description = "공휴일 날짜 (YYYY-MM-DD)", example = "2024-02-10")
-        private String holidayDate;
+        private LocalDate holidayDate;
 
         @Schema(description = "공휴일 타입", example = "NATIONAL")
         private HolidayType holidayType;
@@ -135,8 +137,8 @@ public class HolidayApiDto {
         @Schema(description = "음력 여부", example = "Y")
         private YNType lunarYn;
 
-        @Schema(description = "음력 날짜 (MM-DD)", example = "01-01")
-        private String lunarDate;
+        @Schema(description = "음력 날짜 (YYYY-MM-DD)", example = "2024-01-01")
+        private LocalDate lunarDate;
 
         @Schema(description = "매년 반복 여부", example = "Y")
         private YNType isRecurring;

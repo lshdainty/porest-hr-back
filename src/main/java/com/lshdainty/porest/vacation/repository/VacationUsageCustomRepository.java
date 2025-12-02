@@ -74,4 +74,15 @@ public interface VacationUsageCustomRepository {
      * @return baseTime 이후 VacationUsage 리스트
      */
     List<VacationUsage> findExpectedByUserIdAndBaseTime(String userId, java.time.LocalDateTime baseTime);
+
+    /**
+     * 특정 사용자의 특정 기간 내 VacationUsage 조회
+     * startDate가 startOfPeriod와 endOfPeriod 사이에 있는 휴가 사용 내역 조회
+     *
+     * @param userId 사용자 ID
+     * @param startOfPeriod 조회 기간 시작일
+     * @param endOfPeriod 조회 기간 종료일
+     * @return 해당 기간 내 VacationUsage 리스트
+     */
+    List<VacationUsage> findByUserIdAndPeriod(String userId, java.time.LocalDateTime startOfPeriod, java.time.LocalDateTime endOfPeriod);
 }

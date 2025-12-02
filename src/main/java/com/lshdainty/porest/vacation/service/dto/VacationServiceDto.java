@@ -135,6 +135,18 @@ public class VacationServiceDto {
     // 할당되지 않은 휴가 정책 리스트
     private List<VacationPolicyServiceDto> unassignedPolicies;
 
+    // ========== 전체 유저 휴가 통계 관련 필드 ==========
+    // 부서명
+    private String departmentName;
+    // 총 휴가 일수 (부여받은 전체 휴가)
+    private BigDecimal totalVacationDays;
+    // 사용 휴가 일수
+    private BigDecimal usedVacationDays;
+    // 사용 예정 휴가 일수 (승인 대기 중인 휴가)
+    private BigDecimal scheduledVacationDays;
+    // 잔여 휴가 일수
+    private BigDecimal remainingVacationDays;
+
     @Override
     public String toString() {
         return "VacationServiceDto{" +

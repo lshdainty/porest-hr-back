@@ -11,6 +11,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class HolidayService {
         return holidayRepositoryImpl.findHolidays(countryCode);
     }
 
-    public List<Holiday> searchHolidaysByStartEndDate(String startDate, String endDate, CountryCode countryCode) {
+    public List<Holiday> searchHolidaysByStartEndDate(LocalDate startDate, LocalDate endDate, CountryCode countryCode) {
         return holidayRepositoryImpl.findHolidaysByStartEndDate(startDate, endDate, countryCode);
     }
 

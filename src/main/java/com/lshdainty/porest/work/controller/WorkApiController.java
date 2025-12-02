@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -210,6 +211,18 @@ public class WorkApiController implements WorkApi {
                 status.getTotalHours(),
                 status.getRequiredHours(),
                 status.isCompleted()
+        ));
+    }
+
+    // ========== 미작성 업무 날짜 조회 ==========
+
+    @Override
+    public ApiResponse getUnregisteredWorkDates(Integer year, Integer month, @LoginUser User user) {
+        List<LocalDate> unregisteredDates = workHistoryService.getUnregisteredWorkDates(user.getId(), year, month);
+
+        return ApiResponse.success(new WorkApiDto.UnregisteredWorkDatesResp(
+                unregisteredDates,
+                unregisteredDates.size()
         ));
     }
 

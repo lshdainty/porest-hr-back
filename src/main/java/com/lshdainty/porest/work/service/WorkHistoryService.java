@@ -1,5 +1,6 @@
 package com.lshdainty.porest.work.service;
 
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.work.domain.WorkCode;
@@ -266,12 +267,9 @@ public class WorkHistoryService {
         LocalDate endDate = yearMonth.atEndOfMonth();
 
         // 해당 기간의 공휴일 조회
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String startDateStr = startDate.format(formatter);
-        String endDateStr = endDate.format(formatter);
-        List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(startDateStr, endDateStr, null);
+        List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(startDate, endDate, null);
         Set<LocalDate> holidayDates = holidays.stream()
-                .map(h -> LocalDate.parse(h.getDate(), formatter))
+                .map(h -> h.getDate())
                 .collect(Collectors.toSet());
 
         // 주말과 공휴일을 제외한 근무일 리스트 생성
@@ -451,6 +449,94 @@ public class WorkHistoryService {
                 userId, today, totalHours, isCompleted);
 
         return new TodayWorkStatus(totalHours, requiredHours, isCompleted);
+    }
+
+    /**
+     * 로그인한 사용자의 특정 년/월 미작성 업무 날짜 목록 조회<br>
+     * 주말, 공휴일, 휴가 시간을 제외하고 8시간 미만 작성한 날짜 반환
+     *
+     * @param userId 사용자 ID
+     * @param year 조회할 연도
+     * @param month 조회할 월
+     * @return 미작성 업무 날짜 목록
+     */
+    public List<LocalDate> getUnregisteredWorkDates(String userId, Integer year, Integer month) {
+        // 년월 유효성 검증
+        if (year == null || month == null) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.year.month.required", null, null));
+        }
+
+        // 사용자 존재 확인
+        User user = userService.checkUserExist(userId);
+
+        // 해당 년월의 시작일과 마지막일 계산
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+
+        // 해당 기간의 공휴일 조회
+        List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(startDate, endDate, CountryCode.KR);
+        Set<LocalDate> holidayDates = holidays.stream()
+                .map(h -> h.getDate())
+                .collect(Collectors.toSet());
+
+        // 주말과 공휴일을 제외한 근무일 리스트 생성
+        List<LocalDate> workingDays = new ArrayList<>();
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+            if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY
+                    && !holidayDates.contains(currentDate)) {
+                workingDays.add(currentDate);
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+
+        // 미작성 날짜 수집
+        List<LocalDate> unregisteredDates = new ArrayList<>();
+
+        for (LocalDate workDate : workingDays) {
+            // 해당 유저의 해당 날짜 업무 이력 조회
+            WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+            condition.setUserId(user.getId());
+            condition.setStartDate(workDate);
+            condition.setEndDate(workDate);
+
+            List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+            // 해당 날짜의 총 업무 시간 계산
+            BigDecimal totalWorkHours = histories.stream()
+                    .map(WorkHistory::getHours)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // 해당 유저의 해당 날짜 휴가 사용 내역 조회
+            java.time.LocalDateTime dayStart = workDate.atStartOfDay();
+            java.time.LocalDateTime dayEnd = workDate.plusDays(1).atStartOfDay();
+            List<VacationUsage> vacationUsages = vacationUsageRepository
+                    .findByUserIdAndPeriodWithUser(user.getId(), dayStart, dayEnd);
+
+            // 해당 날짜의 총 휴가 사용 시간 계산 (usedTime * 8시간)
+            BigDecimal totalVacationHours = vacationUsages.stream()
+                    .map(VacationUsage::getUsedTime)
+                    .filter(Objects::nonNull)
+                    .map(usedTime -> usedTime.multiply(new BigDecimal("8.0")))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // 업무 시간 + 휴가 시간
+            BigDecimal totalHours = totalWorkHours.add(totalVacationHours);
+
+            // 8시간 미만인 경우 미작성 리스트에 추가
+            BigDecimal requiredHours = new BigDecimal("8.0");
+            if (totalHours.compareTo(requiredHours) < 0) {
+                unregisteredDates.add(workDate);
+            }
+        }
+
+        log.info("Unregistered work dates fetched - userId: {}, year: {}, month: {}, count: {}",
+                userId, year, month, unregisteredDates.size());
+
+        return unregisteredDates;
     }
 
     /**

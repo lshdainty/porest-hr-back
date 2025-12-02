@@ -268,4 +268,18 @@ public class WorkApiDto {
         @Schema(description = "8시간 달성 여부", example = "true")
         private boolean isCompleted;
     }
+
+    // ========== 미작성 업무 날짜 조회 DTO ==========
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "미작성 업무 날짜 조회 응답")
+    public static class UnregisteredWorkDatesResp {
+        @Schema(description = "미작성 업무 날짜 목록", example = "[\"2024-01-15\", \"2024-01-16\"]")
+        private List<LocalDate> unregisteredDates;
+
+        @Schema(description = "총 미작성 일수", example = "2")
+        private int totalUnregisteredDays;
+    }
 }

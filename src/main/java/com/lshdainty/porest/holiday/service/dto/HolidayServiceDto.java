@@ -7,16 +7,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter @Setter
 @Builder
 public class HolidayServiceDto {
     private Long seq;
     private String name;
-    private String date;
+    private LocalDate date;
     private HolidayType type;
     private CountryCode countryCode;
     private YNType lunarYN;
-    private String lunarDate;
+    private LocalDate lunarDate;
     private YNType isRecurring;
     private String icon;
 }

@@ -603,4 +603,45 @@ public class VacationApiDto {
             private String repeatGrantDesc;        // 반복 부여 정책의 한국어 설명
         }
     }
+
+    // ========== 전체 유저 휴가 통계 조회 DTO ==========
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "전체 유저 휴가 통계 조회 응답")
+    public static class GetAllUsersVacationSummaryResp {
+        @Schema(description = "사용자 ID", example = "user123")
+        private String userId;
+
+        @Schema(description = "사용자 이름", example = "홍길동")
+        private String userName;
+
+        @Schema(description = "부서명", example = "개발팀")
+        private String departmentName;
+
+        @Schema(description = "총 휴가 일수", example = "15.0")
+        private BigDecimal totalVacationDays;
+
+        @Schema(description = "총 휴가 일수 (문자열)", example = "15일")
+        private String totalVacationDaysStr;
+
+        @Schema(description = "사용 휴가 일수", example = "8.0")
+        private BigDecimal usedVacationDays;
+
+        @Schema(description = "사용 휴가 일수 (문자열)", example = "8일")
+        private String usedVacationDaysStr;
+
+        @Schema(description = "사용 예정 휴가 일수", example = "2.0")
+        private BigDecimal scheduledVacationDays;
+
+        @Schema(description = "사용 예정 휴가 일수 (문자열)", example = "2일")
+        private String scheduledVacationDaysStr;
+
+        @Schema(description = "잔여 휴가 일수", example = "5.0")
+        private BigDecimal remainingVacationDays;
+
+        @Schema(description = "잔여 휴가 일수 (문자열)", example = "5일")
+        private String remainingVacationDaysStr;
+    }
 }

@@ -381,4 +381,34 @@ public interface WorkApi {
     ApiResponse getTodayWorkStatus(
             @Parameter(hidden = true) @LoginUser User user
     );
+
+    // ========== 미작성 업무 날짜 조회 ==========
+
+    @Operation(
+            summary = "미작성 업무 날짜 조회",
+            description = "로그인한 사용자 기준으로 특정 년/월의 미작성 업무 날짜 목록을 조회합니다. 주말, 공휴일, 휴가 시간을 제외하고 8시간 미만 작성한 날짜를 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "미작성 업무 날짜 조회 성공",
+                    content = @Content(schema = @Schema(implementation = WorkApiDto.UnregisteredWorkDatesResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청 (년/월 파라미터 누락 또는 형식 오류)"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 필요 (로그인되지 않음)"
+            )
+    })
+    @GetMapping("/api/v1/work-histories/unregistered-dates")
+    ApiResponse getUnregisteredWorkDates(
+            @Parameter(description = "조회할 연도", example = "2024", required = true)
+            @RequestParam("year") Integer year,
+            @Parameter(description = "조회할 월", example = "1", required = true)
+            @RequestParam("month") Integer month,
+            @Parameter(hidden = true) @LoginUser User user
+    );
 }

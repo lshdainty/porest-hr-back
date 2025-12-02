@@ -107,4 +107,14 @@ public class VacationUsageCustomRepositoryImpl implements VacationUsageCustomRep
                         .and(vacationUsage.startDate.gt(baseTime)))
                 .fetch();
     }
+
+    @Override
+    public List<VacationUsage> findByUserIdAndPeriod(String userId, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod) {
+        return query
+                .selectFrom(vacationUsage)
+                .where(vacationUsage.user.id.eq(userId)
+                        .and(vacationUsage.startDate.between(startOfPeriod, endOfPeriod))
+                        .and(vacationUsage.isDeleted.eq(YNType.N)))
+                .fetch();
+    }
 }

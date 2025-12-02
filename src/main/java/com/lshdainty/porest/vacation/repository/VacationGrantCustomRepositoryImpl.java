@@ -179,4 +179,27 @@ public class VacationGrantCustomRepositoryImpl implements VacationGrantCustomRep
                 .orderBy(vacationGrant.createDate.desc())
                 .fetch();
     }
+
+    @Override
+    public List<VacationGrant> findByUserIdAndValidPeriod(String userId, java.time.LocalDateTime startOfPeriod, java.time.LocalDateTime endOfPeriod) {
+        return query
+                .selectFrom(vacationGrant)
+                .where(vacationGrant.user.id.eq(userId)
+                        .and(vacationGrant.grantDate.loe(endOfPeriod))
+                        .and(vacationGrant.expiryDate.goe(startOfPeriod))
+                        .and(vacationGrant.status.in(GrantStatus.ACTIVE, GrantStatus.EXHAUSTED))
+                        .and(vacationGrant.isDeleted.eq(YNType.N)))
+                .fetch();
+    }
+
+    @Override
+    public List<VacationGrant> findByUserIdAndStatusesAndPeriod(String userId, List<GrantStatus> statuses, java.time.LocalDateTime startOfPeriod, java.time.LocalDateTime endOfPeriod) {
+        return query
+                .selectFrom(vacationGrant)
+                .where(vacationGrant.user.id.eq(userId)
+                        .and(vacationGrant.status.in(statuses))
+                        .and(vacationGrant.requestStartTime.between(startOfPeriod, endOfPeriod))
+                        .and(vacationGrant.isDeleted.eq(YNType.N)))
+                .fetch();
+    }
 }

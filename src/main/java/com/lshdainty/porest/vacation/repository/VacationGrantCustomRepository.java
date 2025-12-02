@@ -117,4 +117,32 @@ public interface VacationGrantCustomRepository {
      * @return VacationGrant 리스트
      */
     List<VacationGrant> findByIdsWithUserAndPolicy(List<Long> vacationGrantIds);
+
+    /**
+     * 특정 사용자의 특정 기간 내에 유효한 VacationGrant 조회
+     * - grantDate <= endOfPeriod
+     * - expiryDate >= startOfPeriod
+     * - status: ACTIVE 또는 EXHAUSTED
+     * - isDeleted == N
+     *
+     * @param userId 사용자 ID
+     * @param startOfPeriod 조회 기간 시작일
+     * @param endOfPeriod 조회 기간 종료일
+     * @return 해당 기간 내 유효한 VacationGrant 리스트
+     */
+    List<VacationGrant> findByUserIdAndValidPeriod(String userId, java.time.LocalDateTime startOfPeriod, java.time.LocalDateTime endOfPeriod);
+
+    /**
+     * 특정 사용자의 특정 상태들 & 특정 기간 내 VacationGrant 조회
+     * - status IN (상태 리스트)
+     * - requestStartTime이 startOfPeriod와 endOfPeriod 사이에 있음
+     * - isDeleted == N
+     *
+     * @param userId 사용자 ID
+     * @param statuses 조회할 상태 리스트 (예: PENDING, PROGRESS)
+     * @param startOfPeriod 조회 기간 시작일
+     * @param endOfPeriod 조회 기간 종료일
+     * @return 조건에 맞는 VacationGrant 리스트
+     */
+    List<VacationGrant> findByUserIdAndStatusesAndPeriod(String userId, List<com.lshdainty.porest.vacation.type.GrantStatus> statuses, java.time.LocalDateTime startOfPeriod, java.time.LocalDateTime endOfPeriod);
 }

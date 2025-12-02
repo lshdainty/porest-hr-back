@@ -70,11 +70,11 @@ public class VacationService {
 
         // 5. 공휴일 리스트 조회
         List<LocalDate> holidays = holidayRepository.findHolidaysByStartEndDateWithType(
-                data.getStartDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
-                data.getEndDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
+                data.getStartDate().toLocalDate(),
+                data.getEndDate().toLocalDate(),
                 HolidayType.PUBLIC
         ).stream()
-                .map(h -> LocalDate.parse(h.getDate(), DateTimeFormatter.BASIC_ISO_DATE))
+                .map(h -> h.getDate())
                 .toList();
 
         weekDays = PorestTime.addAllDates(weekDays, holidays);
@@ -1668,6 +1668,85 @@ public class VacationService {
                             .effectiveType(policy.getEffectiveType())
                             .expirationType(policy.getExpirationType())
                             .repeatGrantDescription(repeatGrantDescription)
+                            .build();
+                })
+                .toList();
+    }
+
+    /**
+     * 전체 유저의 특정 년도 휴가 통계 조회<br>
+     * 총 휴가, 사용 휴가, 사용 예정 휴가(승인 대기 중), 잔여 휴가를 계산하여 반환
+     *
+     * @param year 조회할 연도
+     * @return 전체 유저별 휴가 통계
+     */
+    public List<VacationServiceDto> getAllUsersVacationSummary(Integer year) {
+        // 년도 유효성 검증
+        if (year == null) {
+            throw new IllegalArgumentException(ms.getMessage("error.validate.year.required", null, null));
+        }
+
+        // 해당 년도의 시작일과 종료일 계산
+        LocalDateTime startOfYear = LocalDateTime.of(year, 1, 1, 0, 0, 0);
+        LocalDateTime endOfYear = LocalDateTime.of(year, 12, 31, 23, 59, 59);
+
+        // 모든 사용자 조회
+        List<User> allUsers = userService.searchUsers().stream()
+                .map(dto -> userService.checkUserExist(dto.getId()))
+                .toList();
+
+        // 각 사용자별 휴가 통계 계산
+        return allUsers.stream()
+                .map(user -> {
+                    // 부서명 조회
+                    String departmentName = user.getUserDepartments().stream()
+                            .findFirst()
+                            .map(ud -> ud.getDepartment().getName())
+                            .orElse("");
+
+                    // 해당 년도에 유효한 휴가 부여 내역 조회 (ACTIVE + EXHAUSTED)
+                    List<VacationGrant> validGrants = vacationGrantRepository
+                            .findByUserIdAndValidPeriod(user.getId(), startOfYear, endOfYear);
+
+                    // 총 휴가 일수 계산 (부여받은 grantTime 합계)
+                    BigDecimal totalVacationDays = validGrants.stream()
+                            .map(VacationGrant::getGrantTime)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    // 사용 휴가 일수 계산 (해당 년도에 사용한 휴가)
+                    List<VacationUsage> usages = vacationUsageRepository
+                            .findByUserIdAndPeriod(user.getId(), startOfYear, endOfYear);
+                    BigDecimal usedVacationDays = usages.stream()
+                            .map(VacationUsage::getUsedTime)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    // 사용 예정 휴가 일수 계산 (승인 대기 중인 휴가: PENDING, PROGRESS)
+                    List<VacationGrant> pendingGrants = vacationGrantRepository
+                            .findByUserIdAndStatusesAndPeriod(
+                                    user.getId(),
+                                    List.of(GrantStatus.PENDING, GrantStatus.PROGRESS),
+                                    startOfYear,
+                                    endOfYear
+                            );
+                    BigDecimal scheduledVacationDays = pendingGrants.stream()
+                            .map(VacationGrant::getGrantTime)
+                            .filter(Objects::nonNull)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    // 잔여 휴가 일수 계산 (총 휴가 - 사용 휴가 - 사용 예정)
+                    BigDecimal remainingVacationDays = totalVacationDays
+                            .subtract(usedVacationDays)
+                            .subtract(scheduledVacationDays);
+
+                    return VacationServiceDto.builder()
+                            .user(user)
+                            .departmentName(departmentName)
+                            .totalVacationDays(totalVacationDays)
+                            .usedVacationDays(usedVacationDays)
+                            .scheduledVacationDays(scheduledVacationDays)
+                            .remainingVacationDays(remainingVacationDays)
                             .build();
                 })
                 .toList();

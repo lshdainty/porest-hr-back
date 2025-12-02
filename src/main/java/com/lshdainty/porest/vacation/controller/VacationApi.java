@@ -718,4 +718,26 @@ public interface VacationApi {
             @Parameter(description = "사용자 ID", example = "user123", required = true)
             @PathVariable("userId") String userId
     );
+
+    // ========== 전체 유저 휴가 통계 조회 ==========
+
+    @Operation(
+            summary = "전체 유저 휴가 통계 조회",
+            description = "모든 사용자의 특정 년도 휴가 통계를 조회합니다. 총 휴가, 사용 휴가, 사용 예정 휴가(승인 대기 중), 잔여 휴가를 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "전체 유저 휴가 통계 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (VACATION_MANAGE 권한 필요)"
+            )
+    })
+    @GetMapping("/api/v1/vacations/summary")
+    ApiResponse getAllUsersVacationSummary(
+            @Parameter(description = "조회할 연도", example = "2024", required = true)
+            @RequestParam("year") Integer year
+    );
 }

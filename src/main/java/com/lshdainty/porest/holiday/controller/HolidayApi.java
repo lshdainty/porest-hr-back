@@ -10,7 +10,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Tag(name = "Holiday", description = "공휴일 관리 API")
 public interface HolidayApi {
@@ -57,9 +60,9 @@ public interface HolidayApi {
     @GetMapping("api/v1/holidays/date")
     ApiResponse searchHolidaysByStartEndDate(
             @Parameter(description = "시작일 (YYYY-MM-DD)", example = "2024-01-01", required = true)
-            @RequestParam("start") String start,
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @Parameter(description = "종료일 (YYYY-MM-DD)", example = "2024-12-31", required = true)
-            @RequestParam("end") String end,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
             @Parameter(description = "국가 코드", example = "KR", required = true)
             @RequestParam("country_code") CountryCode countryCode
     );

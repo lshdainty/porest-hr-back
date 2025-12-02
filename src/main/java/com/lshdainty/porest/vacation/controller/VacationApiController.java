@@ -716,4 +716,30 @@ public class VacationApiController implements VacationApi {
                 unassignedPolicies
         ));
     }
+
+    // ========== 전체 유저 휴가 통계 조회 ==========
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION_MANAGE')")
+    public ApiResponse getAllUsersVacationSummary(Integer year) {
+        List<VacationServiceDto> userVacationSummaries = vacationService.getAllUsersVacationSummary(year);
+
+        List<VacationApiDto.GetAllUsersVacationSummaryResp> resp = userVacationSummaries.stream()
+                .map(dto -> new VacationApiDto.GetAllUsersVacationSummaryResp(
+                        dto.getUser().getId(),
+                        dto.getUser().getName(),
+                        dto.getDepartmentName(),
+                        dto.getTotalVacationDays(),
+                        VacationTimeType.convertValueToDay(dto.getTotalVacationDays()),
+                        dto.getUsedVacationDays(),
+                        VacationTimeType.convertValueToDay(dto.getUsedVacationDays()),
+                        dto.getScheduledVacationDays(),
+                        VacationTimeType.convertValueToDay(dto.getScheduledVacationDays()),
+                        dto.getRemainingVacationDays(),
+                        VacationTimeType.convertValueToDay(dto.getRemainingVacationDays())
+                ))
+                .toList();
+
+        return ApiResponse.success(resp);
+    }
 }

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ public class HolidayApiController implements HolidayApi {
 
     @Override
     @PreAuthorize("hasAuthority('HOLIDAY_READ')")
-    public ApiResponse searchHolidaysByStartEndDate(String start, String end, CountryCode countryCode) {
+    public ApiResponse searchHolidaysByStartEndDate(LocalDate start, LocalDate end, CountryCode countryCode) {
         List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(start, end, countryCode);
 
         List<HolidayApiDto.SearchHolidaysResp> resp = holidays.stream()

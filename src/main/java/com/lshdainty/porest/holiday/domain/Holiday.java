@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -23,7 +24,7 @@ public class Holiday extends AuditingFields {
 
     @NotNull
     @Column(name = "holiday_date")
-    private String date;        // 공휴일 날짜
+    private LocalDate date;        // 공휴일 날짜
 
     @NotNull
     @Column(name = "holiday_name")
@@ -45,7 +46,7 @@ public class Holiday extends AuditingFields {
     private YNType lunarYN;     // 음력 여부
 
     @Column(name = "holiday_lunar_date")
-    private String lunarDate;   // 음력 날짜
+    private LocalDate lunarDate;   // 음력 날짜
 
     @Enumerated(EnumType.STRING)
     @NotNull
@@ -60,9 +61,9 @@ public class Holiday extends AuditingFields {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 공휴일 생성할 것
      *
-     * @return Dues
+     * @return Holiday
      */
-    public static Holiday createHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, String lunarDate, YNType isRecurring, String icon) {
+    public static Holiday createHoliday(String name, LocalDate date, HolidayType type, CountryCode countryCode, YNType lunarYN, LocalDate lunarDate, YNType isRecurring, String icon) {
         Holiday holiday = new Holiday();
         holiday.name = name;
         holiday.date = date;
@@ -80,7 +81,7 @@ public class Holiday extends AuditingFields {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 공휴일 수정할 것
      */
-    public void updateHoliday(String name, String date, HolidayType type, CountryCode countryCode, YNType lunarYN, String lunarDate, YNType isRecurring, String icon) {
+    public void updateHoliday(String name, LocalDate date, HolidayType type, CountryCode countryCode, YNType lunarYN, LocalDate lunarDate, YNType isRecurring, String icon) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(date)) { this.date = date; }
         if (!Objects.isNull(type)) { this.type = type; }

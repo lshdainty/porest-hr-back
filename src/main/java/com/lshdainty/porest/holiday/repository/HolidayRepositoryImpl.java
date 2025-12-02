@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class HolidayRepositoryImpl implements HolidayRepository {
     }
 
     @Override
-    public List<Holiday> findHolidaysByStartEndDate(String start, String end, CountryCode countryCode) {
+    public List<Holiday> findHolidaysByStartEndDate(LocalDate start, LocalDate end, CountryCode countryCode) {
         return em.createQuery("select h from Holiday h where h.date between :start and :end and h.countryCode = :countryCode order by h.date", Holiday.class)
                 .setParameter("start", start)
                 .setParameter("end", end)
@@ -49,7 +50,7 @@ public class HolidayRepositoryImpl implements HolidayRepository {
     }
 
     @Override
-    public List<Holiday> findHolidaysByStartEndDateWithType(String start, String end, HolidayType type) {
+    public List<Holiday> findHolidaysByStartEndDateWithType(LocalDate start, LocalDate end, HolidayType type) {
         return em.createQuery("select h from Holiday h where h.date between :start and :end and h.type = :type order by h.date", Holiday.class)
                 .setParameter("start", start)
                 .setParameter("end", end)
