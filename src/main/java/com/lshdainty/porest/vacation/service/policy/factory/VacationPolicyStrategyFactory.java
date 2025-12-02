@@ -1,7 +1,7 @@
 package com.lshdainty.porest.vacation.service.policy.factory;
 
 import com.lshdainty.porest.common.util.MessageResolver;
-import com.lshdainty.porest.vacation.repository.VacationPolicyCustomRepositoryImpl;
+import com.lshdainty.porest.vacation.repository.VacationPolicyRepository;
 import com.lshdainty.porest.vacation.service.policy.ManualGrant;
 import com.lshdainty.porest.vacation.service.policy.OnRequest;
 import com.lshdainty.porest.vacation.service.policy.RepeatGrant;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class VacationPolicyStrategyFactory {
     private final MessageResolver messageResolver;
-    private final VacationPolicyCustomRepositoryImpl vacationPolicyRepository;
+    private final VacationPolicyRepository vacationPolicyRepository;
 
     public VacationPolicyStrategy getStrategy(GrantMethod grantMethod) {
         return switch (grantMethod) {

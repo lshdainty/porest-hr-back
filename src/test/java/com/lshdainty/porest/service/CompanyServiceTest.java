@@ -2,7 +2,7 @@ package com.lshdainty.porest.service;
 
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.company.domain.Company;
-import com.lshdainty.porest.company.repository.CompanyCustomRepositoryImpl;
+import com.lshdainty.porest.company.repository.CompanyRepository;
 import com.lshdainty.porest.company.service.CompanyService;
 import com.lshdainty.porest.company.service.dto.CompanyServiceDto;
 import com.lshdainty.porest.department.domain.Department;
@@ -31,7 +31,7 @@ class CompanyServiceTest {
     @Mock
     private MessageSource ms;
     @Mock
-    private CompanyCustomRepositoryImpl companyRepository;
+    private CompanyRepository companyRepository;
 
     @InjectMocks
     private CompanyService companyService;

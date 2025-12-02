@@ -3,8 +3,8 @@ package com.lshdainty.porest.vacation.scheduler;
 import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
-import com.lshdainty.porest.vacation.repository.UserVacationPolicyCustomRepositoryImpl;
-import com.lshdainty.porest.vacation.repository.VacationGrantCustomRepositoryImpl;
+import com.lshdainty.porest.vacation.repository.UserVacationPolicyRepository;
+import com.lshdainty.porest.vacation.repository.VacationGrantRepository;
 import com.lshdainty.porest.vacation.service.policy.RepeatGrant;
 import com.lshdainty.porest.vacation.service.policy.factory.VacationPolicyStrategyFactory;
 import com.lshdainty.porest.vacation.type.GrantMethod;
@@ -28,8 +28,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class VacationGrantScheduler {
-    private final UserVacationPolicyCustomRepositoryImpl userVacationPolicyRepository;
-    private final VacationGrantCustomRepositoryImpl vacationGrantRepository;
+    private final UserVacationPolicyRepository userVacationPolicyRepository;
+    private final VacationGrantRepository vacationGrantRepository;
     private final VacationPolicyStrategyFactory strategyFactory;
 
     /**

@@ -1,5 +1,6 @@
 package com.lshdainty.porest.service;
 
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.schedule.domain.Schedule;
 import com.lshdainty.porest.schedule.repository.ScheduleRepositoryImpl;
 import com.lshdainty.porest.schedule.service.ScheduleService;
@@ -224,7 +225,7 @@ class ScheduleServiceTest {
             then(scheduleRepositoryImpl).should().findById(scheduleId);
             then(userService).should().checkUserExist(userId);
             then(scheduleRepositoryImpl).should().save(any(Schedule.class));
-            assertThat(existingSchedule.getIsDeleted()).isEqualTo("Y");
+            assertThat(existingSchedule.getIsDeleted()).isEqualTo(YNType.Y);
         }
     }
 
@@ -251,7 +252,7 @@ class ScheduleServiceTest {
 
             // then
             then(scheduleRepositoryImpl).should().findById(scheduleId);
-            assertThat(schedule.getIsDeleted()).isEqualTo("Y");
+            assertThat(schedule.getIsDeleted()).isEqualTo(YNType.Y);
         }
 
         @Test

@@ -4,7 +4,7 @@ import com.lshdainty.porest.security.dto.OAuthAttributes;
 import com.lshdainty.porest.security.principal.CustomOAuth2User;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.domain.UserProvider;
-import com.lshdainty.porest.user.repository.UserRepositoryImpl;
+import com.lshdainty.porest.user.repository.UserRepository;
 import com.lshdainty.porest.user.repository.UserProviderRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -28,7 +28,7 @@ import com.lshdainty.porest.permission.domain.Role;
 @Service
 @Transactional
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    private final UserRepositoryImpl userRepository;
+    private final UserRepository userRepository;
     private final UserProviderRepository userProviderRepository;
     private final HttpSession httpSession;
 

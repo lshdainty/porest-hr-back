@@ -2,8 +2,8 @@ package com.lshdainty.porest.service;
 
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.company.type.OriginCompanyType;
-import com.lshdainty.porest.department.repository.DepartmentCustomRepositoryImpl;
-import com.lshdainty.porest.holiday.repository.HolidayRepositoryImpl;
+import com.lshdainty.porest.department.repository.DepartmentRepository;
+import com.lshdainty.porest.holiday.repository.HolidayRepository;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.vacation.domain.*;
@@ -47,13 +47,13 @@ class VacationServiceTest {
     private MessageSource ms;
 
     @Mock
-    private VacationPolicyCustomRepositoryImpl vacationPolicyRepository;
+    private VacationPolicyRepository vacationPolicyRepository;
 
     @Mock
-    private UserVacationPolicyCustomRepositoryImpl userVacationPolicyRepository;
+    private UserVacationPolicyRepository userVacationPolicyRepository;
 
     @Mock
-    private HolidayRepositoryImpl holidayRepository;
+    private HolidayRepository holidayRepository;
 
     @Mock
     private UserService userService;
@@ -62,19 +62,19 @@ class VacationServiceTest {
     private VacationPolicyStrategyFactory vacationPolicyStrategyFactory;
 
     @Mock
-    private VacationGrantCustomRepositoryImpl vacationGrantRepository;
+    private VacationGrantRepository vacationGrantRepository;
 
     @Mock
-    private VacationUsageCustomRepositoryImpl vacationUsageRepository;
+    private VacationUsageRepository vacationUsageRepository;
 
     @Mock
-    private VacationUsageDeductionCustomRepositoryImpl vacationUsageDeductionRepository;
+    private VacationUsageDeductionRepository vacationUsageDeductionRepository;
 
     @Mock
-    private VacationApprovalCustomRepositoryImpl vacationApprovalRepository;
+    private VacationApprovalRepository vacationApprovalRepository;
 
     @Mock
-    private DepartmentCustomRepositoryImpl departmentRepository;
+    private DepartmentRepository departmentRepository;
 
     @InjectMocks
     private VacationService vacationService;

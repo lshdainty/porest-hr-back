@@ -4,11 +4,11 @@ import com.lshdainty.porest.common.message.MessageKey;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.common.util.PorestFile;
-import com.lshdainty.porest.department.repository.DepartmentCustomRepositoryImpl;
+import com.lshdainty.porest.department.repository.DepartmentRepository;
 import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.permission.repository.RoleRepository;
 import com.lshdainty.porest.user.domain.User;
-import com.lshdainty.porest.user.repository.UserRepositoryImpl;
+import com.lshdainty.porest.user.repository.UserRepository;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
 import com.lshdainty.porest.user.type.StatusType;
 import jakarta.persistence.EntityManager;
@@ -33,10 +33,10 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class UserService {
     private final MessageResolver messageResolver;
-    private final UserRepositoryImpl userRepositoryImpl;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EmailService emailService;
-    private final DepartmentCustomRepositoryImpl departmentRepository;
+    private final DepartmentRepository departmentRepository;
     private final EntityManager em;
 
     @Value("${file.root-path}")
@@ -74,7 +74,7 @@ public class UserService {
                 profileDto.getProfileUUID()
         );
 
-        userRepositoryImpl.save(user);
+        userRepository.save(user);
         log.info("사용자 생성 완료: id={}", user.getId());
         return user.getId();
     }
@@ -86,7 +86,7 @@ public class UserService {
 
         // 메인 부서의 한글명 조회
         String mainDepartmentNameKR = user.getUserDepartments().stream()
-                .filter(ud -> ud.getMainYN() == YNType.Y && ud.getIsDeleted() == YNType.N)
+                .filter(ud -> YNType.isY(ud.getMainYN()) && YNType.isN(ud.getIsDeleted()))
                 .findFirst()
                 .map(ud -> ud.getDepartment().getNameKR())
                 .orElse(null);
@@ -136,14 +136,14 @@ public class UserService {
     public List<UserServiceDto> searchUsers() {
         log.debug("전체 사용자 목록 조회 시작");
         // 역할 및 권한 정보를 포함하여 조회
-        List<User> users = userRepositoryImpl.findUsersWithRolesAndPermissions();
+        List<User> users = userRepository.findUsersWithRolesAndPermissions();
         log.debug("전체 사용자 목록 조회 완료: count={}", users.size());
 
         return users.stream()
                 .map(user -> {
                     // 메인 부서의 한글명 조회
                     String mainDepartmentNameKR = user.getUserDepartments().stream()
-                            .filter(ud -> ud.getMainYN() == YNType.Y && ud.getIsDeleted() == YNType.N)
+                            .filter(ud -> YNType.isY(ud.getMainYN()) && YNType.isN(ud.getIsDeleted()))
                             .findFirst()
                             .map(ud -> ud.getDepartment().getNameKR())
                             .orElse(null);
@@ -253,8 +253,8 @@ public class UserService {
     }
 
     public User checkUserExist(String userId) {
-        Optional<User> findUser = userRepositoryImpl.findById(userId);
-        if ((findUser.isEmpty()) || findUser.get().getIsDeleted().equals(YNType.Y)) {
+        Optional<User> findUser = userRepository.findById(userId);
+        if ((findUser.isEmpty()) || YNType.isY(findUser.get().getIsDeleted())) {
             log.warn("사용자 조회 실패 - 존재하지 않거나 삭제된 사용자: userId={}", userId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_USER));
         }
@@ -269,8 +269,8 @@ public class UserService {
      * @return User 엔티티 (역할 및 권한 정보 포함)
      */
     public User findUserById(String userId) {
-        Optional<User> findUser = userRepositoryImpl.findByIdWithRolesAndPermissions(userId);
-        if ((findUser.isEmpty()) || findUser.get().getIsDeleted().equals(YNType.Y)) {
+        Optional<User> findUser = userRepository.findByIdWithRolesAndPermissions(userId);
+        if ((findUser.isEmpty()) || YNType.isY(findUser.get().getIsDeleted())) {
             log.warn("사용자 조회 실패 - 존재하지 않거나 삭제된 사용자: userId={}", userId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_USER));
         }
@@ -350,7 +350,7 @@ public class UserService {
                 data.getJoinDate()
         );
 
-        userRepositoryImpl.save(user);
+        userRepository.save(user);
 
         // 초대 이메일 발송
         emailService.sendInvitationEmail(user.getEmail(), user.getName(), user.getInvitationToken());
@@ -449,7 +449,7 @@ public class UserService {
     @Transactional
     public String completeInvitedUserRegistration(UserServiceDto data) {
         log.debug("초대 수락 및 회원가입 시작: token={}", data.getInvitationToken());
-        Optional<User> findUser = userRepositoryImpl.findByInvitationToken(data.getInvitationToken());
+        Optional<User> findUser = userRepository.findByInvitationToken(data.getInvitationToken());
         if (findUser.isEmpty()) {
             log.warn("회원가입 실패 - 초대 토큰 없음: token={}", data.getInvitationToken());
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_INVITATION));
@@ -474,7 +474,7 @@ public class UserService {
      * 아이디 중복 체크
      */
     public boolean checkUserIdDuplicate(String userId) {
-        Optional<User> existingUser = userRepositoryImpl.findById(userId);
+        Optional<User> existingUser = userRepository.findById(userId);
         // userId가 PK이므로 삭제 여부와 관계없이 존재하면 중복으로 판단
         return existingUser.isPresent();
     }
@@ -530,10 +530,10 @@ public class UserService {
         return approverDepartments.stream()
                 .map(dept -> {
                     // headUserId로 User 조회 (역할 및 권한 정보 포함)
-                    User approver = userRepositoryImpl.findByIdWithRolesAndPermissions(dept.getHeadUserId())
+                    User approver = userRepository.findByIdWithRolesAndPermissions(dept.getHeadUserId())
                             .orElse(null);
 
-                    if (approver == null || approver.getIsDeleted() == YNType.Y) {
+                    if (approver == null || YNType.isY(approver.getIsDeleted())) {
                         return null;
                     }
 

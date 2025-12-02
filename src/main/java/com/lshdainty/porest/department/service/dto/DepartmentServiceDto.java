@@ -47,7 +47,7 @@ public class DepartmentServiceDto {
                 .companyId(department.getCompany() != null ? department.getCompany().getId() : null)
                 .children(department.getChildren() != null
                         ? department.getChildren().stream()
-                        .filter(child -> child.getIsDeleted() == YNType.N)
+                        .filter(child -> YNType.isN(child.getIsDeleted()))
                         .map(DepartmentServiceDto::fromEntityWithChildren)
                         .toList()
                         : null)

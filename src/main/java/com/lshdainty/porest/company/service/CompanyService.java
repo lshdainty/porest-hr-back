@@ -4,7 +4,7 @@ import com.lshdainty.porest.common.message.MessageKey;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.company.domain.Company;
-import com.lshdainty.porest.company.repository.CompanyCustomRepositoryImpl;
+import com.lshdainty.porest.company.repository.CompanyRepository;
 import com.lshdainty.porest.company.service.dto.CompanyServiceDto;
 import com.lshdainty.porest.department.service.dto.DepartmentServiceDto;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CompanyService {
     private final MessageResolver messageResolver;
-    private final CompanyCustomRepositoryImpl companyRepository;
+    private final CompanyRepository companyRepository;
 
     @Transactional
     public String regist(CompanyServiceDto data) {
@@ -92,7 +92,7 @@ public class CompanyService {
 
         // 최상위(parent가 null) 부서만 필터링, 각 부서 트리를 재귀로 DTO 변환
         List<DepartmentServiceDto> departmentDtos = company.getDepartments().stream()
-                .filter(department -> department.getParent() == null && department.getIsDeleted() == YNType.N)
+                .filter(department -> department.getParent() == null && YNType.isN(department.getIsDeleted()))
                 .map(DepartmentServiceDto::fromEntityWithChildren)
                 .toList();
 
@@ -114,7 +114,7 @@ public class CompanyService {
 
     public Company checkCompanyExists(String companyId) {
         Optional<Company> company = companyRepository.findById(companyId);
-        if ((company.isEmpty()) || (company.get().getIsDeleted().equals(YNType.Y))) {
+        if ((company.isEmpty()) || YNType.isY(company.get().getIsDeleted())) {
             log.warn("회사 조회 실패 - 존재하지 않거나 삭제된 회사: id={}", companyId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_COMPANY));
         }

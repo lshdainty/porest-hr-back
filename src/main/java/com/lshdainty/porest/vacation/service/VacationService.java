@@ -5,8 +5,8 @@ import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.common.util.PorestTime;
 import com.lshdainty.porest.department.domain.Department;
-import com.lshdainty.porest.department.repository.DepartmentCustomRepositoryImpl;
-import com.lshdainty.porest.holiday.repository.HolidayRepositoryImpl;
+import com.lshdainty.porest.department.repository.DepartmentRepository;
+import com.lshdainty.porest.holiday.repository.HolidayRepository;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
@@ -39,16 +39,16 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class VacationService {
     private final MessageResolver messageResolver;
-    private final VacationPolicyCustomRepositoryImpl vacationPolicyRepository;
-    private final UserVacationPolicyCustomRepositoryImpl userVacationPolicyRepository;
-    private final HolidayRepositoryImpl holidayRepository;
+    private final VacationPolicyRepository vacationPolicyRepository;
+    private final UserVacationPolicyRepository userVacationPolicyRepository;
+    private final HolidayRepository holidayRepository;
     private final UserService userService;
     private final VacationPolicyStrategyFactory vacationPolicyStrategyFactory;
-    private final VacationGrantCustomRepositoryImpl vacationGrantRepository;
-    private final VacationUsageCustomRepositoryImpl vacationUsageRepository;
-    private final VacationUsageDeductionCustomRepositoryImpl vacationUsageDeductionRepository;
-    private final VacationApprovalCustomRepositoryImpl vacationApprovalRepository;
-    private final DepartmentCustomRepositoryImpl departmentRepository;
+    private final VacationGrantRepository vacationGrantRepository;
+    private final VacationUsageRepository vacationUsageRepository;
+    private final VacationUsageDeductionRepository vacationUsageDeductionRepository;
+    private final VacationApprovalRepository vacationApprovalRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Transactional
     public Long useVacation(VacationServiceDto data) {
@@ -291,7 +291,7 @@ public class VacationService {
                 });
 
         // 2. 이미 삭제된 경우 예외 처리
-        if (usage.getIsDeleted() == YNType.Y) {
+        if (YNType.isY(usage.getIsDeleted())) {
             log.warn("휴가 사용 취소 실패 - 이미 삭제됨: vacationUsageId={}", vacationUsageId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.VALIDATE_ALREADY_DELETED_VACATION_USAGE));
         }
@@ -605,13 +605,13 @@ public class VacationService {
         VacationPolicy vacationPolicy = validateAndGetVacationPolicy(vacationPolicyId);
 
         // 2. 이미 삭제된 정책인지 확인
-        if (vacationPolicy.getIsDeleted() == YNType.Y) {
+        if (YNType.isY(vacationPolicy.getIsDeleted())) {
             log.warn("휴가 정책 삭제 실패 - 이미 삭제됨: vacationPolicyId={}", vacationPolicyId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.VALIDATE_ALREADY_DELETED_VACATION_POLICY));
         }
 
         // 3. 삭제 가능 여부 확인
-        if (vacationPolicy.getCanDeleted() == YNType.N) {
+        if (YNType.isN(vacationPolicy.getCanDeleted())) {
             log.warn("휴가 정책 삭제 실패 - 삭제 불가 정책: vacationPolicyId={}", vacationPolicyId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.VALIDATE_CANNOT_DELETE_VACATION_POLICY));
         }
@@ -625,7 +625,7 @@ public class VacationService {
 
         for (UserVacationPolicy uvp : userVacationPolicies) {
             // 이미 삭제된 경우 스킵
-            if (uvp.getIsDeleted() == YNType.Y) {
+            if (YNType.isY(uvp.getIsDeleted())) {
                 continue;
             }
 
@@ -784,7 +784,7 @@ public class VacationService {
                 });
 
         // 4. 이미 삭제된 경우 예외 처리
-        if (userVacationPolicy.getIsDeleted() == YNType.Y) {
+        if (YNType.isY(userVacationPolicy.getIsDeleted())) {
             log.warn("유저 휴가 정책 회수 실패 - 이미 삭제됨: userId={}, policyId={}", userId, vacationPolicyId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.VALIDATE_ALREADY_DELETED_USER_VACATION_POLICY));
         }
@@ -847,7 +847,7 @@ public class VacationService {
                 UserVacationPolicy userVacationPolicy = optionalUvp.get();
 
                 // 이미 삭제된 경우 스킵
-                if (userVacationPolicy.getIsDeleted() == YNType.Y) {
+                if (YNType.isY(userVacationPolicy.getIsDeleted())) {
                     log.warn("Vacation policy {} already revoked from user {}, skipping", policyId, userId);
                     continue;
                 }
@@ -995,7 +995,7 @@ public class VacationService {
                 });
 
         // 2. 이미 삭제된 경우
-        if (grant.getIsDeleted() == YNType.Y) {
+        if (YNType.isY(grant.getIsDeleted())) {
             log.warn("휴가 부여 회수 실패 - 이미 삭제됨: vacationGrantId={}", vacationGrantId);
             throw new IllegalArgumentException(
                     messageResolver.getMessage(MessageKey.VACATION_ALREADY_DELETED)

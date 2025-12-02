@@ -7,7 +7,7 @@ import com.lshdainty.porest.company.domain.Company;
 import com.lshdainty.porest.company.service.CompanyService;
 import com.lshdainty.porest.department.domain.Department;
 import com.lshdainty.porest.department.domain.UserDepartment;
-import com.lshdainty.porest.department.repository.DepartmentCustomRepositoryImpl;
+import com.lshdainty.porest.department.repository.DepartmentRepository;
 import com.lshdainty.porest.department.service.dto.DepartmentServiceDto;
 import com.lshdainty.porest.department.service.dto.UserDepartmentServiceDto;
 import com.lshdainty.porest.user.domain.User;
@@ -27,7 +27,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class DepartmentService {
     private final MessageResolver messageResolver;
-    private final DepartmentCustomRepositoryImpl departmentRepository;
+    private final DepartmentRepository departmentRepository;
     private final CompanyService companyService;
     private final UserService userService;
 
@@ -112,7 +112,7 @@ public class DepartmentService {
 
         // 하위에 자식 부서가 있는지 확인
         boolean hasChildren = department.getChildren().stream()
-                .anyMatch(child -> child.getIsDeleted() == YNType.N);
+                .anyMatch(child -> YNType.isN(child.getIsDeleted()));
 
         if (hasChildren) {
             log.warn("부서 삭제 실패 - 하위 부서 존재: departmentId={}", departmentId);
@@ -159,7 +159,7 @@ public class DepartmentService {
             User user = userService.checkUserExist(data.getUserId());
 
             // mainYN이 Y인 경우, 해당 유저의 기존 메인 부서가 있는지 확인
-            if (data.getMainYN() == YNType.Y) {
+            if (YNType.isY(data.getMainYN())) {
                 Optional<UserDepartment> existingMainDepartment =
                         departmentRepository.findMainDepartmentByUserId(user.getId());
 
@@ -253,7 +253,7 @@ public class DepartmentService {
 
     public Department checkDepartmentExists(Long departmentId) {
         Optional<Department> department = departmentRepository.findById(departmentId);
-        if ((department.isEmpty()) || department.get().getIsDeleted().equals(YNType.Y)) {
+        if ((department.isEmpty()) || YNType.isY(department.get().getIsDeleted())) {
             log.warn("부서 조회 실패 - 존재하지 않거나 삭제된 부서: departmentId={}", departmentId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_DEPARTMENT));
         }
@@ -269,7 +269,7 @@ public class DepartmentService {
         }
 
         for (Department child : currentDepartment.getChildren()) {
-            if (child.getIsDeleted() == YNType.N) {
+            if (YNType.isN(child.getIsDeleted())) {
                 if (child.getId().equals(targetDepartment.getId())) {
                     return true;
                 }

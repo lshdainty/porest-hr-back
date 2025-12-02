@@ -4,7 +4,7 @@ import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.work.domain.WorkCode;
 import com.lshdainty.porest.work.domain.WorkHistory;
 import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
-import com.lshdainty.porest.work.repository.WorkHistoryCustomRepositoryImpl;
+import com.lshdainty.porest.work.repository.WorkHistoryQueryDslRepository;
 import com.lshdainty.porest.work.type.CodeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,12 +23,12 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@Import({ WorkHistoryCustomRepositoryImpl.class, TestQuerydslConfig.class })
+@Import({ WorkHistoryQueryDslRepository.class, TestQuerydslConfig.class })
 @Transactional
 @DisplayName("JPA 업무이력 레포지토리 테스트")
 class WorkHistoryRepositoryImplTest {
     @Autowired
-    private WorkHistoryCustomRepositoryImpl workHistoryRepository;
+    private WorkHistoryQueryDslRepository workHistoryRepository;
 
     @Autowired
     private TestEntityManager em;

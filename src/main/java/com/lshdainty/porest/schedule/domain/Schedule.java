@@ -1,9 +1,19 @@
 package com.lshdainty.porest.schedule.domain;
 
 import com.lshdainty.porest.common.domain.AuditingFields;
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.schedule.type.ScheduleType;
 import com.lshdainty.porest.user.domain.User;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +50,8 @@ public class Schedule extends AuditingFields {
     private LocalDateTime endDate;
 
     @Column(name = "is_deleted")
-    private String isDeleted;
+    @Enumerated(EnumType.STRING)
+    private YNType isDeleted;
 
     /**
      * 스케줄 생성 함수<br>
@@ -56,7 +67,7 @@ public class Schedule extends AuditingFields {
         schedule.type = type;
         schedule.startDate = startDate;
         schedule.endDate = endDate;
-        schedule.isDeleted = "N";
+        schedule.isDeleted = YNType.N;
         return schedule;
     }
 
@@ -66,6 +77,6 @@ public class Schedule extends AuditingFields {
      * 해당 메소드를 통해 스케줄 삭제할 것
      */
     public void deleteSchedule() {
-        this.isDeleted = "Y";
+        this.isDeleted = YNType.Y;
     }
 }

@@ -4,7 +4,7 @@ import com.lshdainty.porest.common.message.MessageKey;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.user.domain.User;
-import com.lshdainty.porest.user.repository.UserRepositoryImpl;
+import com.lshdainty.porest.user.repository.UserRepository;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SecurityService {
     private final MessageResolver messageResolver;
-    private final UserRepositoryImpl userRepositoryImpl;
+    private final UserRepository userRepository;
 
     /**
      * 초대 토큰으로 사용자 조회 및 유효성 검증
      */
     public UserServiceDto validateInvitationToken(String token) {
         log.debug("초대 토큰 검증 시작: token={}", token);
-        Optional<User> findUser = userRepositoryImpl.findByInvitationToken(token);
+        Optional<User> findUser = userRepository.findByInvitationToken(token);
         if (findUser.isEmpty()) {
             log.warn("초대 토큰 검증 실패 - 토큰 없음: token={}", token);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_INVITATION));

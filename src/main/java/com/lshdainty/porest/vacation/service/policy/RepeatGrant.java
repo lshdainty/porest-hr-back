@@ -4,7 +4,7 @@ import com.lshdainty.porest.common.message.MessageKey;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
-import com.lshdainty.porest.vacation.repository.VacationPolicyCustomRepositoryImpl;
+import com.lshdainty.porest.vacation.repository.VacationPolicyRepository;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.type.GrantMethod;
 import com.lshdainty.porest.vacation.type.RepeatUnit;
@@ -18,7 +18,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RepeatGrant implements VacationPolicyStrategy {
     private final MessageResolver messageResolver;
-    private final VacationPolicyCustomRepositoryImpl vacationPolicyRepository;
+    private final VacationPolicyRepository vacationPolicyRepository;
 
     @Override
     public Long registVacationPolicy(VacationPolicyServiceDto data) {

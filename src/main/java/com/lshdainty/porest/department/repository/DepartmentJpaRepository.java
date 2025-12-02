@@ -1,0 +1,176 @@
+package com.lshdainty.porest.department.repository;
+
+import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.department.domain.Department;
+import com.lshdainty.porest.department.domain.UserDepartment;
+import com.lshdainty.porest.user.domain.User;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Repository("departmentJpaRepository")
+@RequiredArgsConstructor
+public class DepartmentJpaRepository implements DepartmentRepository {
+    private final EntityManager em;
+
+    @Override
+    public void save(Department department) {
+        em.persist(department);
+    }
+
+    @Override
+    public Optional<Department> findById(Long id) {
+        List<Department> result = em.createQuery(
+                "select d from Department d where d.id = :id and d.isDeleted = :isDeleted", Department.class)
+                .setParameter("id", id)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    }
+
+    @Override
+    public Optional<Department> findByIdWithChildren(Long id) {
+        List<Department> result = em.createQuery(
+                "select distinct d from Department d " +
+                "left join fetch d.children " +
+                "where d.id = :id and d.isDeleted = :isDeleted", Department.class)
+                .setParameter("id", id)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    }
+
+    @Override
+    public boolean hasActiveChildren(Long departmentId) {
+        Long count = em.createQuery(
+                "select count(d) from Department d where d.parent.id = :departmentId and d.isDeleted = :isDeleted", Long.class)
+                .setParameter("departmentId", departmentId)
+                .setParameter("isDeleted", YNType.N)
+                .getSingleResult();
+        return count != null && count > 0;
+    }
+
+    @Override
+    public void saveUserDepartment(UserDepartment userDepartment) {
+        em.persist(userDepartment);
+    }
+
+    @Override
+    public Optional<UserDepartment> findMainDepartmentByUserId(String userId) {
+        List<UserDepartment> result = em.createQuery(
+                "select ud from UserDepartment ud where ud.user.id = :userId and ud.mainYN = :mainYN and ud.isDeleted = :isDeleted", UserDepartment.class)
+                .setParameter("userId", userId)
+                .setParameter("mainYN", YNType.Y)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    }
+
+    @Override
+    public Optional<UserDepartment> findUserDepartment(String userId, Long departmentId) {
+        List<UserDepartment> result = em.createQuery(
+                "select ud from UserDepartment ud where ud.user.id = :userId and ud.department.id = :departmentId and ud.isDeleted = :isDeleted", UserDepartment.class)
+                .setParameter("userId", userId)
+                .setParameter("departmentId", departmentId)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    }
+
+    @Override
+    public List<User> findUsersInDepartment(Long departmentId) {
+        return em.createQuery(
+                "select ud.user from UserDepartment ud " +
+                "join ud.user u join ud.department d " +
+                "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted", User.class)
+                .setParameter("departmentId", departmentId)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+    }
+
+    @Override
+    public List<User> findUsersNotInDepartment(Long departmentId) {
+        return em.createQuery(
+                "select u from User u where u.isDeleted = :isDeleted and not exists (" +
+                "select 1 from UserDepartment ud join ud.department d " +
+                "where ud.user.id = u.id and ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted)", User.class)
+                .setParameter("departmentId", departmentId)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+    }
+
+    @Override
+    public List<UserDepartment> findUserDepartmentsInDepartment(Long departmentId) {
+        return em.createQuery(
+                "select ud from UserDepartment ud " +
+                "join fetch ud.user u join ud.department d " +
+                "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted", UserDepartment.class)
+                .setParameter("departmentId", departmentId)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+    }
+
+    @Override
+    public boolean hasMainDepartment(String userId) {
+        Long count = em.createQuery(
+                "select count(ud) from UserDepartment ud where ud.user.id = :userId and ud.mainYN = :mainYN and ud.isDeleted = :isDeleted", Long.class)
+                .setParameter("userId", userId)
+                .setParameter("mainYN", YNType.Y)
+                .setParameter("isDeleted", YNType.N)
+                .getSingleResult();
+        return count != null && count > 0;
+    }
+
+    @Override
+    public List<Department> findByUserIds(List<String> userIds) {
+        return em.createQuery(
+                "select d from Department d where d.headUserId in :userIds and d.isDeleted = :isDeleted", Department.class)
+                .setParameter("userIds", userIds)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+    }
+
+    @Override
+    public List<Department> findApproversByUserId(String userId) {
+        List<UserDepartment> userDeptResult = em.createQuery(
+                "select ud from UserDepartment ud " +
+                "join fetch ud.department d " +
+                "where ud.user.id = :userId and ud.mainYN = :mainYN and ud.isDeleted = :isDeleted", UserDepartment.class)
+                .setParameter("userId", userId)
+                .setParameter("mainYN", YNType.Y)
+                .setParameter("isDeleted", YNType.N)
+                .getResultList();
+
+        if (userDeptResult.isEmpty()) {
+            return List.of();
+        }
+
+        List<Department> approverDepartments = new ArrayList<>();
+        Department currentDept = userDeptResult.get(0).getDepartment();
+
+        while (currentDept != null && currentDept.getParentId() != null) {
+            List<Department> parentResult = em.createQuery(
+                    "select d from Department d where d.id = :id and d.isDeleted = :isDeleted", Department.class)
+                    .setParameter("id", currentDept.getParentId())
+                    .setParameter("isDeleted", YNType.N)
+                    .getResultList();
+
+            if (parentResult.isEmpty()) {
+                break;
+            }
+
+            Department parentDept = parentResult.get(0);
+            if (parentDept.getHeadUserId() != null) {
+                approverDepartments.add(parentDept);
+            }
+
+            currentDept = parentDept;
+        }
+
+        return approverDepartments;
+    }
+}

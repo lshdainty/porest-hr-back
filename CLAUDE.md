@@ -16,6 +16,10 @@
 - Repository: QueryDSL [web:26]
 - 예외: 전역 @RestControllerAdvice로 에러 응답 표준화 [web:26]
 - 로깅: slf4j 사용 [web:26]
+- Import 규칙:
+  - 클래스는 반드시 파일 상단에 import 문으로 선언 (풀경로 인라인 사용 금지)
+  - 사용하지 않는 import는 즉시 삭제
+  - 와일드카드 import(`*`) 사용 금지, 개별 클래스 명시
 
 ## i18n & Message 관리
 - 메시지 키: `MessageKey` enum으로 중앙 관리 (`common/message/MessageKey.java`)

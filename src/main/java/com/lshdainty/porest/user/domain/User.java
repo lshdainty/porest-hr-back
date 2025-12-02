@@ -241,7 +241,7 @@ public class User extends AuditingFields {
 
             // 1. 기존 활성화된 역할 중 새로운 목록에 없는 것은 soft delete
             this.userRoles.stream()
-                    .filter(ur -> ur.getIsDeleted() == YNType.N)
+                    .filter(ur -> YNType.isN(ur.getIsDeleted()))
                     .filter(ur -> !newRoleCodes.contains(ur.getRole().getCode()))
                     .forEach(UserRole::deleteUserRole);
 
@@ -250,7 +250,7 @@ public class User extends AuditingFields {
                 // 이미 활성화된 역할인지 확인 (soft delete된 것은 무시)
                 boolean exists = this.userRoles.stream()
                         .anyMatch(ur -> ur.getRole().getCode().equals(role.getCode())
-                                && ur.getIsDeleted() == YNType.N);
+                                && YNType.isN(ur.getIsDeleted()));
 
                 // 활성화된 역할이 없으면 새로 생성
                 if (!exists) {
@@ -339,7 +339,7 @@ public class User extends AuditingFields {
      */
     public List<Role> getRoles() {
         return this.userRoles.stream()
-                .filter(ur -> ur.getIsDeleted() == YNType.N)
+                .filter(ur -> YNType.isN(ur.getIsDeleted()))
                 .map(UserRole::getRole)
                 .toList();
     }
@@ -353,7 +353,7 @@ public class User extends AuditingFields {
     public void addRole(Role role) {
         boolean exists = this.userRoles.stream()
                 .anyMatch(ur -> ur.getRole().getCode().equals(role.getCode())
-                        && ur.getIsDeleted() == YNType.N);
+                        && YNType.isN(ur.getIsDeleted()));
 
         if (!exists) {
             UserRole userRole = UserRole.createUserRole(this, role);
@@ -370,7 +370,7 @@ public class User extends AuditingFields {
     public void removeRole(Role role) {
         this.userRoles.stream()
                 .filter(ur -> ur.getRole().getCode().equals(role.getCode())
-                        && ur.getIsDeleted() == YNType.N)
+                        && YNType.isN(ur.getIsDeleted()))
                 .forEach(UserRole::deleteUserRole);
     }
 
@@ -391,7 +391,7 @@ public class User extends AuditingFields {
      */
     public boolean hasRole(String roleCode) {
         return this.userRoles.stream()
-                .filter(ur -> ur.getIsDeleted() == YNType.N)
+                .filter(ur -> YNType.isN(ur.getIsDeleted()))
                 .anyMatch(ur -> ur.getRole().getCode().equals(roleCode));
     }
 
@@ -403,7 +403,7 @@ public class User extends AuditingFields {
      */
     public List<String> getAllAuthorities() {
         return this.userRoles.stream()
-                .filter(ur -> ur.getIsDeleted() == YNType.N)
+                .filter(ur -> YNType.isN(ur.getIsDeleted()))
                 .flatMap(ur -> {
                     List<String> authorities = new ArrayList<>();
                     // 1. 역할 코드 추가 (예: "ADMIN", "MANAGER", "USER")

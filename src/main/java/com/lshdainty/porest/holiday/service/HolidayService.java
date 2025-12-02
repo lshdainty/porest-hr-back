@@ -4,7 +4,7 @@ import com.lshdainty.porest.common.message.MessageKey;
 import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.holiday.domain.Holiday;
-import com.lshdainty.porest.holiday.repository.HolidayRepositoryImpl;
+import com.lshdainty.porest.holiday.repository.HolidayRepository;
 import com.lshdainty.porest.holiday.service.dto.HolidayServiceDto;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class HolidayService {
     private final MessageResolver messageResolver;
-    private final HolidayRepositoryImpl holidayRepositoryImpl;
+    private final HolidayRepository holidayRepository;
 
     @Transactional
     public Long registHoliday(HolidayServiceDto data) {
@@ -37,7 +37,7 @@ public class HolidayService {
                 data.getIsRecurring(),
                 data.getIcon()
         );
-        holidayRepositoryImpl.save(holiday);
+        holidayRepository.save(holiday);
         log.info("공휴일 등록 완료: holidaySeq={}, name={}", holiday.getSeq(), data.getName());
         return holiday.getSeq();
     }
@@ -49,17 +49,17 @@ public class HolidayService {
 
     public List<Holiday> findHolidays(CountryCode countryCode) {
         log.debug("공휴일 목록 조회: countryCode={}", countryCode);
-        return holidayRepositoryImpl.findHolidays(countryCode);
+        return holidayRepository.findHolidays(countryCode);
     }
 
     public List<Holiday> searchHolidaysByStartEndDate(LocalDate startDate, LocalDate endDate, CountryCode countryCode) {
         log.debug("기간별 공휴일 조회: startDate={}, endDate={}, countryCode={}", startDate, endDate, countryCode);
-        return holidayRepositoryImpl.findHolidaysByStartEndDate(startDate, endDate, countryCode);
+        return holidayRepository.findHolidaysByStartEndDate(startDate, endDate, countryCode);
     }
 
     public List<Holiday> searchHolidaysByType(HolidayType type) {
         log.debug("타입별 공휴일 조회: type={}", type);
-        return holidayRepositoryImpl.findHolidaysByType(type);
+        return holidayRepository.findHolidaysByType(type);
     }
 
     @Transactional
@@ -83,12 +83,12 @@ public class HolidayService {
     public void deleteHoliday(Long holidaySeq) {
         log.debug("공휴일 삭제 시작: holidaySeq={}", holidaySeq);
         Holiday findHoliday = checkHolidayExist(holidaySeq);
-        holidayRepositoryImpl.delete(findHoliday);
+        holidayRepository.delete(findHoliday);
         log.info("공휴일 삭제 완료: holidaySeq={}", holidaySeq);
     }
 
     public Holiday checkHolidayExist(Long holidaySeq) {
-        Optional<Holiday> holiday = holidayRepositoryImpl.findById(holidaySeq);
+        Optional<Holiday> holiday = holidayRepository.findById(holidaySeq);
         holiday.orElseThrow(() -> {
             log.warn("공휴일 조회 실패 - 존재하지 않는 공휴일: holidaySeq={}", holidaySeq);
             return new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_HOLIDAY));

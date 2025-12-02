@@ -157,7 +157,7 @@ public class Role extends AuditingFields {
      */
     public List<Permission> getPermissions() {
         return this.rolePermissions.stream()
-                .filter(rp -> rp.getIsDeleted() == YNType.N)
+                .filter(rp -> YNType.isN(rp.getIsDeleted()))
                 .map(RolePermission::getPermission)
                 .toList();
     }
@@ -171,7 +171,7 @@ public class Role extends AuditingFields {
     public void addPermission(Permission permission) {
         boolean exists = this.rolePermissions.stream()
                 .anyMatch(rp -> rp.getPermission().getCode().equals(permission.getCode())
-                        && rp.getIsDeleted() == YNType.N);
+                        && YNType.isN(rp.getIsDeleted()));
 
         if (!exists) {
             RolePermission rolePermission = RolePermission.createRolePermission(this, permission);
@@ -188,7 +188,7 @@ public class Role extends AuditingFields {
     public void removePermission(Permission permission) {
         this.rolePermissions.stream()
                 .filter(rp -> rp.getPermission().getCode().equals(permission.getCode())
-                        && rp.getIsDeleted() == YNType.N)
+                        && YNType.isN(rp.getIsDeleted()))
                 .forEach(RolePermission::deleteRolePermission);
     }
 
@@ -209,7 +209,7 @@ public class Role extends AuditingFields {
      */
     public boolean hasPermission(String permissionCode) {
         return this.rolePermissions.stream()
-                .filter(rp -> rp.getIsDeleted() == YNType.N)
+                .filter(rp -> YNType.isN(rp.getIsDeleted()))
                 .anyMatch(rp -> rp.getPermission().getCode().equals(permissionCode));
     }
 }

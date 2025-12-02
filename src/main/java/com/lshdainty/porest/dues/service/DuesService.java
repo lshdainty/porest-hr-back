@@ -4,7 +4,7 @@ import com.lshdainty.porest.common.message.MessageKey;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.dues.domain.Dues;
 import com.lshdainty.porest.dues.type.DuesCalcType;
-import com.lshdainty.porest.dues.repository.DuesRepositoryImpl;
+import com.lshdainty.porest.dues.repository.DuesRepository;
 import com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto;
 import com.lshdainty.porest.dues.service.dto.DuesServiceDto;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class DuesService {
     private final MessageResolver messageResolver;
-    private final DuesRepositoryImpl duesRepositoryImpl;
+    private final DuesRepository duesRepository;
 
     @Transactional
     public Long registDues(DuesServiceDto data) {
@@ -35,14 +35,14 @@ public class DuesService {
                 data.getDate(),
                 data.getDetail()
         );
-        duesRepositoryImpl.save(dues);
+        duesRepository.save(dues);
         log.info("회비 등록 완료: duesSeq={}", dues.getSeq());
         return dues.getSeq();
     }
 
     public List<DuesServiceDto> searchDues() {
         log.debug("전체 회비 목록 조회");
-        List<Dues> dues = duesRepositoryImpl.findDues();
+        List<Dues> dues = duesRepository.findDues();
 
         List<DuesServiceDto> dtos = dues.stream()
                 .map(d -> DuesServiceDto.builder()
@@ -66,7 +66,7 @@ public class DuesService {
 
     public List<DuesServiceDto> searchYearDues(int year) {
         log.debug("연도별 회비 목록 조회: year={}", year);
-        List<Dues> dues = duesRepositoryImpl.findDuesByYear(year);
+        List<Dues> dues = duesRepository.findDuesByYear(year);
 
         List<DuesServiceDto> dtos = dues.stream()
                 .map(d -> DuesServiceDto.builder()
@@ -90,7 +90,7 @@ public class DuesService {
 
     public DuesServiceDto searchYearOperationDues(int year) {
         log.debug("연도별 운영 회비 조회: year={}", year);
-        List<Dues> dues = duesRepositoryImpl.findOperatingDuesByYear(year);
+        List<Dues> dues = duesRepository.findOperatingDuesByYear(year);
         Long total = 0L;
         Long deposit = 0L;
         Long withdraw = 0L;
@@ -111,11 +111,11 @@ public class DuesService {
     }
 
     public Long searchMonthBirthDues(int year, int month) {
-        return duesRepositoryImpl.findBirthDuesByYearAndMonth(year, month);
+        return duesRepository.findBirthDuesByYearAndMonth(year, month);
     }
 
     public List<DuesServiceDto> searchUsersMonthBirthDues(int year) {
-        List<UsersMonthBirthDuesDto> repositoryDtos = duesRepositoryImpl.findUsersMonthBirthDues(year);
+        List<UsersMonthBirthDuesDto> repositoryDtos = duesRepository.findUsersMonthBirthDues(year);
         return repositoryDtos.stream()
                 .map(d -> DuesServiceDto.builder()
                         .userName(d.getUserName())
@@ -145,12 +145,12 @@ public class DuesService {
     public void deleteDues(Long duesSeq) {
         log.debug("회비 삭제 시작: duesSeq={}", duesSeq);
         Dues findDues = checkDuesExist(duesSeq);
-        duesRepositoryImpl.delete(findDues);
+        duesRepository.delete(findDues);
         log.info("회비 삭제 완료: duesSeq={}", duesSeq);
     }
 
     public Dues checkDuesExist(Long duesSeq) {
-        Optional<Dues> dues = duesRepositoryImpl.findById(duesSeq);
+        Optional<Dues> dues = duesRepository.findById(duesSeq);
         dues.orElseThrow(() -> {
             log.warn("회비 조회 실패 - 존재하지 않는 회비: duesSeq={}", duesSeq);
             return new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_DUES));

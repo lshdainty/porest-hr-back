@@ -7,13 +7,13 @@ import com.lshdainty.porest.holiday.domain.Holiday;
 import com.lshdainty.porest.holiday.service.HolidayService;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import com.lshdainty.porest.user.domain.User;
-import com.lshdainty.porest.user.repository.UserRepositoryImpl;
+import com.lshdainty.porest.user.repository.UserRepository;
 import com.lshdainty.porest.user.service.UserService;
-import com.lshdainty.porest.vacation.repository.VacationUsageCustomRepositoryImpl;
+import com.lshdainty.porest.vacation.repository.VacationUsageRepository;
 import com.lshdainty.porest.work.domain.WorkCode;
 import com.lshdainty.porest.work.domain.WorkHistory;
-import com.lshdainty.porest.work.repository.WorkCodeRepositoryImpl;
-import com.lshdainty.porest.work.repository.WorkHistoryCustomRepositoryImpl;
+import com.lshdainty.porest.work.repository.WorkCodeRepository;
+import com.lshdainty.porest.work.repository.WorkHistoryRepository;
 import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import com.lshdainty.porest.work.service.dto.WorkCodeServiceDto;
 import com.lshdainty.porest.work.service.dto.WorkHistoryServiceDto;
@@ -44,12 +44,12 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class WorkHistoryService {
     private final MessageResolver messageResolver;
-    private final WorkHistoryCustomRepositoryImpl workHistoryRepository;
-    private final WorkCodeRepositoryImpl workCodeRepository;
+    private final WorkHistoryRepository workHistoryRepository;
+    private final WorkCodeRepository workCodeRepository;
     private final UserService userService;
     private final HolidayService holidayService;
-    private final UserRepositoryImpl userRepository;
-    private final VacationUsageCustomRepositoryImpl vacationUsageRepository;
+    private final UserRepository userRepository;
+    private final VacationUsageRepository vacationUsageRepository;
 
     @Transactional
     public Long createWorkHistory(WorkHistoryServiceDto data) {

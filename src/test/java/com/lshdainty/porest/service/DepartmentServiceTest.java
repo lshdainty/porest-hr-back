@@ -5,7 +5,7 @@ import com.lshdainty.porest.company.domain.Company;
 import com.lshdainty.porest.company.service.CompanyService;
 import com.lshdainty.porest.department.domain.Department;
 import com.lshdainty.porest.department.domain.UserDepartment;
-import com.lshdainty.porest.department.repository.DepartmentCustomRepositoryImpl;
+import com.lshdainty.porest.department.repository.DepartmentRepository;
 import com.lshdainty.porest.department.service.DepartmentService;
 import com.lshdainty.porest.department.service.dto.DepartmentServiceDto;
 import com.lshdainty.porest.department.service.dto.UserDepartmentServiceDto;
@@ -37,7 +37,7 @@ class DepartmentServiceTest {
     @Mock
     private MessageSource ms;
     @Mock
-    private DepartmentCustomRepositoryImpl departmentRepository;
+    private DepartmentRepository departmentRepository;
     @Mock
     private CompanyService companyService;
     @Mock

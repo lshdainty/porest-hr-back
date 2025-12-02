@@ -1,10 +1,11 @@
 package com.lshdainty.porest.schedule.service;
 
 import com.lshdainty.porest.common.message.MessageKey;
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.common.util.PorestTime;
 import com.lshdainty.porest.schedule.domain.Schedule;
-import com.lshdainty.porest.schedule.repository.ScheduleRepositoryImpl;
+import com.lshdainty.porest.schedule.repository.ScheduleRepository;
 import com.lshdainty.porest.schedule.service.dto.ScheduleServiceDto;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
@@ -22,7 +23,7 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class ScheduleService {
     private final MessageResolver messageResolver;
-    private final ScheduleRepositoryImpl scheduleRepositoryImpl;
+    private final ScheduleRepository scheduleRepository;
     private final UserService userService;
 
     @Transactional
@@ -45,7 +46,7 @@ public class ScheduleService {
         );
 
         // 휴가 등록
-        scheduleRepositoryImpl.save(schedule);
+        scheduleRepository.save(schedule);
         log.info("일정 등록 완료: scheduleId={}, userId={}", schedule.getId(), data.getUserId());
 
         return schedule.getId();
@@ -53,7 +54,7 @@ public class ScheduleService {
 
     public List<Schedule> searchSchedulesByUser(String userId) {
         log.debug("사용자별 일정 조회: userId={}", userId);
-        return scheduleRepositoryImpl.findSchedulesByUserId(userId);
+        return scheduleRepository.findSchedulesByUserId(userId);
     }
 
     public List<Schedule> searchSchedulesByPeriod(LocalDateTime start, LocalDateTime end) {
@@ -62,7 +63,7 @@ public class ScheduleService {
             log.warn("일정 조회 실패 - 시작일이 종료일보다 이후: start={}, end={}", start, end);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.VALIDATE_START_AFTER_END));
         }
-        return scheduleRepositoryImpl.findSchedulesByPeriod(start, end);
+        return scheduleRepository.findSchedulesByPeriod(start, end);
     }
 
     @Transactional
@@ -94,8 +95,8 @@ public class ScheduleService {
     }
 
     public Schedule checkScheduleExist(Long scheduleId) {
-        Optional<Schedule> schedule = scheduleRepositoryImpl.findById(scheduleId);
-        if (schedule.isEmpty() || schedule.get().getIsDeleted().equals("Y")) {
+        Optional<Schedule> schedule = scheduleRepository.findById(scheduleId);
+        if (schedule.isEmpty() || YNType.isY(schedule.get().getIsDeleted())) {
             log.warn("일정 조회 실패 - 존재하지 않는 일정: scheduleId={}", scheduleId);
             throw new IllegalArgumentException(messageResolver.getMessage(MessageKey.NOT_FOUND_SCHEDULE));
         }

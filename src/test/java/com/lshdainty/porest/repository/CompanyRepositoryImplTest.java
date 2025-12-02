@@ -1,7 +1,7 @@
 package com.lshdainty.porest.repository;
 
 import com.lshdainty.porest.company.domain.Company;
-import com.lshdainty.porest.company.repository.CompanyCustomRepositoryImpl;
+import com.lshdainty.porest.company.repository.CompanyQueryDslRepository;
 import com.lshdainty.porest.department.domain.Department;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -18,12 +18,12 @@ import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @DataJpaTest
-@Import({CompanyCustomRepositoryImpl.class, TestQuerydslConfig.class})
+@Import({CompanyQueryDslRepository.class, TestQuerydslConfig.class})
 @Transactional
 @DisplayName("JPA 회사 레포지토리 테스트")
 class CompanyRepositoryImplTest {
     @Autowired
-    private CompanyCustomRepositoryImpl companyRepository;
+    private CompanyQueryDslRepository companyRepository;
 
     @Autowired
     private TestEntityManager em;
