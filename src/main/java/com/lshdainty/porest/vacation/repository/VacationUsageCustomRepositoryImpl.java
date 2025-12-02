@@ -7,8 +7,12 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.lshdainty.porest.vacation.domain.QVacationUsage.vacationUsage;
@@ -116,5 +120,29 @@ public class VacationUsageCustomRepositoryImpl implements VacationUsageCustomRep
                         .and(vacationUsage.startDate.between(startOfPeriod, endOfPeriod))
                         .and(vacationUsage.isDeleted.eq(YNType.N)))
                 .fetch();
+    }
+
+    @Override
+    public Map<LocalDate, BigDecimal> findDailyVacationHoursByUserAndPeriod(String userId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+
+        List<VacationUsage> usages = query
+                .selectFrom(vacationUsage)
+                .where(
+                        vacationUsage.user.id.eq(userId),
+                        vacationUsage.startDate.goe(startDateTime),
+                        vacationUsage.startDate.lt(endDateTime),
+                        vacationUsage.isDeleted.eq(YNType.N)
+                )
+                .fetch();
+
+        Map<LocalDate, BigDecimal> dailyHoursMap = new HashMap<>();
+        for (VacationUsage usage : usages) {
+            LocalDate date = usage.getStartDate().toLocalDate();
+            BigDecimal usedTime = usage.getUsedTime() != null ? usage.getUsedTime() : BigDecimal.ZERO;
+            dailyHoursMap.merge(date, usedTime, BigDecimal::add);
+        }
+        return dailyHoursMap;
     }
 }

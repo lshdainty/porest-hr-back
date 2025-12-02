@@ -2,7 +2,10 @@ package com.lshdainty.porest.vacation.repository;
 
 import com.lshdainty.porest.vacation.domain.VacationUsage;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface VacationUsageCustomRepository {
@@ -85,4 +88,15 @@ public interface VacationUsageCustomRepository {
      * @return 해당 기간 내 VacationUsage 리스트
      */
     List<VacationUsage> findByUserIdAndPeriod(String userId, java.time.LocalDateTime startOfPeriod, java.time.LocalDateTime endOfPeriod);
+
+    /**
+     * 특정 사용자의 기간 내 날짜별 휴가 사용 시간 합계 조회
+     * startDate의 날짜 부분을 기준으로 그룹핑하여 usedTime 합계 반환
+     *
+     * @param userId 사용자 ID
+     * @param startDate 조회 기간 시작일
+     * @param endDate 조회 기간 종료일
+     * @return 날짜별 휴가 사용 시간 Map (key: 날짜, value: usedTime 합계)
+     */
+    Map<LocalDate, BigDecimal> findDailyVacationHoursByUserAndPeriod(String userId, LocalDate startDate, LocalDate endDate);
 }

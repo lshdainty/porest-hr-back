@@ -477,7 +477,7 @@ public class WorkHistoryService {
         // 해당 기간의 공휴일 조회
         List<Holiday> holidays = holidayService.searchHolidaysByStartEndDate(startDate, endDate, CountryCode.KR);
         Set<LocalDate> holidayDates = holidays.stream()
-                .map(h -> h.getDate())
+                .map(Holiday::getDate)
                 .collect(Collectors.toSet());
 
         // 주말과 공휴일을 제외한 근무일 리스트 생성
@@ -492,46 +492,27 @@ public class WorkHistoryService {
             currentDate = currentDate.plusDays(1);
         }
 
-        // 미작성 날짜 수집
-        List<LocalDate> unregisteredDates = new ArrayList<>();
+        // 기간 내 날짜별 업무 시간 합계 조회 (단일 쿼리)
+        Map<LocalDate, BigDecimal> dailyWorkHoursMap = workHistoryRepository
+                .findDailyWorkHoursByUserAndPeriod(user.getId(), startDate, endDate);
 
-        for (LocalDate workDate : workingDays) {
-            // 해당 유저의 해당 날짜 업무 이력 조회
-            WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
-            condition.setUserId(user.getId());
-            condition.setStartDate(workDate);
-            condition.setEndDate(workDate);
+        // 기간 내 날짜별 휴가 사용 시간 합계 조회 (단일 쿼리)
+        Map<LocalDate, BigDecimal> dailyVacationMap = vacationUsageRepository
+                .findDailyVacationHoursByUserAndPeriod(user.getId(), startDate, endDate);
 
-            List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+        // 미작성 날짜 필터링
+        BigDecimal requiredHours = new BigDecimal("8.0");
+        BigDecimal vacationMultiplier = new BigDecimal("8.0");
 
-            // 해당 날짜의 총 업무 시간 계산
-            BigDecimal totalWorkHours = histories.stream()
-                    .map(WorkHistory::getHours)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            // 해당 유저의 해당 날짜 휴가 사용 내역 조회
-            java.time.LocalDateTime dayStart = workDate.atStartOfDay();
-            java.time.LocalDateTime dayEnd = workDate.plusDays(1).atStartOfDay();
-            List<VacationUsage> vacationUsages = vacationUsageRepository
-                    .findByUserIdAndPeriodWithUser(user.getId(), dayStart, dayEnd);
-
-            // 해당 날짜의 총 휴가 사용 시간 계산 (usedTime * 8시간)
-            BigDecimal totalVacationHours = vacationUsages.stream()
-                    .map(VacationUsage::getUsedTime)
-                    .filter(Objects::nonNull)
-                    .map(usedTime -> usedTime.multiply(new BigDecimal("8.0")))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            // 업무 시간 + 휴가 시간
-            BigDecimal totalHours = totalWorkHours.add(totalVacationHours);
-
-            // 8시간 미만인 경우 미작성 리스트에 추가
-            BigDecimal requiredHours = new BigDecimal("8.0");
-            if (totalHours.compareTo(requiredHours) < 0) {
-                unregisteredDates.add(workDate);
-            }
-        }
+        List<LocalDate> unregisteredDates = workingDays.stream()
+                .filter(workDate -> {
+                    BigDecimal workHours = dailyWorkHoursMap.getOrDefault(workDate, BigDecimal.ZERO);
+                    BigDecimal vacationUsedTime = dailyVacationMap.getOrDefault(workDate, BigDecimal.ZERO);
+                    BigDecimal vacationHours = vacationUsedTime.multiply(vacationMultiplier);
+                    BigDecimal totalHours = workHours.add(vacationHours);
+                    return totalHours.compareTo(requiredHours) < 0;
+                })
+                .collect(Collectors.toList());
 
         log.info("Unregistered work dates fetched - userId: {}, year: {}, month: {}, count: {}",
                 userId, year, month, unregisteredDates.size());

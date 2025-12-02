@@ -6,6 +6,7 @@ import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface WorkHistoryCustomRepository {
@@ -30,4 +31,7 @@ public interface WorkHistoryCustomRepository {
 
     // 특정 사용자의 특정 날짜 업무 내역 목록 조회
     List<WorkHistory> findByUserAndDate(String userId, LocalDate date);
+
+    // 특정 사용자의 기간 내 날짜별 업무 시간 합계 조회
+    Map<LocalDate, BigDecimal> findDailyWorkHoursByUserAndPeriod(String userId, LocalDate startDate, LocalDate endDate);
 }

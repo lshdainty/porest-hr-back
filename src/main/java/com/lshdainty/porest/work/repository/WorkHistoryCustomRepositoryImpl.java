@@ -13,7 +13,9 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -143,5 +145,25 @@ public class WorkHistoryCustomRepositoryImpl implements WorkHistoryCustomReposit
                         workHistory.isDeleted.eq(YNType.N)
                 )
                 .fetch();
+    }
+
+    @Override
+    public Map<LocalDate, BigDecimal> findDailyWorkHoursByUserAndPeriod(String userId, LocalDate startDate, LocalDate endDate) {
+        List<WorkHistory> histories = query
+                .selectFrom(workHistory)
+                .where(
+                        workHistory.user.id.eq(userId),
+                        workHistory.date.between(startDate, endDate),
+                        workHistory.isDeleted.eq(YNType.N)
+                )
+                .fetch();
+
+        Map<LocalDate, BigDecimal> dailyHoursMap = new HashMap<>();
+        for (WorkHistory history : histories) {
+            LocalDate date = history.getDate();
+            BigDecimal hours = history.getHours() != null ? history.getHours() : BigDecimal.ZERO;
+            dailyHoursMap.merge(date, hours, BigDecimal::add);
+        }
+        return dailyHoursMap;
     }
 }
