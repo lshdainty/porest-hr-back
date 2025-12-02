@@ -55,7 +55,7 @@ public interface DuesApi {
     @GetMapping("/api/v1/dues")
     ApiResponse searchYearDues(
             @Parameter(description = "조회할 연도 (YYYY)", example = "2024", required = true)
-            @RequestParam("year") String year
+            @RequestParam("year") Integer year
     );
 
     @Operation(
@@ -76,7 +76,7 @@ public interface DuesApi {
     @GetMapping("/api/v1/dues/operation")
     ApiResponse searchYearOperationDues(
             @Parameter(description = "조회할 연도 (YYYY)", example = "2024", required = true)
-            @RequestParam("year") String year
+            @RequestParam("year") Integer year
     );
 
     @Operation(
@@ -97,9 +97,9 @@ public interface DuesApi {
     @GetMapping("/api/v1/dues/birth/month")
     ApiResponse searchMonthBirthDues(
             @Parameter(description = "조회할 연도 (YYYY)", example = "2024", required = true)
-            @RequestParam("year") String year,
-            @Parameter(description = "조회할 월 (MM)", example = "01", required = true)
-            @RequestParam("month") String month
+            @RequestParam("year") Integer year,
+            @Parameter(description = "조회할 월 (1-12)", example = "1", required = true)
+            @RequestParam("month") Integer month
     );
 
     @Operation(
@@ -119,7 +119,7 @@ public interface DuesApi {
     @GetMapping("/api/v1/dues/users/birth/month")
     ApiResponse searchUsersMonthBirthDues(
             @Parameter(description = "조회할 연도 (YYYY)", example = "2024", required = true)
-            @RequestParam("year") String year
+            @RequestParam("year") Integer year
     );
 
     @Operation(

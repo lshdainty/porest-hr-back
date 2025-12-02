@@ -33,24 +33,24 @@ public class DuesRepositoryImpl implements DuesRepository {
     }
 
     @Override
-    public List<Dues> findDuesByYear(String year) {
-        return em.createQuery("select d from Dues d where substring(d.date, 1, 4) = :year order by d.date", Dues.class)
+    public List<Dues> findDuesByYear(int year) {
+        return em.createQuery("select d from Dues d where year(d.date) = :year order by d.date", Dues.class)
                 .setParameter("year", year)
                 .getResultList();
     }
 
 
     @Override
-    public List<Dues> findOperatingDuesByYear(String year) {
-        return em.createQuery("select d from Dues d where substring(d.date, 1, 4) = :year and d.type <> :type order by d.date", Dues.class)
+    public List<Dues> findOperatingDuesByYear(int year) {
+        return em.createQuery("select d from Dues d where year(d.date) = :year and d.type <> :type order by d.date", Dues.class)
                 .setParameter("year", year)
                 .setParameter("type", DuesType.BIRTH)
                 .getResultList();
     }
 
     @Override
-    public Long findBirthDuesByYearAndMonth(String year, String month) {
-        return em.createQuery("select sum(d.amount) from Dues d where substring(d.date, 1, 4) = :year and substring(d.date, 6, 2) = :month and d.type = :type and d.calc = :calc", Long.class)
+    public Long findBirthDuesByYearAndMonth(int year, int month) {
+        return em.createQuery("select sum(d.amount) from Dues d where year(d.date) = :year and month(d.date) = :month and d.type = :type and d.calc = :calc", Long.class)
                 .setParameter("year", year)
                 .setParameter("month", month)
                 .setParameter("type", DuesType.BIRTH)
@@ -59,8 +59,8 @@ public class DuesRepositoryImpl implements DuesRepository {
     }
 
     @Override
-    public List<UsersMonthBirthDuesDto> findUsersMonthBirthDues(String year) {
-        return em.createQuery("select new com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto(d.userName, substring(d.date, 6, 2), sum(d.amount), d.detail) from Dues d where substring(d.date, 1, 4) = :year and d.type = :type and d.calc = :calc group by d.userName, substring(d.date, 6, 2), d.detail", UsersMonthBirthDuesDto.class)
+    public List<UsersMonthBirthDuesDto> findUsersMonthBirthDues(int year) {
+        return em.createQuery("select new com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto(d.userName, month(d.date), sum(d.amount), d.detail) from Dues d where year(d.date) = :year and d.type = :type and d.calc = :calc group by d.userName, month(d.date), d.detail", UsersMonthBirthDuesDto.class)
                 .setParameter("year", year)
                 .setParameter("type", DuesType.BIRTH)
                 .setParameter("calc", DuesCalcType.PLUS)

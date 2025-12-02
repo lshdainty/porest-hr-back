@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -34,7 +35,7 @@ public class Dues extends AuditingFields {
     private DuesCalcType calc;
 
     @Column(name = "dues_date")
-    private String date;
+    private LocalDate date;
 
     @Column(name = "dues_detail")
     private String detail;
@@ -46,7 +47,7 @@ public class Dues extends AuditingFields {
      *
      * @return Dues
      */
-    public static Dues createDues(String userName, Long amount, DuesType type, DuesCalcType calc, String date, String detail) {
+    public static Dues createDues(String userName, Long amount, DuesType type, DuesCalcType calc, LocalDate date, String detail) {
         Dues dues = new Dues();
         dues.userName = userName;
         dues.amount = amount;
@@ -62,7 +63,7 @@ public class Dues extends AuditingFields {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 회비 수정할 것
      */
-    public void updateDues(String userName, Long amount, DuesType type, DuesCalcType calc, String date, String detail) {
+    public void updateDues(String userName, Long amount, DuesType type, DuesCalcType calc, LocalDate date, String detail) {
         if (!Objects.isNull(userName)) { this.userName = userName; }
         if (!Objects.isNull(amount)) { this.amount = amount; }
         if (!Objects.isNull(type)) { this.type = type; }

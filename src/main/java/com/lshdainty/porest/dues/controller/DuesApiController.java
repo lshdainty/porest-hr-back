@@ -39,7 +39,7 @@ public class DuesApiController implements DuesApi {
 
     @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchYearDues(String year) {
+    public ApiResponse searchYearDues(Integer year) {
         List<DuesServiceDto> dtos = duesService.searchYearDues(year);
         return ApiResponse.success(dtos.stream()
                 .map(d -> new DuesApiDto.SearchYearDuesResp(
@@ -57,7 +57,7 @@ public class DuesApiController implements DuesApi {
 
     @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchYearOperationDues(String year) {
+    public ApiResponse searchYearOperationDues(Integer year) {
         DuesServiceDto serviceDto = duesService.searchYearOperationDues(year);
         return ApiResponse.success(new DuesApiDto.SearchYearOperationDuesResp(
                 serviceDto.getTotalDues(),
@@ -68,14 +68,14 @@ public class DuesApiController implements DuesApi {
 
     @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchMonthBirthDues(String year, String month) {
+    public ApiResponse searchMonthBirthDues(Integer year, Integer month) {
         Long birthDues = duesService.searchMonthBirthDues(year, month);
         return ApiResponse.success(new DuesApiDto.SearchMonthBirthDuesResp(birthDues));
     }
 
     @Override
     @PreAuthorize("hasAuthority('DUES_READ')")
-    public ApiResponse searchUsersMonthBirthDues(String year) {
+    public ApiResponse searchUsersMonthBirthDues(Integer year) {
         List<DuesServiceDto> serviceDtos = duesService.searchUsersMonthBirthDues(year);
 
         Map<String, List<DuesServiceDto>> duesByUserName = serviceDtos.stream()
@@ -88,9 +88,9 @@ public class DuesApiController implements DuesApi {
 
                     List<Long> monthBirthDues = new ArrayList<>(Collections.nCopies(12, 0L));
                     for (DuesServiceDto due : userDues) {
-                        int month = Integer.parseInt(due.getDate()) - 1; // "01" -> 0
-                        if (month >= 0 && month < 12) {
-                            monthBirthDues.set(month, due.getAmount());
+                        int monthIndex = due.getMonth() - 1; // 1 -> 0
+                        if (monthIndex >= 0 && monthIndex < 12) {
+                            monthBirthDues.set(monthIndex, due.getAmount());
                         }
                     }
 

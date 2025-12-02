@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class DuesApiDto {
@@ -29,7 +30,7 @@ public class DuesApiDto {
         private DuesCalcType duesCalc;
 
         @Schema(description = "회비 날짜 (YYYY-MM-DD)", example = "2024-01-15")
-        private String duesDate;
+        private LocalDate duesDate;
 
         @Schema(description = "상세 내용", example = "1월 회비")
         private String duesDetail;
@@ -62,7 +63,7 @@ public class DuesApiDto {
         private DuesCalcType duesCalc;
 
         @Schema(description = "회비 날짜 (YYYY-MM-DD)", example = "2024-01-15")
-        private String duesDate;
+        private LocalDate duesDate;
 
         @Schema(description = "상세 내용", example = "1월 회비")
         private String duesDetail;
@@ -89,7 +90,7 @@ public class DuesApiDto {
         private DuesCalcType duesCalc;
 
         @Schema(description = "회비 날짜", example = "2024-01-15")
-        private String duesDate;
+        private LocalDate duesDate;
 
         @Schema(description = "상세 내용", example = "1월 회비")
         private String duesDetail;

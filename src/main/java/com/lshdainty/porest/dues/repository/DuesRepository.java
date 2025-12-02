@@ -14,13 +14,13 @@ public interface DuesRepository {
     // 전체 회비 조회
     List<Dues> findDues();
     // 년도에 해당하는 회비 조회
-    List<Dues> findDuesByYear(String year);
+    List<Dues> findDuesByYear(int year);
     // 해당년도 운영비 조회
-    List<Dues> findOperatingDuesByYear(String year);
+    List<Dues> findOperatingDuesByYear(int year);
     // 해당년도 해당월 생일비 합계 조회
-    Long findBirthDuesByYearAndMonth(String year, String month);
+    Long findBirthDuesByYearAndMonth(int year, int month);
     // 해당년도 사용자 월별 생일비 입금내역 조회
-    List<UsersMonthBirthDuesDto> findUsersMonthBirthDues(String year);
+    List<UsersMonthBirthDuesDto> findUsersMonthBirthDues(int year);
     // 회비 삭제
     void delete(Dues dues);
 }

@@ -408,24 +408,24 @@ public class InitDB {
 		}
 
 		public void initSetDues() {
-			saveDues("이서준", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-01-04", "생일비");
-			saveDues("김서연", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-01-04", "생일비");
-			saveDues("김지후", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-01-04", "생일비");
-			saveDues("이준우", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-01-04", "생일비");
-			saveDues("조민서", 80000L, DuesType.BIRTH, DuesCalcType.MINUS, "2025-01-31", "생일비 출금");
-			saveDues("이하은", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-02-04", "생일비");
-			saveDues("김서연", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-02-04", "생일비");
-			saveDues("김지후", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-02-04", "생일비");
-			saveDues("이준우", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-02-04", "생일비");
-			saveDues("조민서", 30000L, DuesType.BIRTH, DuesCalcType.MINUS, "2025-02-28", "생일비 출금");
-			saveDues("이서준", 30000L, DuesType.OPERATION, DuesCalcType.PLUS, "2025-01-28", "운영비 입금");
-			saveDues("김서연", 30000L, DuesType.OPERATION, DuesCalcType.PLUS, "2025-04-28", "운영비 입금");
-			saveDues("김지후", 10000L, DuesType.FINE, DuesCalcType.PLUS, "2025-07-28", "운영비 입금");
-			saveDues("조민서", 20000L, DuesType.FINE, DuesCalcType.PLUS, "2025-07-28", "운영비 출금");
-			saveDues("이준우", 10000L, DuesType.FINE, DuesCalcType.PLUS, "2025-07-28", "운영비 출금");
-			saveDues("이하은", 10000L, DuesType.OPERATION, DuesCalcType.MINUS, "2025-07-28", "운영비 출금");
-			saveDues("조민서", 10000L, DuesType.OPERATION, DuesCalcType.MINUS, "2025-07-28", "운영비 출금");
-			saveDues("이서준", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, "2025-07-04", "생일비");
+			saveDues("이서준", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 1, 4), "생일비");
+			saveDues("김서연", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 1, 4), "생일비");
+			saveDues("김지후", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 1, 4), "생일비");
+			saveDues("이준우", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 1, 4), "생일비");
+			saveDues("조민서", 80000L, DuesType.BIRTH, DuesCalcType.MINUS, LocalDate.of(2025, 1, 31), "생일비 출금");
+			saveDues("이하은", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 2, 4), "생일비");
+			saveDues("김서연", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 2, 4), "생일비");
+			saveDues("김지후", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 2, 4), "생일비");
+			saveDues("이준우", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 2, 4), "생일비");
+			saveDues("조민서", 30000L, DuesType.BIRTH, DuesCalcType.MINUS, LocalDate.of(2025, 2, 28), "생일비 출금");
+			saveDues("이서준", 30000L, DuesType.OPERATION, DuesCalcType.PLUS, LocalDate.of(2025, 1, 28), "운영비 입금");
+			saveDues("김서연", 30000L, DuesType.OPERATION, DuesCalcType.PLUS, LocalDate.of(2025, 4, 28), "운영비 입금");
+			saveDues("김지후", 10000L, DuesType.FINE, DuesCalcType.PLUS, LocalDate.of(2025, 7, 28), "운영비 입금");
+			saveDues("조민서", 20000L, DuesType.FINE, DuesCalcType.PLUS, LocalDate.of(2025, 7, 28), "운영비 출금");
+			saveDues("이준우", 10000L, DuesType.FINE, DuesCalcType.PLUS, LocalDate.of(2025, 7, 28), "운영비 출금");
+			saveDues("이하은", 10000L, DuesType.OPERATION, DuesCalcType.MINUS, LocalDate.of(2025, 7, 28), "운영비 출금");
+			saveDues("조민서", 10000L, DuesType.OPERATION, DuesCalcType.MINUS, LocalDate.of(2025, 7, 28), "운영비 출금");
+			saveDues("이서준", 10000L, DuesType.BIRTH, DuesCalcType.PLUS, LocalDate.of(2025, 7, 4), "생일비");
 		}
 
 		public void initSetVacationPolicy() {
@@ -1038,7 +1038,7 @@ public class InitDB {
 			return schedule;
 		}
 
-		public Dues saveDues(String userName, Long amount, DuesType type, DuesCalcType calc, String date,
+		public Dues saveDues(String userName, Long amount, DuesType type, DuesCalcType calc, LocalDate date,
 				String detail) {
 			Dues dues = Dues.createDues(userName, amount, type, calc, date, detail);
 			em.persist(dues);
