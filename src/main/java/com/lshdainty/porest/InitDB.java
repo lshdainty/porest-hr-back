@@ -37,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -182,68 +181,68 @@ public class InitDB {
 		}
 
 		public void initSetHoliday() {
-			saveHoliday("신정", LocalDate.parse("20250101", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("신정", LocalDate.of(2025, 1, 1), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"🌅");
-			saveHoliday("임시공휴일(설날)", LocalDate.parse("20250127", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
+			saveHoliday("임시공휴일(설날)", LocalDate.of(2025, 1, 27), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
 					YNType.N, null);
-			saveHoliday("설날연휴", LocalDate.parse("20250128", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.parse("20241231", DateTimeFormatter.BASIC_ISO_DATE),
+			saveHoliday("설날연휴", LocalDate.of(2025, 1, 28), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2024, 12, 31),
 					YNType.Y, "🧧");
-			saveHoliday("설날", LocalDate.parse("20250129", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.parse("20250101", DateTimeFormatter.BASIC_ISO_DATE),
+			saveHoliday("설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 1),
 					YNType.Y, "🧧");
-			saveHoliday("설날연휴", LocalDate.parse("20250130", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.parse("20250102", DateTimeFormatter.BASIC_ISO_DATE),
+			saveHoliday("설날연휴", LocalDate.of(2025, 1, 30), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 2),
 					YNType.Y, "🧧");
-			saveHoliday("삼일절", LocalDate.parse("20250301", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("삼일절", LocalDate.of(2025, 3, 1), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"🇰🇷");
-			saveHoliday("대체공휴일(삼일절)", LocalDate.parse("20250303", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
+			saveHoliday("대체공휴일(삼일절)", LocalDate.of(2025, 3, 3), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
 					YNType.N, null);
-			saveHoliday("근로자의 날", LocalDate.parse("20250501", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("근로자의 날", LocalDate.of(2025, 5, 1), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"🧑‍💻");
-			saveHoliday("어린이날", LocalDate.parse("20250505", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("어린이날", LocalDate.of(2025, 5, 5), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"👶");
-			saveHoliday("석가탄신일", LocalDate.parse("20250505", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.parse("20250408", DateTimeFormatter.BASIC_ISO_DATE),
+			saveHoliday("석가탄신일", LocalDate.of(2025, 5, 5), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 4, 8),
 					YNType.Y, "🪷");
-			saveHoliday("대체공휴일(석가탄신일)", LocalDate.parse("20250506", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
+			saveHoliday("대체공휴일(석가탄신일)", LocalDate.of(2025, 5, 6), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
 					YNType.N, null);
-			saveHoliday("임시공휴일(제 21대 대선)", LocalDate.parse("20250603", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N,
+			saveHoliday("임시공휴일(제 21대 대선)", LocalDate.of(2025, 6, 3), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N,
 					null, YNType.N, "🗳");
-			saveHoliday("현충일", LocalDate.parse("20250606", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("현충일", LocalDate.of(2025, 6, 6), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"🪖");
-			saveHoliday("광복절", LocalDate.parse("20250815", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("광복절", LocalDate.of(2025, 8, 15), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"🇰🇷");
-			saveHoliday("개천절", LocalDate.parse("20251003", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("개천절", LocalDate.of(2025, 10, 3), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"🫅");
-			saveHoliday("추석연휴", LocalDate.parse("20251005", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.parse("20250814", DateTimeFormatter.BASIC_ISO_DATE),
+			saveHoliday("추석연휴", LocalDate.of(2025, 10, 5), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 8, 14),
 					YNType.Y, "🎑");
-			saveHoliday("추석", LocalDate.parse("20251006", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.parse("20250815", DateTimeFormatter.BASIC_ISO_DATE),
+			saveHoliday("추석", LocalDate.of(2025, 10, 6), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 8, 15),
 					YNType.Y, "🎑");
-			saveHoliday("추석연휴", LocalDate.parse("20251007", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.parse("20250816", DateTimeFormatter.BASIC_ISO_DATE),
+			saveHoliday("추석연휴", LocalDate.of(2025, 10, 7), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 8, 16),
 					YNType.Y, "🧧");
-			saveHoliday("대체공휴일(추석)", LocalDate.parse("20251008", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
+			saveHoliday("대체공휴일(추석)", LocalDate.of(2025, 10, 8), HolidayType.SUBSTITUTE, CountryCode.KR, YNType.N, null,
 					YNType.N, null);
-			saveHoliday("한글날", LocalDate.parse("20251009", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("한글날", LocalDate.of(2025, 10, 9), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"📚");
-			saveHoliday("크리스마스", LocalDate.parse("20251225", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
+			saveHoliday("크리스마스", LocalDate.of(2025, 12, 25), HolidayType.PUBLIC, CountryCode.KR, YNType.N, null, YNType.Y,
 					"🎄");
 
-			saveHoliday("권장휴가", LocalDate.parse("20250131", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 1, 31), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20250304", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 3, 4), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20250404", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 4, 4), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20250502", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 5, 2), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20250523", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 5, 23), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20250704", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 7, 4), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20250814", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 8, 14), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20250905", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 9, 5), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20251010", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 10, 10), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
-			saveHoliday("권장휴가", LocalDate.parse("20251114", DateTimeFormatter.BASIC_ISO_DATE), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
+			saveHoliday("권장휴가", LocalDate.of(2025, 11, 14), HolidayType.ETC, CountryCode.KR, YNType.N, null, YNType.N,
 					"🏖");
 		}
 
