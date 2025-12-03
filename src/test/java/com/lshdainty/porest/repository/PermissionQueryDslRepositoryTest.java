@@ -346,7 +346,7 @@ class PermissionQueryDslRepositoryTest {
         // then
         Permission updatedPermission = permissionRepository.findById(permission.getId()).orElseThrow();
         assertThat(updatedPermission.getName()).isEqualTo("수정된 이름");
-        assertThat(updatedPermission.getDescription()).isEqualTo("수정된 설명");
+        assertThat(updatedPermission.getDesc()).isEqualTo("수정된 설명");
         assertThat(updatedPermission.getResource()).isEqualTo(ResourceType.VACATION);
         assertThat(updatedPermission.getAction()).isEqualTo(ActionType.WRITE);
     }

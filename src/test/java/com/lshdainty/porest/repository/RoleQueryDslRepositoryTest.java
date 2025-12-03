@@ -393,7 +393,7 @@ class RoleQueryDslRepositoryTest {
         // then
         Role updatedRole = roleRepository.findById(role.getId()).orElseThrow();
         assertThat(updatedRole.getName()).isEqualTo("수정된 이름");
-        assertThat(updatedRole.getDescription()).isEqualTo("수정된 설명");
+        assertThat(updatedRole.getDesc()).isEqualTo("수정된 설명");
     }
 
     @Test

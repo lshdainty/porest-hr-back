@@ -61,17 +61,17 @@ public class RoleService {
      *
      * @param roleCode 역할 코드
      * @param roleName 역할 이름
-     * @param description 역할 설명
+     * @param desc 역할 설명
      * @return Role
      */
     @Transactional
-    public Role createRole(String roleCode, String roleName, String description) {
+    public Role createRole(String roleCode, String roleName, String desc) {
         log.debug("역할 생성 시작: roleCode={}, roleName={}", roleCode, roleName);
         if (roleRepository.findByCode(roleCode).isPresent()) {
             log.warn("역할 생성 실패 - 중복 코드: roleCode={}", roleCode);
             throw new DuplicateException(ErrorCode.ROLE_ALREADY_EXISTS);
         }
-        Role role = Role.createRole(roleCode, roleName, description);
+        Role role = Role.createRole(roleCode, roleName, desc);
         roleRepository.save(role);
         log.info("역할 생성 완료: roleCode={}", roleCode);
         return role;
@@ -82,12 +82,12 @@ public class RoleService {
      *
      * @param roleCode 역할 코드
      * @param roleName 역할 이름
-     * @param description 역할 설명
+     * @param desc 역할 설명
      * @param permissionCodes 권한 코드 리스트
      * @return Role
      */
     @Transactional
-    public Role createRoleWithPermissions(String roleCode, String roleName, String description, List<String> permissionCodes) {
+    public Role createRoleWithPermissions(String roleCode, String roleName, String desc, List<String> permissionCodes) {
         log.debug("역할 생성 (권한 포함) 시작: roleCode={}, roleName={}, permissionCount={}", roleCode, roleName, permissionCodes.size());
         if (roleRepository.findByCode(roleCode).isPresent()) {
             log.warn("역할 생성 실패 - 중복 코드: roleCode={}", roleCode);
@@ -102,7 +102,7 @@ public class RoleService {
                         }))
                 .collect(Collectors.toList());
 
-        Role role = Role.createRoleWithPermissions(roleCode, roleName, description, permissions);
+        Role role = Role.createRoleWithPermissions(roleCode, roleName, desc, permissions);
         roleRepository.save(role);
         log.info("역할 생성 (권한 포함) 완료: roleCode={}, permissionCount={}", roleCode, permissions.size());
         return role;
@@ -112,17 +112,17 @@ public class RoleService {
      * 역할 정보 수정 (설명만)
      *
      * @param roleCode 역할 코드
-     * @param description 역할 설명
+     * @param desc 역할 설명
      */
     @Transactional
-    public void updateRole(String roleCode, String description) {
+    public void updateRole(String roleCode, String desc) {
         log.debug("역할 수정 시작: roleCode={}", roleCode);
         Role role = roleRepository.findByCode(roleCode)
                 .orElseThrow(() -> {
                     log.warn("역할 수정 실패 - 존재하지 않는 역할: roleCode={}", roleCode);
                     return new EntityNotFoundException(ErrorCode.ROLE_NOT_FOUND);
                 });
-        role.updateRole(null, description, null);
+        role.updateRole(null, desc, null);
         log.info("역할 수정 완료: roleCode={}", roleCode);
     }
 
@@ -130,11 +130,11 @@ public class RoleService {
      * 역할 정보 수정 (설명 + 권한)
      *
      * @param roleCode 역할 코드
-     * @param description 역할 설명
+     * @param desc 역할 설명
      * @param permissionCodes 권한 코드 리스트
      */
     @Transactional
-    public void updateRoleWithPermissions(String roleCode, String description, List<String> permissionCodes) {
+    public void updateRoleWithPermissions(String roleCode, String desc, List<String> permissionCodes) {
         log.debug("역할 수정 (권한 포함) 시작: roleCode={}", roleCode);
         Role role = getRole(roleCode);
 
@@ -146,7 +146,7 @@ public class RoleService {
                         }))
                 .collect(Collectors.toList());
 
-        role.updateRole(null, description, permissions);
+        role.updateRole(null, desc, permissions);
         log.info("역할 수정 (권한 포함) 완료: roleCode={}", roleCode);
     }
 
@@ -272,13 +272,13 @@ public class RoleService {
      *
      * @param code 권한 코드
      * @param name 권한 이름 (한글명)
-     * @param description 권한 설명
+     * @param desc 권한 설명
      * @param resource 리소스
      * @param action 액션
      * @return Permission
      */
     @Transactional
-    public Permission createPermission(String code, String name, String description, String resource, String action) {
+    public Permission createPermission(String code, String name, String desc, String resource, String action) {
         log.debug("권한 생성 시작: code={}, name={}", code, name);
         if (permissionRepository.findByCode(code).isPresent()) {
             log.warn("권한 생성 실패 - 중복 코드: code={}", code);
@@ -286,7 +286,7 @@ public class RoleService {
         }
         ResourceType resourceType = ResourceType.valueOf(resource);
         ActionType actionType = ActionType.valueOf(action);
-        Permission permission = Permission.createPermission(code, name, description, resourceType, actionType);
+        Permission permission = Permission.createPermission(code, name, desc, resourceType, actionType);
         permissionRepository.save(permission);
         log.info("권한 생성 완료: code={}", code);
         return permission;
@@ -297,17 +297,17 @@ public class RoleService {
      *
      * @param code 권한 코드
      * @param name 권한 이름 (한글명)
-     * @param description 권한 설명
+     * @param desc 권한 설명
      * @param resource 리소스
      * @param action 액션
      */
     @Transactional
-    public void updatePermission(String code, String name, String description, String resource, String action) {
+    public void updatePermission(String code, String name, String desc, String resource, String action) {
         log.debug("권한 수정 시작: code={}", code);
         Permission permission = getPermission(code);
         ResourceType resourceType = resource != null ? ResourceType.valueOf(resource) : null;
         ActionType actionType = action != null ? ActionType.valueOf(action) : null;
-        permission.updatePermission(name, description, resourceType, actionType);
+        permission.updatePermission(name, desc, resourceType, actionType);
         log.info("권한 수정 완료: code={}", code);
     }
 

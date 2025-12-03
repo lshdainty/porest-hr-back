@@ -47,8 +47,8 @@ public class Permission extends AuditingFields {
      * 권한 설명<br>
      * 권한에 대한 상세 설명
      */
-    @Column(name = "description")
-    private String description;
+    @Column(name = "permission_desc")
+    private String desc;
 
     /**
      * 리소스<br>
@@ -83,16 +83,16 @@ public class Permission extends AuditingFields {
      *
      * @param code 권한 코드
      * @param name 권한 이름 (한글명)
-     * @param description 권한 설명
+     * @param desc 권한 설명
      * @param resource 리소스
      * @param action 액션
      * @return Permission
      */
-    public static Permission createPermission(String code, String name, String description, ResourceType resource, ActionType action) {
+    public static Permission createPermission(String code, String name, String desc, ResourceType resource, ActionType action) {
         Permission permission = new Permission();
         permission.code = code;
         permission.name = name;
-        permission.description = description;
+        permission.desc = desc;
         permission.resource = resource;
         permission.action = action;
         permission.isDeleted = YNType.N;
@@ -105,13 +105,13 @@ public class Permission extends AuditingFields {
      * 해당 메소드를 통해 권한 수정할 것
      *
      * @param name 권한 이름 (한글명)
-     * @param description 권한 설명
+     * @param desc 권한 설명
      * @param resource 리소스
      * @param action 액션
      */
-    public void updatePermission(String name, String description, ResourceType resource, ActionType action) {
+    public void updatePermission(String name, String desc, ResourceType resource, ActionType action) {
         if (!Objects.isNull(name)) { this.name = name; }
-        if (!Objects.isNull(description)) { this.description = description; }
+        if (!Objects.isNull(desc)) { this.desc = desc; }
         if (!Objects.isNull(resource)) { this.resource = resource; }
         if (!Objects.isNull(action)) { this.action = action; }
     }

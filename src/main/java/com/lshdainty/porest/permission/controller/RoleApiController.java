@@ -43,7 +43,7 @@ public class RoleApiController implements RoleApi {
                 .map(role -> new RoleApiDto.RoleResp(
                         role.getCode(),
                         role.getName(),
-                        role.getDescription(),
+                        role.getDesc(),
                         role.getPermissions().stream()
                                 .map(Permission::getCode)
                                 .collect(Collectors.toList())
@@ -66,7 +66,7 @@ public class RoleApiController implements RoleApi {
         return ApiResponse.success(new RoleApiDto.RoleResp(
                 role.getCode(),
                 role.getName(),
-                role.getDescription(),
+                role.getDesc(),
                 role.getPermissions().stream()
                         .map(Permission::getCode)
                         .collect(Collectors.toList())
@@ -88,11 +88,11 @@ public class RoleApiController implements RoleApi {
             role = roleService.createRoleWithPermissions(
                     req.getRoleCode(),
                     req.getRoleName(),
-                    req.getDescription(),
+                    req.getDesc(),
                     req.getPermissionCodes()
             );
         } else {
-            role = roleService.createRole(req.getRoleCode(), req.getRoleName(), req.getDescription());
+            role = roleService.createRole(req.getRoleCode(), req.getRoleName(), req.getDesc());
         }
         return ApiResponse.success(role.getCode());
     }
@@ -112,12 +112,12 @@ public class RoleApiController implements RoleApi {
             // 설명 + 권한 둘 다 수정
             roleService.updateRoleWithPermissions(
                     roleCode,
-                    req.getDescription(),
+                    req.getDesc(),
                     req.getPermissionCodes()
             );
-        } else if (StringUtils.hasText(req.getDescription())) {
+        } else if (StringUtils.hasText(req.getDesc())) {
             // 설명만 수정
-            roleService.updateRole(roleCode, req.getDescription());
+            roleService.updateRole(roleCode, req.getDesc());
         }
         return ApiResponse.success();
     }
@@ -231,7 +231,7 @@ public class RoleApiController implements RoleApi {
                 .map(p -> new RoleApiDto.PermissionResp(
                         p.getCode(),
                         p.getName(),
-                        p.getDescription(),
+                        p.getDesc(),
                         p.getResource().name(),
                         p.getAction().name()
                 ))
@@ -253,7 +253,7 @@ public class RoleApiController implements RoleApi {
         return ApiResponse.success(new RoleApiDto.PermissionResp(
                 permission.getCode(),
                 permission.getName(),
-                permission.getDescription(),
+                permission.getDesc(),
                 permission.getResource().name(),
                 permission.getAction().name()
         ));
@@ -274,7 +274,7 @@ public class RoleApiController implements RoleApi {
                 .map(p -> new RoleApiDto.PermissionResp(
                         p.getCode(),
                         p.getName(),
-                        p.getDescription(),
+                        p.getDesc(),
                         p.getResource().name(),
                         p.getAction().name()
                 ))
@@ -295,7 +295,7 @@ public class RoleApiController implements RoleApi {
         Permission permission = roleService.createPermission(
                 req.getCode(),
                 req.getName(),
-                req.getDescription(),
+                req.getDesc(),
                 req.getResource(),
                 req.getAction()
         );
@@ -316,7 +316,7 @@ public class RoleApiController implements RoleApi {
         roleService.updatePermission(
                 permissionCode,
                 req.getName(),
-                req.getDescription(),
+                req.getDesc(),
                 req.getResource(),
                 req.getAction()
         );

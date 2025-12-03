@@ -31,7 +31,7 @@ public class RoleApiDto {
         private String roleName;
 
         @Schema(description = "설명", example = "시스템 관리자 역할")
-        private String description;
+        private String desc;
 
         @Schema(description = "권한 목록", example = "[\"USER_READ\", \"USER_MANAGE\"]")
         private List<String> permissions;
@@ -46,7 +46,7 @@ public class RoleApiDto {
     public static class RoleSimpleResp {
         private String roleCode;
         private String roleName;
-        private String description;
+        private String desc;
     }
 
     /* ==================== Role Request DTO ==================== */
@@ -67,7 +67,7 @@ public class RoleApiDto {
         private String roleName;
 
         @Schema(description = "설명", example = "시스템 관리자 역할")
-        private String description;
+        private String desc;
 
         @Schema(description = "권한 코드 목록 (선택)", example = "[\"USER_READ\", \"USER_MANAGE\"]")
         private List<String> permissionCodes;
@@ -83,7 +83,7 @@ public class RoleApiDto {
     @Schema(description = "역할 수정 요청")
     public static class UpdateRoleReq {
         @Schema(description = "설명", example = "시스템 관리자 역할")
-        private String description;
+        private String desc;
 
         @Schema(description = "권한 코드 목록 (선택)", example = "[\"USER_READ\", \"USER_MANAGE\"]")
         private List<String> permissionCodes;
@@ -128,7 +128,7 @@ public class RoleApiDto {
         private String name;
 
         @Schema(description = "설명", example = "사용자 정보를 조회할 수 있는 권한")
-        private String description;
+        private String desc;
 
         @Schema(description = "리소스", example = "USER")
         private String resource;
@@ -155,7 +155,7 @@ public class RoleApiDto {
         private String name;
 
         @Schema(description = "설명", example = "사용자 정보를 조회할 수 있는 권한")
-        private String description;
+        private String desc;
 
         @Schema(description = "리소스", example = "USER", required = true)
         private String resource;
@@ -173,7 +173,7 @@ public class RoleApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class UpdatePermissionReq {
         private String name;
-        private String description;
+        private String desc;
         private String resource;
         private String action;
     }

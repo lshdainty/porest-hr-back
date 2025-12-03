@@ -50,8 +50,8 @@ public class Role extends AuditingFields {
      * 역할 설명<br>
      * 역할에 대한 상세 설명
      */
-    @Column(name = "description")
-    private String description;
+    @Column(name = "role_desc")
+    private String desc;
 
     /**
      * 역할-권한 매핑 목록<br>
@@ -77,14 +77,14 @@ public class Role extends AuditingFields {
      *
      * @param code 역할 코드
      * @param name 역할 이름 (한글명)
-     * @param description 역할 설명
+     * @param desc 역할 설명
      * @return Role
      */
-    public static Role createRole(String code, String name, String description) {
+    public static Role createRole(String code, String name, String desc) {
         Role role = new Role();
         role.code = code;
         role.name = name;
-        role.description = description;
+        role.desc = desc;
         role.rolePermissions = new ArrayList<>();
         role.isDeleted = YNType.N;
         return role;
@@ -96,15 +96,15 @@ public class Role extends AuditingFields {
      *
      * @param code 역할 코드
      * @param name 역할 이름 (한글명)
-     * @param description 역할 설명
+     * @param desc 역할 설명
      * @param permissions 권한 리스트
      * @return Role
      */
-    public static Role createRoleWithPermissions(String code, String name, String description, List<Permission> permissions) {
+    public static Role createRoleWithPermissions(String code, String name, String desc, List<Permission> permissions) {
         Role role = new Role();
         role.code = code;
         role.name = name;
-        role.description = description;
+        role.desc = desc;
         role.rolePermissions = new ArrayList<>();
         role.isDeleted = YNType.N;
 
@@ -123,12 +123,12 @@ public class Role extends AuditingFields {
      * 해당 메소드를 통해 역할 수정할 것
      *
      * @param name 역할 이름 (한글명)
-     * @param description 역할 설명
+     * @param desc 역할 설명
      * @param permissions 권한 리스트
      */
-    public void updateRole(String name, String description, List<Permission> permissions) {
+    public void updateRole(String name, String desc, List<Permission> permissions) {
         if (!Objects.isNull(name)) { this.name = name; }
-        if (!Objects.isNull(description)) { this.description = description; }
+        if (!Objects.isNull(desc)) { this.desc = desc; }
         if (!Objects.isNull(permissions)) {
             this.rolePermissions.clear();
             for (Permission permission : permissions) {
