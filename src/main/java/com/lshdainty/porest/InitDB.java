@@ -326,7 +326,18 @@ public class InitDB {
                         ActionType.READ);
                 permissionRepository.save(regulationRead);
 
-				// 8. 권한 관리
+				// 9. 공지사항 관리
+				Permission noticeRead = Permission.createPermission("NOTICE:READ", "공지사항 조회", "공지사항 조회",
+						ResourceType.NOTICE, ActionType.READ);
+				permissionRepository.save(noticeRead);
+				Permission noticeWrite = Permission.createPermission("NOTICE:WRITE", "공지사항 작성", "공지사항 등록/수정",
+						ResourceType.NOTICE, ActionType.WRITE);
+				permissionRepository.save(noticeWrite);
+				Permission noticeManage = Permission.createPermission("NOTICE:MANAGE", "공지사항 관리", "공지사항 삭제 및 전체 관리",
+						ResourceType.NOTICE, ActionType.MANAGE);
+				permissionRepository.save(noticeManage);
+
+				// 10. 권한 관리
 				Permission roleManage = Permission.createPermission("ROLE:MANAGE", "권한 관리", "역할 및 권한 설정",
 						ResourceType.ROLE, ActionType.MANAGE);
 				permissionRepository.save(roleManage);
@@ -356,6 +367,9 @@ public class InitDB {
 				adminRole.addPermission(duesRead);
 				adminRole.addPermission(duesManage);
                 adminRole.addPermission(regulationRead);
+				adminRole.addPermission(noticeRead);
+				adminRole.addPermission(noticeWrite);
+				adminRole.addPermission(noticeManage);
 				adminRole.addPermission(roleManage);
 				roleRepository.save(adminRole);
 
@@ -373,6 +387,8 @@ public class InitDB {
 				adminRole.addPermission(scheduleManage);
 				managerRole.addPermission(duesRead);
                 managerRole.addPermission(regulationRead);
+				managerRole.addPermission(noticeRead);
+				managerRole.addPermission(noticeWrite);
 				roleRepository.save(managerRole);
 
 				// USER Role (일반 사용자 권한)
@@ -387,6 +403,7 @@ public class InitDB {
 				userRole.addPermission(scheduleWrite);
 				userRole.addPermission(duesRead);
                 userRole.addPermission(regulationRead);
+				userRole.addPermission(noticeRead);
 				roleRepository.save(userRole);
 			}
 		}

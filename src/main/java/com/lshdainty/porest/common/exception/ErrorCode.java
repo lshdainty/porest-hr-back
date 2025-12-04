@@ -121,6 +121,12 @@ public enum ErrorCode {
     // ========================================
     UNSUPPORTED_OAUTH_PROVIDER("AUTH_001", "error.auth.unsupported.provider", HttpStatus.BAD_REQUEST),
 
+    // ========================================
+    // NOTICE (공지사항)
+    // ========================================
+    NOTICE_NOT_FOUND("NOTICE_001", "error.notfound.notice", HttpStatus.NOT_FOUND),
+    NOTICE_INVALID_DATE("NOTICE_002", "error.notice.invalid.date", HttpStatus.BAD_REQUEST),
+
     ;
 
     /**
