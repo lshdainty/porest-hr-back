@@ -162,10 +162,19 @@ public class VacationApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class GetAvailableVacationsResp {
-        private VacationType vacationType;
-        private String vacationTypeName;
         private BigDecimal totalRemainTime;
         private String totalRemainTimeStr;
+        private List<AvailableVacationByType> vacations;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class AvailableVacationByType {
+        private VacationType vacationType;
+        private String vacationTypeName;
+        private BigDecimal remainTime;
+        private String remainTimeStr;
     }
 
     @Getter

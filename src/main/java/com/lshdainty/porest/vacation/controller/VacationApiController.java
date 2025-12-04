@@ -20,6 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -141,14 +142,26 @@ public class VacationApiController implements VacationApi {
     public ApiResponse getAvailableVacations(String userId, LocalDateTime startDate) {
         List<VacationServiceDto> availableVacations = vacationService.getAvailableVacations(userId, startDate);
 
-        List<VacationApiDto.GetAvailableVacationsResp> resp = availableVacations.stream()
-                .map(dto -> new VacationApiDto.GetAvailableVacationsResp(
+        // 타입별 잔여 휴가 리스트 생성
+        List<VacationApiDto.AvailableVacationByType> vacationsByType = availableVacations.stream()
+                .map(dto -> new VacationApiDto.AvailableVacationByType(
                         dto.getType(),
                         getTranslatedName(dto.getType()),
                         dto.getRemainTime(),
                         vacationTimeFormatter.format(dto.getRemainTime())
                 ))
                 .toList();
+
+        // 전체 잔여 휴가 시간 계산
+        BigDecimal totalRemainTime = availableVacations.stream()
+                .map(VacationServiceDto::getRemainTime)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        VacationApiDto.GetAvailableVacationsResp resp = new VacationApiDto.GetAvailableVacationsResp(
+                totalRemainTime,
+                vacationTimeFormatter.format(totalRemainTime),
+                vacationsByType
+        );
 
         return ApiResponse.success(resp);
     }
