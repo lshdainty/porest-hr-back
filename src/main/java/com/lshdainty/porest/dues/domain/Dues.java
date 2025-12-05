@@ -20,7 +20,7 @@ public class Dues extends AuditingFields {
      * 회비 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dues_id")
     private Long id;
 

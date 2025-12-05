@@ -15,7 +15,7 @@ public class UserProvider extends AuditingFields {
      * 제공자 시퀀스<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "provider_seq")
     private Long seq;
 

@@ -4,16 +4,7 @@ import com.lshdainty.porest.common.domain.AuditingFields;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.schedule.type.ScheduleType;
 import com.lshdainty.porest.user.domain.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,8 +22,7 @@ public class Schedule extends AuditingFields {
      * 스케줄 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedule_id")
     private Long id;
 

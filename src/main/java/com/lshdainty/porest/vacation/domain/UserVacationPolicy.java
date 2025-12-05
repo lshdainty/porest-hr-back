@@ -18,7 +18,7 @@ public class UserVacationPolicy extends AuditingFields {
      * 유저 휴가 정책 관리 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_vacation_policy_id")
     private Long id;
 

@@ -22,7 +22,7 @@ public class Holiday extends AuditingFields {
      * 공휴일 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "holiday_id")
     private Long id;
 

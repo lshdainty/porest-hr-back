@@ -28,7 +28,7 @@ public class Role extends AuditingFields {
      * 역할 ID (Primary Key)<br>
      * 자동 생성되는 고유 식별자
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")
     private Long id;
 

@@ -17,7 +17,7 @@ public class UserDepartment extends AuditingFields {
      * 유저 부서 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_department_id")
     private Long id;
 

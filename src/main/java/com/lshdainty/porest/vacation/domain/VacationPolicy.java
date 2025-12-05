@@ -23,7 +23,7 @@ public class VacationPolicy extends AuditingFields {
      * 휴가 정책 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vacation_policy_id")
     private Long id;
 
@@ -74,7 +74,7 @@ public class VacationPolicy extends AuditingFields {
      * 휴가 부여 기준 시간<br>
      * 정책에 설정된 휴가 부여 시간
      */
-    @Column(name = "grant_time")
+    @Column(name = "grant_time", precision = 7, scale = 4)
     private BigDecimal grantTime;
 
     /**

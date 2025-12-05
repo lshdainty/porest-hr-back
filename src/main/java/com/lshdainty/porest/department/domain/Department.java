@@ -22,7 +22,7 @@ public class Department extends AuditingFields {
      * 부서 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "department_id")
     private Long id;
 
