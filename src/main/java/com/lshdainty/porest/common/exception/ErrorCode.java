@@ -51,6 +51,9 @@ public enum ErrorCode {
     VACATION_CANNOT_CANCEL("VACATION_006", "error.vacation.cannot.cancel", HttpStatus.BAD_REQUEST),
     VACATION_POLICY_NOT_FOUND("VACATION_007", "error.notfound.vacation.policy", HttpStatus.NOT_FOUND),
     VACATION_GRANT_NOT_FOUND("VACATION_008", "error.notfound.vacation.grant", HttpStatus.NOT_FOUND),
+    VACATION_APPROVER_COUNT_MISMATCH("VACATION_009", "error.vacation.approver.count.mismatch", HttpStatus.BAD_REQUEST),
+    VACATION_DUPLICATE_APPROVER("VACATION_010", "error.vacation.duplicate.approver", HttpStatus.BAD_REQUEST),
+    VACATION_SELF_APPROVAL_NOT_ALLOWED("VACATION_011", "error.vacation.self.approval.not.allowed", HttpStatus.BAD_REQUEST),
 
     // ========================================
     // WORK (근무)

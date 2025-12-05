@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -56,8 +57,8 @@ class NoticeServiceTest {
             // given
             String writerId = "admin";
             User writer = User.createUser(writerId);
-            LocalDateTime start = LocalDateTime.now();
-            LocalDateTime end = start.plusDays(30);
+            LocalDate start = LocalDate.now();
+            LocalDate end = start.plusDays(30);
 
             NoticeServiceDto data = NoticeServiceDto.builder()
                     .writerId(writerId)
@@ -106,8 +107,8 @@ class NoticeServiceTest {
             // given
             String writerId = "admin";
             User writer = User.createUser(writerId);
-            LocalDateTime start = LocalDateTime.now().plusDays(30);
-            LocalDateTime end = LocalDateTime.now();
+            LocalDate start = LocalDate.now().plusDays(30);
+            LocalDate end = LocalDate.now();
 
             NoticeServiceDto data = NoticeServiceDto.builder()
                     .writerId(writerId)
@@ -136,7 +137,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "테스트 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             setNoticeId(notice, noticeId);
 
@@ -159,7 +160,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "테스트 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             setNoticeId(notice, noticeId);
 
@@ -192,7 +193,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제된 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             notice.deleteNotice();
 
@@ -214,11 +215,11 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice1 = Notice.createNotice(
                     writer, "공지1", "내용1", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             Notice notice2 = Notice.createNotice(
                     writer, "공지2", "내용2", NoticeType.URGENT,
-                    YNType.Y, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.Y, LocalDate.now(), LocalDate.now().plusDays(30)
             );
 
             Pageable pageable = PageRequest.of(0, 10);
@@ -241,7 +242,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "긴급 공지", "내용", NoticeType.URGENT,
-                    YNType.Y, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.Y, LocalDate.now(), LocalDate.now().plusDays(30)
             );
 
             Pageable pageable = PageRequest.of(0, 10);
@@ -265,7 +266,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "시스템 점검 안내", "내용", NoticeType.MAINTENANCE,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
 
             Pageable pageable = PageRequest.of(0, 10);
@@ -288,20 +289,20 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "활성 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30)
             );
 
             Pageable pageable = PageRequest.of(0, 10);
             Page<Notice> noticePage = new PageImpl<>(List.of(notice), pageable, 1);
 
-            given(noticeRepository.findActiveNotices(any(LocalDateTime.class), any(Pageable.class)))
+            given(noticeRepository.findActiveNotices(any(LocalDate.class), any(Pageable.class)))
                     .willReturn(noticePage);
 
             // when
             Page<NoticeServiceDto> result = noticeService.searchActiveNotices(pageable);
 
             // then
-            then(noticeRepository).should().findActiveNotices(any(LocalDateTime.class), any(Pageable.class));
+            then(noticeRepository).should().findActiveNotices(any(LocalDate.class), any(Pageable.class));
             assertThat(result.getTotalElements()).isEqualTo(1);
         }
 
@@ -312,7 +313,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "고정 공지", "내용", NoticeType.URGENT,
-                    YNType.Y, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.Y, LocalDate.now(), LocalDate.now().plusDays(30)
             );
 
             Pageable pageable = PageRequest.of(0, 10);
@@ -341,7 +342,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "원본 제목", "원본 내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             setNoticeId(notice, noticeId);
 
@@ -350,8 +351,8 @@ class NoticeServiceTest {
                     .content("수정 내용")
                     .type(NoticeType.URGENT)
                     .isPinned(YNType.Y)
-                    .startDate(LocalDateTime.now())
-                    .endDate(LocalDateTime.now().plusDays(60))
+                    .startDate(LocalDate.now())
+                    .endDate(LocalDate.now().plusDays(60))
                     .build();
 
             given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
@@ -390,14 +391,14 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "원본 제목", "원본 내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             setNoticeId(notice, noticeId);
 
             NoticeServiceDto updateData = NoticeServiceDto.builder()
                     .title("수정 제목")
-                    .startDate(LocalDateTime.now().plusDays(30))
-                    .endDate(LocalDateTime.now())
+                    .startDate(LocalDate.now().plusDays(30))
+                    .endDate(LocalDate.now())
                     .build();
 
             given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
@@ -419,7 +420,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제할 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             setNoticeId(notice, noticeId);
 
@@ -452,7 +453,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제된 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             notice.deleteNotice();
 
@@ -475,7 +476,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "테스트 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             setNoticeId(notice, noticeId);
 
@@ -508,7 +509,7 @@ class NoticeServiceTest {
             User writer = User.createUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제된 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             notice.deleteNotice();
 

@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +51,7 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice notice = Notice.createNotice(
                     writer, "테스트 공지", "테스트 내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
 
             // when
@@ -83,7 +83,7 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice notice = Notice.createNotice(
                     writer, "삭제될 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(notice);
             notice.deleteNotice();
@@ -107,11 +107,11 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice normalNotice = Notice.createNotice(
                     writer, "일반 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             Notice pinnedNotice = Notice.createNotice(
                     writer, "고정 공지", "내용", NoticeType.URGENT,
-                    YNType.Y, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.Y, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(normalNotice);
             noticeRepository.save(pinnedNotice);
@@ -133,11 +133,11 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice activeNotice = Notice.createNotice(
                     writer, "활성 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             Notice deletedNotice = Notice.createNotice(
                     writer, "삭제 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(activeNotice);
             noticeRepository.save(deletedNotice);
@@ -164,11 +164,11 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice generalNotice = Notice.createNotice(
                     writer, "일반 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             Notice urgentNotice = Notice.createNotice(
                     writer, "긴급 공지", "내용", NoticeType.URGENT,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(generalNotice);
             noticeRepository.save(urgentNotice);
@@ -194,11 +194,11 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice notice1 = Notice.createNotice(
                     writer, "시스템 점검 안내", "내용", NoticeType.MAINTENANCE,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             Notice notice2 = Notice.createNotice(
                     writer, "이벤트 안내", "내용", NoticeType.EVENT,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(notice1);
             noticeRepository.save(notice2);
@@ -220,7 +220,7 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice notice = Notice.createNotice(
                     writer, "System Maintenance", "내용", NoticeType.MAINTENANCE,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(notice);
             em.flush();
@@ -242,7 +242,7 @@ class NoticeQueryDslRepositoryTest {
         @DisplayName("현재 노출 기간 내의 공지사항만 조회")
         void findActiveNotices() {
             // given
-            LocalDateTime now = LocalDateTime.now();
+            LocalDate now = LocalDate.now();
             Notice activeNotice = Notice.createNotice(
                     writer, "활성 공지", "내용", NoticeType.GENERAL,
                     YNType.N, now.minusDays(1), now.plusDays(30)
@@ -280,11 +280,11 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice pinnedNotice = Notice.createNotice(
                     writer, "고정 공지", "내용", NoticeType.URGENT,
-                    YNType.Y, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.Y, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             Notice normalNotice = Notice.createNotice(
                     writer, "일반 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(pinnedNotice);
             noticeRepository.save(normalNotice);
@@ -308,7 +308,7 @@ class NoticeQueryDslRepositoryTest {
         @DisplayName("현재 활성화된 공지사항 수 반환")
         void countActiveNotices() {
             // given
-            LocalDateTime now = LocalDateTime.now();
+            LocalDate now = LocalDate.now();
             Notice activeNotice1 = Notice.createNotice(
                     writer, "활성 공지1", "내용", NoticeType.GENERAL,
                     YNType.N, now.minusDays(1), now.plusDays(30)
@@ -344,7 +344,7 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice notice = Notice.createNotice(
                     writer, "원본 제목", "원본 내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(notice);
             em.flush();
@@ -370,7 +370,7 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice notice = Notice.createNotice(
                     writer, "삭제할 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(notice);
             em.flush();
@@ -393,7 +393,7 @@ class NoticeQueryDslRepositoryTest {
             // given
             Notice notice = Notice.createNotice(
                     writer, "조회수 테스트", "내용", NoticeType.GENERAL,
-                    YNType.N, LocalDateTime.now(), LocalDateTime.now().plusDays(30)
+                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
             );
             noticeRepository.save(notice);
             em.flush();

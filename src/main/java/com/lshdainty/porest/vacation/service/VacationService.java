@@ -1107,30 +1107,52 @@ public class VacationService {
         List<String> approverIds = data.getApproverIds();
         Integer requiredCount = policy.getApprovalRequiredCount();
 
+        // 가용 승인자 수 조회 (상위 부서장 목록)
+        List<Department> availableApproverDepartments = departmentRepository.findApproversByUserId(userId);
+        int availableApproverCount = availableApproverDepartments.size();
+
+        // 실제 필요한 승인자 수 계산: min(정책 요구 인원, 가용 승인자 수)
+        int actualRequiredCount = 0;
         if (requiredCount != null && requiredCount > 0) {
+            actualRequiredCount = Math.min(requiredCount, availableApproverCount);
+        }
+
+        log.debug("승인자 검증: userId={}, policyRequired={}, available={}, actualRequired={}",
+                userId, requiredCount, availableApproverCount, actualRequiredCount);
+
+        if (actualRequiredCount > 0) {
+            // 승인자가 필요하지만 미지정된 경우
             if (approverIds == null || approverIds.isEmpty()) {
-                log.warn("휴가 신청 실패 - 승인자 미지정: userId={}, requiredCount={}", userId, requiredCount);
+                log.warn("휴가 신청 실패 - 승인자 미지정: userId={}, actualRequiredCount={}", userId, actualRequiredCount);
                 throw new InvalidValueException(ErrorCode.INVALID_PARAMETER);
             }
 
-            if (approverIds.size() != requiredCount) {
-                log.warn("휴가 신청 실패 - 승인자 수 불일치: userId={}, requiredCount={}, actualCount={}", userId, requiredCount, approverIds.size());
-                throw new InvalidValueException(ErrorCode.INVALID_PARAMETER);
+            // 승인자 수 검증: 실제 필요 인원과 일치해야 함
+            if (approverIds.size() != actualRequiredCount) {
+                log.warn("휴가 신청 실패 - 승인자 수 불일치: userId={}, actualRequired={}, provided={}",
+                        userId, actualRequiredCount, approverIds.size());
+                throw new InvalidValueException(ErrorCode.VACATION_APPROVER_COUNT_MISMATCH);
             }
 
             // 6-1. 승인자 중복 체크
             Set<String> uniqueApproverIds = new HashSet<>(approverIds);
             if (uniqueApproverIds.size() != approverIds.size()) {
                 log.warn("휴가 신청 실패 - 중복된 승인자: userId={}, approverIds={}", userId, approverIds);
-                throw new InvalidValueException(ErrorCode.INVALID_PARAMETER);
+                throw new InvalidValueException(ErrorCode.VACATION_DUPLICATE_APPROVER);
             }
 
-            // 6-2. 승인자 모두 존재하는지 확인
+            // 6-2. 본인을 승인자로 지정 불가
+            if (approverIds.contains(userId)) {
+                log.warn("휴가 신청 실패 - 본인을 승인자로 지정: userId={}", userId);
+                throw new InvalidValueException(ErrorCode.VACATION_SELF_APPROVAL_NOT_ALLOWED);
+            }
+
+            // 6-3. 승인자 모두 존재하는지 확인
             for (String approverId : approverIds) {
                 userService.checkUserExist(approverId);
             }
 
-            // 6-3. 승인자가 부서장인지 확인 (headUserId로 검증)
+            // 6-4. 승인자가 부서장인지 확인 (headUserId로 검증)
             List<Department> departments = departmentRepository.findByUserIds(approverIds);
 
             // 부서장이 아닌 승인자 찾기
@@ -1147,7 +1169,7 @@ public class VacationService {
                 throw new InvalidValueException(ErrorCode.INVALID_PARAMETER);
             }
 
-            // 6-4. 승인자를 부서 레벨 순서로 정렬 (레벨 오름차순: 하위 부서장 먼저)
+            // 6-5. 승인자를 부서 레벨 순서로 정렬 (레벨 오름차순: 하위 부서장 먼저)
             Map<String, Department> approverDepartmentMap = departments.stream()
                     .collect(Collectors.toMap(Department::getHeadUserId, dept -> dept));
 
@@ -1179,7 +1201,9 @@ public class VacationService {
         vacationGrantRepository.save(vacationGrant);
 
         // 9. 승인이 필요한 경우 VacationApproval 생성 (순서대로)
-        if (requiredCount != null && requiredCount > 0 && approverIds != null) {
+        // actualRequiredCount > 0: 승인이 필요한 경우
+        // actualRequiredCount == 0: 가용 승인자가 없거나 정책 요구 인원이 0인 경우 → 즉시 승인
+        if (actualRequiredCount > 0 && approverIds != null && !approverIds.isEmpty()) {
             List<VacationApproval> approvals = new ArrayList<>();
             int order = 1;
             for (String approverId : approverIds) {
@@ -1194,13 +1218,20 @@ public class VacationService {
                     userId, policy.getId(), vacationGrant.getId(), approverIds);
         } else {
             // 승인이 필요 없는 경우 즉시 ACTIVE 상태로 전환
+            // - 정책의 approvalRequiredCount가 0 또는 null인 경우
+            // - 가용 승인자가 0명인 경우 (최상위 조직장 등)
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime grantDate = policy.getEffectiveType().calculateDate(now);
             LocalDateTime expiryDate = policy.getExpirationType().calculateDate(grantDate);
             vacationGrant.approve(grantDate, expiryDate);
 
-            log.info("휴가 신청 완료 (즉시 승인) - User: {}, Policy: {}, GrantId: {}",
-                    userId, policy.getId(), vacationGrant.getId());
+            if (requiredCount != null && requiredCount > 0 && availableApproverCount == 0) {
+                log.info("휴가 신청 완료 (자동 승인 - 최상위 조직장) - User: {}, Policy: {}, GrantId: {}",
+                        userId, policy.getId(), vacationGrant.getId());
+            } else {
+                log.info("휴가 신청 완료 (즉시 승인) - User: {}, Policy: {}, GrantId: {}",
+                        userId, policy.getId(), vacationGrant.getId());
+            }
         }
 
         return vacationGrant.getId();

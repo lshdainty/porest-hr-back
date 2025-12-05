@@ -436,8 +436,8 @@ public class UserApiDto {
     @Getter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    @Schema(description = "승인권자 목록 조회 응답")
-    public static class GetApproversResp {
+    @Schema(description = "승인권자 상세 정보")
+    public static class ApproverDetailResp {
         @Schema(description = "사용자 ID", example = "user123")
         private String userId;
 
@@ -470,6 +470,21 @@ public class UserApiDto {
 
         @Schema(description = "부서 레벨", example = "2")
         private Long departmentLevel;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "승인권자 목록 조회 응답")
+    public static class GetApproversResp {
+        @Schema(description = "승인권자 목록")
+        private List<ApproverDetailResp> approvers;
+
+        @Schema(description = "가용 승인자 수 (최대 선택 가능 인원)", example = "2")
+        private int maxAvailableCount;
+
+        @Schema(description = "자동 승인 여부 (가용 승인자가 없는 경우 true)", example = "false")
+        private boolean isAutoApproval;
     }
 
     @Getter

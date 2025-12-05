@@ -358,7 +358,7 @@ public class UserApiController implements UserApi {
     public ApiResponse getUserApprovers(String userId) {
         List<UserServiceDto> approvers = userService.getUserApprovers(userId);
 
-        List<UserApiDto.GetApproversResp> resp = approvers.stream()
+        List<UserApiDto.ApproverDetailResp> approverDetails = approvers.stream()
                 .map(approver -> {
                     // 역할 상세 정보 변환 (null 체크)
                     List<UserApiDto.RoleDetailResp> roleDetails = approver.getRoles() != null
@@ -382,7 +382,7 @@ public class UserApiController implements UserApi {
                     List<String> roleNames = approver.getRoleNames() != null ? approver.getRoleNames() : List.of();
                     List<String> allPermissions = approver.getAllPermissions() != null ? approver.getAllPermissions() : List.of();
 
-                    return new UserApiDto.GetApproversResp(
+                    return new UserApiDto.ApproverDetailResp(
                             approver.getId(),
                             approver.getName(),
                             approver.getEmail(),
@@ -398,7 +398,14 @@ public class UserApiController implements UserApi {
                 })
                 .collect(Collectors.toList());
 
-        return ApiResponse.success(resp);
+        int maxAvailableCount = approverDetails.size();
+        boolean isAutoApproval = maxAvailableCount == 0;
+
+        return ApiResponse.success(new UserApiDto.GetApproversResp(
+                approverDetails,
+                maxAvailableCount,
+                isAutoApproval
+        ));
     }
 
     private String getTranslatedName(OriginCompanyType type) {
