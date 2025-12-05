@@ -17,6 +17,13 @@
   - Repository는 순수 데이터 접근만 담당 (비즈니스 로직 금지)
   - 날짜 변환, 값 계산 등은 Service에서 처리 후 파라미터로 전달
   - 재사용성과 테스트 용이성을 위해 계산된 값을 받도록 설계
+  - **Repository 구조 (3개 파일 필수)**:
+    - `{Entity}Repository.java` - 인터페이스 (JavaDoc 주석 포함)
+    - `{Entity}QueryDslRepository.java` - QueryDSL 구현체 (`@Primary` 적용)
+    - `{Entity}JpaRepository.java` - JPQL 구현체 (백업용)
+  - **QueryDslRepository 수정 시 JpaRepository도 동기화 필수**
+  - QueryDslRepository: `@Repository`, `@Primary`, `@RequiredArgsConstructor`
+  - JpaRepository: `@Repository("{entity}JpaRepository")`, `@RequiredArgsConstructor`
 - 예외: 전역 @RestControllerAdvice로 에러 응답 표준화 (상세 내용은 아래 "Exception 처리" 섹션 참조)
 - 로깅: slf4j 사용 [web:26]
 - Import 규칙:

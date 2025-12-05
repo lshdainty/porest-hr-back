@@ -114,6 +114,14 @@ public class User extends AuditingFields {
     private YNType lunarYN;
 
     /**
+     * 국가 코드<br>
+     * 사용자의 국가 정보
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "country_code")
+    private CountryCode countryCode;
+
+    /**
      * 초대 토큰<br>
      * 회원가입 초대 시 사용되는 고유 토큰
      */
@@ -156,14 +164,6 @@ public class User extends AuditingFields {
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted")
     private YNType isDeleted;
-
-    /**
-     * 국가 코드<br>
-     * 사용자의 국가 정보
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "country_code")
-    private CountryCode countryCode;
 
     /**
      * 대시보드 데이터<br>
