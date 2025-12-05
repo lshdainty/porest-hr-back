@@ -33,93 +33,197 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "users")
 public class User extends AuditingFields {
+    /**
+     * 유저 아이디<br>
+     * 테이블 관리용 Primary Key
+     */
     @Id
     @Column(name = "user_id")
-    private String id; // 유저 아이디
+    private String id;
 
+    /**
+     * 유저 비밀번호<br>
+     * 암호화된 비밀번호 저장
+     */
     @Column(name = "user_pwd")
-    private String pwd; // 유저 비번
+    private String pwd;
 
+    /**
+     * 유저 이름<br>
+     * 사용자의 실명
+     */
     @Column(name = "user_name")
-    private String name; // 유저 이름
+    private String name;
 
+    /**
+     * 유저 이메일<br>
+     * 사용자의 이메일 주소
+     */
     @Column(name = "user_email")
-    private String email; // 유저 이메일
+    private String email;
 
+    /**
+     * 유저 생일<br>
+     * 사용자의 생년월일
+     */
     @Column(name = "user_birth")
-    private LocalDate birth; // 유저 생일
+    private LocalDate birth;
 
+    /**
+     * 유연근무제 시간<br>
+     * 사용자의 근무 시간대 (예: "8 ~ 5", "9 ~ 6", "10 ~ 7")
+     */
     @Column(name = "user_work_time")
-    private String workTime; // 유연근무제
+    private String workTime;
 
+    /**
+     * 입사일<br>
+     * 사용자의 회사 입사 날짜
+     */
     @Column(name = "join_date")
-    private LocalDate joinDate; // 입사일
+    private LocalDate joinDate;
 
+    /**
+     * 유저 원소속 회사<br>
+     * 사용자가 원래 속한 회사 정보
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "user_origin_company")
-    private OriginCompanyType company; // 유저 원소속 회사
+    private OriginCompanyType company;
 
+    /**
+     * 프로필 이미지 파일명<br>
+     * 사용자의 프로필 이미지 원본 파일명
+     */
     @Column(name = "profile_name")
     private String profileName;
 
+    /**
+     * 프로필 이미지 UUID<br>
+     * 사용자의 프로필 이미지 고유 식별자
+     */
     @Column(name = "profile_uuid")
     private String profileUUID;
 
+    /**
+     * 음력 여부<br>
+     * 생일의 음력/양력 여부
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "lunar_yn")
-    private YNType lunarYN; // 음력여부
+    private YNType lunarYN;
 
+    /**
+     * 초대 토큰<br>
+     * 회원가입 초대 시 사용되는 고유 토큰
+     */
     @Column(name = "invitation_token")
-    private String invitationToken; // 초대 토큰
+    private String invitationToken;
 
+    /**
+     * 초대 상태<br>
+     * 초대 진행 상태 (PENDING, ACTIVE 등)
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "invitation_status")
-    private StatusType invitationStatus; // 초대 상태
+    private StatusType invitationStatus;
 
+    /**
+     * 초대 발송 시간<br>
+     * 초대 이메일이 발송된 일시
+     */
     @Column(name = "invitation_sent_at")
-    private LocalDateTime invitationSentAt; // 초대 발송 시간
+    private LocalDateTime invitationSentAt;
 
+    /**
+     * 초대 만료 시간<br>
+     * 초대 토큰이 만료되는 일시
+     */
     @Column(name = "invitation_expires_at")
-    private LocalDateTime invitationExpiresAt; // 초대 만료 시간
+    private LocalDateTime invitationExpiresAt;
 
+    /**
+     * 실제 회원가입 완료 시간<br>
+     * 사용자가 회원가입을 완료한 일시
+     */
     @Column(name = "registered_at")
-    private LocalDateTime registeredAt; // 실제 회원가입 완료 시간
+    private LocalDateTime registeredAt;
 
+    /**
+     * 삭제 여부<br>
+     * Soft delete를 위한 플래그
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted")
-    private YNType isDeleted; // 삭제여부
+    private YNType isDeleted;
 
+    /**
+     * 국가 코드<br>
+     * 사용자의 국가 정보
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "country_code")
-    private CountryCode countryCode; // 국가 코드
+    private CountryCode countryCode;
 
+    /**
+     * 대시보드 데이터<br>
+     * 사용자 맞춤 대시보드 설정 정보 (JSON 형식)
+     */
     @Column(name = "dashboard", columnDefinition = "json")
-    private String dashboard; // 대시보드 데이터
+    private String dashboard;
 
+    /**
+     * 유저 OAuth 제공자 목록<br>
+     * 사용자의 소셜 로그인 연동 정보 목록
+     */
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)   // JPA에서는 mappedBy는 읽기 전용
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserProvider> providers = new ArrayList<>();
 
+    /**
+     * 유저 휴가 부여 목록<br>
+     * 사용자에게 부여된 휴가 내역 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<VacationGrant> vacationGrants = new ArrayList<>();
 
+    /**
+     * 유저 휴가 사용 목록<br>
+     * 사용자가 사용한 휴가 내역 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<VacationUsage> vacationUsages = new ArrayList<>();
 
+    /**
+     * 유저 휴가 정책 목록<br>
+     * 사용자에게 적용된 휴가 정책 매핑 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserVacationPolicy> userVacationPolicies = new ArrayList<>();
 
+    /**
+     * 유저 부서 목록<br>
+     * 사용자가 소속된 부서 매핑 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserDepartment> userDepartments = new ArrayList<>();
 
+    /**
+     * 유저 휴가 승인 목록<br>
+     * 사용자가 승인자로 지정된 휴가 승인 내역 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "approver", cascade = CascadeType.ALL)
     private List<VacationApproval> vacationApprovals = new ArrayList<>();
 
+    /**
+     * 유저 역할 목록<br>
+     * 사용자에게 부여된 역할 매핑 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRole> userRoles = new ArrayList<>();

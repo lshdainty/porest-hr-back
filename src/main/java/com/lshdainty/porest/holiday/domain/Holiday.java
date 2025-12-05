@@ -18,41 +18,77 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "holiday")
 public class Holiday extends AuditingFields {
+    /**
+     * 공휴일 아이디<br>
+     * 테이블 관리용 seq
+     */
     @Id @GeneratedValue
     @Column(name = "holiday_id")
-    private Long id;           // 공휴일 아이디
+    private Long id;
 
+    /**
+     * 공휴일 날짜<br>
+     * 공휴일이 해당하는 날짜 (양력 기준)
+     */
     @NotNull
     @Column(name = "holiday_date")
-    private LocalDate date;        // 공휴일 날짜
+    private LocalDate date;
 
+    /**
+     * 공휴일 이름<br>
+     * 공휴일의 명칭 (예: 설날, 추석, 광복절 등)
+     */
     @NotNull
     @Column(name = "holiday_name")
-    private String name;        // 공휴일 이름
+    private String name;
 
+    /**
+     * 공휴일 타입<br>
+     * 공휴일의 종류를 구분하기 위한 타입
+     */
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "holiday_type")
-    private HolidayType type;   // 공휴일 타입
+    private HolidayType type;
 
+    /**
+     * 국가 코드<br>
+     * 공휴일이 적용되는 국가 정보
+     */
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "country_code")
-    private CountryCode countryCode; // 국가 코드
+    private CountryCode countryCode;
 
+    /**
+     * 음력 여부<br>
+     * 공휴일 날짜가 음력인지 여부
+     */
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "lunar_yn")
-    private YNType lunarYN;     // 음력 여부
+    private YNType lunarYN;
 
+    /**
+     * 음력 날짜<br>
+     * 음력 기준 공휴일 날짜 (음력 여부가 Y일 경우 사용)
+     */
     @Column(name = "lunar_date")
-    private LocalDate lunarDate;   // 음력 날짜
+    private LocalDate lunarDate;
 
+    /**
+     * 반복 여부<br>
+     * 매년 반복되는 공휴일인지 여부
+     */
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "is_recurring")
-    private YNType isRecurring; // 반복 여부
+    private YNType isRecurring;
 
+    /**
+     * 공휴일 아이콘<br>
+     * UI에서 표시할 아이콘 정보
+     */
     @Column(name = "holiday_icon")
     private String icon;
 

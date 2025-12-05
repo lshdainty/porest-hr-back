@@ -27,28 +27,57 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "schedule")
 public class Schedule extends AuditingFields {
+    /**
+     * 스케줄 아이디<br>
+     * 테이블 관리용 seq
+     */
     @Id
     @GeneratedValue
     @Column(name = "schedule_id")
     private Long id;
 
+    /**
+     * 유저 객체<br>
+     * 테이블 컬럼은 user_id<br>
+     * 어떤 유저의 스케줄인지 알기 위해 사용
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    /**
+     * 스케줄 타입<br>
+     * 스케줄의 종류를 구분하기 위한 타입
+     */
     @Column(name = "schedule_type")
     @Enumerated(EnumType.STRING)
     private ScheduleType type;
 
+    /**
+     * 스케줄 설명<br>
+     * 스케줄에 대한 상세 내용 및 설명
+     */
     @Column(name = "schedule_desc")
     private String desc;
 
+    /**
+     * 스케줄 시작 일시<br>
+     * 스케줄이 시작되는 날짜와 시간
+     */
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
+    /**
+     * 스케줄 종료 일시<br>
+     * 스케줄이 종료되는 날짜와 시간
+     */
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
+    /**
+     * 삭제 여부<br>
+     * Soft delete를 위한 플래그
+     */
     @Column(name = "is_deleted")
     @Enumerated(EnumType.STRING)
     private YNType isDeleted;

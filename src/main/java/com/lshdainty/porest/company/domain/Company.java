@@ -18,22 +18,42 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "company")
 public class Company extends AuditingFields {
+    /**
+     * 회사 아이디<br>
+     * 테이블 관리용 Primary Key
+     */
     @Id
     @Column(name = "company_id")
-    private String id; // 회사 아이디
+    private String id;
 
+    /**
+     * 회사명<br>
+     * 회사의 이름
+     */
     @Column(name = "company_name")
-    private String name; // 회사명
+    private String name;
 
+    /**
+     * 회사 설명<br>
+     * 회사에 대한 상세 설명
+     */
     @Column(name = "company_desc")
-    private String desc; // 회사 설명
+    private String desc;
 
+    /**
+     * 삭제 여부<br>
+     * Soft delete를 위한 플래그
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted")
-    private YNType isDeleted; // 삭제여부
+    private YNType isDeleted;
 
+    /**
+     * 부서 목록<br>
+     * 회사에 속한 부서 목록
+     */
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)   // JPA에서는 mappedBy는 읽기 전용
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<Department> departments = new ArrayList<>();
 
     /**

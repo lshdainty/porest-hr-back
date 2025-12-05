@@ -18,50 +18,104 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "department")
 public class Department extends AuditingFields {
+    /**
+     * 부서 아이디<br>
+     * 테이블 관리용 seq
+     */
     @Id @GeneratedValue
     @Column(name = "department_id")
-    private Long id;        // 부서 아이디
+    private Long id;
 
+    /**
+     * 부서명<br>
+     * 부서의 영문 이름
+     */
     @Column(name = "department_name")
-    private String name;    // 부서명
+    private String name;
 
+    /**
+     * 부서명 (국문)<br>
+     * 부서의 한글 이름
+     */
     @Column(name = "department_name_kr")
-    private String nameKR;  // 부서명(국문)
+    private String nameKR;
 
+    /**
+     * 상위 부서 아이디 (읽기 전용)<br>
+     * 부모에 대한 수정은 parent 객체를 통해 진행할 것
+     */
     @Column(name = "parent_department_id", insertable = false, updatable = false)
-    private Long parentId;  // 읽기 전용 (부모에 대한 수정은 parent 객체를 통해 진행할 것
+    private Long parentId;
 
+    /**
+     * 상위 부서 객체<br>
+     * 테이블 컬럼은 parent_department_id<br>
+     * 부서의 계층 구조를 표현하기 위한 자기 참조 관계
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_department_id")
-    private Department parent;  // 상위 부서
+    private Department parent;
 
+    /**
+     * 부서장 아이디<br>
+     * 부서를 관리하는 사용자의 아이디
+     */
     @Column(name = "head_user_id")
     private String headUserId;
 
+    /**
+     * 부서 레벨<br>
+     * 부서 계층 구조에서의 깊이 (tree 레벨)
+     */
     @Column(name = "department_level")
-    private Long level;     // tree 레벨
+    private Long level;
 
+    /**
+     * 부서 설명<br>
+     * 부서에 대한 상세 설명
+     */
     @Column(name = "department_desc")
-    private String desc;    // 부서 설명
+    private String desc;
 
+    /**
+     * 색상 코드<br>
+     * UI에서 부서 표시 시 사용할 색상 코드
+     */
     @Column(name = "color_code")
     private String color;
 
+    /**
+     * 회사 객체<br>
+     * 테이블 컬럼은 company_id<br>
+     * 부서가 속한 회사 정보
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
 
+    /**
+     * 하위 부서 목록<br>
+     * 해당 부서 하위에 속한 부서 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Department> children = new ArrayList<>();
 
+    /**
+     * 소속 유저 목록<br>
+     * 해당 부서에 소속된 유저 매핑 목록
+     */
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
     private List<UserDepartment> userDepartments = new ArrayList<>();
 
+    /**
+     * 삭제 여부<br>
+     * Soft delete를 위한 플래그
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted")
-    private YNType isDeleted; // 삭제여부
+    private YNType isDeleted;
 
     // company 추가 연관관계 편의 메소드
     public void addCompany(Company company) {

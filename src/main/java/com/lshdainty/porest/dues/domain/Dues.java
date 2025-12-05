@@ -16,27 +16,55 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "dues")
 public class Dues extends AuditingFields {
+    /**
+     * 회비 아이디<br>
+     * 테이블 관리용 seq
+     */
     @Id @GeneratedValue
     @Column(name = "dues_id")
     private Long id;
 
+    /**
+     * 회비 사용자명<br>
+     * 회비를 납부하거나 사용한 사용자의 이름
+     */
     @Column(name = "dues_user_name")
     private String userName;
 
+    /**
+     * 회비 금액<br>
+     * 납부 또는 사용된 회비 금액
+     */
     @Column(name = "dues_amount")
     private Long amount;
 
+    /**
+     * 회비 타입<br>
+     * 회비의 종류를 구분하기 위한 타입
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "dues_type")
     private DuesType type;
 
+    /**
+     * 회비 계산 타입<br>
+     * 회비 금액 계산 방식을 구분하기 위한 타입
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "dues_calc")
     private DuesCalcType calc;
 
+    /**
+     * 회비 날짜<br>
+     * 회비 납부 또는 사용 날짜
+     */
     @Column(name = "dues_date")
     private LocalDate date;
 
+    /**
+     * 회비 상세 내용<br>
+     * 회비 사용 내역에 대한 상세 설명
+     */
     @Column(name = "dues_detail")
     private String detail;
 

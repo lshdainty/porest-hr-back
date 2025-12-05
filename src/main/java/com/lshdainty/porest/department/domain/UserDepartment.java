@@ -13,25 +13,47 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "user_department")
 public class UserDepartment extends AuditingFields {
+    /**
+     * 유저 부서 아이디<br>
+     * 테이블 관리용 seq
+     */
     @Id @GeneratedValue
     @Column(name = "user_department_id")
-    private Long id;                // seq
+    private Long id;
 
+    /**
+     * 유저 객체<br>
+     * 테이블 컬럼은 user_id<br>
+     * 어떤 유저가 부서에 속해 있는지 알기 위해 사용
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;              // 유저 정보
+    private User user;
 
+    /**
+     * 부서 객체<br>
+     * 테이블 컬럼은 department_id<br>
+     * 유저가 속한 부서 정보
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
-    private Department department;  // 유저가 속한 부서 정보
+    private Department department;
 
+    /**
+     * 메인 부서 여부<br>
+     * 유저가 여러 부서에 속할 경우 대표 부서를 구분하기 위한 플래그
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "main_department_yn")
-    private YNType mainYN;          // 메인 부서 여부
+    private YNType mainYN;
 
+    /**
+     * 삭제 여부<br>
+     * Soft delete를 위한 플래그
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted")
-    private YNType isDeleted;           // 삭제여부
+    private YNType isDeleted;
 
     // user 추가 연관관계 편의 메소드
     public void addUser(User user) {
