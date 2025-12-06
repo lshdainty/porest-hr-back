@@ -18,7 +18,7 @@ public interface WorkHistoryService {
      * 업무 이력 생성
      *
      * @param data 업무 이력 데이터
-     * @return 생성된 업무 이력 seq
+     * @return 생성된 업무 이력 id
      */
     Long createWorkHistory(WorkHistoryServiceDto data);
 
@@ -26,7 +26,7 @@ public interface WorkHistoryService {
      * 업무 이력 일괄 생성
      *
      * @param dataList 업무 이력 데이터 리스트
-     * @return 생성된 업무 이력 seq 리스트
+     * @return 생성된 업무 이력 id 리스트
      */
     List<Long> createWorkHistories(List<WorkHistoryServiceDto> dataList);
 
@@ -41,10 +41,10 @@ public interface WorkHistoryService {
     /**
      * 업무 이력 단건 조회
      *
-     * @param seq 업무 이력 seq
+     * @param id 업무 이력 id
      * @return 업무 이력 상세 정보
      */
-    WorkHistoryServiceDto findWorkHistory(Long seq);
+    WorkHistoryServiceDto findWorkHistory(Long id);
 
     /**
      * 업무 이력 수정
@@ -56,9 +56,9 @@ public interface WorkHistoryService {
     /**
      * 업무 이력 삭제
      *
-     * @param seq 업무 이력 seq
+     * @param id 업무 이력 id
      */
-    void deleteWorkHistory(Long seq);
+    void deleteWorkHistory(Long id);
 
     /**
      * 업무 이력 엑셀 다운로드

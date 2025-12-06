@@ -7,10 +7,10 @@ import lombok.Getter;
 @Getter
 @Builder
 public class WorkCodeServiceDto {
-    private Long seq;
+    private Long id;
     private String code;
     private String name;
     private CodeType type;
     private Integer orderSeq;
-    private Long parentSeq;
+    private Long parentId;
 }

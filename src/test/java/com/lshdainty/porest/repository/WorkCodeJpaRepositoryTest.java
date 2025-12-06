@@ -73,8 +73,8 @@ class WorkCodeJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("Seq로 업무코드 조회")
-    void findBySeq() {
+    @DisplayName("Id로 업무코드 조회")
+    void findById() {
         // given
         WorkCode workCode = WorkCode.createWorkCode("GRP001", "개발팀", CodeType.LABEL, null, 1);
         workCodeRepository.save(workCode);
@@ -82,7 +82,7 @@ class WorkCodeJpaRepositoryTest {
         em.clear();
 
         // when
-        Optional<WorkCode> findCode = workCodeRepository.findBySeq(workCode.getSeq());
+        Optional<WorkCode> findCode = workCodeRepository.findById(workCode.getId());
 
         // then
         assertThat(findCode.isPresent()).isTrue();
@@ -90,10 +90,10 @@ class WorkCodeJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("Seq로 조회 시 업무코드가 없으면 빈 Optional 반환")
-    void findBySeqEmpty() {
+    @DisplayName("Id로 조회 시 업무코드가 없으면 빈 Optional 반환")
+    void findByIdEmpty() {
         // when
-        Optional<WorkCode> findCode = workCodeRepository.findBySeq(999L);
+        Optional<WorkCode> findCode = workCodeRepository.findById(999L);
 
         // then
         assertThat(findCode.isEmpty()).isTrue();
@@ -140,8 +140,8 @@ class WorkCodeJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("부모 Seq로 하위 코드 조회")
-    void findAllByConditionsWithParentSeq() {
+    @DisplayName("부모 Id로 하위 코드 조회")
+    void findAllByConditionsWithParentId() {
         // given
         WorkCode parent = WorkCode.createWorkCode("GRP001", "개발팀", CodeType.LABEL, null, 1);
         workCodeRepository.save(parent);
@@ -150,7 +150,7 @@ class WorkCodeJpaRepositoryTest {
         em.clear();
 
         // when
-        List<WorkCode> codes = workCodeRepository.findAllByConditions(null, parent.getSeq(), null, null);
+        List<WorkCode> codes = workCodeRepository.findAllByConditions(null, parent.getId(), null, null);
 
         // then
         assertThat(codes).hasSize(1);

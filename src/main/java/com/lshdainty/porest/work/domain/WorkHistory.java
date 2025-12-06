@@ -17,11 +17,11 @@ import java.time.LocalDate;
 @Table(name = "work_history")
 public class WorkHistory extends AuditingFields {
     /**
-     * 이력 관리용 시퀀스
+     * 이력 관리용 ID
      */
-    @Id @GeneratedValue
-    @Column(name = "work_history_seq")
-    private Long seq;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "work_history_id")
+    private Long id;
 
     /**
      * 업무 날짜
@@ -33,7 +33,7 @@ public class WorkHistory extends AuditingFields {
      * 근무자
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "work_user")
+    @JoinColumn(name = "user_id")
     private User user;
 
     /**

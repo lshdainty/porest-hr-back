@@ -42,7 +42,7 @@ public class WorkHistoryJpaRepository implements WorkHistoryRepository {
                                 "left join fetch wh.group " +
                                 "left join fetch wh.part " +
                                 "left join fetch wh.division " +
-                                "where wh.seq = :id", WorkHistory.class)
+                                "where wh.id = :id", WorkHistory.class)
                 .setParameter("id", id)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
@@ -64,9 +64,9 @@ public class WorkHistoryJpaRepository implements WorkHistoryRepository {
         appendConditions(jpql, params, condition);
 
         if ("OLDEST".equalsIgnoreCase(condition.getSortType())) {
-            jpql.append(" order by wh.date asc, wh.seq desc");
+            jpql.append(" order by wh.date asc, wh.id desc");
         } else {
-            jpql.append(" order by wh.date desc, wh.seq desc");
+            jpql.append(" order by wh.date desc, wh.id desc");
         }
 
         TypedQuery<WorkHistory> query = em.createQuery(jpql.toString(), WorkHistory.class);
@@ -173,17 +173,17 @@ public class WorkHistoryJpaRepository implements WorkHistoryRepository {
         }
 
         if (condition.getGroupSeq() != null) {
-            jpql.append(" and wh.group.seq = :groupSeq");
+            jpql.append(" and wh.group.id = :groupSeq");
             params.put("groupSeq", condition.getGroupSeq());
         }
 
         if (condition.getPartSeq() != null) {
-            jpql.append(" and wh.part.seq = :partSeq");
+            jpql.append(" and wh.part.id = :partSeq");
             params.put("partSeq", condition.getPartSeq());
         }
 
         if (condition.getDivisionSeq() != null) {
-            jpql.append(" and wh.division.seq = :divisionSeq");
+            jpql.append(" and wh.division.id = :divisionSeq");
             params.put("divisionSeq", condition.getDivisionSeq());
         }
     }

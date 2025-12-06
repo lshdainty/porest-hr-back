@@ -21,7 +21,7 @@ public class VacationApproval extends AuditingFields {
      * 휴가 승인 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vacation_approval_id")
     private Long id;
 
@@ -41,7 +41,7 @@ public class VacationApproval extends AuditingFields {
      * 누가 승인하는지 알기 위해 사용
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approver_id")
+    @JoinColumn(name = "user_id")
     @Setter
     private User approver;
 

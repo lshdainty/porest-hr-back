@@ -77,8 +77,8 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
                 data.getHours(),
                 data.getContent());
         workHistoryRepository.save(workHistory);
-        log.info("업무 이력 생성 완료: seq={}, userId={}, hours={}", workHistory.getSeq(), data.getUserId(), data.getHours());
-        return workHistory.getSeq();
+        log.info("업무 이력 생성 완료: id={}, userId={}, hours={}", workHistory.getId(), data.getUserId(), data.getHours());
+        return workHistory.getId();
     }
 
     @Override
@@ -105,7 +105,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
         log.info("업무 이력 일괄 생성 완료: count={}", workHistories.size());
 
         return workHistories.stream()
-                .map(WorkHistory::getSeq)
+                .map(WorkHistory::getId)
                 .collect(Collectors.toList());
     }
 
@@ -116,7 +116,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
 
         return workHistories.stream()
                 .map(w -> WorkHistoryServiceDto.builder()
-                        .seq(w.getSeq())
+                        .id(w.getId())
                         .date(w.getDate())
                         .userId(w.getUser().getId())
                         .userName(w.getUser().getName())
@@ -133,12 +133,12 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
     }
 
     @Override
-    public WorkHistoryServiceDto findWorkHistory(Long seq) {
-        log.debug("업무 이력 조회: seq={}", seq);
-        WorkHistory w = checkWorkHistoryExist(seq);
+    public WorkHistoryServiceDto findWorkHistory(Long id) {
+        log.debug("업무 이력 조회: id={}", id);
+        WorkHistory w = checkWorkHistoryExist(id);
 
         return WorkHistoryServiceDto.builder()
-                .seq(w.getSeq())
+                .id(w.getId())
                 .date(w.getDate())
                 .userId(w.getUser().getId())
                 .userName(w.getUser().getName())
@@ -156,8 +156,8 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
     @Override
     @Transactional
     public void updateWorkHistory(WorkHistoryServiceDto data) {
-        log.debug("업무 이력 수정 시작: seq={}", data.getSeq());
-        WorkHistory workHistory = checkWorkHistoryExist(data.getSeq());
+        log.debug("업무 이력 수정 시작: id={}", data.getId());
+        WorkHistory workHistory = checkWorkHistoryExist(data.getId());
         User user = userService.checkUserExist(data.getUserId());
         WorkCode group = checkWorkCodeExist(data.getGroupCode());
         WorkCode part = checkWorkCodeExist(data.getPartCode());
@@ -171,22 +171,22 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
                 classes,
                 data.getHours(),
                 data.getContent());
-        log.info("업무 이력 수정 완료: seq={}", data.getSeq());
+        log.info("업무 이력 수정 완료: id={}", data.getId());
     }
 
     @Override
     @Transactional
-    public void deleteWorkHistory(Long seq) {
-        log.debug("업무 이력 삭제 시작: seq={}", seq);
-        WorkHistory workHistory = checkWorkHistoryExist(seq);
+    public void deleteWorkHistory(Long id) {
+        log.debug("업무 이력 삭제 시작: id={}", id);
+        WorkHistory workHistory = checkWorkHistoryExist(id);
         workHistoryRepository.delete(workHistory);
-        log.info("업무 이력 삭제 완료: seq={}", seq);
+        log.info("업무 이력 삭제 완료: id={}", id);
     }
 
-    private WorkHistory checkWorkHistoryExist(Long seq) {
-        Optional<WorkHistory> workHistory = workHistoryRepository.findById(seq);
+    private WorkHistory checkWorkHistoryExist(Long id) {
+        Optional<WorkHistory> workHistory = workHistoryRepository.findById(id);
         workHistory.orElseThrow(() -> {
-            log.warn("업무 이력 조회 실패 - 존재하지 않는 이력: seq={}", seq);
+            log.warn("업무 이력 조회 실패 - 존재하지 않는 이력: id={}", id);
             return new EntityNotFoundException(ErrorCode.WORK_NOT_FOUND);
         });
         return workHistory.get();
@@ -210,7 +210,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
             return null;
         }
         return WorkCodeServiceDto.builder()
-                .seq(workCode.getSeq())
+                .id(workCode.getId())
                 .code(workCode.getCode())
                 .name(workCode.getName())
                 .type(workCode.getType())

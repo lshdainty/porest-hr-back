@@ -49,8 +49,8 @@ public class WorkApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "업무 내역 등록 응답")
     public static class CreateWorkHistoryResp {
-        @Schema(description = "생성된 업무 내역 시퀀스", example = "1")
-        private Long workHistorySeq;
+        @Schema(description = "생성된 업무 내역 ID", example = "1")
+        private Long workHistoryId;
     }
 
     @Getter
@@ -68,8 +68,8 @@ public class WorkApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "업무 내역 일괄 등록 응답")
     public static class BulkCreateWorkHistoryResp {
-        @Schema(description = "생성된 업무 내역 시퀀스 목록", example = "[1, 2, 3]")
-        private List<Long> workHistorySeqs;
+        @Schema(description = "생성된 업무 내역 ID 목록", example = "[1, 2, 3]")
+        private List<Long> workHistoryIds;
     }
 
     @Getter
@@ -104,8 +104,8 @@ public class WorkApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "업무 내역 응답")
     public static class WorkHistoryResp {
-        @Schema(description = "업무 내역 시퀀스", example = "1")
-        private Long workHistorySeq;
+        @Schema(description = "업무 내역 ID", example = "1")
+        private Long workHistoryId;
 
         @Schema(description = "업무 날짜", example = "2024-01-15")
         private LocalDate workDate;
@@ -149,8 +149,8 @@ public class WorkApiDto {
         @Schema(description = "코드 타입", example = "GROUP")
         private CodeType codeType;
 
-        @Schema(description = "부모 업무 코드 시퀀스", example = "1")
-        private Long parentWorkCodeSeq;
+        @Schema(description = "부모 업무 코드 ID", example = "1")
+        private Long parentWorkCodeId;
 
         @Schema(description = "정렬 순서", example = "1")
         private Integer orderSeq;
@@ -161,8 +161,8 @@ public class WorkApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "업무 코드 생성 응답")
     public static class CreateWorkCodeResp {
-        @Schema(description = "생성된 업무 코드 시퀀스", example = "1")
-        private Long workCodeSeq;
+        @Schema(description = "생성된 업무 코드 ID", example = "1")
+        private Long workCodeId;
     }
 
     @Getter
@@ -177,8 +177,8 @@ public class WorkApiDto {
         @Schema(description = "업무 코드 이름", example = "그룹A")
         private String workCodeName;
 
-        @Schema(description = "부모 업무 코드 시퀀스", example = "1")
-        private Long parentWorkCodeSeq;
+        @Schema(description = "부모 업무 코드 ID", example = "1")
+        private Long parentWorkCodeId;
 
         @Schema(description = "정렬 순서", example = "1")
         private Integer orderSeq;
@@ -189,8 +189,8 @@ public class WorkApiDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "업무 코드 응답")
     public static class WorkCodeResp {
-        @Schema(description = "업무 코드 시퀀스", example = "1")
-        private Long workCodeSeq;
+        @Schema(description = "업무 코드 ID", example = "1")
+        private Long workCodeId;
 
         @Schema(description = "업무 코드", example = "GROUP_A")
         private String workCode;
@@ -204,8 +204,8 @@ public class WorkApiDto {
         @Schema(description = "정렬 순서", example = "1")
         private Integer orderSeq;
 
-        @Schema(description = "부모 업무 코드 시퀀스", example = "1")
-        private Long parentWorkCodeSeq;
+        @Schema(description = "부모 업무 코드 ID", example = "1")
+        private Long parentWorkCodeId;
     }
 
     // ========== 시스템 로그 DTO ==========

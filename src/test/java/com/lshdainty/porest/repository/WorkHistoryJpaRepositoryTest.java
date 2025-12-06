@@ -69,7 +69,7 @@ class WorkHistoryJpaRepositoryTest {
         em.clear();
 
         // then
-        Optional<WorkHistory> findHistory = workHistoryRepository.findById(workHistory.getSeq());
+        Optional<WorkHistory> findHistory = workHistoryRepository.findById(workHistory.getId());
         assertThat(findHistory.isPresent()).isTrue();
         assertThat(findHistory.get().getContent()).isEqualTo("API 개발");
         assertThat(findHistory.get().getHours()).isEqualByComparingTo(new BigDecimal("8.0"));
@@ -243,7 +243,7 @@ class WorkHistoryJpaRepositoryTest {
         em.clear();
 
         // when
-        WorkHistory foundHistory = workHistoryRepository.findById(workHistory.getSeq()).orElseThrow();
+        WorkHistory foundHistory = workHistoryRepository.findById(workHistory.getId()).orElseThrow();
         workHistoryRepository.delete(foundHistory);
         em.flush();
         em.clear();
@@ -377,14 +377,14 @@ class WorkHistoryJpaRepositoryTest {
         em.clear();
 
         // when
-        WorkHistory foundHistory = workHistoryRepository.findById(workHistory.getSeq()).orElseThrow();
+        WorkHistory foundHistory = workHistoryRepository.findById(workHistory.getId()).orElseThrow();
         foundHistory.updateWorkHistory(LocalDate.of(2025, 1, 2), null, null, null, null,
                 new BigDecimal("4.0"), "수정된 내용");
         em.flush();
         em.clear();
 
         // then
-        WorkHistory updatedHistory = workHistoryRepository.findById(workHistory.getSeq()).orElseThrow();
+        WorkHistory updatedHistory = workHistoryRepository.findById(workHistory.getId()).orElseThrow();
         assertThat(updatedHistory.getDate()).isEqualTo(LocalDate.of(2025, 1, 2));
         assertThat(updatedHistory.getHours()).isEqualByComparingTo(new BigDecimal("4.0"));
         assertThat(updatedHistory.getContent()).isEqualTo("수정된 내용");
@@ -441,7 +441,7 @@ class WorkHistoryJpaRepositoryTest {
 
         // when
         WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
-        condition.setGroupSeq(group.getSeq());
+        condition.setGroupSeq(group.getId());
         List<WorkHistory> histories = workHistoryRepository.findAll(condition);
 
         // then

@@ -32,24 +32,24 @@ public class WorkCodeJpaRepository implements WorkCodeRepository {
     }
 
     @Override
-    public Optional<WorkCode> findBySeq(Long seq) {
+    public Optional<WorkCode> findById(Long id) {
         List<WorkCode> result = em.createQuery(
-                        "select wc from WorkCode wc where wc.seq = :seq and wc.isDeleted = :isDeleted", WorkCode.class)
-                .setParameter("seq", seq)
+                        "select wc from WorkCode wc where wc.id = :id and wc.isDeleted = :isDeleted", WorkCode.class)
+                .setParameter("id", id)
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     @Override
-    public List<WorkCode> findAllByConditions(String parentWorkCode, Long parentWorkCodeSeq, Boolean parentIsNull, CodeType type) {
+    public List<WorkCode> findAllByConditions(String parentWorkCode, Long parentWorkCodeId, Boolean parentIsNull, CodeType type) {
         StringBuilder jpql = new StringBuilder("select wc from WorkCode wc where wc.isDeleted = :isDeleted");
 
         // 부모 코드 조건
         if (parentIsNull != null && parentIsNull) {
             jpql.append(" and wc.parent is null");
-        } else if (parentWorkCodeSeq != null) {
-            jpql.append(" and wc.parent.seq = :parentSeq");
+        } else if (parentWorkCodeId != null) {
+            jpql.append(" and wc.parent.id = :parentId");
         } else if (parentWorkCode != null && !parentWorkCode.isEmpty()) {
             jpql.append(" and wc.parent.code = :parentCode");
         }
@@ -64,8 +64,8 @@ public class WorkCodeJpaRepository implements WorkCodeRepository {
         TypedQuery<WorkCode> query = em.createQuery(jpql.toString(), WorkCode.class)
                 .setParameter("isDeleted", YNType.N);
 
-        if (parentWorkCodeSeq != null && (parentIsNull == null || !parentIsNull)) {
-            query.setParameter("parentSeq", parentWorkCodeSeq);
+        if (parentWorkCodeId != null && (parentIsNull == null || !parentIsNull)) {
+            query.setParameter("parentId", parentWorkCodeId);
         } else if (parentWorkCode != null && !parentWorkCode.isEmpty() && (parentIsNull == null || !parentIsNull)) {
             query.setParameter("parentCode", parentWorkCode);
         }

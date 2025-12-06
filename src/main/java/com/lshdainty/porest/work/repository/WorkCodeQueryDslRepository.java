@@ -41,12 +41,12 @@ public class WorkCodeQueryDslRepository implements WorkCodeRepository {
     }
 
     @Override
-    public Optional<WorkCode> findBySeq(Long seq) {
+    public Optional<WorkCode> findById(Long id) {
         return Optional.ofNullable(
                 query
                         .selectFrom(workCode)
                         .where(
-                                workCode.seq.eq(seq),
+                                workCode.id.eq(id),
                                 workCode.isDeleted.eq(YNType.N)
                         )
                         .fetchFirst()
@@ -54,7 +54,7 @@ public class WorkCodeQueryDslRepository implements WorkCodeRepository {
     }
 
     @Override
-    public List<WorkCode> findAllByConditions(String parentWorkCode, Long parentWorkCodeSeq, Boolean parentIsNull, CodeType type) {
+    public List<WorkCode> findAllByConditions(String parentWorkCode, Long parentWorkCodeId, Boolean parentIsNull, CodeType type) {
         BooleanBuilder builder = new BooleanBuilder();
 
         // 삭제되지 않은 데이터만 조회
@@ -64,10 +64,10 @@ public class WorkCodeQueryDslRepository implements WorkCodeRepository {
         if (parentIsNull != null && parentIsNull) {
             // 최상위 코드 조회 (parent가 null)
             builder.and(workCode.parent.isNull());
-        } else if (parentWorkCodeSeq != null) {
-            // Seq로 특정 부모 코드의 하위 코드 조회 (우선순위 높음)
-            WorkCode parent = findBySeq(parentWorkCodeSeq)
-                    .orElseThrow(() -> new IllegalArgumentException("부모 코드를 찾을 수 없습니다 (seq: " + parentWorkCodeSeq + ")"));
+        } else if (parentWorkCodeId != null) {
+            // Id로 특정 부모 코드의 하위 코드 조회 (우선순위 높음)
+            WorkCode parent = findById(parentWorkCodeId)
+                    .orElseThrow(() -> new IllegalArgumentException("부모 코드를 찾을 수 없습니다 (id: " + parentWorkCodeId + ")"));
             builder.and(workCode.parent.eq(parent));
         } else if (parentWorkCode != null && !parentWorkCode.isEmpty()) {
             // 코드 문자열로 특정 부모 코드의 하위 코드 조회

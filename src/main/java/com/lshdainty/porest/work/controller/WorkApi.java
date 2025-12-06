@@ -110,10 +110,10 @@ public interface WorkApi {
                     description = "업무 내역을 찾을 수 없음"
             )
     })
-    @GetMapping("/api/v1/work-histories/{seq}")
+    @GetMapping("/api/v1/work-histories/{id}")
     ApiResponse findWorkHistory(
-            @Parameter(description = "업무 내역 시퀀스", example = "1", required = true)
-            @PathVariable("seq") Long seq
+            @Parameter(description = "업무 내역 ID", example = "1", required = true)
+            @PathVariable("id") Long id
     );
 
     @Operation(
@@ -134,10 +134,10 @@ public interface WorkApi {
                     description = "업무 내역을 찾을 수 없음"
             )
     })
-    @PutMapping("/api/v1/work-histories/{seq}")
+    @PutMapping("/api/v1/work-histories/{id}")
     ApiResponse updateWorkHistory(
-            @Parameter(description = "업무 내역 시퀀스", example = "1", required = true)
-            @PathVariable("seq") Long seq,
+            @Parameter(description = "업무 내역 ID", example = "1", required = true)
+            @PathVariable("id") Long id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "업무 내역 수정 정보",
                     required = true,
@@ -164,10 +164,10 @@ public interface WorkApi {
                     description = "업무 내역을 찾을 수 없음"
             )
     })
-    @DeleteMapping("/api/v1/work-histories/{seq}")
+    @DeleteMapping("/api/v1/work-histories/{id}")
     ApiResponse deleteWorkHistory(
-            @Parameter(description = "업무 내역 시퀀스", example = "1", required = true)
-            @PathVariable("seq") Long seq
+            @Parameter(description = "업무 내역 ID", example = "1", required = true)
+            @PathVariable("id") Long id
     );
 
     @Operation(
@@ -258,8 +258,8 @@ public interface WorkApi {
     ApiResponse getWorkCodes(
             @Parameter(description = "부모 업무 코드", example = "GROUP_A")
             @RequestParam(value = "parent_work_code", required = false) String parentWorkCode,
-            @Parameter(description = "부모 업무 코드 시퀀스", example = "1")
-            @RequestParam(value = "parent_work_code_seq", required = false) Long parentWorkCodeSeq,
+            @Parameter(description = "부모 업무 코드 ID", example = "1")
+            @RequestParam(value = "parent_work_code_id", required = false) Long parentWorkCodeId,
             @Parameter(description = "부모 코드가 null인 항목만 조회", example = "true")
             @RequestParam(value = "parent_is_null", required = false) Boolean parentIsNull,
             @Parameter(description = "코드 타입", example = "GROUP")
@@ -284,10 +284,10 @@ public interface WorkApi {
                     description = "업무 코드를 찾을 수 없음"
             )
     })
-    @PutMapping("/api/v1/work-codes/{seq}")
+    @PutMapping("/api/v1/work-codes/{id}")
     ApiResponse updateWorkCode(
-            @Parameter(description = "업무 코드 시퀀스", example = "1", required = true)
-            @PathVariable("seq") Long seq,
+            @Parameter(description = "업무 코드 ID", example = "1", required = true)
+            @PathVariable("id") Long id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "업무 코드 수정 정보",
                     required = true,
@@ -314,10 +314,10 @@ public interface WorkApi {
                     description = "업무 코드를 찾을 수 없음"
             )
     })
-    @DeleteMapping("/api/v1/work-codes/{seq}")
+    @DeleteMapping("/api/v1/work-codes/{id}")
     ApiResponse deleteWorkCode(
-            @Parameter(description = "업무 코드 시퀀스", example = "1", required = true)
-            @PathVariable("seq") Long seq
+            @Parameter(description = "업무 코드 ID", example = "1", required = true)
+            @PathVariable("id") Long id
     );
 
     // ========== 시스템 로그 관리 ==========

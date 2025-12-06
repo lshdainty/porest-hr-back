@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Getter @Setter
 @Builder
 public class WorkHistoryServiceDto {
-    private Long seq;
+    private Long id;
     private LocalDate date;
     private User user;
     private String userId;

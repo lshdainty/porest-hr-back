@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WorkSystemLog extends AuditingFields {
     /**
-     * 로그 관리용 시퀀스
+     * 로그 관리용 ID
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "system_seq")
-    private Long seq;
+    @Column(name = "system_log_id")
+    private Long id;
 
     /**
      * 시스템 코드

@@ -37,7 +37,7 @@ public class WorkApiController implements WorkApi {
     @Override
     @PreAuthorize("hasAuthority('WORK_CREATE')")
     public ApiResponse createWorkHistory(WorkApiDto.CreateWorkHistoryReq data) {
-        Long workHistorySeq = workHistoryService.createWorkHistory(WorkHistoryServiceDto.builder()
+        Long workHistoryId = workHistoryService.createWorkHistory(WorkHistoryServiceDto.builder()
                 .date(data.getWorkDate())
                 .userId(data.getWorkUserId())
                 .groupCode(data.getWorkGroupCode())
@@ -46,7 +46,7 @@ public class WorkApiController implements WorkApi {
                 .hours(data.getWorkHour())
                 .content(data.getWorkContent())
                 .build());
-        return ApiResponse.success(new WorkApiDto.CreateWorkHistoryResp(workHistorySeq));
+        return ApiResponse.success(new WorkApiDto.CreateWorkHistoryResp(workHistoryId));
     }
 
     @Override
@@ -64,8 +64,8 @@ public class WorkApiController implements WorkApi {
                         .build())
                 .collect(Collectors.toList());
 
-        List<Long> workHistorySeqs = workHistoryService.createWorkHistories(dtos);
-        return ApiResponse.success(new WorkApiDto.BulkCreateWorkHistoryResp(workHistorySeqs));
+        List<Long> workHistoryIds = workHistoryService.createWorkHistories(dtos);
+        return ApiResponse.success(new WorkApiDto.BulkCreateWorkHistoryResp(workHistoryIds));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class WorkApiController implements WorkApi {
         List<WorkHistoryServiceDto> dtos = workHistoryService.findAllWorkHistories(condition);
         return ApiResponse.success(dtos.stream()
                 .map(w -> new WorkApiDto.WorkHistoryResp(
-                        w.getSeq(),
+                        w.getId(),
                         w.getDate(),
                         w.getUserId(),
                         w.getUserName(),
@@ -88,10 +88,10 @@ public class WorkApiController implements WorkApi {
 
     @Override
     @PreAuthorize("hasAuthority('WORK_READ')")
-    public ApiResponse findWorkHistory(Long seq) {
-        WorkHistoryServiceDto w = workHistoryService.findWorkHistory(seq);
+    public ApiResponse findWorkHistory(Long id) {
+        WorkHistoryServiceDto w = workHistoryService.findWorkHistory(id);
         return ApiResponse.success(new WorkApiDto.WorkHistoryResp(
-                w.getSeq(),
+                w.getId(),
                 w.getDate(),
                 w.getUserId(),
                 w.getUserName(),
@@ -104,9 +104,9 @@ public class WorkApiController implements WorkApi {
 
     @Override
     @PreAuthorize("hasAuthority('WORK_UPDATE')")
-    public ApiResponse updateWorkHistory(Long seq, WorkApiDto.UpdateWorkHistoryReq data) {
+    public ApiResponse updateWorkHistory(Long id, WorkApiDto.UpdateWorkHistoryReq data) {
         workHistoryService.updateWorkHistory(WorkHistoryServiceDto.builder()
-                .seq(seq)
+                .id(id)
                 .date(data.getWorkDate())
                 .userId(data.getWorkUserId())
                 .groupCode(data.getWorkGroupCode())
@@ -120,8 +120,8 @@ public class WorkApiController implements WorkApi {
 
     @Override
     @PreAuthorize("hasAuthority('WORK_UPDATE')")
-    public ApiResponse deleteWorkHistory(Long seq) {
-        workHistoryService.deleteWorkHistory(seq);
+    public ApiResponse deleteWorkHistory(Long id) {
+        workHistoryService.deleteWorkHistory(id);
         return ApiResponse.success();
     }
 
@@ -142,20 +142,20 @@ public class WorkApiController implements WorkApi {
     @Override
     @PreAuthorize("hasAuthority('WORK_MANAGE')")
     public ApiResponse createWorkCode(WorkApiDto.CreateWorkCodeReq data) {
-        Long workCodeSeq = workCodeService.createWorkCode(
+        Long workCodeId = workCodeService.createWorkCode(
                 data.getWorkCode(),
                 data.getWorkCodeName(),
                 data.getCodeType(),
-                data.getParentWorkCodeSeq(),
+                data.getParentWorkCodeId(),
                 data.getOrderSeq()
         );
-        return ApiResponse.success(new WorkApiDto.CreateWorkCodeResp(workCodeSeq));
+        return ApiResponse.success(new WorkApiDto.CreateWorkCodeResp(workCodeId));
     }
 
     @Override
     @PreAuthorize("hasAuthority('WORK_READ')")
-    public ApiResponse getWorkCodes(String parentWorkCode, Long parentWorkCodeSeq, Boolean parentIsNull, CodeType type) {
-        List<WorkCodeServiceDto> workCodes = workCodeService.findWorkCodes(parentWorkCode, parentWorkCodeSeq, parentIsNull, type);
+    public ApiResponse getWorkCodes(String parentWorkCode, Long parentWorkCodeId, Boolean parentIsNull, CodeType type) {
+        List<WorkCodeServiceDto> workCodes = workCodeService.findWorkCodes(parentWorkCode, parentWorkCodeId, parentIsNull, type);
         return ApiResponse.success(workCodes.stream()
                 .map(this::convertToWorkCodeResp)
                 .collect(Collectors.toList()));
@@ -163,12 +163,12 @@ public class WorkApiController implements WorkApi {
 
     @Override
     @PreAuthorize("hasAuthority('WORK_MANAGE')")
-    public ApiResponse updateWorkCode(Long seq, WorkApiDto.UpdateWorkCodeReq data) {
+    public ApiResponse updateWorkCode(Long id, WorkApiDto.UpdateWorkCodeReq data) {
         workCodeService.updateWorkCode(
-                seq,
+                id,
                 data.getWorkCode(),
                 data.getWorkCodeName(),
-                data.getParentWorkCodeSeq(),
+                data.getParentWorkCodeId(),
                 data.getOrderSeq()
         );
         return ApiResponse.success();
@@ -176,8 +176,8 @@ public class WorkApiController implements WorkApi {
 
     @Override
     @PreAuthorize("hasAuthority('WORK_MANAGE')")
-    public ApiResponse deleteWorkCode(Long seq) {
-        workCodeService.deleteWorkCode(seq);
+    public ApiResponse deleteWorkCode(Long id) {
+        workCodeService.deleteWorkCode(id);
         return ApiResponse.success();
     }
 
@@ -233,11 +233,11 @@ public class WorkApiController implements WorkApi {
             return null;
         }
         return new WorkApiDto.WorkCodeResp(
-                dto.getSeq(),
+                dto.getId(),
                 dto.getCode(),
                 dto.getName(),
                 dto.getType(),
                 dto.getOrderSeq(),
-                dto.getParentSeq());
+                dto.getParentId());
     }
 }

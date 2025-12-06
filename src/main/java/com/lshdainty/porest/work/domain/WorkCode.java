@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "work_code")
 public class WorkCode extends AuditingFields {
     /**
-     * 코드 관리용 시퀀스
+     * 코드 관리용 ID
      */
-    @Id @GeneratedValue
-    @Column(name = "work_code_seq")
-    private Long seq;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "work_code_id")
+    private Long id;
 
     /**
      * 코드 값
@@ -43,7 +43,7 @@ public class WorkCode extends AuditingFields {
      * 부모 코드 (자기 참조)
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_code")
+    @JoinColumn(name = "parent_code_id")
     private WorkCode parent;
 
     /**

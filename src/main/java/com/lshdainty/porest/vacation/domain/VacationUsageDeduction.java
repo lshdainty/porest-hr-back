@@ -17,7 +17,7 @@ public class VacationUsageDeduction extends AuditingFields {
      * 휴가 사용 차감 내역 아이디<br>
      * 테이블 관리용 seq
      */
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vacation_usage_deduction_id")
     private Long id;
 
