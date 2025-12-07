@@ -13,7 +13,7 @@ spring:
   # JPA 설정
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
 
   # OAuth2 설정 (외부 환경변수에서 주입)
   security:
