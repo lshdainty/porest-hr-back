@@ -279,6 +279,7 @@ public class User extends AuditingFields {
         user.joinDate = joinDate;
         user.countryCode = countryCode;
         user.invitationStatus = StatusType.PENDING; // 초대 상태로 설정
+        user.lunarYN = YNType.N;
         user.isDeleted = YNType.N;
 
         // 초대 토큰 생성 (48시간 유효)
