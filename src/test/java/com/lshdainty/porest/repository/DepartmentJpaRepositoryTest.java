@@ -5,7 +5,7 @@ import com.lshdainty.porest.company.domain.Company;
 import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.department.domain.Department;
 import com.lshdainty.porest.department.domain.UserDepartment;
-import com.lshdainty.porest.department.repository.DepartmentQueryDslRepository;
+import com.lshdainty.porest.department.repository.DepartmentJpaRepository;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.common.type.YNType;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,15 +21,15 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({DepartmentQueryDslRepository.class, TestQuerydslConfig.class})
+@Import({DepartmentJpaRepository.class, TestQuerydslConfig.class})
 @Transactional
-@DisplayName("QueryDSL 부서 레포지토리 테스트")
-class DepartmentQueryDslRepositoryTest {
+@DisplayName("JPA 부서 레포지토리 테스트")
+class DepartmentJpaRepositoryTest {
     @Autowired
-    private DepartmentQueryDslRepository departmentRepository;
+    private DepartmentJpaRepository departmentRepository;
 
     @Autowired
     private TestEntityManager em;

@@ -4,7 +4,7 @@ import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.schedule.domain.Schedule;
-import com.lshdainty.porest.schedule.repository.ScheduleQueryDslRepository;
+import com.lshdainty.porest.schedule.repository.ScheduleJpaRepository;
 import com.lshdainty.porest.schedule.type.ScheduleType;
 import com.lshdainty.porest.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,12 +24,12 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({ScheduleQueryDslRepository.class, TestQuerydslConfig.class})
+@Import({ScheduleJpaRepository.class, TestQuerydslConfig.class})
 @Transactional
-@DisplayName("QueryDSL 스케줄 레포지토리 테스트")
-class ScheduleQueryDslRepositoryTest {
+@DisplayName("JPA 스케줄 레포지토리 테스트")
+class ScheduleJpaRepositoryTest {
     @Autowired
-    private ScheduleQueryDslRepository scheduleRepository;
+    private ScheduleJpaRepository scheduleRepository;
 
     @Autowired
     private TestEntityManager em;

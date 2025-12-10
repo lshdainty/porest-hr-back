@@ -1,6 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +44,11 @@ class VacationGrantJpaRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        user = User.createUser("user1");
+        user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         policy = VacationPolicy.createManualGrantPolicy(
@@ -184,7 +191,11 @@ class VacationGrantJpaRepositoryTest {
     @DisplayName("전체 휴가부여와 유저 함께 조회")
     void findAllWithUser() {
         // given
-        User user2 = User.createUser("user2");
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user2);
 
         vacationGrantRepository.save(VacationGrant.createVacationGrant(
@@ -482,6 +493,75 @@ class VacationGrantJpaRepositoryTest {
                 LocalDateTime.of(2025, 6, 1, 0, 0),
                 LocalDateTime.of(2025, 6, 30, 23, 59)
         );
+
+        // then
+        assertThat(grants).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("유저별 연도별 휴가부여 조회")
+    void findByUserIdAndYear() {
+        // given
+        // 2025년 휴가
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
+                user, policy, "2025년 연차", VacationType.ANNUAL, new BigDecimal("8.0"),
+                LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
+        ));
+        // 2024년 휴가
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
+                user, policy, "2024년 연차", VacationType.ANNUAL, new BigDecimal("8.0"),
+                LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 12, 31, 23, 59, 59)
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        List<VacationGrant> grants = vacationGrantRepository.findByUserIdAndYear("user1", 2025);
+
+        // then
+        assertThat(grants).hasSize(1);
+        assertThat(grants.get(0).getDesc()).isEqualTo("2025년 연차");
+    }
+
+    @Test
+    @DisplayName("유저별 연도별 휴가부여 조회 - 연도에 걸쳐있는 휴가도 포함")
+    void findByUserIdAndYearWithCrossYear() {
+        // given
+        // 2024년~2025년에 걸쳐있는 휴가
+        vacationGrantRepository.save(VacationGrant.createVacationGrant(
+                user, policy, "연도걸침 연차", VacationType.ANNUAL, new BigDecimal("8.0"),
+                LocalDateTime.of(2024, 6, 1, 0, 0, 0), LocalDateTime.of(2025, 5, 31, 23, 59, 59)
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        List<VacationGrant> grants = vacationGrantRepository.findByUserIdAndYear("user1", 2025);
+
+        // then
+        assertThat(grants).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("유저별 연도별 신청 휴가 조회")
+    void findAllRequestedVacationsByUserIdAndYear() {
+        // given
+        VacationPolicy onRequestPolicy = VacationPolicy.createOnRequestPolicy(
+                "신청연차", "신청 정책", VacationType.ANNUAL, new BigDecimal("1.0"),
+                YNType.N, YNType.N, 1, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
+        );
+        em.persist(onRequestPolicy);
+
+        VacationGrant pendingGrant = VacationGrant.createPendingVacationGrant(
+                user, onRequestPolicy, "2025년 신청", VacationType.ANNUAL, new BigDecimal("1.0"),
+                LocalDateTime.of(2025, 6, 15, 9, 0), LocalDateTime.of(2025, 6, 15, 18, 0), "개인 사유"
+        );
+        em.persist(pendingGrant);
+        em.flush();
+        em.clear();
+
+        // when
+        List<VacationGrant> grants = vacationGrantRepository.findAllRequestedVacationsByUserIdAndYear("user1", 2025);
 
         // then
         assertThat(grants).hasSize(1);

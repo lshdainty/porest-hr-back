@@ -844,9 +844,7 @@ class VacationServiceTest {
             given(userService.checkUserExist(userId)).willReturn(user);
             given(vacationGrantRepository.findValidGrantsByUserIdAndBaseTime(eq(userId), any()))
                     .willReturn(List.of());
-            given(vacationUsageRepository.findUsedByUserIdAndBaseTime(eq(userId), any()))
-                    .willReturn(List.of());
-            given(vacationUsageRepository.findExpectedByUserIdAndBaseTime(eq(userId), any()))
+            given(vacationUsageDeductionRepository.findByGrantIds(any()))
                     .willReturn(List.of());
 
             // when
@@ -1205,6 +1203,321 @@ class VacationServiceTest {
 
             // then
             assertThat(result).hasSize(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("수동 휴가 부여")
+    class ManualGrantVacation {
+        @Test
+        @DisplayName("성공 - 고정 부여 시간으로 휴가가 부여된다")
+        void manualGrantVacationWithFixedTime() {
+            // given
+            String userId = "user1";
+            Long policyId = 1L;
+            User user = createTestUser(userId);
+            VacationPolicy policy = VacationPolicy.createManualGrantPolicy(
+                    "수동부여", "수동부여", VacationType.ANNUAL,
+                    new BigDecimal("3.0000"), YNType.N, YNType.N,
+                    EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
+            );
+            ReflectionTestUtils.setField(policy, "id", policyId);
+
+            VacationServiceDto data = VacationServiceDto.builder()
+                    .policyId(policyId)
+                    .desc("관리자 직접 부여")
+                    .grantDate(LocalDateTime.of(2025, 1, 1, 0, 0))
+                    .expiryDate(LocalDateTime.of(2025, 12, 31, 23, 59))
+                    .build();
+
+            given(userService.checkUserExist(userId)).willReturn(user);
+            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+            willDoNothing().given(vacationGrantRepository).save(any(VacationGrant.class));
+
+            // when
+            VacationGrant result = vacationService.manualGrantVacation(userId, data);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getGrantTime()).isEqualByComparingTo(new BigDecimal("3.0000"));
+            then(vacationGrantRepository).should().save(any(VacationGrant.class));
+        }
+
+        @Test
+        @DisplayName("성공 - 가변 부여 시간으로 휴가가 부여된다")
+        void manualGrantVacationWithFlexibleTime() {
+            // given
+            String userId = "user1";
+            Long policyId = 1L;
+            User user = createTestUser(userId);
+            VacationPolicy policy = VacationPolicy.createManualGrantPolicy(
+                    "수동부여", "수동부여", VacationType.ANNUAL,
+                    null, YNType.Y, YNType.N,
+                    EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
+            );
+            ReflectionTestUtils.setField(policy, "id", policyId);
+
+            VacationServiceDto data = VacationServiceDto.builder()
+                    .policyId(policyId)
+                    .desc("관리자 직접 부여")
+                    .grantTime(new BigDecimal("5.0000"))
+                    .grantDate(LocalDateTime.of(2025, 1, 1, 0, 0))
+                    .expiryDate(LocalDateTime.of(2025, 12, 31, 23, 59))
+                    .build();
+
+            given(userService.checkUserExist(userId)).willReturn(user);
+            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+            willDoNothing().given(vacationGrantRepository).save(any(VacationGrant.class));
+
+            // when
+            VacationGrant result = vacationService.manualGrantVacation(userId, data);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getGrantTime()).isEqualByComparingTo(new BigDecimal("5.0000"));
+        }
+
+        @Test
+        @DisplayName("실패 - MANUAL_GRANT 정책이 아니면 예외가 발생한다")
+        void manualGrantVacationFailNotManualGrant() {
+            // given
+            String userId = "user1";
+            Long policyId = 1L;
+            User user = createTestUser(userId);
+            VacationPolicy policy = VacationPolicy.createOnRequestPolicy(
+                    "신청부여", "신청부여", VacationType.ANNUAL,
+                    new BigDecimal("1.0000"), YNType.N, YNType.N, 1,
+                    EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
+            );
+            ReflectionTestUtils.setField(policy, "id", policyId);
+
+            VacationServiceDto data = VacationServiceDto.builder()
+                    .policyId(policyId)
+                    .build();
+
+            given(userService.checkUserExist(userId)).willReturn(user);
+            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+
+            // when & then
+            assertThatThrownBy(() -> vacationService.manualGrantVacation(userId, data))
+                    .isInstanceOf(BusinessRuleViolationException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 가변 부여 정책에서 grantTime이 없으면 예외가 발생한다")
+        void manualGrantVacationFailNoGrantTime() {
+            // given
+            String userId = "user1";
+            Long policyId = 1L;
+            User user = createTestUser(userId);
+            VacationPolicy policy = VacationPolicy.createManualGrantPolicy(
+                    "수동부여", "수동부여", VacationType.ANNUAL,
+                    null, YNType.Y, YNType.N,
+                    EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
+            );
+            ReflectionTestUtils.setField(policy, "id", policyId);
+
+            VacationServiceDto data = VacationServiceDto.builder()
+                    .policyId(policyId)
+                    .desc("관리자 직접 부여")
+                    .grantDate(LocalDateTime.of(2025, 1, 1, 0, 0))
+                    .expiryDate(LocalDateTime.of(2025, 12, 31, 23, 59))
+                    .build();
+
+            given(userService.checkUserExist(userId)).willReturn(user);
+            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+
+            // when & then
+            assertThatThrownBy(() -> vacationService.manualGrantVacation(userId, data))
+                    .isInstanceOf(com.lshdainty.porest.common.exception.InvalidValueException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("휴가 정책 할당 상태 조회")
+    class GetVacationPolicyAssignmentStatus {
+        @Test
+        @DisplayName("성공 - 할당된 정책과 미할당 정책을 구분하여 반환한다")
+        void getVacationPolicyAssignmentStatusSuccess() {
+            // given
+            String userId = "user1";
+            User user = createTestUser(userId);
+
+            VacationPolicy policy1 = createTestPolicy();
+            ReflectionTestUtils.setField(policy1, "id", 1L);
+            VacationPolicy policy2 = createTestPolicy();
+            ReflectionTestUtils.setField(policy2, "id", 2L);
+
+            UserVacationPolicy uvp = UserVacationPolicy.createUserVacationPolicy(user, policy1);
+            ReflectionTestUtils.setField(uvp, "id", 1L);
+
+            given(userService.checkUserExist(userId)).willReturn(user);
+            given(vacationPolicyRepository.findVacationPolicies()).willReturn(List.of(policy1, policy2));
+            given(userVacationPolicyRepository.findByUserId(userId)).willReturn(List.of(uvp));
+
+            // when
+            VacationServiceDto result = vacationService.getVacationPolicyAssignmentStatus(userId);
+
+            // then
+            assertThat(result.getAssignedPolicies()).hasSize(1);
+            assertThat(result.getUnassignedPolicies()).hasSize(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("휴가 사용 내역 조회 및 검증")
+    class ValidateAndGetVacationUsage {
+        @Test
+        @DisplayName("성공 - 휴가 사용 내역을 반환한다")
+        void validateAndGetVacationUsageSuccess() {
+            // given
+            Long usageId = 1L;
+            User user = createTestUser("user1");
+            VacationUsage usage = createTestUsage(user);
+            ReflectionTestUtils.setField(usage, "id", usageId);
+
+            given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
+
+            // when
+            VacationUsage result = vacationService.validateAndGetVacationUsage(usageId);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(usageId);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 휴가 사용 내역이면 예외가 발생한다")
+        void validateAndGetVacationUsageFailNotFound() {
+            // given
+            Long usageId = 999L;
+            given(vacationUsageRepository.findById(usageId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> vacationService.validateAndGetVacationUsage(usageId))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("휴가 사용 내역 수정")
+    class UpdateVacationUsage {
+        @Test
+        @DisplayName("실패 - 존재하지 않는 휴가 사용 내역이면 예외가 발생한다")
+        void updateVacationUsageFailNotFound() {
+            // given
+            Long usageId = 999L;
+            VacationServiceDto data = VacationServiceDto.builder()
+                    .userId("user1")
+                    .type(VacationType.ANNUAL)
+                    .timeType(VacationTimeType.DAYOFF)
+                    .startDate(LocalDateTime.now().plusDays(3))
+                    .endDate(LocalDateTime.now().plusDays(3).plusHours(8))
+                    .desc("수정된 휴가")
+                    .build();
+
+            given(vacationUsageRepository.findById(usageId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 이미 삭제된 휴가 사용 내역이면 예외가 발생한다")
+        void updateVacationUsageFailAlreadyDeleted() {
+            // given
+            Long usageId = 1L;
+            User user = createTestUser("user1");
+            VacationUsage usage = createTestUsage(user);
+            ReflectionTestUtils.setField(usage, "id", usageId);
+            usage.deleteVacationUsage();
+
+            VacationServiceDto data = VacationServiceDto.builder()
+                    .userId(user.getId())
+                    .type(VacationType.ANNUAL)
+                    .timeType(VacationTimeType.DAYOFF)
+                    .startDate(LocalDateTime.now().plusDays(3))
+                    .endDate(LocalDateTime.now().plusDays(3).plusHours(8))
+                    .desc("수정된 휴가")
+                    .build();
+
+            given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
+
+            // when & then
+            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data))
+                    .isInstanceOf(BusinessRuleViolationException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 과거 시작일은 수정할 수 없다")
+        void updateVacationUsageFailPastStartDate() {
+            // given
+            Long usageId = 1L;
+            User user = createTestUser("user1");
+            VacationUsage usage = createTestUsage(user);
+            ReflectionTestUtils.setField(usage, "id", usageId);
+            ReflectionTestUtils.setField(usage, "startDate", LocalDateTime.now().minusDays(1));
+
+            VacationServiceDto data = VacationServiceDto.builder()
+                    .userId(user.getId())
+                    .type(VacationType.ANNUAL)
+                    .timeType(VacationTimeType.DAYOFF)
+                    .startDate(LocalDateTime.now().plusDays(3))
+                    .endDate(LocalDateTime.now().plusDays(3).plusHours(8))
+                    .desc("수정된 휴가")
+                    .build();
+
+            given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
+
+            // when & then
+            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data))
+                    .isInstanceOf(BusinessRuleViolationException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("전체 유저 휴가 요약 조회")
+    class GetAllUsersVacationSummary {
+        @Test
+        @DisplayName("실패 - 년도가 null이면 예외가 발생한다")
+        void getAllUsersVacationSummaryFailNullYear() {
+            // when & then
+            assertThatThrownBy(() -> vacationService.getAllUsersVacationSummary(null))
+                    .isInstanceOf(com.lshdainty.porest.common.exception.InvalidValueException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("휴가 부여 내역 조회 - deduction 존재 시 VacationType 설정")
+    class GetVacationUsagesByPeriodWithDeduction {
+        @Test
+        @DisplayName("성공 - deduction이 있으면 VacationType을 설정하여 반환한다")
+        void getVacationUsagesByPeriodWithDeductionSuccess() {
+            // given
+            LocalDateTime startDate = LocalDateTime.of(2025, 1, 1, 0, 0);
+            LocalDateTime endDate = LocalDateTime.of(2025, 1, 31, 23, 59);
+
+            User user = createTestUser("user1");
+            VacationUsage usage = createTestUsage(user);
+            ReflectionTestUtils.setField(usage, "id", 1L);
+
+            VacationGrant grant = createTestGrant(user);
+            ReflectionTestUtils.setField(grant, "id", 1L);
+
+            VacationUsageDeduction deduction = VacationUsageDeduction.createVacationUsageDeduction(
+                    usage, grant, new BigDecimal("1.0000"));
+
+            given(vacationUsageRepository.findByPeriodWithUser(startDate, endDate))
+                    .willReturn(List.of(usage));
+            given(vacationUsageDeductionRepository.findByUsageId(1L)).willReturn(List.of(deduction));
+
+            // when
+            List<VacationServiceDto> result = vacationService.getVacationUsagesByPeriod(startDate, endDate);
+
+            // then
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getType()).isEqualTo(VacationType.ANNUAL);
         }
     }
 

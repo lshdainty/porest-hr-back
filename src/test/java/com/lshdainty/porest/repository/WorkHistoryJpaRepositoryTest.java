@@ -1,5 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
+import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.work.domain.WorkCode;
 import com.lshdainty.porest.work.domain.WorkHistory;
@@ -41,7 +44,11 @@ class WorkHistoryJpaRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        user = User.createUser("user1");
+        user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         group = WorkCode.createWorkCode("GRP001", "개발팀", CodeType.LABEL, null, 1);
@@ -315,7 +322,11 @@ class WorkHistoryJpaRepositoryTest {
     @DisplayName("여러 사용자의 기간별 일일 업무시간 합계 조회")
     void findDailyWorkHoursByUsersAndPeriod() {
         // given
-        User user2 = User.createUser("user2");
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user2);
 
         workHistoryRepository.save(WorkHistory.createWorkHistory(
@@ -427,13 +438,17 @@ class WorkHistoryJpaRepositoryTest {
         // given
         WorkCode anotherGroup = WorkCode.createWorkCode("GRP002", "운영팀", CodeType.LABEL, null, 2);
         em.persist(anotherGroup);
+        WorkCode anotherPart = WorkCode.createWorkCode("PART002", "운영파트", CodeType.OPTION, anotherGroup, 1);
+        em.persist(anotherPart);
+        WorkCode anotherDivision = WorkCode.createWorkCode("DIV002", "운영분류", CodeType.OPTION, anotherPart, 1);
+        em.persist(anotherDivision);
 
         workHistoryRepository.save(WorkHistory.createWorkHistory(
                 LocalDate.of(2025, 1, 1), user, group, part, division,
                 new BigDecimal("8.0"), "개발팀 작업"
         ));
         workHistoryRepository.save(WorkHistory.createWorkHistory(
-                LocalDate.of(2025, 1, 1), user, anotherGroup, null, null,
+                LocalDate.of(2025, 1, 1), user, anotherGroup, anotherPart, anotherDivision,
                 new BigDecimal("8.0"), "운영팀 작업"
         ));
         em.flush();
@@ -453,8 +468,11 @@ class WorkHistoryJpaRepositoryTest {
     @DisplayName("사용자 이름으로 필터링하여 조회")
     void findAllWithUserName() {
         // given
-        User user2 = User.createUser("user2");
-        user2.updateUser("홍길동", null, null, null, null, null, null, null, null, null, null);
+        User user2 = User.createUser(
+                "user2", "password", "홍길동", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user2);
 
         workHistoryRepository.save(WorkHistory.createWorkHistory(
@@ -501,4 +519,63 @@ class WorkHistoryJpaRepositoryTest {
         // then
         assertThat(count).isEqualTo(2);
     }
+
+    @Test
+    @DisplayName("파트로 필터링하여 조회")
+    void findAllWithPartSeq() {
+        // given
+        WorkCode part2 = WorkCode.createWorkCode("PART002", "프론트엔드", CodeType.OPTION, group, 2);
+        em.persist(part2);
+        WorkCode division2 = WorkCode.createWorkCode("DIV002", "UI개발", CodeType.OPTION, part2, 1);
+        em.persist(division2);
+
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "백엔드 작업"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part2, division2,
+                new BigDecimal("8.0"), "프론트엔드 작업"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setPartSeq(part.getId());
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("백엔드 작업");
+    }
+
+    @Test
+    @DisplayName("디비전으로 필터링하여 조회")
+    void findAllWithDivisionSeq() {
+        // given
+        WorkCode division2 = WorkCode.createWorkCode("DIV002", "UI개발", CodeType.OPTION, part, 2);
+        em.persist(division2);
+
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "API 개발"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division2,
+                new BigDecimal("8.0"), "UI 개발"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setDivisionSeq(division.getId());
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("API 개발");
+    }
+
 }

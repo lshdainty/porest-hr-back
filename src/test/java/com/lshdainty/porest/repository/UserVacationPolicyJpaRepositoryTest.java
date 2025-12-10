@@ -1,6 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.domain.UserVacationPolicy;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
@@ -43,7 +45,11 @@ class UserVacationPolicyJpaRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        user = User.createUser("user1");
+        user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         policy = VacationPolicy.createManualGrantPolicy(
@@ -221,7 +227,11 @@ class UserVacationPolicyJpaRepositoryTest {
     @DisplayName("정책 ID로 유저휴가정책 목록 조회")
     void findByVacationPolicyId() {
         // given
-        User user2 = User.createUser("user2");
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user2);
 
         userVacationPolicyRepository.save(UserVacationPolicy.createUserVacationPolicy(user, policy));

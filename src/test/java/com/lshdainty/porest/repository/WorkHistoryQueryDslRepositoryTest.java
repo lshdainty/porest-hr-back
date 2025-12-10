@@ -1,5 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
+import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.work.domain.WorkCode;
 import com.lshdainty.porest.work.domain.WorkHistory;
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +45,11 @@ class WorkHistoryQueryDslRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        user = User.createUser("user1");
+        user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         group = WorkCode.createWorkCode("GRP001", "개발팀", CodeType.LABEL, null, 1);
@@ -265,7 +273,11 @@ class WorkHistoryQueryDslRepositoryTest {
     @DisplayName("여러 사용자의 기간별 일일 업무시간 합계 조회")
     void findDailyWorkHoursByUsersAndPeriod() {
         // given
-        User user2 = User.createUser("user2");
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user2);
 
         workHistoryRepository.save(WorkHistory.createWorkHistory(
@@ -326,5 +338,268 @@ class WorkHistoryQueryDslRepositoryTest {
         assertThat(updatedHistory.getDate()).isEqualTo(LocalDate.of(2025, 1, 2));
         assertThat(updatedHistory.getHours()).isEqualByComparingTo(new BigDecimal("4.0"));
         assertThat(updatedHistory.getContent()).isEqualTo("수정된 내용");
+    }
+
+    @Test
+    @DisplayName("스트림으로 전체 업무이력 조회")
+    void findAllStream() {
+        // given
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "작업1"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 2), user, group, part, division,
+                new BigDecimal("8.0"), "작업2"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setUserId("user1");
+        Stream<WorkHistory> stream = workHistoryRepository.findAllStream(condition);
+
+        // then
+        List<WorkHistory> histories = stream.toList();
+        assertThat(histories).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("스트림 조회 - 오래된순 정렬")
+    void findAllStreamOldestSort() {
+        // given
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 2), user, group, part, division,
+                new BigDecimal("8.0"), "작업2"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "작업1"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setUserId("user1");
+        condition.setSortType("OLDEST");
+        Stream<WorkHistory> stream = workHistoryRepository.findAllStream(condition);
+
+        // then
+        List<WorkHistory> histories = stream.toList();
+        assertThat(histories).hasSize(2);
+        assertThat(histories.get(0).getDate()).isEqualTo(LocalDate.of(2025, 1, 1));
+    }
+
+    @Test
+    @DisplayName("사용자 이름으로 검색")
+    void findAllWithUserNameFilter() {
+        // given
+        User user2 = User.createUser(
+                "user2", "password", "김철수", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
+        em.persist(user2);
+
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "테스트유저 작업"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user2, group, part, division,
+                new BigDecimal("8.0"), "철수 작업"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setUserName("테스트");
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("테스트유저 작업");
+    }
+
+    @Test
+    @DisplayName("그룹으로 필터링 조회")
+    void findAllWithGroupFilter() {
+        // given
+        WorkCode group2 = WorkCode.createWorkCode("GRP002", "기획팀", CodeType.LABEL, null, 2);
+        em.persist(group2);
+        WorkCode part2 = WorkCode.createWorkCode("PART002", "기획파트", CodeType.OPTION, group2, 1);
+        em.persist(part2);
+        WorkCode division2 = WorkCode.createWorkCode("DIV002", "기획분류", CodeType.OPTION, part2, 1);
+        em.persist(division2);
+
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "개발팀 작업"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group2, part2, division2,
+                new BigDecimal("8.0"), "기획팀 작업"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setGroupSeq(group.getId());
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("개발팀 작업");
+    }
+
+    @Test
+    @DisplayName("파트로 필터링 조회")
+    void findAllWithPartFilter() {
+        // given
+        WorkCode part2 = WorkCode.createWorkCode("PART002", "프론트엔드", CodeType.OPTION, group, 2);
+        em.persist(part2);
+        WorkCode division2 = WorkCode.createWorkCode("DIV002", "UI개발", CodeType.OPTION, part2, 1);
+        em.persist(division2);
+
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "백엔드 작업"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part2, division2,
+                new BigDecimal("8.0"), "프론트엔드 작업"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setPartSeq(part.getId());
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("백엔드 작업");
+    }
+
+    @Test
+    @DisplayName("디비전으로 필터링 조회")
+    void findAllWithDivisionFilter() {
+        // given
+        WorkCode division2 = WorkCode.createWorkCode("DIV002", "UI개발", CodeType.OPTION, part, 2);
+        em.persist(division2);
+
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "API 개발"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division2,
+                new BigDecimal("8.0"), "UI 개발"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setDivisionSeq(division.getId());
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("API 개발");
+    }
+
+    @Test
+    @DisplayName("시작일만 설정하여 조회")
+    void findAllWithStartDateOnly() {
+        // given
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "1월 작업"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 2, 1), user, group, part, division,
+                new BigDecimal("8.0"), "2월 작업"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setStartDate(LocalDate.of(2025, 1, 15));
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("2월 작업");
+    }
+
+    @Test
+    @DisplayName("종료일만 설정하여 조회")
+    void findAllWithEndDateOnly() {
+        // given
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "1월 작업"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 2, 1), user, group, part, division,
+                new BigDecimal("8.0"), "2월 작업"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setEndDate(LocalDate.of(2025, 1, 15));
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getContent()).isEqualTo("1월 작업");
+    }
+
+    @Test
+    @DisplayName("null 사용자 목록으로 조회 시 빈 맵 반환")
+    void findDailyWorkHoursByUsersAndPeriodNull() {
+        // when
+        Map<String, Map<LocalDate, BigDecimal>> result = workHistoryRepository.findDailyWorkHoursByUsersAndPeriod(
+                null, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31)
+        );
+
+        // then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("오래된순 정렬로 조회")
+    void findAllWithOldestSort() {
+        // given
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 2), user, group, part, division,
+                new BigDecimal("8.0"), "작업2"
+        ));
+        workHistoryRepository.save(WorkHistory.createWorkHistory(
+                LocalDate.of(2025, 1, 1), user, group, part, division,
+                new BigDecimal("8.0"), "작업1"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
+        condition.setUserId("user1");
+        condition.setSortType("OLDEST");
+        List<WorkHistory> histories = workHistoryRepository.findAll(condition);
+
+        // then
+        assertThat(histories).hasSize(2);
+        assertThat(histories.get(0).getDate()).isEqualTo(LocalDate.of(2025, 1, 1));
+        assertThat(histories.get(1).getDate()).isEqualTo(LocalDate.of(2025, 1, 2));
     }
 }

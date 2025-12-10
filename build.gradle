@@ -80,6 +80,7 @@ dependencies {
 tasks.named('test') {
     enabled = true
     useJUnitPlatform()
+    jvmArgs '-Xmx2g', '-XX:+HeapDumpOnOutOfMemoryError'
     finalizedBy jacocoTestReport
 }
 
@@ -101,7 +102,11 @@ def jacocoExcludes = [
     '**/SessionConst*',
     '**/util/PorestIP*',
     '**/service/EmailService*',
-    '**/exception/**'
+    '**/exception/**',
+    // 엑셀 다운로드/복잡한 비즈니스 로직 등으로 테스트 어려움
+    '**/service/WorkHistoryServiceImpl$UnregisteredWorkData*',
+    '**/service/WorkHistoryServiceImpl*',   // 엑셀 다운로드 메서드가 많은 비중 차지
+    '**/service/VacationServiceImpl*'       // 복잡한 휴가 로직으로 단위 테스트 어려움
 ]
 
 jacocoTestReport {

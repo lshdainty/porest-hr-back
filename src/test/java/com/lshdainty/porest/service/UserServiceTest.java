@@ -34,6 +34,8 @@ import com.lshdainty.porest.department.domain.UserDepartment;
 import com.lshdainty.porest.company.domain.Company;
 import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.permission.repository.RoleRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,6 +62,8 @@ class UserServiceTest {
     private DepartmentRepository departmentRepository;
     @Mock
     private RoleRepository roleRepository;
+    @Mock
+    private EntityManager em;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -1128,6 +1132,162 @@ class UserServiceTest {
 
             // then
             assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("ID로 Role 포함 유저 조회")
+    class GetUserWithRolesById {
+        @Test
+        @DisplayName("성공 - Role과 Permission을 포함한 유저를 반환한다")
+        @SuppressWarnings("unchecked")
+        void getUserWithRolesByIdSuccess() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+
+            TypedQuery<User> userQuery = mock(TypedQuery.class);
+            given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("userId"), eq(userId))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
+            given(userQuery.getResultList()).willReturn(List.of(user));
+
+            // when
+            Optional<User> result = userService.getUserWithRolesById(userId);
+
+            // then
+            assertThat(result).isPresent();
+            assertThat(result.get().getId()).isEqualTo(userId);
+        }
+
+        @Test
+        @DisplayName("성공 - 유저가 없으면 빈 Optional을 반환한다")
+        @SuppressWarnings("unchecked")
+        void getUserWithRolesByIdNotFound() {
+            // given
+            String userId = "nonexistent";
+
+            TypedQuery<User> userQuery = mock(TypedQuery.class);
+            given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("userId"), eq(userId))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
+            given(userQuery.getResultList()).willReturn(List.of());
+
+            // when
+            Optional<User> result = userService.getUserWithRolesById(userId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("성공 - Role이 있는 유저의 Permission도 조회한다")
+        @SuppressWarnings("unchecked")
+        void getUserWithRolesByIdWithRoles() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+            Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
+            user.addRole(role);
+
+            TypedQuery<User> userQuery = mock(TypedQuery.class);
+            TypedQuery<Role> roleQuery = mock(TypedQuery.class);
+
+            given(em.createQuery(contains("from User"), eq(User.class))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("userId"), eq(userId))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
+            given(userQuery.getResultList()).willReturn(List.of(user));
+
+            given(em.createQuery(contains("from Role"), eq(Role.class))).willReturn(roleQuery);
+            given(roleQuery.setParameter(eq("roles"), anyList())).willReturn(roleQuery);
+            given(roleQuery.getResultList()).willReturn(List.of(role));
+
+            // when
+            Optional<User> result = userService.getUserWithRolesById(userId);
+
+            // then
+            assertThat(result).isPresent();
+            assertThat(result.get().getRoles()).contains(role);
+        }
+    }
+
+    @Nested
+    @DisplayName("초대 토큰으로 Role 포함 유저 조회")
+    class GetUserWithRolesByInvitationToken {
+        @Test
+        @DisplayName("성공 - Role과 Permission을 포함한 유저를 반환한다")
+        @SuppressWarnings("unchecked")
+        void getUserWithRolesByInvitationTokenSuccess() {
+            // given
+            User user = User.createInvitedUser("user1", "유저", "test@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+            String token = user.getInvitationToken();
+
+            TypedQuery<User> userQuery = mock(TypedQuery.class);
+            given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("token"), eq(token))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
+            given(userQuery.getResultList()).willReturn(List.of(user));
+
+            // when
+            Optional<User> result = userService.getUserWithRolesByInvitationToken(token);
+
+            // then
+            assertThat(result).isPresent();
+            assertThat(result.get().getInvitationToken()).isEqualTo(token);
+        }
+
+        @Test
+        @DisplayName("성공 - 토큰이 없으면 빈 Optional을 반환한다")
+        @SuppressWarnings("unchecked")
+        void getUserWithRolesByInvitationTokenNotFound() {
+            // given
+            String token = "invalid-token";
+
+            TypedQuery<User> userQuery = mock(TypedQuery.class);
+            given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("token"), eq(token))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
+            given(userQuery.getResultList()).willReturn(List.of());
+
+            // when
+            Optional<User> result = userService.getUserWithRolesByInvitationToken(token);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("성공 - Role이 있는 유저의 Permission도 조회한다")
+        @SuppressWarnings("unchecked")
+        void getUserWithRolesByInvitationTokenWithRoles() {
+            // given
+            User user = User.createInvitedUser("user1", "유저", "test@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+            String token = user.getInvitationToken();
+            Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
+            user.addRole(role);
+
+            TypedQuery<User> userQuery = mock(TypedQuery.class);
+            TypedQuery<Role> roleQuery = mock(TypedQuery.class);
+
+            given(em.createQuery(contains("from User"), eq(User.class))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("token"), eq(token))).willReturn(userQuery);
+            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
+            given(userQuery.getResultList()).willReturn(List.of(user));
+
+            given(em.createQuery(contains("from Role"), eq(Role.class))).willReturn(roleQuery);
+            given(roleQuery.setParameter(eq("roles"), anyList())).willReturn(roleQuery);
+            given(roleQuery.getResultList()).willReturn(List.of(role));
+
+            // when
+            Optional<User> result = userService.getUserWithRolesByInvitationToken(token);
+
+            // then
+            assertThat(result).isPresent();
+            assertThat(result.get().getRoles()).contains(role);
         }
     }
 }

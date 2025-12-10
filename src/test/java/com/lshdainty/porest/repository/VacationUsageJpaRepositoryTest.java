@@ -1,5 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
+import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.domain.VacationUsage;
 import com.lshdainty.porest.vacation.repository.VacationUsageJpaRepository;
@@ -14,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +39,11 @@ class VacationUsageJpaRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        user = User.createUser("user1");
+        user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
     }
 
@@ -145,7 +153,11 @@ class VacationUsageJpaRepositoryTest {
     @DisplayName("모든 휴가사용 목록 조회")
     void findAllWithUser() {
         // given
-        User user2 = User.createUser("user2");
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user2);
 
         vacationUsageRepository.save(VacationUsage.createVacationUsage(
@@ -373,7 +385,11 @@ class VacationUsageJpaRepositoryTest {
     @DisplayName("여러 유저의 일별 휴가사용 조회")
     void findByUserIdsAndPeriodForDaily() {
         // given
-        User user2 = User.createUser("user2");
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user2);
 
         vacationUsageRepository.save(VacationUsage.createVacationUsage(
@@ -426,5 +442,58 @@ class VacationUsageJpaRepositoryTest {
 
         // then
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("유저별 연도별 휴가사용 조회")
+    void findByUserIdAndYear() {
+        // given
+        vacationUsageRepository.save(VacationUsage.createVacationUsage(
+                user, "2025년 연차", VacationTimeType.DAYOFF,
+                LocalDateTime.of(2025, 6, 1, 9, 0), LocalDateTime.of(2025, 6, 1, 18, 0),
+                new BigDecimal("1.0000")
+        ));
+        vacationUsageRepository.save(VacationUsage.createVacationUsage(
+                user, "2024년 연차", VacationTimeType.DAYOFF,
+                LocalDateTime.of(2024, 6, 1, 9, 0), LocalDateTime.of(2024, 6, 1, 18, 0),
+                new BigDecimal("1.0000")
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        List<VacationUsage> result = vacationUsageRepository.findByUserIdAndYear("user1", 2025);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getDesc()).isEqualTo("2025년 연차");
+    }
+
+    @Test
+    @DisplayName("유저별 연도별 휴가사용 조회 - 삭제된 내역 제외")
+    void findByUserIdAndYearExcludesDeleted() {
+        // given
+        VacationUsage activeUsage = VacationUsage.createVacationUsage(
+                user, "활성 연차", VacationTimeType.DAYOFF,
+                LocalDateTime.of(2025, 6, 1, 9, 0), LocalDateTime.of(2025, 6, 1, 18, 0),
+                new BigDecimal("1.0000")
+        );
+        VacationUsage deletedUsage = VacationUsage.createVacationUsage(
+                user, "삭제 연차", VacationTimeType.DAYOFF,
+                LocalDateTime.of(2025, 7, 1, 9, 0), LocalDateTime.of(2025, 7, 1, 18, 0),
+                new BigDecimal("1.0000")
+        );
+        vacationUsageRepository.save(activeUsage);
+        vacationUsageRepository.save(deletedUsage);
+        deletedUsage.deleteVacationUsage();
+        em.flush();
+        em.clear();
+
+        // when
+        List<VacationUsage> result = vacationUsageRepository.findByUserIdAndYear("user1", 2025);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getDesc()).isEqualTo("활성 연차");
     }
 }
