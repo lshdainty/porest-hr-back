@@ -1,6 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.notice.domain.Notice;
 import com.lshdainty.porest.notice.repository.NoticeQueryDslRepository;
 import com.lshdainty.porest.notice.type.NoticeType;
@@ -38,7 +40,11 @@ class NoticeQueryDslRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        writer = User.createUser("admin");
+        writer = User.createUser(
+                "admin", "password", "관리자", "admin@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(writer);
     }
 

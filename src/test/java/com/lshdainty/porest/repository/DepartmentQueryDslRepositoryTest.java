@@ -1,6 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.company.domain.Company;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.department.domain.Department;
 import com.lshdainty.porest.department.domain.UserDepartment;
 import com.lshdainty.porest.department.repository.DepartmentQueryDslRepository;
@@ -15,6 +17,7 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -128,7 +131,11 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("유저-부서 연결 저장")
     void saveUserDepartment() {
         // given
-        User user = User.createUser("user1");
+        User user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
@@ -149,7 +156,11 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("특정 유저의 메인 부서 조회")
     void findMainDepartmentByUserId() {
         // given
-        User user = User.createUser("user1");
+        User user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
@@ -171,7 +182,11 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("특정 유저와 부서의 연결 조회")
     void findUserDepartment() {
         // given
-        User user = User.createUser("user1");
+        User user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
@@ -192,8 +207,16 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("특정 부서에 속한 유저 조회")
     void findUsersInDepartment() {
         // given
-        User user1 = User.createUser("user1");
-        User user2 = User.createUser("user2");
+        User user1 = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user1);
         em.persist(user2);
 
@@ -216,9 +239,21 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("특정 부서에 속하지 않은 유저 조회")
     void findUsersNotInDepartment() {
         // given
-        User user1 = User.createUser("user1");
-        User user2 = User.createUser("user2");
-        User user3 = User.createUser("user3");
+        User user1 = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User user3 = User.createUser(
+                "user3", "password", "테스트유저3", "user3@test.com",
+                LocalDate.of(1992, 3, 3), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user1);
         em.persist(user2);
         em.persist(user3);
@@ -241,7 +276,11 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("특정 유저의 메인 부서 존재 여부 확인")
     void hasMainDepartment() {
         // given
-        User user = User.createUser("user1");
+        User user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
@@ -283,8 +322,16 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("특정 부서에 속한 UserDepartment 목록 조회")
     void findUserDepartmentsInDepartment() {
         // given
-        User user1 = User.createUser("user1");
-        User user2 = User.createUser("user2");
+        User user1 = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User user2 = User.createUser(
+                "user2", "password", "테스트유저2", "user2@test.com",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user1);
         em.persist(user2);
 
@@ -327,7 +374,11 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("사용자의 상위 결재자 부서 목록 조회")
     void findApproversByUserId() {
         // given
-        User user = User.createUser("user1");
+        User user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         // 부서 계층 생성: 본부 -> 팀 -> 파트
@@ -368,7 +419,11 @@ class DepartmentQueryDslRepositoryTest {
     @DisplayName("최상위 부서인 경우 결재자가 없다")
     void findApproversByUserIdTopLevel() {
         // given
-        User user = User.createUser("user1");
+        User user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
         Department topDept = Department.createDepartment("최상위", "최상위", null, "head1", 1L, "최상위", "#FF0000", company);

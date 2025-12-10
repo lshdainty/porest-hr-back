@@ -1,6 +1,8 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.domain.VacationApproval;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,10 +46,18 @@ class VacationApprovalQueryDslRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        user = User.createUser("user1");
+        user = User.createUser(
+                "user1", "password", "테스트유저1", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(user);
 
-        approver = User.createUser("approver1");
+        approver = User.createUser(
+                "approver1", "password", "결재자1", "approver1@test.com",
+                LocalDate.of(1985, 5, 5), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(approver);
 
         policy = VacationPolicy.createOnRequestPolicy(
@@ -82,7 +93,11 @@ class VacationApprovalQueryDslRepositoryTest {
     @DisplayName("승인 다건 저장")
     void saveAll() {
         // given
-        User approver2 = User.createUser("approver2");
+        User approver2 = User.createUser(
+                "approver2", "password", "결재자2", "approver2@test.com",
+                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(approver2);
 
         List<VacationApproval> approvals = List.of(
@@ -121,7 +136,11 @@ class VacationApprovalQueryDslRepositoryTest {
     @DisplayName("부여 ID로 조회 시 삭제된 승인 제외")
     void findByVacationGrantIdExcludesDeleted() {
         // given
-        User approver2 = User.createUser("approver2");
+        User approver2 = User.createUser(
+                "approver2", "password", "결재자2", "approver2@test.com",
+                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(approver2);
 
         VacationApproval activeApproval = VacationApproval.createVacationApproval(grant, approver, 1);
@@ -263,8 +282,16 @@ class VacationApprovalQueryDslRepositoryTest {
     @DisplayName("다단계 승인 저장 및 조회")
     void multipleApproversForSameGrant() {
         // given
-        User approver2 = User.createUser("approver2");
-        User approver3 = User.createUser("approver3");
+        User approver2 = User.createUser(
+                "approver2", "password", "결재자2", "approver2@test.com",
+                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User approver3 = User.createUser(
+                "approver3", "password", "결재자3", "approver3@test.com",
+                LocalDate.of(1987, 7, 7), OriginCompanyType.DTOL, "9 ~ 6",
+                YNType.N, null, null, CountryCode.KR
+        );
         em.persist(approver2);
         em.persist(approver3);
 
