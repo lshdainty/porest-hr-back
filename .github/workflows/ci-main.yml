@@ -8,28 +8,27 @@ on:
 
 jobs:
   JUnit-Test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
         # Branch Checkout
       - name: Checkout Branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-        # JDK 17 Setup
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        # JDK 25 Setup (Spring Boot 4.0 requires JDK 17+, project uses JDK 25)
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '25'
           distribution: 'temurin'
 
         # Gradle Wrapper 권한 부여
       - name: Grant execute permission for gradlew
-        run: chmod +x gradle
+        run: chmod +x gradlew
 
-        # Gradle Cache Setting
+        # Gradle Setup & Cache
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
         with:
-          arguments: build
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
         # Execute Test
@@ -45,7 +44,7 @@ jobs:
 
         # Generate Test Fail Result Report
       - name: If the test fails, register a check comment in the failed code line
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: 'build/test-results/**/*.xml'
