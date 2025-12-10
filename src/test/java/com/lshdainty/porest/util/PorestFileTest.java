@@ -1,12 +1,15 @@
 package com.lshdainty.porest.util;
 
+import com.lshdainty.porest.common.exception.ResourceNotFoundException;
+import com.lshdainty.porest.common.message.MessageKey;
+import com.lshdainty.porest.common.util.MessageResolver;
+import com.lshdainty.porest.common.util.PorestFile;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,18 +17,21 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.NoSuchElementException;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.doThrow;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("porest File Util 테스트")
 class PorestFileTest {
 
     @Mock
-    private MessageSource ms;
+    private MessageResolver messageResolver;
 
     @TempDir
     Path tempDir;
@@ -41,7 +47,7 @@ class PorestFileTest {
         String customFileName = "custom.txt";
 
         // When
-        boolean result = PorestFile.save(multipartFile, tempDir.toString(), customFileName, ms);
+        boolean result = PorestFile.save(multipartFile, tempDir.toString(), customFileName, messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -61,7 +67,7 @@ class PorestFileTest {
         );
 
         // When
-        boolean result = PorestFile.save(multipartFile, tempDir.toString(), null, ms);
+        boolean result = PorestFile.save(multipartFile, tempDir.toString(), null, messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -82,7 +88,7 @@ class PorestFileTest {
         String fileName = "test.txt";
 
         // When
-        boolean result = PorestFile.save(multipartFile, subDir.toString(), fileName, ms);
+        boolean result = PorestFile.save(multipartFile, subDir.toString(), fileName, messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -95,7 +101,7 @@ class PorestFileTest {
     @DisplayName("파일 저장 - 실패 (null 파일)")
     void saveFailNullFile() {
         // Given & When & Then
-        assertThat(PorestFile.save(null, tempDir.toString(), "test.txt", ms)).isFalse();
+        assertThat(PorestFile.save(null, tempDir.toString(), "test.txt", messageResolver)).isFalse();
     }
 
     @Test
@@ -105,7 +111,7 @@ class PorestFileTest {
         MockMultipartFile emptyFile = new MockMultipartFile("file", "", "text/plain", new byte[0]);
 
         // When & Then
-        assertThat(PorestFile.save(emptyFile, tempDir.toString(), "test.txt", ms)).isFalse();
+        assertThat(PorestFile.save(emptyFile, tempDir.toString(), "test.txt", messageResolver)).isFalse();
     }
 
     @Test
@@ -117,7 +123,7 @@ class PorestFileTest {
         );
 
         // When & Then
-        assertThat(PorestFile.save(multipartFile, tempDir.toString(), null, ms)).isFalse();
+        assertThat(PorestFile.save(multipartFile, tempDir.toString(), null, messageResolver)).isFalse();
     }
 
     @Test
@@ -130,14 +136,14 @@ class PorestFileTest {
         // transferTo 메서드가 호출될 때 IOException을 던지도록 설정
         doThrow(new IOException("Transfer failed")).when(mockFile).transferTo(any(File.class));
 
-        given(ms.getMessage("error.file.save", new String[]{"test.txt"}, null))
-                .willReturn("File save failed");
+        given(messageResolver.getMessage(any(MessageKey.class), anyString()))
+                .willReturn("File registHoliday failed");
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> PorestFile.save(mockFile, tempDir.toString(), "test.txt", ms));
+                () -> PorestFile.save(mockFile, tempDir.toString(), "test.txt", messageResolver));
 
-        assertThat(exception.getMessage()).isEqualTo("File save failed");
+        assertThat(exception.getMessage()).isEqualTo("File registHoliday failed");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);
     }
 
@@ -150,7 +156,7 @@ class PorestFileTest {
         Files.writeString(testFile, content);
 
         // When
-        byte[] result = PorestFile.read(testFile.toString(), ms);
+        byte[] result = PorestFile.read(testFile.toString(), messageResolver);
 
         // Then
         assertThat(new String(result)).isEqualTo(content);
@@ -161,14 +167,10 @@ class PorestFileTest {
     void readFileFailNotFound() {
         // Given
         String nonExistentPath = tempDir.resolve("nonexistent.txt").toString();
-        given(ms.getMessage("error.file.notfound", new String[]{nonExistentPath}, null))
-                .willReturn("File not found");
 
         // When & Then
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> PorestFile.read(nonExistentPath, ms));
-
-        assertThat(exception.getMessage()).isEqualTo("File not found");
+        assertThrows(ResourceNotFoundException.class,
+                () -> PorestFile.read(nonExistentPath, messageResolver));
     }
 
     @Test
@@ -178,14 +180,9 @@ class PorestFileTest {
         Path directory = tempDir.resolve("testDir");
         Files.createDirectory(directory);
 
-        given(ms.getMessage("error.file.notfound", new String[]{directory.toString()}, null))
-                .willReturn("File not found");
-
         // When & Then
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> PorestFile.read(directory.toString(), ms));
-
-        assertThat(exception.getMessage()).isEqualTo("File not found");
+        assertThrows(ResourceNotFoundException.class,
+                () -> PorestFile.read(directory.toString(), messageResolver));
     }
 
     @Test
@@ -199,14 +196,9 @@ class PorestFileTest {
         Files.delete(testFile);
         Files.createDirectory(testFile); // 파일 대신 디렉토리 생성하여 읽기 실패 유발
 
-        given(ms.getMessage("error.file.notfound", new String[]{testFile.toString()}, null))
-                .willReturn("File not found");
-
         // When & Then
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> PorestFile.read(testFile.toString(), ms));
-
-        assertThat(exception.getMessage()).isEqualTo("File not found");
+        assertThrows(ResourceNotFoundException.class,
+                () -> PorestFile.read(testFile.toString(), messageResolver));
     }
 
     @Test
@@ -219,7 +211,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.copy(sourceFile.toString(), targetFile.toString(), ms);
+        boolean result = PorestFile.copy(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -239,7 +231,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.copy(sourceFile.toString(), targetFile.toString(), ms);
+        boolean result = PorestFile.copy(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -254,14 +246,10 @@ class PorestFileTest {
         // Given
         String nonExistentSource = tempDir.resolve("nonexistent.txt").toString();
         String targetPath = tempDir.resolve("target.txt").toString();
-        given(ms.getMessage("error.file.notfound", new String[]{nonExistentSource}, null))
-                .willReturn("Source file not found");
 
         // When & Then
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> PorestFile.copy(nonExistentSource, targetPath, ms));
-
-        assertThat(exception.getMessage()).isEqualTo("Source file not found");
+        assertThrows(ResourceNotFoundException.class,
+                () -> PorestFile.copy(nonExistentSource, targetPath, messageResolver));
     }
 
     @Test
@@ -274,12 +262,12 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
         Files.writeString(targetFile, "existing content"); // 대상 파일이 이미 존재
 
-        given(ms.getMessage("error.file.copy", new String[]{sourceFile.toString(), targetFile.toString()}, null))
+        given(messageResolver.getMessage(any(MessageKey.class), anyString(), anyString()))
                 .willReturn("File copy failed");
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> PorestFile.copy(sourceFile.toString(), targetFile.toString(), ms));
+                () -> PorestFile.copy(sourceFile.toString(), targetFile.toString(), messageResolver));
 
         assertThat(exception.getMessage()).isEqualTo("File copy failed");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);
@@ -295,7 +283,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.move(sourceFile.toString(), targetFile.toString(), ms);
+        boolean result = PorestFile.move(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -315,7 +303,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.move(sourceFile.toString(), targetFile.toString(), ms);
+        boolean result = PorestFile.move(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -331,14 +319,10 @@ class PorestFileTest {
         // Given
         String nonExistentSource = tempDir.resolve("nonexistent.txt").toString();
         String targetPath = tempDir.resolve("target.txt").toString();
-        given(ms.getMessage("error.file.notfound", new String[]{nonExistentSource}, null))
-                .willReturn("Source file not found");
 
         // When & Then
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> PorestFile.move(nonExistentSource, targetPath, ms));
-
-        assertThat(exception.getMessage()).isEqualTo("Source file not found");
+        assertThrows(ResourceNotFoundException.class,
+                () -> PorestFile.move(nonExistentSource, targetPath, messageResolver));
     }
 
     @Test
@@ -351,12 +335,12 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
         Files.writeString(targetFile, "existing content"); // 대상 파일이 이미 존재
 
-        given(ms.getMessage("error.file.move", new String[]{sourceFile.toString(), targetFile.toString()}, null))
+        given(messageResolver.getMessage(any(MessageKey.class), anyString(), anyString()))
                 .willReturn("File move failed");
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> PorestFile.move(sourceFile.toString(), targetFile.toString(), ms));
+                () -> PorestFile.move(sourceFile.toString(), targetFile.toString(), messageResolver));
 
         assertThat(exception.getMessage()).isEqualTo("File move failed");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);

@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+
+    <!-- 로컬 콘솔에도 로그 출력 -->
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%highlight(%-5level)][%yellow(%d{yyyy.MM.dd HH:mm:ss.SSS})][%magenta(%-8(%X{requestId}))] - [%cyan(%logger{0}.%M\(%L\))] - %msg%n</pattern>
+            <pattern>%highlight(%-5level) %yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %magenta(%-8(%X{requestId})) %cyan(%logger{0}) %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="info">
-        <appender-ref ref="consoleAppender"/>
-    </root>
+
+    <!-- Loki로 로그 전송 설정 (prod 환경만) -->
+    <springProfile name="prod">
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>${LOKI_URL:-http://localhost:3100/loki/api/v1/push}</url>
+            </http>
+            <format>
+                <label>
+                    <pattern>app=porest,host=${HOSTNAME},level=%level,env=prod</pattern>
+                </label>
+                <message>
+                    <pattern>%-5level %d{yyyy-MM-dd HH:mm:ss.SSS} %-8(%X{requestId}) %logger{0} %msg%n</pattern>
+                </message>
+            </format>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+    </springProfile>
+
+    <!-- 로컬 환경 (Loki 미사용) -->
+    <springProfile name="!prod">
+        <root level="info">
+            <appender-ref ref="consoleAppender"/>
+        </root>
+    </springProfile>
 </configuration>

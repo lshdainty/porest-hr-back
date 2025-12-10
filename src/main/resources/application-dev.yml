@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+  # OAuth2 설정 (개발용 - 테스트 키 사용)
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET}
+            scope: profile,email
+
+  # 메일 설정 (개발용 - 실제 전송 안함)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connection-timeout: 5000
+          timeout: 5000
+          write-timeout: 5000
+
+logging:
+  level:
+    com.lshdainty.porest.api: debug
+    com.lshdainty.porest.repository: debug
+    com.lshdainty.porest.service: debug
+    com.lshdainty.porest.domain: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+file:
+  root-path: /Users/lshdainty/study/testimg
+
+app:
+  frontend:
+    base-url: http://localhost:3000
