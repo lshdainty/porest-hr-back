@@ -1,7 +1,7 @@
 package com.lshdainty.porest.security.controller.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.company.type.OriginCompanyType;
 import java.util.List;

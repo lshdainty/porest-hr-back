@@ -1,7 +1,7 @@
 package com.lshdainty.porest.dues.controller.dto;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
 import com.lshdainty.porest.dues.type.DuesCalcType;
 import com.lshdainty.porest.dues.type.DuesType;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -23,7 +23,7 @@ public class Holiday extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "holiday_id", columnDefinition = "bigint(20) COMMENT '공휴일 아이디'")
+    @Column(name = "holiday_id")
     private Long id;
 
     /**
@@ -31,7 +31,7 @@ public class Holiday extends AuditingFields {
      * 공휴일이 해당하는 날짜 (양력 기준)
      */
     @NotNull
-    @Column(name = "holiday_date", nullable = false, columnDefinition = "date NOT NULL COMMENT '공휴일 일자'")
+    @Column(name = "holiday_date", nullable = false)
     private LocalDate date;
 
     /**
@@ -39,7 +39,7 @@ public class Holiday extends AuditingFields {
      * 공휴일의 명칭 (예: 설날, 추석, 광복절 등)
      */
     @NotNull
-    @Column(name = "holiday_name", nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '공휴일 이름'")
+    @Column(name = "holiday_name", nullable = false, length = 20)
     private String name;
 
     /**
@@ -48,7 +48,7 @@ public class Holiday extends AuditingFields {
      */
     @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "holiday_type", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '공휴일 타입'")
+    @Column(name = "holiday_type", nullable = false, length = 15)
     private HolidayType type;
 
     /**
@@ -57,7 +57,7 @@ public class Holiday extends AuditingFields {
      */
     @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "country_code", nullable = false, length = 2, columnDefinition = "varchar(2) DEFAULT 'KR' NOT NULL COMMENT '국가 코드'")
+    @Column(name = "country_code", nullable = false, length = 2)
     private CountryCode countryCode;
 
     /**
@@ -66,14 +66,14 @@ public class Holiday extends AuditingFields {
      */
     @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "lunar_yn", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '음력 여부'")
+    @Column(name = "lunar_yn", nullable = false, length = 1)
     private YNType lunarYN;
 
     /**
      * 음력 일자<br>
      * 음력 기준 공휴일 날짜 (음력 여부가 Y일 경우 사용)
      */
-    @Column(name = "lunar_date", columnDefinition = "date COMMENT '음력 일자'")
+    @Column(name = "lunar_date")
     private LocalDate lunarDate;
 
     /**
@@ -82,14 +82,14 @@ public class Holiday extends AuditingFields {
      */
     @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "is_recurring", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '반복 여부'")
+    @Column(name = "is_recurring", nullable = false, length = 1)
     private YNType isRecurring;
 
     /**
      * 아이콘<br>
      * UI에서 표시할 아이콘 정보
      */
-    @Column(name = "holiday_icon", length = 5, columnDefinition = "varchar(5) COMMENT '아이콘'")
+    @Column(name = "holiday_icon", length = 5)
     private String icon;
 
     /**

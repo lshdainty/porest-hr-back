@@ -26,7 +26,7 @@ public class VacationGrant extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_grant_id", columnDefinition = "bigint(20) COMMENT '휴가 부여 아이디'")
+    @Column(name = "vacation_grant_id")
     private Long id;
 
     /**
@@ -52,7 +52,7 @@ public class VacationGrant extends AuditingFields {
      * 휴가 부여 사유<br>
      * 휴가 부여 사유를 작성, 관리하는 컬럼
      */
-    @Column(name = "vacation_grant_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '휴가 부여 사유'")
+    @Column(name = "vacation_grant_desc", length = 1000)
     private String desc;
 
     /**
@@ -60,7 +60,7 @@ public class VacationGrant extends AuditingFields {
      * 휴가 타입으로 그룹핑하여 휴가 사용일수 관리함
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "vacation_type", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '휴가 타입'")
+    @Column(name = "vacation_type", nullable = false, length = 15)
     private VacationType type;
 
     /**
@@ -69,7 +69,7 @@ public class VacationGrant extends AuditingFields {
      * 사용할 수 있는 기간의 시작 일자를 의미<br>
      * 시스템에서 추가하는 createAt하고 grantDate는 다름
      */
-    @Column(name = "grant_date", columnDefinition = "datetime(6) COMMENT '휴가 사용 가능시간 시작 일시'")
+    @Column(name = "grant_date")
     private LocalDateTime grantDate;
 
     /**
@@ -77,7 +77,7 @@ public class VacationGrant extends AuditingFields {
      * 사용자가 휴가 정책을 통해 휴가를 부여받아
      * 사용할 수 있는 기간의 만료 일자를 의미
      */
-    @Column(name = "expiry_date", columnDefinition = "datetime(6) COMMENT '휴가 사용 가능시간 종료 일시'")
+    @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
 
     /**
@@ -85,7 +85,7 @@ public class VacationGrant extends AuditingFields {
      * 휴가 정책에 따른 휴가 부여 내역<br>
      * (grantTime만 있다면 휴가 부여 내역으로 간주)
      */
-    @Column(name = "grant_time", precision = 7, scale = 4, columnDefinition = "decimal(7,4) COMMENT '휴가 부여 시간'")
+    @Column(name = "grant_time", precision = 7, scale = 4)
     private BigDecimal grantTime;
 
     /**
@@ -93,7 +93,7 @@ public class VacationGrant extends AuditingFields {
      * 사용자가 부여받은 휴가 중에서 만료 기간이 짧은 것을 기준으로<br>
      * 부여받은 시간에서 사용한 시간만큼 차감하여 남아있는 시간을 기록
      */
-    @Column(name = "remain_time", precision = 7, scale = 4, columnDefinition = "decimal(7,4) COMMENT '휴가 잔여 시간'")
+    @Column(name = "remain_time", precision = 7, scale = 4)
     private BigDecimal remainTime;
 
     /**
@@ -103,7 +103,7 @@ public class VacationGrant extends AuditingFields {
      * 완전히 잘못된 데이터의 경우만 is_deleted로 소프트 삭제 처리함
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "grant_status", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '휴가 부여 상태'")
+    @Column(name = "grant_status", nullable = false, length = 15)
     private GrantStatus status;
 
     /**
@@ -113,7 +113,7 @@ public class VacationGrant extends AuditingFields {
      * - 결혼/출산: 해당 일자 (예: 2025-09-14 00:00)<br>
      * 모든 신청 타입에서 필수로 사용됨
      */
-    @Column(name = "request_start_time", columnDefinition = "datetime(6) COMMENT '요청 대상 일자 시작 일시'")
+    @Column(name = "request_start_time")
     private LocalDateTime requestStartTime;
 
     /**
@@ -122,21 +122,21 @@ public class VacationGrant extends AuditingFields {
      * OT 종료 시간 (예: 2025-09-14 19:00)<br>
      * 결혼/출산 등 OT가 아닌 경우는 null
      */
-    @Column(name = "request_end_time", columnDefinition = "datetime(6) COMMENT '요청 대상 일자 종료 일시'")
+    @Column(name = "request_end_time")
     private LocalDateTime requestEndTime;
 
     /**
      * 요청 사유<br>
      * 신청 시 추가 타입으로 휴가를 신청할 때 휴가 신청 사유를 작성하는데 해당 컬럼에 값이 들어감
      */
-    @Column(name = "request_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '요청 사유'")
+    @Column(name = "request_desc", length = 1000)
     private String requestDesc;
 
     /**
      * 삭제 여부
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     @BatchSize(size = 100)

@@ -23,7 +23,7 @@ public class UserRole extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_role_id", columnDefinition = "bigint(20) COMMENT '사용자-역할 매핑 아이디'")
+    @Column(name = "user_role_id")
     private Long id;
 
     /**
@@ -47,7 +47,7 @@ public class UserRole extends AuditingFields {
      * Soft delete를 위한 플래그
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     /**

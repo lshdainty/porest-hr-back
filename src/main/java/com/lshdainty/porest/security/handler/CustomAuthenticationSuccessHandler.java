@@ -1,6 +1,6 @@
 package com.lshdainty.porest.security.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.security.controller.dto.AuthApiDto;
 import com.lshdainty.porest.security.service.CustomUserDetailsService;

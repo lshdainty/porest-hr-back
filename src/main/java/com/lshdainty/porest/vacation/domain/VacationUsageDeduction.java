@@ -18,7 +18,7 @@ public class VacationUsageDeduction extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_usage_deduction_id", columnDefinition = "bigint(20) COMMENT '휴가 사용 차감 내역 아이디'")
+    @Column(name = "vacation_usage_deduction_id")
     private Long id;
 
     /**
@@ -41,7 +41,7 @@ public class VacationUsageDeduction extends AuditingFields {
      * 휴가 차감 시간<br>
      * 부여받은 객체에서 어느정도 차감했는지를 관리하는 컬럼<br>
      */
-    @Column(name = "deducted_time", nullable = false, precision = 7, scale = 4, columnDefinition = "decimal(7,4) NOT NULL COMMENT '차감 시간'")
+    @Column(name = "deducted_time", nullable = false, precision = 7, scale = 4)
     private BigDecimal deductedTime;
 
     /**

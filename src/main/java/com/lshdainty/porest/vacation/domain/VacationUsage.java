@@ -23,7 +23,7 @@ public class VacationUsage extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_usage_id", columnDefinition = "bigint(20) COMMENT '휴가 사용 아이디'")
+    @Column(name = "vacation_usage_id")
     private Long id;
 
     /**
@@ -40,7 +40,7 @@ public class VacationUsage extends AuditingFields {
      * 휴가 내역 설명<br>
      * 사용자에게 부여한 혹은 사용내역에 대한 설명
      */
-    @Column(name = "vacation_usage_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '휴가 사용 사유'")
+    @Column(name = "vacation_usage_desc", length = 1000)
     private String desc;
 
     /**
@@ -48,21 +48,21 @@ public class VacationUsage extends AuditingFields {
      * 사용자가 사용한 휴가 시간 타입
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "vacation_time_type", nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '휴가 시간 타입'")
+    @Column(name = "vacation_time_type", nullable = false, length = 20)
     private VacationTimeType type;
 
     /**
      * 휴가 사용 시작일<br>
      * 사용자가 사용한 휴가의 시작 일자와 시간
      */
-    @Column(name = "start_date", nullable = false, columnDefinition = "datetime(6) NOT NULL COMMENT '휴가 사용 시작 일시'")
+    @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
 
     /**
      * 휴가 사용 종료일<br>
      * 사용자가 사용한 휴가의 종료 일자와 시간
      */
-    @Column(name = "end_date", nullable = false, columnDefinition = "datetime(6) NOT NULL COMMENT '휴가 사용 종료 일시'")
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
 
     /**
@@ -70,14 +70,14 @@ public class VacationUsage extends AuditingFields {
      * 주말/공휴일 제외한 실제 사용한 시간<br>
      * 부분 취소 시 이 값을 기준으로 재계산
      */
-    @Column(name = "used_time", nullable = false, precision = 7, scale = 4, columnDefinition = "decimal(7,4) NOT NULL COMMENT '휴가 총 사용 시간'")
+    @Column(name = "used_time", nullable = false, precision = 7, scale = 4)
     private BigDecimal usedTime;
 
     /**
      * 삭제 여부
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     @BatchSize(size = 100)

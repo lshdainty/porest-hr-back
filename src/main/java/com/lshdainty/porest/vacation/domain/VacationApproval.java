@@ -22,7 +22,7 @@ public class VacationApproval extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_approval_id", columnDefinition = "bigint(20) COMMENT '휴가 승인 아이디'")
+    @Column(name = "vacation_approval_id")
     private Long id;
 
     /**
@@ -49,7 +49,7 @@ public class VacationApproval extends AuditingFields {
      * 승인 순서<br>
      * 레벨 기반 순차 승인을 위한 순서 (1부터 시작, 작을수록 먼저 승인)
      */
-    @Column(name = "approval_order", nullable = false, columnDefinition = "int(11) NOT NULL COMMENT '승인 순서'")
+    @Column(name = "approval_order", nullable = false)
     private Integer approvalOrder;
 
     /**
@@ -57,28 +57,28 @@ public class VacationApproval extends AuditingFields {
      * 해당 승인자의 승인 상태를 의미함
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "approval_status", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '승인 상태'")
+    @Column(name = "approval_status", nullable = false, length = 15)
     private ApprovalStatus approvalStatus;
 
     /**
      * 승인일시<br>
      * 승인자가 승인 또는 거부한 일시
      */
-    @Column(name = "approval_date", columnDefinition = "datetime(6) COMMENT '승인 일시'")
+    @Column(name = "approval_date")
     private LocalDateTime approvalDate;
 
     /**
      * 거부 사유<br>
      * 승인자가 거부했을 경우 거부 사유
      */
-    @Column(name = "rejection_reason", length = 1000, columnDefinition = "varchar(1000) COMMENT '거부 사유'")
+    @Column(name = "rejection_reason", length = 1000)
     private String rejectionReason;
 
     /**
      * 삭제 여부
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     // vacationGrant 추가 연관관계 편의 메소드

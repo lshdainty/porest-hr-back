@@ -23,21 +23,21 @@ public class Department extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "department_id", columnDefinition = "bigint(20) COMMENT '부서 아이디'")
+    @Column(name = "department_id")
     private Long id;
 
     /**
      * 부서명<br>
      * 부서의 영문 이름
      */
-    @Column(name = "department_name", nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '부서명'")
+    @Column(name = "department_name", nullable = false, length = 20)
     private String name;
 
     /**
      * 부서 국문명<br>
      * 부서의 한글 이름
      */
-    @Column(name = "department_name_kr", nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '부서 국문명'")
+    @Column(name = "department_name_kr", nullable = false, length = 20)
     private String nameKR;
 
     /**
@@ -60,28 +60,28 @@ public class Department extends AuditingFields {
      * 부서장 아이디<br>
      * 부서를 관리하는 사용자의 아이디
      */
-    @Column(name = "head_user_id", length = 20, columnDefinition = "varchar(20) COMMENT '부서장 아이디'")
+    @Column(name = "head_user_id", length = 20)
     private String headUserId;
 
     /**
      * 부서 레벨<br>
      * 부서 계층 구조에서의 깊이 (tree 레벨)
      */
-    @Column(name = "department_level", columnDefinition = "bigint(20) COMMENT '부서 레벨'")
+    @Column(name = "department_level")
     private Long level;
 
     /**
      * 부서 설명<br>
      * 부서에 대한 상세 설명
      */
-    @Column(name = "department_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '부서 설명'")
+    @Column(name = "department_desc", length = 1000)
     private String desc;
 
     /**
      * 색상 코드<br>
      * UI에서 부서 표시 시 사용할 색상 코드
      */
-    @Column(name = "color_code", length = 10, columnDefinition = "varchar(10) COMMENT '색상 코드'")
+    @Column(name = "color_code", length = 10)
     private String color;
 
     /**
@@ -114,7 +114,7 @@ public class Department extends AuditingFields {
      * Soft delete를 위한 플래그
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     // company 추가 연관관계 편의 메소드

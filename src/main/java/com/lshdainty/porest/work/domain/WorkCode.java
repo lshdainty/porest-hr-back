@@ -18,26 +18,26 @@ public class WorkCode extends AuditingFields {
      * 코드 관리용 ID
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "work_code_id", columnDefinition = "bigint(20) COMMENT '업무 코드 아이디'")
+    @Column(name = "work_code_id")
     private Long id;
 
     /**
      * 업무 코드
      */
-    @Column(name = "work_code", nullable = false, length = 50, columnDefinition = "varchar(50) NOT NULL COMMENT '업무 코드'")
+    @Column(name = "work_code", nullable = false, length = 50)
     private String code;
 
     /**
      * 업무 코드명
      */
-    @Column(name = "work_code_name", nullable = false, length = 50, columnDefinition = "varchar(50) NOT NULL COMMENT '업무 코드명'")
+    @Column(name = "work_code_name", nullable = false, length = 50)
     private String name;
 
     /**
      * 코드 타입
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "code_type", nullable = false, length = 10, columnDefinition = "varchar(10) NOT NULL COMMENT '코드 타입'")
+    @Column(name = "code_type", nullable = false, length = 10)
     private CodeType type;
 
     /**
@@ -50,14 +50,14 @@ public class WorkCode extends AuditingFields {
     /**
      * 정렬 순서
      */
-    @Column(name = "order_seq", columnDefinition = "int(11) COMMENT '정렬 순서'")
+    @Column(name = "order_seq")
     private Integer orderSeq;
 
     /**
      * 삭제 여부
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     /**

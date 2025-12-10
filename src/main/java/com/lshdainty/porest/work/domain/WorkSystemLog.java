@@ -22,14 +22,14 @@ public class WorkSystemLog extends AuditingFields {
      * 시스템 로그 아이디<br>
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "system_log_id", columnDefinition = "bigint(20) COMMENT '시스템 로그 아이디'")
+    @Column(name = "system_log_id")
     private Long id;
 
     /**
      * 시스템 코드
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "system_code", nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '시스템 코드'")
+    @Column(name = "system_code", nullable = false, length = 20)
     private SystemType code;
 
     /**

@@ -28,28 +28,28 @@ public class Role extends AuditingFields {
      * 자동 생성되는 고유 식별자
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id", columnDefinition = "bigint(20) COMMENT '역할 아이디'")
+    @Column(name = "role_id")
     private Long id;
 
     /**
      * 역할 코드<br>
      * 예: ADMIN, MANAGER, USER
      */
-    @Column(name = "role_code", unique = true, nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '역할 코드'")
+    @Column(name = "role_code", unique = true, nullable = false, length = 20)
     private String code;
 
     /**
      * 역할 이름<br>
      * 예: 관리자, 매니저, 일반 사용자
      */
-    @Column(name = "role_name", nullable = false, length = 20, columnDefinition = "varchar(20) NOT NULL COMMENT '역할 이름'")
+    @Column(name = "role_name", nullable = false, length = 20)
     private String name;
 
     /**
      * 역할 설명<br>
      * 역할에 대한 상세 설명
      */
-    @Column(name = "role_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '역할 설명'")
+    @Column(name = "role_desc", length = 1000)
     private String desc;
 
     /**
@@ -66,7 +66,7 @@ public class Role extends AuditingFields {
      * Soft delete를 위한 플래그
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     /**

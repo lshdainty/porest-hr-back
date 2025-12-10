@@ -23,7 +23,7 @@ public class Schedule extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_id", columnDefinition = "bigint(20) COMMENT '스케줄 아이디'")
+    @Column(name = "schedule_id")
     private Long id;
 
     /**
@@ -39,7 +39,7 @@ public class Schedule extends AuditingFields {
      * 스케줄 타입<br>
      * 스케줄의 종류를 구분하기 위한 타입
      */
-    @Column(name = "schedule_type", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '스케줄 타입'")
+    @Column(name = "schedule_type", nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
     private ScheduleType type;
 
@@ -47,28 +47,28 @@ public class Schedule extends AuditingFields {
      * 스케줄 설명<br>
      * 스케줄에 대한 상세 내용 및 설명
      */
-    @Column(name = "schedule_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '스케줄 설명'")
+    @Column(name = "schedule_desc", length = 1000)
     private String desc;
 
     /**
      * 시작 일자<br>
      * 스케줄이 시작되는 날짜와 시간
      */
-    @Column(name = "start_date", columnDefinition = "datetime(6) COMMENT '시작 일자'")
+    @Column(name = "start_date")
     private LocalDateTime startDate;
 
     /**
      * 종료 일자<br>
      * 스케줄이 종료되는 날짜와 시간
      */
-    @Column(name = "end_date", columnDefinition = "datetime(6) COMMENT '종료 일자'")
+    @Column(name = "end_date")
     private LocalDateTime endDate;
 
     /**
      * 삭제 여부<br>
      * Soft delete를 위한 플래그
      */
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     @Enumerated(EnumType.STRING)
     private YNType isDeleted;
 

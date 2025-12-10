@@ -23,21 +23,21 @@ public class Company extends AuditingFields {
      * 테이블 관리용 Primary Key
      */
     @Id
-    @Column(name = "company_id", length = 50, columnDefinition = "varchar(50) COMMENT '회사 아이디'")
+    @Column(name = "company_id", length = 50)
     private String id;
 
     /**
      * 회사명<br>
      * 회사의 이름
      */
-    @Column(name = "company_name", nullable = false, length = 100, columnDefinition = "varchar(100) NOT NULL COMMENT '회사명'")
+    @Column(name = "company_name", nullable = false, length = 100)
     private String name;
 
     /**
      * 회사 설명<br>
      * 회사에 대한 상세 설명
      */
-    @Column(name = "company_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '회사 설명'")
+    @Column(name = "company_desc", length = 1000)
     private String desc;
 
     /**
@@ -45,7 +45,7 @@ public class Company extends AuditingFields {
      * Soft delete를 위한 플래그
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     /**

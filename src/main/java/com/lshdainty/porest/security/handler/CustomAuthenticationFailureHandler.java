@@ -1,6 +1,6 @@
 package com.lshdainty.porest.security.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.common.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;

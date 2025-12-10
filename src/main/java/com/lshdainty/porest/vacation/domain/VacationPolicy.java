@@ -24,14 +24,14 @@ public class VacationPolicy extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_policy_id", columnDefinition = "bigint(20) COMMENT '휴가 정책 아이디'")
+    @Column(name = "vacation_policy_id")
     private Long id;
 
     /**
      * 휴가 정책 이름<br>
      * 정책을 구분할 수 있는 이름
      */
-    @Column(name = "vacation_policy_name", length = 50, columnDefinition = "varchar(50) COMMENT '휴가 정책 이름'")
+    @Column(name = "vacation_policy_name", length = 50)
     private String name;
 
     /**
@@ -39,7 +39,7 @@ public class VacationPolicy extends AuditingFields {
      * 사용자가 휴가를 신청하거나 할때<br>
      * 확인할 수 있는 정책 내용
      */
-    @Column(name = "vacation_policy_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '휴가 정책 설명'")
+    @Column(name = "vacation_policy_desc", length = 1000)
     private String desc;
 
     /**
@@ -48,7 +48,7 @@ public class VacationPolicy extends AuditingFields {
      * 휴가 일수를 관리하기 위한 휴가 타입
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "vacation_type", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '휴가 타입'")
+    @Column(name = "vacation_type", nullable = false, length = 15)
     private VacationType  vacationType;
 
     /**
@@ -57,7 +57,7 @@ public class VacationPolicy extends AuditingFields {
      * 방식이 결정된다.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "grant_method", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '휴가 부여 방법'")
+    @Column(name = "grant_method", nullable = false, length = 15)
     private GrantMethod grantMethod;
 
     /**
@@ -67,14 +67,14 @@ public class VacationPolicy extends AuditingFields {
      * 해당 값이 N이면 무조건 grantTime은 0 이상이어야하고 Y이면 무조건 null이어야함
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_flexible_grant", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '가변 부여 여부'")
+    @Column(name = "is_flexible_grant", nullable = false, length = 1)
     private YNType isFlexibleGrant;
 
     /**
      * 휴가 부여 기준 시간<br>
      * 정책에 설정된 휴가 부여 시간
      */
-    @Column(name = "grant_time", precision = 7, scale = 4, columnDefinition = "decimal(7,4) COMMENT '휴가 부여 기준 시간'")
+    @Column(name = "grant_time", precision = 7, scale = 4)
     private BigDecimal grantTime;
 
     /**
@@ -84,7 +84,7 @@ public class VacationPolicy extends AuditingFields {
      * 분 단위를 버리지않고 활용하여 휴가에 활용한다.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "minute_grant_yn", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '분단위 부여 여부'")
+    @Column(name = "minute_grant_yn", nullable = false, length = 1)
     private YNType minuteGrantYn;
 
     /**
@@ -93,7 +93,7 @@ public class VacationPolicy extends AuditingFields {
      * 해당 단위에 따라 스케줄링되어 휴가가 자동 부여됨
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "repeat_unit", length = 10, columnDefinition = "varchar(10) COMMENT '휴가 부여 반복 단위'")
+    @Column(name = "repeat_unit", length = 10)
     private RepeatUnit repeatUnit;
 
     /**
@@ -102,7 +102,7 @@ public class VacationPolicy extends AuditingFields {
      * 해당 값에 따라 스케줄링되어 휴가가 자동 부여됨<br>
      * 예) 2년 간격
      */
-    @Column(name = "repeat_Interval", columnDefinition = "int(11) COMMENT '휴가 부여 반복 간격'")
+    @Column(name = "repeat_Interval")
     private Integer repeatInterval;
 
     /**
@@ -111,7 +111,7 @@ public class VacationPolicy extends AuditingFields {
      * 해당 값에 따라 스케줄링되어 휴가가 자동 부여됨<br>
      * 예) 매년 10월 16일
      */
-    @Column(name = "specific_months", columnDefinition = "int(11) COMMENT '특정 월 지정'")
+    @Column(name = "specific_months")
     private Integer specificMonths;
 
     /**
@@ -120,7 +120,7 @@ public class VacationPolicy extends AuditingFields {
      * 해당 값에 따라 스케줄링되어 휴가가 자동 부여됨<br>
      * 예) 매년 10월 16일
      */
-    @Column(name = "specific_days", columnDefinition = "int(11) COMMENT '특정 일 지정'")
+    @Column(name = "specific_days")
     private Integer specificDays;
 
     /**
@@ -128,7 +128,7 @@ public class VacationPolicy extends AuditingFields {
      * 정책 생성 시점과는 다른 값<br>
      * 정책은 25년에 생성했지만 정책 실행은 26년도부터 가능하도록 할 때 사용
      */
-    @Column(name = "first_grant_date", columnDefinition = "datetime(6) COMMENT '첫 부여 일시'")
+    @Column(name = "first_grant_date")
     private LocalDateTime firstGrantDate;
 
     /**
@@ -137,7 +137,7 @@ public class VacationPolicy extends AuditingFields {
      * N: 1회만 부여 (N년 후 1회 부여)
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_recurring", length = 1, columnDefinition = "varchar(1) COMMENT '반복 부여 여부'")
+    @Column(name = "is_recurring", length = 1)
     private YNType isRecurring;
 
     /**
@@ -146,7 +146,7 @@ public class VacationPolicy extends AuditingFields {
      * null이면 제한 없음, 1이면 1회만 부여<br>
      * 예: "7년 후 1회 부여" → maxGrantCount = 1
      */
-    @Column(name = "max_grant_count", columnDefinition = "int(11) COMMENT '최대 부여 횟수'")
+    @Column(name = "max_grant_count")
     private Integer maxGrantCount;
 
     /**
@@ -157,7 +157,7 @@ public class VacationPolicy extends AuditingFields {
      * 1 이상: 지정된 인원 수만큼 승인이 필요<br>
      * 예) 2명의 승인이 필요한 경우 approvalRequiredCount = 2
      */
-    @Column(name = "approval_required_count", columnDefinition = "int(11) COMMENT '승인 처리 필요 인원수'")
+    @Column(name = "approval_required_count")
     private Integer approvalRequiredCount;
 
     /**
@@ -166,7 +166,7 @@ public class VacationPolicy extends AuditingFields {
      * 지금은 간단하게 당해년도 1월 1일, 생성 즉시 2개만 생성
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "effective_type", length = 30, columnDefinition = "varchar(30) COMMENT '유효기간 발효일 타입'")
+    @Column(name = "effective_type", length = 30)
     private EffectiveType effectiveType;
 
     /**
@@ -175,21 +175,21 @@ public class VacationPolicy extends AuditingFields {
      * 지금은 간단하게 당해년도 12월 31일, +1~12개월 까지만 생성
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "expiration_type", length = 30, columnDefinition = "varchar(30) COMMENT '유효기간 만료일 타입'")
+    @Column(name = "expiration_type", length = 30)
     private ExpirationType expirationType;
 
     /**
      * 삭제 가능 여부
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "can_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 가능 여부'")
+    @Column(name = "can_deleted", nullable = false, length = 1)
     private YNType canDeleted;
 
     /**
      * 삭제 여부
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     @BatchSize(size = 100)

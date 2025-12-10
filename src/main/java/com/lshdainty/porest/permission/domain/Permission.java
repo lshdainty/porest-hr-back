@@ -26,28 +26,28 @@ public class Permission extends AuditingFields {
      * 자동 생성되는 고유 식별자
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "permission_id", columnDefinition = "bigint(20) COMMENT '권한 아이디'")
+    @Column(name = "permission_id")
     private Long id;
 
     /**
      * 권한 코드<br>
      * 예: USER:READ, VACATION:REQUEST
      */
-    @Column(name = "permission_code", unique = true, nullable = false, length = 100, columnDefinition = "varchar(100) NOT NULL COMMENT '권한 코드'")
+    @Column(name = "permission_code", unique = true, nullable = false, length = 100)
     private String code;
 
     /**
      * 권한 이름<br>
      * 예: 사용자 조회, 휴가 신청
      */
-    @Column(name = "permission_name", length = 20, columnDefinition = "varchar(20) COMMENT '권한 이름'")
+    @Column(name = "permission_name", length = 20)
     private String name;
 
     /**
      * 권한 설명<br>
      * 권한에 대한 상세 설명
      */
-    @Column(name = "permission_desc", length = 1000, columnDefinition = "varchar(1000) COMMENT '권한 설명'")
+    @Column(name = "permission_desc", length = 1000)
     private String desc;
 
     /**
@@ -56,7 +56,7 @@ public class Permission extends AuditingFields {
      * 예: USER, VACATION, WORK, SCHEDULE
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "resource", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '리소스 타입'")
+    @Column(name = "resource", nullable = false, length = 15)
     private ResourceType resource;
 
     /**
@@ -65,7 +65,7 @@ public class Permission extends AuditingFields {
      * 예: READ, WRITE, MANAGE, APPROVE
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "action", nullable = false, length = 15, columnDefinition = "varchar(15) NOT NULL COMMENT '액션 타입'")
+    @Column(name = "action", nullable = false, length = 15)
     private ActionType action;
 
     /**
@@ -73,7 +73,7 @@ public class Permission extends AuditingFields {
      * Soft delete를 위한 플래그
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     /**

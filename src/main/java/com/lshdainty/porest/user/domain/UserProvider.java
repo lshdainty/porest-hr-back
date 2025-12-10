@@ -16,7 +16,7 @@ public class UserProvider extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "provider_seq", columnDefinition = "bigint(20) COMMENT 'provider 시퀀스'")
+    @Column(name = "provider_seq")
     private Long seq;
 
     /**
@@ -32,14 +32,14 @@ public class UserProvider extends AuditingFields {
      * provider 타입<br>
      * OAuth 제공자 종류 (예: GOOGLE, KAKAO, NAVER 등)
      */
-    @Column(name = "provider_type", nullable = false, length = 10, columnDefinition = "varchar(10) NOT NULL COMMENT 'provider 타입'")
+    @Column(name = "provider_type", nullable = false, length = 10)
     private String type;
 
     /**
      * OAuth 제공자 사용자 아이디<br>
      * OAuth 제공자에서 발급한 고유 사용자 식별자
      */
-    @Column(name = "provider_user_id", length = 100, columnDefinition = "varchar(100) COMMENT 'OAuth 제공자 사용자 아이디'")
+    @Column(name = "provider_user_id", length = 100)
     private String id;
 
     // user 추가 연관관계 편의 메소드

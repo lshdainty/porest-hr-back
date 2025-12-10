@@ -18,7 +18,7 @@ public class UserDepartment extends AuditingFields {
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_department_id", columnDefinition = "bigint(20) COMMENT '사용자-부서 매핑 아이디'")
+    @Column(name = "user_department_id")
     private Long id;
 
     /**
@@ -44,7 +44,7 @@ public class UserDepartment extends AuditingFields {
      * 유저가 여러 부서에 속할 경우 대표 부서를 구분하기 위한 플래그
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "main_department_yn", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '메인 부서 여부'")
+    @Column(name = "main_department_yn", nullable = false, length = 1)
     private YNType mainYN;
 
     /**
@@ -52,7 +52,7 @@ public class UserDepartment extends AuditingFields {
      * Soft delete를 위한 플래그
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_deleted", nullable = false, length = 1, columnDefinition = "varchar(1) DEFAULT 'N' NOT NULL COMMENT '삭제 여부'")
+    @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
 
     // user 추가 연관관계 편의 메소드

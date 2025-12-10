@@ -35,6 +35,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
     private static final String TRACE_ID_KEY = "requestId";
     private static final int MAX_BODY_LENGTH = 500;
     private static final int MAX_USER_AGENT_LENGTH = 50;
+    private static final int CONTENT_CACHE_LIMIT = 10 * 1024; // 10KB
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
             "/actuator/health",
             "/actuator/prometheus",
@@ -57,7 +58,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
         MDC.put(TRACE_ID_KEY, traceId);
 
         // Request/Response Body를 여러 번 읽을 수 있도록 래핑
-        ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
+        ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request, CONTENT_CACHE_LIMIT);
         ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper(response);
 
         long startTime = System.currentTimeMillis();
