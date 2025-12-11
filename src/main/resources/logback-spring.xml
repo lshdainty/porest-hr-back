@@ -12,14 +12,13 @@
     <!-- Loki로 로그 전송 설정 (prod 환경만) -->
     <springProfile name="prod">
         <!-- Loki4j 디버그 로그 활성화 -->
-        <logger name="com.github.loki4j" level="DEBUG"/>
+<!--        <logger name="com.github.loki4j" level="DEBUG"/>-->
 
         <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-            <verbose>true</verbose>
+<!--            <verbose>true</verbose>-->
             <http>
                 <url>${LOKI_URL:-http://localhost:3100/loki/api/v1/push}</url>
             </http>
-            <!-- loki4j 2.0.x: labels는 줄바꿈 구분, message는 <pattern> 태그 사용 -->
             <labels>
                 app = porest
                 host = ${HOSTNAME}
