@@ -73,7 +73,7 @@ class WorkHistoryServiceTest {
 
     private User createTestUser(String userId) {
         return User.createUser(userId, "password", "테스트유저", "test@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
     }
 
     private WorkCode createTestWorkCode(Long id, String code, String name, CodeType type) {

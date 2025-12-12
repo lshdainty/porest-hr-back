@@ -71,7 +71,7 @@ public class User extends AuditingFields {
 
     /**
      * 사용자 근무시간<br>
-     * 사용자의 근무 시간대 (예: "8 ~ 5", "9 ~ 6", "10 ~ 7")
+     * 사용자의 근무 시간대 (예: "8 ~ 17", "9 ~ 18", "10 ~ 19", "13 ~ 21")
      */
     @Column(name = "user_work_time", length = 10)
     private String workTime;
@@ -412,17 +412,21 @@ public class User extends AuditingFields {
         LocalTime end = LocalTime.of(0,0);
 
         switch (getWorkTime()) {
-            case "8 ~ 5":
+            case "8 ~ 17":
                 start = LocalTime.of(8,0);
                 end = LocalTime.of(17,0);
                 break;
-            case "9 ~ 6":
+            case "9 ~ 18":
                 start = LocalTime.of(9,0);
                 end = LocalTime.of(18,0);
                 break;
-            case "10 ~ 7":
+            case "10 ~ 19":
                 start = LocalTime.of(10,0);
                 end = LocalTime.of(19,0);
+                break;
+            case "13 ~ 21":
+                start = LocalTime.of(13,0);
+                end = LocalTime.of(21,0);
                 break;
         }
 

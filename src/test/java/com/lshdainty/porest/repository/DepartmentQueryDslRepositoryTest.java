@@ -133,7 +133,7 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);
@@ -158,7 +158,7 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);
@@ -184,7 +184,7 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);
@@ -209,12 +209,12 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user1 = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         User user2 = User.createUser(
                 "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user1);
@@ -241,17 +241,17 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user1 = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         User user2 = User.createUser(
                 "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         User user3 = User.createUser(
                 "user3", "password", "테스트유저3", "user3@test.com",
-                LocalDate.of(1992, 3, 3), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1992, 3, 3), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user1);
@@ -278,7 +278,7 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);
@@ -324,12 +324,12 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user1 = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         User user2 = User.createUser(
                 "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user1);
@@ -376,7 +376,7 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);
@@ -421,7 +421,7 @@ class DepartmentQueryDslRepositoryTest {
         // given
         User user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);

@@ -173,7 +173,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
             // when
@@ -202,7 +202,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             user.deleteUser();
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
@@ -217,7 +217,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, "test.jpg", "some-uuid", CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, "test.jpg", "some-uuid", CountryCode.KR);
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
             try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
@@ -240,7 +240,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, "test.jpg", null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, "test.jpg", null, CountryCode.KR);
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
             // when
@@ -257,7 +257,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "개발팀", null, "head1", 1L, "desc", "#000", company);
@@ -279,7 +279,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "개발팀", null, "head1", 1L, "desc", "#000", company);
@@ -302,7 +302,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "개발팀", null, "head1", 1L, "desc", "#000", company);
@@ -363,13 +363,13 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             UserServiceDto data = UserServiceDto.builder()
                     .id(userId)
                     .name("이하은")
-                    .workTime("10 ~ 7")
+                    .workTime("10 ~ 19")
                     .build();
 
             // when
@@ -378,7 +378,7 @@ class UserServiceTest {
             // then
             then(userRepository).should().findById(userId);
             assertThat(user.getName()).isEqualTo("이하은");
-            assertThat(user.getWorkTime()).isEqualTo("10 ~ 7");
+            assertThat(user.getWorkTime()).isEqualTo("10 ~ 19");
         }
 
         @Test
@@ -401,7 +401,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             UserServiceDto data = UserServiceDto.builder()
@@ -423,7 +423,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
@@ -453,7 +453,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             // when
@@ -515,7 +515,7 @@ class UserServiceTest {
                     .name("신규유저")
                     .email("new@test.com")
                     .company(OriginCompanyType.SKAX)
-                    .workTime("9 ~ 6")
+                    .workTime("9 ~ 18")
                     .joinDate(LocalDate.now())
                     .build();
 
@@ -561,7 +561,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createInvitedUser(userId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
 
@@ -583,7 +583,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createInvitedUser(userId, "유저", "old@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             UserServiceDto data = UserServiceDto.builder()
@@ -604,7 +604,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createInvitedUser(userId, "유저", "old@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
 
@@ -626,7 +626,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createInvitedUser(userId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             user.completeRegistration(LocalDate.now(), YNType.N);
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
@@ -647,7 +647,7 @@ class UserServiceTest {
         void completeRegistrationSuccess() {
             // given
             User user = User.createInvitedUser("user1", "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
 
             given(userRepository.findByInvitationToken(token)).willReturn(Optional.of(user));
@@ -686,7 +686,7 @@ class UserServiceTest {
         void completeRegistrationFailExpiredToken() {
             // given
             User user = User.createInvitedUser("user1", "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
 
             // 만료일을 과거로 설정
@@ -975,7 +975,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             String dashboardData = "{\"widgets\": [{\"type\": \"chart\", \"position\": 1}]}";
@@ -996,7 +996,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             user.updateDashboard("{\"old\": \"data\"}");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -1026,7 +1026,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             user.deleteUser();
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -1053,7 +1053,7 @@ class UserServiceTest {
             ReflectionTestUtils.setField(dept, "id", 1L);
 
             User approver = User.createUser("head1", "", "부서장", "head@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
 
             given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of(dept));
             given(userRepository.findByIdWithRolesAndPermissions("head1")).willReturn(Optional.of(approver));
@@ -1145,7 +1145,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
 
             TypedQuery<User> userQuery = mock(TypedQuery.class);
             given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
@@ -1188,7 +1188,7 @@ class UserServiceTest {
             // given
             String userId = "user1";
             User user = User.createUser(userId, "", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
             user.addRole(role);
 
@@ -1222,7 +1222,7 @@ class UserServiceTest {
         void getUserWithRolesByInvitationTokenSuccess() {
             // given
             User user = User.createInvitedUser("user1", "유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
 
             TypedQuery<User> userQuery = mock(TypedQuery.class);
@@ -1265,7 +1265,7 @@ class UserServiceTest {
         void getUserWithRolesByInvitationTokenWithRoles() {
             // given
             User user = User.createInvitedUser("user1", "유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
             Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
             user.addRole(role);

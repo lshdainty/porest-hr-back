@@ -46,7 +46,7 @@ class SecurityServiceTest {
         void validateInvitationTokenSuccess() {
             // given
             User user = User.createInvitedUser("user1", "테스트유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
 
             given(userRepository.findByInvitationToken(token)).willReturn(Optional.of(user));
@@ -77,7 +77,7 @@ class SecurityServiceTest {
         void validateInvitationTokenFailExpired() {
             // given
             User user = User.createInvitedUser("user1", "테스트유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
 
             // 만료일을 과거로 설정
@@ -95,7 +95,7 @@ class SecurityServiceTest {
         void validateInvitationTokenWithRoles() {
             // given
             User user = User.createInvitedUser("user1", "테스트유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
 
             given(userRepository.findByInvitationToken(token)).willReturn(Optional.of(user));
@@ -113,7 +113,7 @@ class SecurityServiceTest {
         void validateInvitationTokenWithInvitationStatus() {
             // given
             User user = User.createInvitedUser("user1", "테스트유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 6", LocalDate.now(), CountryCode.KR);
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             String token = user.getInvitationToken();
 
             given(userRepository.findByInvitationToken(token)).willReturn(Optional.of(user));

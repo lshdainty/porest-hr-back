@@ -49,7 +49,7 @@ class VacationUsageDeductionJpaRepositoryTest {
     void setUp() {
         user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);

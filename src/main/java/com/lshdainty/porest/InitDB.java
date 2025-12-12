@@ -85,17 +85,17 @@ public class InitDB {
 			// 1. 사용자 생성
 			// ==========================================
 			user1 = saveMember("user1", "이서준", "aaa@naver.com", LocalDate.of(1970, 7, 23),
-					OriginCompanyType.SKAX, "9 ~ 6", YNType.N);
+					OriginCompanyType.SKAX, "9 ~ 18", YNType.N);
 			user2 = saveMember("user2", "김서연", "bbb@naver.com", LocalDate.of(1970, 10, 26),
-					OriginCompanyType.DTOL, "8 ~ 5", YNType.N);
+					OriginCompanyType.DTOL, "8 ~ 17", YNType.N);
 			user3 = saveMember("user3", "김지후", "ccc@naver.com", LocalDate.of(1974, 1, 15),
-					OriginCompanyType.INSIGHTON, "10 ~ 7", YNType.Y);
+					OriginCompanyType.INSIGHTON, "10 ~ 19", YNType.Y);
 			user4 = saveMember("user4", "이준우", "ddd@naver.com", LocalDate.of(1980, 4, 30),
-					OriginCompanyType.BIGXDATA, "9 ~ 6", YNType.N);
+					OriginCompanyType.BIGXDATA, "9 ~ 18", YNType.N);
 			user5 = saveMember("user5", "조민서", "eee@naver.com", LocalDate.of(1992, 12, 20),
-					OriginCompanyType.CNTHOTH, "10 ~ 7", YNType.N);
+					OriginCompanyType.CNTHOTH, "10 ~ 19", YNType.N);
 			user6 = saveMember("user6", "이하은", "fff@naver.com", LocalDate.of(1885, 9, 2),
-					OriginCompanyType.SKAX, "8 ~ 5", YNType.N);
+					OriginCompanyType.SKAX, "8 ~ 17", YNType.N);
 
 			// ==========================================
 			// 2. 역할 조회

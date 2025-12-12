@@ -1759,7 +1759,7 @@ class VacationServiceTest {
     // 테스트 헬퍼 메서드들
     private User createTestUser(String userId) {
         return User.createUser(userId, "password", "테스트유저", "test@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
     }
 
     private VacationGrant createTestGrant(User user) {

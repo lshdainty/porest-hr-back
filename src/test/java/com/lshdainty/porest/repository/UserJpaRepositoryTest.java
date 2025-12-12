@@ -41,7 +41,7 @@ class UserJpaRepositoryTest {
         // given
         User user = User.createUser(
                 "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
 
@@ -73,7 +73,7 @@ class UserJpaRepositoryTest {
         // given
         User user = User.createUser(
                 "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user);
@@ -95,12 +95,12 @@ class UserJpaRepositoryTest {
         // given
         userRepository.save(User.createUser(
                 "user1", "password", "유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         ));
         userRepository.save(User.createUser(
                 "user2", "password", "유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 5",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
                 YNType.N, null, null, CountryCode.KR
         ));
         em.flush();
@@ -120,12 +120,12 @@ class UserJpaRepositoryTest {
         // given
         User activeUser = User.createUser(
                 "activeUser", "password", "활성유저", "active@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         User deletedUser = User.createUser(
                 "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 5",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(activeUser);
@@ -158,7 +158,7 @@ class UserJpaRepositoryTest {
         // given
         User user = User.createUser(
                 "testUser", "password", "원래이름", "original@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user);
@@ -168,7 +168,7 @@ class UserJpaRepositoryTest {
         // when
         User foundUser = userRepository.findById("testUser").orElseThrow();
         foundUser.updateUser("수정이름", "updated@test.com", null,
-                LocalDate.of(1991, 1, 1), OriginCompanyType.DTOL, "8 ~ 5",
+                LocalDate.of(1991, 1, 1), OriginCompanyType.DTOL, "8 ~ 17",
                 YNType.Y, null, null, null, null);
         em.flush();
         em.clear();
@@ -177,7 +177,7 @@ class UserJpaRepositoryTest {
         User updatedUser = userRepository.findById("testUser").orElseThrow();
         assertThat(updatedUser.getName()).isEqualTo("수정이름");
         assertThat(updatedUser.getEmail()).isEqualTo("updated@test.com");
-        assertThat(updatedUser.getWorkTime()).isEqualTo("8 ~ 5");
+        assertThat(updatedUser.getWorkTime()).isEqualTo("8 ~ 17");
     }
 
     @Test
@@ -186,7 +186,7 @@ class UserJpaRepositoryTest {
         // given
         User user = User.createUser(
                 "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user);
@@ -215,7 +215,7 @@ class UserJpaRepositoryTest {
         // given
         User invitedUser = User.createInvitedUser(
                 "invitedUser", "초대유저", "invited@test.com",
-                OriginCompanyType.DTOL, "9 ~ 6",
+                OriginCompanyType.DTOL, "9 ~ 18",
                 LocalDate.of(2025, 1, 1), CountryCode.KR
         );
 
@@ -238,7 +238,7 @@ class UserJpaRepositoryTest {
         // given
         User invitedUser = User.createInvitedUser(
                 "invitedUser", "초대유저", "invited@test.com",
-                OriginCompanyType.DTOL, "9 ~ 6",
+                OriginCompanyType.DTOL, "9 ~ 18",
                 LocalDate.of(2025, 1, 1), CountryCode.KR
         );
         userRepository.save(invitedUser);
@@ -280,7 +280,7 @@ class UserJpaRepositoryTest {
 
         User user = User.createUser(
                 "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         user.addRole(role);
@@ -313,7 +313,7 @@ class UserJpaRepositoryTest {
         // given
         User user = User.createUser(
                 "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user);
@@ -344,7 +344,7 @@ class UserJpaRepositoryTest {
 
         User user1 = User.createUser(
                 "user1", "password", "유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         user1.addRole(role);
@@ -352,7 +352,7 @@ class UserJpaRepositoryTest {
 
         User user2 = User.createUser(
                 "user2", "password", "유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 5",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user2);
@@ -382,14 +382,14 @@ class UserJpaRepositoryTest {
         // given
         User user1 = User.createUser(
                 "user1", "password", "유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user1);
 
         User user2 = User.createUser(
                 "user2", "password", "유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 5",
+                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user2);
@@ -410,7 +410,7 @@ class UserJpaRepositoryTest {
         // given
         User deletedUser = User.createUser(
                 "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(deletedUser);
@@ -437,7 +437,7 @@ class UserJpaRepositoryTest {
         // given
         User activeUser = User.createUser(
                 "activeUser", "password", "활성유저", "active@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(activeUser);
@@ -461,7 +461,7 @@ class UserJpaRepositoryTest {
         // given
         User deletedUser = User.createUser(
                 "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(deletedUser);

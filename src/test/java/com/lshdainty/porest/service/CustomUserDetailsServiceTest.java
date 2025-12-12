@@ -51,7 +51,7 @@ class CustomUserDetailsServiceTest {
             // given
             String username = "user1";
             User user = User.createUser(username, "password", "테스트유저", "test@test.com",
-                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findByIdWithRolesAndPermissions(username)).willReturn(Optional.of(user));
 
             // when
@@ -72,7 +72,7 @@ class CustomUserDetailsServiceTest {
             // given
             String username = "user1";
             User user = User.createUser(username, "password", "테스트유저", "test@test.com",
-                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
 
             // 역할 및 권한 설정
             Permission permission = Permission.createPermission("USER:READ", "사용자 조회", "desc", ResourceType.USER, ActionType.READ);
@@ -115,7 +115,7 @@ class CustomUserDetailsServiceTest {
             // given
             String username = "user1";
             User user = User.createUser(username, "testPassword", "테스트유저", "test@test.com",
-                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findByIdWithRolesAndPermissions(username)).willReturn(Optional.of(user));
 
             // when
@@ -136,7 +136,7 @@ class CustomUserDetailsServiceTest {
             // given
             String username = "user1";
             User user = User.createUser(username, "password", "테스트유저", "test@test.com",
-                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findByIdWithRolesAndPermissions(username)).willReturn(Optional.of(user));
 
             // when
@@ -154,7 +154,7 @@ class CustomUserDetailsServiceTest {
             // given
             String username = "user1";
             User user = User.createUser(username, "password", "테스트유저", "test@test.com",
-                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 6", YNType.N, null, null, CountryCode.KR);
+                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
             given(userRepository.findByIdWithRolesAndPermissions(username)).willReturn(Optional.of(user));
 
             // when

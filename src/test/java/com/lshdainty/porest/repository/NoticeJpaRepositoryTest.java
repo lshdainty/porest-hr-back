@@ -42,7 +42,7 @@ class NoticeJpaRepositoryTest {
     void setUp() {
         writer = User.createUser(
                 "admin", "password", "관리자", "admin@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(writer);

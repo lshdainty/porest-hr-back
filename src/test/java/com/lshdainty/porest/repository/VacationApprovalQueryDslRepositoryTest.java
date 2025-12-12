@@ -48,14 +48,14 @@ class VacationApprovalQueryDslRepositoryTest {
     void setUp() {
         user = User.createUser(
                 "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(user);
 
         approver = User.createUser(
                 "approver1", "password", "결재자1", "approver1@test.com",
-                LocalDate.of(1985, 5, 5), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1985, 5, 5), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(approver);
@@ -95,7 +95,7 @@ class VacationApprovalQueryDslRepositoryTest {
         // given
         User approver2 = User.createUser(
                 "approver2", "password", "결재자2", "approver2@test.com",
-                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(approver2);
@@ -138,7 +138,7 @@ class VacationApprovalQueryDslRepositoryTest {
         // given
         User approver2 = User.createUser(
                 "approver2", "password", "결재자2", "approver2@test.com",
-                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(approver2);
@@ -284,12 +284,12 @@ class VacationApprovalQueryDslRepositoryTest {
         // given
         User approver2 = User.createUser(
                 "approver2", "password", "결재자2", "approver2@test.com",
-                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         User approver3 = User.createUser(
                 "approver3", "password", "결재자3", "approver3@test.com",
-                LocalDate.of(1987, 7, 7), OriginCompanyType.DTOL, "9 ~ 6",
+                LocalDate.of(1987, 7, 7), OriginCompanyType.DTOL, "9 ~ 18",
                 YNType.N, null, null, CountryCode.KR
         );
         em.persist(approver2);
