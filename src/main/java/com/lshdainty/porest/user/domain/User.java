@@ -90,7 +90,7 @@ public class User extends AuditingFields {
      * 사용자가 원래 속한 회사 정보
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_origin_company", nullable = false, length = 10)
+    @Column(name = "user_origin_company", nullable = false, length = 20)
     private OriginCompanyType company;
 
     /**

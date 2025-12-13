@@ -4,11 +4,12 @@ import com.lshdainty.porest.common.type.DisplayType;
 
 public enum OriginCompanyType implements DisplayType {
     SKAX(1L),
-    DTOL(2L),
-    INSIGHTON(3L),
+    INSIGHTON(2L),
+    DTOL(3L),
     BIGXDATA(4L),
     CNTHOTH(5L),
-    AGS(6L);
+    BUSINESSINSIGHT(6L),
+    AGS(7L);
 
     private static final String MESSAGE_KEY_PREFIX = "type.origin.company.";
     private Long orderSeq;
