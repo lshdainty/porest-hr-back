@@ -171,7 +171,8 @@ public class User extends AuditingFields {
      * 대시보드 레이아웃 정보<br>
      * 사용자 맞춤 대시보드 설정 정보 (JSON 형식)
      */
-    @Column(name = "dashboard")
+    @Lob
+    @Column(name = "dashboard", length = 65535)
     private String dashboard;
 
     /**
