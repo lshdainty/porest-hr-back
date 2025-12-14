@@ -2,6 +2,7 @@ package com.lshdainty.porest.holiday.repository;
 
 import com.lshdainty.porest.holiday.domain.Holiday;
 import com.lshdainty.porest.common.type.CountryCode;
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.holiday.type.HolidayType;
 
 import java.time.LocalDate;
@@ -70,4 +71,30 @@ public interface HolidayRepository {
      * @param holiday 삭제할 휴일
      */
     void delete(Holiday holiday);
+
+    /**
+     * 반복 여부로 휴일 조회
+     *
+     * @param isRecurring 반복 여부
+     * @param countryCode 국가 코드
+     * @return List&lt;Holiday&gt;
+     */
+    List<Holiday> findByIsRecurring(YNType isRecurring, CountryCode countryCode);
+
+    /**
+     * 휴일 일괄 저장
+     *
+     * @param holidays 저장할 휴일 목록
+     */
+    void saveAll(List<Holiday> holidays);
+
+    /**
+     * 휴일 중복 체크 (날짜 + 이름 + 국가코드)
+     *
+     * @param date 휴일 날짜
+     * @param name 휴일 이름
+     * @param countryCode 국가 코드
+     * @return 중복 여부
+     */
+    boolean existsByDateAndNameAndCountryCode(LocalDate date, String name, CountryCode countryCode);
 }

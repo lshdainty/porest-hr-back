@@ -123,4 +123,46 @@ public class HolidayApiController implements HolidayApi {
         holidayService.deleteHoliday(id);
         return ApiResponse.success();
     }
+
+    @Override
+    @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
+    public ApiResponse previewRecurringHolidays(Integer targetYear, CountryCode countryCode) {
+        List<HolidayServiceDto> previews = holidayService.getRecurringHolidaysPreview(targetYear, countryCode);
+
+        List<HolidayApiDto.PreviewRecurringHolidaysResp> resp = previews.stream()
+                .map(dto -> new HolidayApiDto.PreviewRecurringHolidaysResp(
+                        dto.getName(),
+                        dto.getDate(),
+                        dto.getType(),
+                        dto.getCountryCode(),
+                        dto.getLunarYN(),
+                        dto.getLunarDate(),
+                        dto.getIsRecurring(),
+                        dto.getIcon()
+                ))
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(resp);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
+    public ApiResponse bulkSaveHolidays(HolidayApiDto.BulkSaveHolidaysReq data) {
+        List<HolidayServiceDto> serviceDtos = data.getHolidays().stream()
+                .map(item -> HolidayServiceDto.builder()
+                        .name(item.getHolidayName())
+                        .date(item.getHolidayDate())
+                        .type(item.getHolidayType())
+                        .countryCode(item.getCountryCode())
+                        .lunarYN(item.getLunarYn())
+                        .lunarDate(item.getLunarDate())
+                        .isRecurring(item.getIsRecurring())
+                        .icon(item.getHolidayIcon())
+                        .build())
+                .collect(Collectors.toList());
+
+        int savedCount = holidayService.bulkSaveHolidays(serviceDtos);
+
+        return ApiResponse.success(new HolidayApiDto.BulkSaveHolidaysResp(savedCount));
+    }
 }

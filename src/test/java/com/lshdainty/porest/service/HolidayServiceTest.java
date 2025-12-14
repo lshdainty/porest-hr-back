@@ -1,11 +1,11 @@
 package com.lshdainty.porest.service;
 
+import com.lshdainty.porest.common.exception.DuplicateException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
 import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.holiday.domain.Holiday;
 import com.lshdainty.porest.holiday.repository.HolidayRepository;
-import com.lshdainty.porest.holiday.service.HolidayService;
 import com.lshdainty.porest.holiday.service.HolidayServiceImpl;
 import com.lshdainty.porest.holiday.service.dto.HolidayServiceDto;
 import com.lshdainty.porest.holiday.type.HolidayType;
@@ -283,6 +283,139 @@ class HolidayServiceTest {
             // when & then
             assertThatThrownBy(() -> holidayService.checkHolidayExist(id))
                     .isInstanceOf(EntityNotFoundException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("반복 공휴일 프리뷰 조회")
+    class GetRecurringHolidaysPreview {
+        @Test
+        @DisplayName("성공 - 양력 반복 공휴일 프리뷰")
+        void getRecurringHolidaysPreviewSolarSuccess() {
+            // given
+            int targetYear = 2026;
+            CountryCode countryCode = CountryCode.KR;
+            Holiday solarHoliday = Holiday.createHoliday(
+                    "광복절", LocalDate.of(2025, 8, 15), HolidayType.PUBLIC,
+                    CountryCode.KR, YNType.N, null, YNType.Y, null
+            );
+            given(holidayRepository.findByIsRecurring(YNType.Y, countryCode))
+                    .willReturn(List.of(solarHoliday));
+
+            // when
+            List<HolidayServiceDto> result = holidayService.getRecurringHolidaysPreview(targetYear, countryCode);
+
+            // then
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getDate()).isEqualTo(LocalDate.of(2026, 8, 15));
+            assertThat(result.get(0).getIsRecurring()).isEqualTo(YNType.N);
+        }
+
+        @Test
+        @DisplayName("성공 - 음력 반복 공휴일 프리뷰")
+        void getRecurringHolidaysPreviewLunarSuccess() {
+            // given
+            int targetYear = 2026;
+            CountryCode countryCode = CountryCode.KR;
+            Holiday lunarHoliday = Holiday.createHoliday(
+                    "설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC,
+                    CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 1), YNType.Y, null
+            );
+            given(holidayRepository.findByIsRecurring(YNType.Y, countryCode))
+                    .willReturn(List.of(lunarHoliday));
+
+            // when
+            List<HolidayServiceDto> result = holidayService.getRecurringHolidaysPreview(targetYear, countryCode);
+
+            // then
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getLunarDate()).isEqualTo(LocalDate.of(2026, 1, 1));
+            // 양력 날짜는 음력 변환 결과 (2026년 음력 1월 1일의 양력 날짜)
+            assertThat(result.get(0).getDate()).isNotNull();
+            assertThat(result.get(0).getIsRecurring()).isEqualTo(YNType.N);
+        }
+
+        @Test
+        @DisplayName("성공 - 반복 공휴일이 없으면 빈 리스트")
+        void getRecurringHolidaysPreviewEmpty() {
+            // given
+            given(holidayRepository.findByIsRecurring(YNType.Y, CountryCode.KR))
+                    .willReturn(List.of());
+
+            // when
+            List<HolidayServiceDto> result = holidayService.getRecurringHolidaysPreview(2026, CountryCode.KR);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("공휴일 일괄 저장")
+    class BulkSaveHolidays {
+        @Test
+        @DisplayName("성공 - 공휴일 일괄 저장")
+        void bulkSaveHolidaysSuccess() {
+            // given
+            List<HolidayServiceDto> holidays = List.of(
+                    HolidayServiceDto.builder()
+                            .name("설날")
+                            .date(LocalDate.of(2026, 2, 17))
+                            .type(HolidayType.PUBLIC)
+                            .countryCode(CountryCode.KR)
+                            .lunarYN(YNType.Y)
+                            .lunarDate(LocalDate.of(2026, 1, 1))
+                            .isRecurring(YNType.N)
+                            .build()
+            );
+            given(holidayRepository.existsByDateAndNameAndCountryCode(any(), any(), any()))
+                    .willReturn(false);
+            willDoNothing().given(holidayRepository).saveAll(anyList());
+
+            // when
+            int result = holidayService.bulkSaveHolidays(holidays);
+
+            // then
+            assertThat(result).isEqualTo(1);
+            then(holidayRepository).should().saveAll(anyList());
+        }
+
+        @Test
+        @DisplayName("실패 - 중복 공휴일 존재 시 예외 발생")
+        void bulkSaveHolidaysFailDuplicate() {
+            // given
+            List<HolidayServiceDto> holidays = List.of(
+                    HolidayServiceDto.builder()
+                            .name("설날")
+                            .date(LocalDate.of(2026, 2, 17))
+                            .type(HolidayType.PUBLIC)
+                            .countryCode(CountryCode.KR)
+                            .lunarYN(YNType.Y)
+                            .isRecurring(YNType.N)
+                            .build()
+            );
+            given(holidayRepository.existsByDateAndNameAndCountryCode(
+                    LocalDate.of(2026, 2, 17), "설날", CountryCode.KR))
+                    .willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> holidayService.bulkSaveHolidays(holidays))
+                    .isInstanceOf(DuplicateException.class);
+            then(holidayRepository).should(never()).saveAll(anyList());
+        }
+
+        @Test
+        @DisplayName("성공 - 빈 목록 저장 시 0 반환")
+        void bulkSaveHolidaysEmptyList() {
+            // given
+            List<HolidayServiceDto> holidays = List.of();
+
+            // when
+            int result = holidayService.bulkSaveHolidays(holidays);
+
+            // then
+            assertThat(result).isEqualTo(0);
+            then(holidayRepository).should(never()).saveAll(anyList());
         }
     }
 

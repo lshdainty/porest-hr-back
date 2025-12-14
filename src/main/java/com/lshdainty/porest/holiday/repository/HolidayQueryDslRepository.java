@@ -1,6 +1,7 @@
 package com.lshdainty.porest.holiday.repository;
 
 import com.lshdainty.porest.common.type.CountryCode;
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.holiday.domain.Holiday;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -73,5 +74,34 @@ public class HolidayQueryDslRepository implements HolidayRepository {
     @Override
     public void delete(Holiday holiday) {
         em.remove(holiday);
+    }
+
+    @Override
+    public List<Holiday> findByIsRecurring(YNType isRecurring, CountryCode countryCode) {
+        return query
+                .selectFrom(holiday)
+                .where(holiday.isRecurring.eq(isRecurring)
+                        .and(holiday.countryCode.eq(countryCode)))
+                .orderBy(holiday.date.asc())
+                .fetch();
+    }
+
+    @Override
+    public void saveAll(List<Holiday> holidays) {
+        for (Holiday h : holidays) {
+            em.persist(h);
+        }
+    }
+
+    @Override
+    public boolean existsByDateAndNameAndCountryCode(LocalDate date, String name, CountryCode countryCode) {
+        Integer result = query
+                .selectOne()
+                .from(holiday)
+                .where(holiday.date.eq(date)
+                        .and(holiday.name.eq(name))
+                        .and(holiday.countryCode.eq(countryCode)))
+                .fetchFirst();
+        return result != null;
     }
 }

@@ -144,4 +144,55 @@ public interface HolidayApi {
             @Parameter(description = "공휴일 아이디", example = "1", required = true)
             @PathVariable("id") Long id
     );
+
+    @Operation(
+            summary = "반복 공휴일 프리뷰",
+            description = "매년 반복되는 공휴일을 특정 연도로 변환한 프리뷰 목록을 조회합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "프리뷰 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (HOLIDAY_MANAGE 권한 필요)"
+            )
+    })
+    @GetMapping("/api/v1/holidays/recurring/preview")
+    ApiResponse previewRecurringHolidays(
+            @Parameter(description = "생성할 연도", example = "2025", required = true)
+            @RequestParam("target_year") Integer targetYear,
+            @Parameter(description = "국가 코드", example = "KR", required = true)
+            @RequestParam("country_code") CountryCode countryCode
+    );
+
+    @Operation(
+            summary = "공휴일 일괄 저장",
+            description = "확인된 공휴일 목록(대체공휴일 포함)을 일괄 저장합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "일괄 저장 성공",
+                    content = @Content(schema = @Schema(implementation = HolidayApiDto.BulkSaveHolidaysResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (HOLIDAY_MANAGE 권한 필요)"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409",
+                    description = "중복된 공휴일 존재"
+            )
+    })
+    @PostMapping("/api/v1/holidays/bulk")
+    ApiResponse bulkSaveHolidays(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "저장할 공휴일 목록",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = HolidayApiDto.BulkSaveHolidaysReq.class))
+            )
+            @RequestBody HolidayApiDto.BulkSaveHolidaysReq data
+    );
 }

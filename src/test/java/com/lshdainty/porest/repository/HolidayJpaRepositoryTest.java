@@ -221,4 +221,105 @@ class HolidayJpaRepositoryTest {
         assertThat(updatedHoliday.getDate()).isEqualTo(LocalDate.of(2025, 1, 2));
         assertThat(updatedHoliday.getType()).isEqualTo(HolidayType.SUBSTITUTE);
     }
+
+    @Test
+    @DisplayName("반복 여부로 공휴일 조회")
+    void findByIsRecurring() {
+        // given
+        holidayRepository.save(Holiday.createHoliday(
+                "설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC,
+                CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 1), YNType.Y, null
+        ));
+        holidayRepository.save(Holiday.createHoliday(
+                "대체공휴일", LocalDate.of(2025, 1, 30), HolidayType.SUBSTITUTE,
+                CountryCode.KR, YNType.N, null, YNType.N, null
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        List<Holiday> holidays = holidayRepository.findByIsRecurring(YNType.Y, CountryCode.KR);
+
+        // then
+        assertThat(holidays).hasSize(1);
+        assertThat(holidays.get(0).getName()).isEqualTo("설날");
+    }
+
+    @Test
+    @DisplayName("반복 공휴일이 없으면 빈 리스트 반환")
+    void findByIsRecurringEmpty() {
+        // when
+        List<Holiday> holidays = holidayRepository.findByIsRecurring(YNType.Y, CountryCode.KR);
+
+        // then
+        assertThat(holidays).isEmpty();
+    }
+
+    @Test
+    @DisplayName("여러 공휴일 일괄 저장")
+    void saveAll() {
+        // given
+        List<Holiday> holidays = List.of(
+                Holiday.createHoliday("설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, null, YNType.N, null),
+                Holiday.createHoliday("추석", LocalDate.of(2025, 10, 6), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, null, YNType.N, null)
+        );
+
+        // when
+        holidayRepository.saveAll(holidays);
+        em.flush();
+        em.clear();
+
+        // then
+        List<Holiday> savedHolidays = holidayRepository.findHolidays(CountryCode.KR);
+        assertThat(savedHolidays).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("중복 공휴일 존재 체크 - 존재함")
+    void existsByDateAndNameAndCountryCodeTrue() {
+        // given
+        holidayRepository.save(Holiday.createHoliday(
+                "설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC,
+                CountryCode.KR, YNType.Y, null, YNType.N, null
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        boolean exists = holidayRepository.existsByDateAndNameAndCountryCode(
+                LocalDate.of(2025, 1, 29), "설날", CountryCode.KR);
+
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("중복 공휴일 존재 체크 - 존재하지 않음")
+    void existsByDateAndNameAndCountryCodeFalse() {
+        // when
+        boolean exists = holidayRepository.existsByDateAndNameAndCountryCode(
+                LocalDate.of(2025, 1, 29), "설날", CountryCode.KR);
+
+        // then
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    @DisplayName("날짜는 같지만 이름이 다르면 중복 아님")
+    void existsByDateAndNameAndCountryCodeDifferentName() {
+        // given
+        holidayRepository.save(Holiday.createHoliday(
+                "설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC,
+                CountryCode.KR, YNType.Y, null, YNType.N, null
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        boolean exists = holidayRepository.existsByDateAndNameAndCountryCode(
+                LocalDate.of(2025, 1, 29), "설날 대체공휴일", CountryCode.KR);
+
+        // then
+        assertThat(exists).isFalse();
+    }
 }

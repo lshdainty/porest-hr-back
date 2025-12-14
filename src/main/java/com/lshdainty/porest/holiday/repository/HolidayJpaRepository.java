@@ -2,6 +2,7 @@ package com.lshdainty.porest.holiday.repository;
 
 import com.lshdainty.porest.holiday.domain.Holiday;
 import com.lshdainty.porest.common.type.CountryCode;
+import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +63,33 @@ public class HolidayJpaRepository implements HolidayRepository {
     @Override
     public void delete(Holiday holiday) {
         em.remove(holiday);
+    }
+
+    @Override
+    public List<Holiday> findByIsRecurring(YNType isRecurring, CountryCode countryCode) {
+        return em.createQuery("select h from Holiday h where h.isRecurring = :isRecurring and h.countryCode = :countryCode order by h.date", Holiday.class)
+                .setParameter("isRecurring", isRecurring)
+                .setParameter("countryCode", countryCode)
+                .getResultList();
+    }
+
+    @Override
+    public void saveAll(List<Holiday> holidays) {
+        for (Holiday h : holidays) {
+            em.persist(h);
+        }
+    }
+
+    @Override
+    public boolean existsByDateAndNameAndCountryCode(LocalDate date, String name, CountryCode countryCode) {
+        List<Holiday> results = em.createQuery(
+                "select h from Holiday h where h.date = :date and h.name = :name and h.countryCode = :countryCode",
+                Holiday.class)
+                .setParameter("date", date)
+                .setParameter("name", name)
+                .setParameter("countryCode", countryCode)
+                .setMaxResults(1)
+                .getResultList();
+        return !results.isEmpty();
     }
 }

@@ -78,4 +78,22 @@ public interface HolidayService {
      * @throws com.lshdainty.porest.common.exception.EntityNotFoundException 공휴일이 존재하지 않을 경우
      */
     Holiday checkHolidayExist(Long holidayId);
+
+    /**
+     * 반복 공휴일을 특정 연도로 변환한 프리뷰 목록을 조회합니다.
+     *
+     * @param targetYear 생성할 연도
+     * @param countryCode 국가 코드
+     * @return 변환된 공휴일 프리뷰 목록
+     */
+    List<HolidayServiceDto> getRecurringHolidaysPreview(int targetYear, CountryCode countryCode);
+
+    /**
+     * 공휴일을 일괄 저장합니다.
+     *
+     * @param holidays 저장할 공휴일 목록
+     * @return 저장된 공휴일 수
+     * @throws com.lshdainty.porest.common.exception.DuplicateException 중복된 공휴일이 존재할 경우
+     */
+    int bulkSaveHolidays(List<HolidayServiceDto> holidays);
 }
