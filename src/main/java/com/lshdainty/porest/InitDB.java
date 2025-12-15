@@ -363,6 +363,7 @@ public class InitDB {
 				// MANAGER Role (팀장/관리자 권한)
 				Role managerRole = Role.createRole("MANAGER", "매니저", "승인 및 조회 권한");
 				managerRole.addPermission(userRead);
+                managerRole.addPermission(userEdit);
 				managerRole.addPermission(vacationRead);
 				managerRole.addPermission(vacationUse);
 				managerRole.addPermission(vacationRequest);
