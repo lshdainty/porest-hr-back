@@ -32,7 +32,7 @@ public interface NoticeApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (NOTICE:MANAGE 권한 필요)"
+                    description = "권한 없음 (NOTICE:MANAGE 필요)"
             )
     })
     @PostMapping("/api/v1/notice")
@@ -56,6 +56,10 @@ public interface NoticeApi {
                     content = @Content(schema = @Schema(implementation = NoticeApiDto.SearchNoticeResp.class))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (NOTICE:READ 필요)"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
                     description = "공지사항을 찾을 수 없음"
             )
@@ -74,6 +78,10 @@ public interface NoticeApi {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "공지사항 목록 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (NOTICE:READ 필요)"
             )
     })
     @GetMapping("/api/v1/notices")
@@ -92,6 +100,10 @@ public interface NoticeApi {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "공지사항 유형별 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (NOTICE:READ 필요)"
             )
     })
     @GetMapping("/api/v1/notices/type/{type}")
@@ -112,6 +124,10 @@ public interface NoticeApi {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "공지사항 검색 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (NOTICE:READ 필요)"
             )
     })
     @GetMapping("/api/v1/notices/search")
@@ -132,6 +148,10 @@ public interface NoticeApi {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "활성 공지사항 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (NOTICE:READ 필요)"
             )
     })
     @GetMapping("/api/v1/notices/active")
@@ -150,6 +170,10 @@ public interface NoticeApi {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
                     description = "고정 공지사항 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (NOTICE:READ 필요)"
             )
     })
     @GetMapping("/api/v1/notices/pinned")
@@ -171,7 +195,7 @@ public interface NoticeApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (NOTICE:MANAGE 권한 필요)"
+                    description = "권한 없음 (NOTICE:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -201,7 +225,7 @@ public interface NoticeApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (NOTICE:MANAGE 권한 필요)"
+                    description = "권한 없음 (NOTICE:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",

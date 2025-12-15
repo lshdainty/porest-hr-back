@@ -7,11 +7,14 @@ import com.lshdainty.porest.common.type.DisplayType;
 import com.lshdainty.porest.security.annotation.LoginUser;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.controller.dto.VacationApiDto;
+import com.lshdainty.porest.vacation.controller.dto.VacationPlanApiDto;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
 import com.lshdainty.porest.vacation.domain.VacationUsage;
+import com.lshdainty.porest.vacation.service.VacationPlanService;
 import com.lshdainty.porest.vacation.service.VacationService;
 import com.lshdainty.porest.vacation.service.VacationTimeFormatter;
 import com.lshdainty.porest.vacation.service.dto.VacationApprovalServiceDto;
+import com.lshdainty.porest.vacation.service.dto.VacationPlanServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationPolicyServiceDto;
 import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.type.GrantMethod;
@@ -35,6 +38,7 @@ import java.util.List;
 @Slf4j
 public class VacationApiController implements VacationApi {
     private final VacationService vacationService;
+    private final VacationPlanService vacationPlanService;
     private final MessageSource messageSource;
     private final VacationTimeFormatter vacationTimeFormatter;
 
@@ -787,5 +791,153 @@ public class VacationApiController implements VacationApi {
             log.warn("{} 접근 거부 - 로그인 유저: {}, 요청 유저: {}", action, loginUserId, requestUserId);
             throw new ForbiddenException(ErrorCode.VACATION_ACCESS_DENIED);
         }
+    }
+
+    // ========================================
+    // Vacation Plan CRUD
+    // ========================================
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse createPlan(VacationPlanApiDto.CreatePlanReq data) {
+        log.info("휴가 플랜 생성 요청: code={}, name={}", data.getCode(), data.getName());
+
+        VacationPlanServiceDto result;
+        if (data.getPolicyIds() != null && !data.getPolicyIds().isEmpty()) {
+            result = vacationPlanService.createPlanWithPolicies(
+                    data.getCode(),
+                    data.getName(),
+                    data.getDesc(),
+                    data.getPolicyIds()
+            );
+        } else {
+            result = vacationPlanService.createPlan(
+                    data.getCode(),
+                    data.getName(),
+                    data.getDesc()
+            );
+        }
+
+        return ApiResponse.success(VacationPlanApiDto.PlanResp.from(result));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse getAllPlans() {
+        log.info("전체 휴가 플랜 목록 조회 요청");
+
+        List<VacationPlanServiceDto> plans = vacationPlanService.getAllPlans();
+        List<VacationPlanApiDto.PlanResp> response = plans.stream()
+                .map(VacationPlanApiDto.PlanResp::from)
+                .toList();
+
+        return ApiResponse.success(response);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse getPlan(String code) {
+        log.info("휴가 플랜 상세 조회 요청: code={}", code);
+
+        VacationPlanServiceDto plan = vacationPlanService.getPlan(code);
+        return ApiResponse.success(VacationPlanApiDto.PlanResp.from(plan));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse updatePlan(String code, VacationPlanApiDto.UpdatePlanReq data) {
+        log.info("휴가 플랜 수정 요청: code={}", code);
+
+        VacationPlanServiceDto result = vacationPlanService.updatePlan(
+                code,
+                data.getName(),
+                data.getDesc()
+        );
+
+        return ApiResponse.success(VacationPlanApiDto.PlanResp.from(result));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse deletePlan(String code) {
+        log.info("휴가 플랜 삭제 요청: code={}", code);
+
+        vacationPlanService.deletePlan(code);
+        return ApiResponse.success();
+    }
+
+    // ========================================
+    // Plan-Policy 관리
+    // ========================================
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse addPolicyToPlan(String code, Long policyId) {
+        log.info("플랜에 정책 추가 요청: code={}, policyId={}", code, policyId);
+
+        vacationPlanService.addPolicyToPlan(code, policyId);
+        return ApiResponse.success();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse removePolicyFromPlan(String code, Long policyId) {
+        log.info("플랜에서 정책 제거 요청: code={}, policyId={}", code, policyId);
+
+        vacationPlanService.removePolicyFromPlan(code, policyId);
+        return ApiResponse.success();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse updatePlanPolicies(String code, VacationPlanApiDto.UpdatePlanPoliciesReq data) {
+        log.info("플랜 정책 전체 업데이트 요청: code={}", code);
+
+        vacationPlanService.updatePlanPolicies(code, data.getPolicyIds());
+        return ApiResponse.success();
+    }
+
+    // ========================================
+    // User-Plan 관리
+    // ========================================
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse assignPlanToUser(String userId, VacationPlanApiDto.AssignPlanReq data) {
+        log.info("사용자에게 플랜 할당 요청: userId={}, planCode={}", userId, data.getPlanCode());
+
+        vacationPlanService.assignPlanToUser(userId, data.getPlanCode());
+        return ApiResponse.success();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse assignPlansToUser(String userId, VacationPlanApiDto.AssignPlansReq data) {
+        log.info("사용자에게 여러 플랜 할당 요청: userId={}, planCodes={}", userId, data.getPlanCodes());
+
+        vacationPlanService.assignPlansToUser(userId, data.getPlanCodes());
+        return ApiResponse.success();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse revokePlanFromUser(String userId, String code) {
+        log.info("사용자에게서 플랜 회수 요청: userId={}, planCode={}", userId, code);
+
+        vacationPlanService.revokePlanFromUser(userId, code);
+        return ApiResponse.success();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
+    public ApiResponse getUserPlans(String userId) {
+        log.info("사용자의 플랜 목록 조회 요청: userId={}", userId);
+
+        List<VacationPlanServiceDto> plans = vacationPlanService.getUserPlans(userId);
+        List<VacationPlanApiDto.PlanResp> response = plans.stream()
+                .map(VacationPlanApiDto.PlanResp::from)
+                .toList();
+
+        return ApiResponse.success(response);
     }
 }

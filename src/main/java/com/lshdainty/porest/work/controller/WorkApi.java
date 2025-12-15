@@ -36,7 +36,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_CREATE 권한 필요)"
+                    description = "권한 없음 (WORK:WRITE 필요)"
             )
     })
     @PostMapping("/api/v1/work-histories")
@@ -61,7 +61,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_CREATE 권한 필요)"
+                    description = "권한 없음 (WORK:WRITE 필요)"
             )
     })
     @PostMapping("/api/v1/work-histories/bulk")
@@ -85,7 +85,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_MANAGE 권한 필요)"
+                    description = "권한 없음 (WORK:READ 필요)"
             )
     })
     @GetMapping("/api/v1/work-histories")
@@ -103,7 +103,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_READ 권한 필요)"
+                    description = "권한 없음 (WORK:READ 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -127,7 +127,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_UPDATE 권한 필요)"
+                    description = "권한 없음 (WORK:WRITE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -157,7 +157,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_UPDATE 권한 필요)"
+                    description = "권한 없음 (WORK:WRITE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -181,7 +181,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_MANAGE 권한 필요)"
+                    description = "권한 없음 (WORK:READ 필요)"
             )
     })
     @GetMapping("/api/v1/work-histories/excel/download")
@@ -201,7 +201,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_MANAGE 권한 필요)"
+                    description = "권한 없음 (WORK:READ 필요)"
             )
     })
     @GetMapping("/api/v1/work-histories/unregistered-hours/download")
@@ -227,7 +227,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_MANAGE 권한 필요)"
+                    description = "권한 없음 (WORK:MANAGE 필요)"
             )
     })
     @PostMapping("/api/v1/work-codes")
@@ -251,7 +251,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_READ 권한 필요)"
+                    description = "권한 없음 (WORK:READ 필요)"
             )
     })
     @GetMapping("/api/v1/work-codes")
@@ -277,7 +277,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_MANAGE 권한 필요)"
+                    description = "권한 없음 (WORK:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -307,7 +307,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK_MANAGE 권한 필요)"
+                    description = "권한 없음 (WORK:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",

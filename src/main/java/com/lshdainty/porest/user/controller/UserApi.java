@@ -51,7 +51,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_READ 권한 필요)"
+                    description = "권한 없음 (USER:READ 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -92,7 +92,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_READ 권한 필요)"
+                    description = "권한 없음 (USER:READ 필요)"
             )
     })
     @GetMapping("/api/v1/users")
@@ -110,7 +110,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_UPDATE 권한 필요)"
+                    description = "권한 없음 (USER:EDIT 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -140,7 +140,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_DELETE 권한 필요)"
+                    description = "권한 없음 (USER:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -185,7 +185,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_CREATE 권한 필요)"
+                    description = "권한 없음 (USER:MANAGE 필요)"
             )
     })
     @PostMapping("/api/v1/users/invitations")
@@ -210,7 +210,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_UPDATE 권한 필요)"
+                    description = "권한 없음 (USER:EDIT 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -241,7 +241,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_CREATE 권한 필요)"
+                    description = "권한 없음 (USER:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -283,7 +283,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER_UPDATE 권한 필요)"
+                    description = "권한 없음 (USER:EDIT 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",

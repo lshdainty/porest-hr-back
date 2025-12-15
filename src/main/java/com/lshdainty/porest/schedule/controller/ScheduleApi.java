@@ -31,7 +31,7 @@ public interface ScheduleApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (SCHEDULE_CREATE 권한 필요)"
+                    description = "권한 없음 (SCHEDULE:WRITE 필요)"
             )
     })
     @PostMapping("/api/v1/schedule")
@@ -58,7 +58,7 @@ public interface ScheduleApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (SCHEDULE_UPDATE 권한 필요)"
+                    description = "권한 없음 (SCHEDULE:WRITE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -89,7 +89,7 @@ public interface ScheduleApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (SCHEDULE_DELETE 권한 필요)"
+                    description = "권한 없음 (SCHEDULE:WRITE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -114,7 +114,7 @@ public interface ScheduleApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (SCHEDULE_READ 권한 필요)"
+                    description = "권한 없음 (SCHEDULE:READ 필요)"
             )
     })
     @GetMapping("/api/v1/schedules/user/{userNo}")
@@ -134,7 +134,7 @@ public interface ScheduleApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (SCHEDULE_READ 권한 필요)"
+                    description = "권한 없음 (SCHEDULE:READ 필요)"
             )
     })
     @GetMapping("/api/v1/schedules/period")

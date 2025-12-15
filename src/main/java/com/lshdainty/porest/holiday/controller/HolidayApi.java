@@ -32,7 +32,7 @@ public interface HolidayApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (HOLIDAY_MANAGE 권한 필요)"
+                    description = "권한 없음 (HOLIDAY:MANAGE 필요)"
             )
     })
     @PostMapping("api/v1/holiday")
@@ -56,7 +56,7 @@ public interface HolidayApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (HOLIDAY_READ 권한 필요)"
+                    description = "권한 없음 (HOLIDAY:READ 필요)"
             )
     })
     @GetMapping("api/v1/holidays/date")
@@ -81,7 +81,7 @@ public interface HolidayApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (HOLIDAY_READ 권한 필요)"
+                    description = "권한 없음 (HOLIDAY:READ 필요)"
             )
     })
     @GetMapping("api/v1/holidays/type/{type}")
@@ -102,7 +102,7 @@ public interface HolidayApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (HOLIDAY_MANAGE 권한 필요)"
+                    description = "권한 없음 (HOLIDAY:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -132,7 +132,7 @@ public interface HolidayApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (HOLIDAY_MANAGE 권한 필요)"
+                    description = "권한 없음 (HOLIDAY:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -156,7 +156,7 @@ public interface HolidayApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (HOLIDAY_MANAGE 권한 필요)"
+                    description = "권한 없음 (HOLIDAY:MANAGE 필요)"
             )
     })
     @GetMapping("/api/v1/holidays/recurring/preview")
@@ -179,7 +179,7 @@ public interface HolidayApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (HOLIDAY_MANAGE 권한 필요)"
+                    description = "권한 없음 (HOLIDAY:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "409",

@@ -25,7 +25,7 @@ public interface DuesApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (DUES_MANAGE 권한 필요)"
+                    description = "권한 없음 (DUES:MANAGE 필요)"
             )
     })
     @PostMapping("/api/v1/dues")
@@ -49,7 +49,7 @@ public interface DuesApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (DUES_READ 권한 필요)"
+                    description = "권한 없음 (DUES:READ 필요)"
             )
     })
     @GetMapping("/api/v1/dues")
@@ -70,7 +70,7 @@ public interface DuesApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (DUES_READ 권한 필요)"
+                    description = "권한 없음 (DUES:READ 필요)"
             )
     })
     @GetMapping("/api/v1/dues/operation")
@@ -91,7 +91,7 @@ public interface DuesApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (DUES_READ 권한 필요)"
+                    description = "권한 없음 (DUES:READ 필요)"
             )
     })
     @GetMapping("/api/v1/dues/birth/month")
@@ -113,7 +113,7 @@ public interface DuesApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (DUES_READ 권한 필요)"
+                    description = "권한 없음 (DUES:READ 필요)"
             )
     })
     @GetMapping("/api/v1/dues/users/birth/month")
@@ -133,7 +133,7 @@ public interface DuesApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (DUES_MANAGE 권한 필요)"
+                    description = "권한 없음 (DUES:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -163,7 +163,7 @@ public interface DuesApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (DUES_MANAGE 권한 필요)"
+                    description = "권한 없음 (DUES:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",

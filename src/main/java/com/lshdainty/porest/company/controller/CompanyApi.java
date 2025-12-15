@@ -25,7 +25,7 @@ public interface CompanyApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (COMPANY_MANAGE 권한 필요)"
+                    description = "권한 없음 (COMPANY:MANAGE 필요)"
             )
     })
     @PostMapping("/api/v1/company")
@@ -50,7 +50,7 @@ public interface CompanyApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (COMPANY_READ 권한 필요)"
+                    description = "권한 없음 (COMPANY:READ 필요)"
             )
     })
     @GetMapping("/api/v1/company")
@@ -67,7 +67,7 @@ public interface CompanyApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (COMPANY_MANAGE 권한 필요)"
+                    description = "권한 없음 (COMPANY:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -97,7 +97,7 @@ public interface CompanyApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (COMPANY_MANAGE 권한 필요)"
+                    description = "권한 없음 (COMPANY:MANAGE 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -122,7 +122,7 @@ public interface CompanyApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (COMPANY_READ 권한 필요)"
+                    description = "권한 없음 (COMPANY:READ 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
