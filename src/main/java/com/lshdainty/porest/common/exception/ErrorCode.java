@@ -55,6 +55,7 @@ public enum ErrorCode {
     VACATION_DUPLICATE_APPROVER("VACATION_010", "error.vacation.duplicate.approver", HttpStatus.BAD_REQUEST),
     VACATION_SELF_APPROVAL_NOT_ALLOWED("VACATION_011", "error.vacation.self.approval.not.allowed", HttpStatus.BAD_REQUEST),
     VACATION_MINUTE_USAGE_NOT_ALLOWED("VACATION_012", "error.vacation.minute.usage.not.allowed", HttpStatus.BAD_REQUEST),
+    VACATION_ACCESS_DENIED("VACATION_013", "error.vacation.access.denied", HttpStatus.FORBIDDEN),
 
     // ========================================
     // VACATION PLAN (휴가 플랜)
@@ -95,6 +96,7 @@ public enum ErrorCode {
     SCHEDULE_NOT_FOUND("SCHEDULE_001", "error.notfound.schedule", HttpStatus.NOT_FOUND),
     SCHEDULE_INVALID_DATE("SCHEDULE_002", "error.schedule.invalid.date", HttpStatus.BAD_REQUEST),
     SCHEDULE_CONFLICT("SCHEDULE_003", "error.schedule.conflict", HttpStatus.CONFLICT),
+    SCHEDULE_ACCESS_DENIED("SCHEDULE_004", "error.schedule.access.denied", HttpStatus.FORBIDDEN),
 
     // ========================================
     // PERMISSION (권한)

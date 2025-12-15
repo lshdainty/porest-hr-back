@@ -1,6 +1,8 @@
 package com.lshdainty.porest.vacation.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
+import com.lshdainty.porest.security.annotation.LoginUser;
+import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.controller.dto.VacationApiDto;
 import com.lshdainty.porest.vacation.type.GrantMethod;
 import com.lshdainty.porest.vacation.type.GrantStatus;
@@ -41,7 +43,8 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.UseVacationReq.class))
             )
-            @RequestBody VacationApiDto.UseVacationReq data
+            @RequestBody VacationApiDto.UseVacationReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -134,7 +137,8 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.UpdateVacationUsageReq.class))
             )
-            @RequestBody VacationApiDto.UpdateVacationUsageReq data
+            @RequestBody VacationApiDto.UpdateVacationUsageReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -158,7 +162,8 @@ public interface VacationApi {
     @DeleteMapping("/api/v1/vacation-usages/{id}")
     ApiResponse cancelVacationUsage(
             @Parameter(description = "휴가 사용 ID", example = "1", required = true)
-            @PathVariable("id") Long vacationUsageId
+            @PathVariable("id") Long vacationUsageId,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -466,7 +471,8 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.RequestVacationReq.class))
             )
-            @RequestBody VacationApiDto.RequestVacationReq data
+            @RequestBody VacationApiDto.RequestVacationReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -493,7 +499,8 @@ public interface VacationApi {
             @Parameter(description = "승인 ID", example = "1", required = true)
             @PathVariable("approvalId") Long approvalId,
             @Parameter(description = "승인자 ID", example = "admin123", required = true)
-            @RequestParam("approverId") String approverId
+            @RequestParam("approverId") String approverId,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -526,7 +533,8 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.RejectVacationReq.class))
             )
-            @RequestBody VacationApiDto.RejectVacationReq data
+            @RequestBody VacationApiDto.RejectVacationReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -553,7 +561,8 @@ public interface VacationApi {
             @Parameter(description = "휴가 부여 ID", example = "1", required = true)
             @PathVariable("vacationGrantId") Long vacationGrantId,
             @Parameter(description = "사용자 ID", example = "user123", required = true)
-            @RequestParam("userId") String userId
+            @RequestParam("userId") String userId,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(

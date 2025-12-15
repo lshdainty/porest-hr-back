@@ -1,8 +1,14 @@
 package com.lshdainty.porest.vacation.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
+import com.lshdainty.porest.common.exception.ErrorCode;
+import com.lshdainty.porest.common.exception.ForbiddenException;
+import com.lshdainty.porest.common.type.DisplayType;
+import com.lshdainty.porest.security.annotation.LoginUser;
+import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.controller.dto.VacationApiDto;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
+import com.lshdainty.porest.vacation.domain.VacationUsage;
 import com.lshdainty.porest.vacation.service.VacationService;
 import com.lshdainty.porest.vacation.service.VacationTimeFormatter;
 import com.lshdainty.porest.vacation.service.dto.VacationApprovalServiceDto;
@@ -11,14 +17,14 @@ import com.lshdainty.porest.vacation.service.dto.VacationServiceDto;
 import com.lshdainty.porest.vacation.type.GrantMethod;
 import com.lshdainty.porest.vacation.type.GrantStatus;
 import com.lshdainty.porest.vacation.type.VacationType;
-import com.lshdainty.porest.common.type.DisplayType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,7 +40,10 @@ public class VacationApiController implements VacationApi {
 
     @Override
     @PreAuthorize("hasAuthority('VACATION:USE')")
-    public ApiResponse useVacation(VacationApiDto.UseVacationReq data) {
+    public ApiResponse useVacation(VacationApiDto.UseVacationReq data, @LoginUser User loginUser) {
+        // 본인 확인: 로그인 유저와 요청 유저가 다르고, VACATION:MANAGE 권한이 없으면 거부
+        validateVacationOwnership(loginUser.getId(), data.getUserId());
+
         Long vacationUsageId = vacationService.useVacation(VacationServiceDto.builder()
                         .userId(data.getUserId())
                         .type(data.getVacationType())
@@ -168,7 +177,10 @@ public class VacationApiController implements VacationApi {
 
     @Override
     @PreAuthorize("hasAuthority('VACATION:USE')")
-    public ApiResponse updateVacationUsage(Long vacationUsageId, VacationApiDto.UpdateVacationUsageReq data) {
+    public ApiResponse updateVacationUsage(Long vacationUsageId, VacationApiDto.UpdateVacationUsageReq data, @LoginUser User loginUser) {
+        // 본인 확인: 로그인 유저와 요청 유저가 다르고, VACATION:MANAGE 권한이 없으면 거부
+        validateVacationOwnership(loginUser.getId(), data.getUserId());
+
         Long newVacationUsageId = vacationService.updateVacationUsage(
                 vacationUsageId,
                 VacationServiceDto.builder()
@@ -186,7 +198,11 @@ public class VacationApiController implements VacationApi {
 
     @Override
     @PreAuthorize("hasAuthority('VACATION:USE')")
-    public ApiResponse cancelVacationUsage(Long vacationUsageId) {
+    public ApiResponse cancelVacationUsage(Long vacationUsageId, @LoginUser User loginUser) {
+        // 휴가 사용 내역 조회하여 소유자 확인
+        VacationUsage vacationUsage = vacationService.validateAndGetVacationUsage(vacationUsageId);
+        validateVacationOwnership(loginUser.getId(), vacationUsage.getUser().getId());
+
         vacationService.cancelVacationUsage(vacationUsageId);
         return ApiResponse.success();
     }
@@ -275,7 +291,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION:POLICY:MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse createVacationPolicy(VacationApiDto.CreateVacationPolicyReq data) {
         Long vacationPolicyId = vacationService.createVacationPolicy(VacationPolicyServiceDto.builder()
                 .name(data.getVacationPolicyName())
@@ -302,7 +318,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse getVacationPolicy(Long vacationPolicyId) {
         VacationPolicyServiceDto policy = vacationService.getVacationPolicy(vacationPolicyId);
 
@@ -327,7 +343,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse getVacationPolicies() {
         List<VacationPolicyServiceDto> policies = vacationService.getVacationPolicies();
 
@@ -356,7 +372,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION:POLICY:MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse deleteVacationPolicy(Long vacationPolicyId) {
         Long deletedPolicyId = vacationService.deleteVacationPolicy(vacationPolicyId);
 
@@ -364,7 +380,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse getUserAssignedVacationPolicies(String userId, GrantMethod grantMethod) {
         List<VacationPolicyServiceDto> policies = vacationService.getUserAssignedVacationPolicies(userId, grantMethod);
 
@@ -397,7 +413,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse getUserAssignedVacationPoliciesWithFilters(String userId, VacationType vacationType, GrantMethod grantMethod) {
         List<VacationPolicyServiceDto> policies = vacationService.getUserAssignedVacationPoliciesWithFilters(
                 userId, vacationType, grantMethod);
@@ -464,7 +480,9 @@ public class VacationApiController implements VacationApi {
 
     @Override
     @PreAuthorize("hasAuthority('VACATION:REQUEST')")
-    public ApiResponse requestVacation(String userId, VacationApiDto.RequestVacationReq data) {
+    public ApiResponse requestVacation(String userId, VacationApiDto.RequestVacationReq data, @LoginUser User loginUser) {
+        // 본인 확인: 로그인 유저와 신청 유저가 다르면 거부
+        validateUserIdentity(loginUser.getId(), userId, "휴가 신청");
 
         Long vacationGrantId = vacationService.requestVacation(userId, VacationServiceDto.builder()
                 .policyId(data.getPolicyId())
@@ -481,7 +499,9 @@ public class VacationApiController implements VacationApi {
 
     @Override
     @PreAuthorize("hasAuthority('VACATION:APPROVE')")
-    public ApiResponse approveVacation(Long approvalId, String approverId) {
+    public ApiResponse approveVacation(Long approvalId, String approverId, @LoginUser User loginUser) {
+        // 본인 확인: 로그인 유저와 승인자가 다르면 거부
+        validateUserIdentity(loginUser.getId(), approverId, "휴가 승인");
 
         Long processedApprovalId = vacationService.approveVacation(approvalId, approverId);
 
@@ -490,7 +510,9 @@ public class VacationApiController implements VacationApi {
 
     @Override
     @PreAuthorize("hasAuthority('VACATION:APPROVE')")
-    public ApiResponse rejectVacation(Long approvalId, String approverId, VacationApiDto.RejectVacationReq data) {
+    public ApiResponse rejectVacation(Long approvalId, String approverId, VacationApiDto.RejectVacationReq data, @LoginUser User loginUser) {
+        // 본인 확인: 로그인 유저와 반려자가 다르면 거부
+        validateUserIdentity(loginUser.getId(), approverId, "휴가 반려");
 
         Long processedApprovalId = vacationService.rejectVacation(
                 approvalId,
@@ -505,7 +527,9 @@ public class VacationApiController implements VacationApi {
 
     @Override
     @PreAuthorize("hasAuthority('VACATION:REQUEST')")
-    public ApiResponse cancelVacationRequest(Long vacationGrantId, String userId) {
+    public ApiResponse cancelVacationRequest(Long vacationGrantId, String userId, @LoginUser User loginUser) {
+        // 본인 확인: 로그인 유저와 취소 요청자가 다르면 거부
+        validateUserIdentity(loginUser.getId(), userId, "휴가 신청 취소");
 
         Long canceledVacationGrantId = vacationService.cancelVacationRequest(vacationGrantId, userId);
 
@@ -644,7 +668,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION:POLICY:MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse getVacationPolicyAssignmentStatus(String userId) {
         VacationServiceDto result = vacationService.getVacationPolicyAssignmentStatus(userId);
 
@@ -729,5 +753,39 @@ public class VacationApiController implements VacationApi {
     private String getTranslatedName(DisplayType type) {
         if (type == null) return null;
         return messageSource.getMessage(type.getMessageKey(), null, LocaleContextHolder.getLocale());
+    }
+
+    /**
+     * 휴가 소유권 검증
+     * 로그인 유저와 대상 유저가 다르고, VACATION:MANAGE 권한이 없으면 예외 발생
+     */
+    private void validateVacationOwnership(String loginUserId, String targetUserId) {
+        if (!loginUserId.equals(targetUserId) && !hasVacationManageAuthority()) {
+            log.warn("휴가 접근 거부 - 로그인 유저: {}, 대상 유저: {}", loginUserId, targetUserId);
+            throw new ForbiddenException(ErrorCode.VACATION_ACCESS_DENIED);
+        }
+    }
+
+    /**
+     * 현재 사용자가 VACATION:MANAGE 권한을 가지고 있는지 확인
+     */
+    private boolean hasVacationManageAuthority() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(auth -> "VACATION:MANAGE".equals(auth.getAuthority()));
+    }
+
+    /**
+     * 사용자 본인 확인 검증
+     * 로그인 유저와 요청 유저가 다르면 예외 발생 (MANAGE 권한 바이패스 없음)
+     */
+    private void validateUserIdentity(String loginUserId, String requestUserId, String action) {
+        if (!loginUserId.equals(requestUserId)) {
+            log.warn("{} 접근 거부 - 로그인 유저: {}, 요청 유저: {}", action, loginUserId, requestUserId);
+            throw new ForbiddenException(ErrorCode.VACATION_ACCESS_DENIED);
+        }
     }
 }

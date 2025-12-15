@@ -1,18 +1,24 @@
 package com.lshdainty.porest.schedule.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.schedule.domain.Schedule;
+import com.lshdainty.porest.common.exception.ErrorCode;
+import com.lshdainty.porest.common.exception.ForbiddenException;
+import com.lshdainty.porest.common.type.DisplayType;
 import com.lshdainty.porest.schedule.controller.dto.ScheduleApiDto;
+import com.lshdainty.porest.schedule.domain.Schedule;
 import com.lshdainty.porest.schedule.service.ScheduleService;
 import com.lshdainty.porest.schedule.service.dto.ScheduleServiceDto;
-import com.lshdainty.porest.common.type.DisplayType;
+import com.lshdainty.porest.security.annotation.LoginUser;
+import com.lshdainty.porest.user.domain.User;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +32,9 @@ public class ScheduleApiController implements ScheduleApi {
 
     @Override
     @PreAuthorize("hasAuthority('SCHEDULE:WRITE')")
-    public ApiResponse registSchedule(ScheduleApiDto.RegistScheduleReq data, HttpServletRequest req) {
+    public ApiResponse registSchedule(ScheduleApiDto.RegistScheduleReq data, User loginUser, HttpServletRequest req) {
+        validateScheduleOwnership(loginUser.getId(), data.getUserId());
+
         Long scheduleId = scheduleService.registSchedule(ScheduleServiceDto.builder()
                 .userId(data.getUserId())
                 .type(data.getScheduleType())
@@ -41,7 +49,9 @@ public class ScheduleApiController implements ScheduleApi {
 
     @Override
     @PreAuthorize("hasAuthority('SCHEDULE:WRITE')")
-    public ApiResponse updateSchedule(Long scheduleId, ScheduleApiDto.UpdateScheduleReq data) {
+    public ApiResponse updateSchedule(Long scheduleId, ScheduleApiDto.UpdateScheduleReq data, User loginUser) {
+        validateScheduleOwnership(loginUser.getId(), data.getUserId());
+
         Long newScheduleId = scheduleService.updateSchedule(
                 scheduleId,
                 ScheduleServiceDto.builder()
@@ -58,7 +68,10 @@ public class ScheduleApiController implements ScheduleApi {
 
     @Override
     @PreAuthorize("hasAuthority('SCHEDULE:WRITE')")
-    public ApiResponse deleteSchedule(Long scheduleId) {
+    public ApiResponse deleteSchedule(Long scheduleId, User loginUser) {
+        Schedule schedule = scheduleService.checkScheduleExist(scheduleId);
+        validateScheduleOwnership(loginUser.getId(), schedule.getUser().getId());
+
         scheduleService.deleteSchedule(scheduleId);
         return ApiResponse.success();
     }
@@ -106,5 +119,28 @@ public class ScheduleApiController implements ScheduleApi {
     private String getTranslatedName(DisplayType type) {
         if (type == null) return null;
         return messageSource.getMessage(type.getMessageKey(), null, LocaleContextHolder.getLocale());
+    }
+
+    /**
+     * 일정 소유권 검증
+     * 로그인 유저와 대상 유저가 다른 경우 SCHEDULE:MANAGE 권한이 있으면 허용
+     */
+    private void validateScheduleOwnership(String loginUserId, String targetUserId) {
+        if (!loginUserId.equals(targetUserId) && !hasScheduleManageAuthority()) {
+            log.warn("일정 접근 거부 - 로그인 유저: {}, 대상 유저: {}", loginUserId, targetUserId);
+            throw new ForbiddenException(ErrorCode.SCHEDULE_ACCESS_DENIED);
+        }
+    }
+
+    /**
+     * 현재 사용자가 SCHEDULE:MANAGE 권한을 가지고 있는지 확인
+     */
+    private boolean hasScheduleManageAuthority() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(auth -> "SCHEDULE:MANAGE".equals(auth.getAuthority()));
     }
 }

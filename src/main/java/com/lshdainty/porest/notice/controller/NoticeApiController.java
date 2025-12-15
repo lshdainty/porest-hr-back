@@ -28,7 +28,7 @@ public class NoticeApiController implements NoticeApi {
     private final MessageSource messageSource;
 
     @Override
-    @PreAuthorize("hasAuthority('NOTICE:WRITE')")
+    @PreAuthorize("hasAuthority('NOTICE:MANAGE')")
     public ApiResponse createNotice(NoticeApiDto.CreateNoticeReq data) {
         Long noticeId = noticeService.createNotice(NoticeServiceDto.builder()
                 .writerId(data.getWriterId())
@@ -112,7 +112,7 @@ public class NoticeApiController implements NoticeApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('NOTICE:WRITE')")
+    @PreAuthorize("hasAuthority('NOTICE:MANAGE')")
     public ApiResponse updateNotice(Long noticeId, NoticeApiDto.UpdateNoticeReq data) {
         noticeService.updateNotice(noticeId, NoticeServiceDto.builder()
                 .title(data.getTitle())

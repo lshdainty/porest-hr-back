@@ -32,7 +32,7 @@ public interface NoticeApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (NOTICE:WRITE 권한 필요)"
+                    description = "권한 없음 (NOTICE:MANAGE 권한 필요)"
             )
     })
     @PostMapping("/api/v1/notice")
@@ -171,7 +171,7 @@ public interface NoticeApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (NOTICE:WRITE 권한 필요)"
+                    description = "권한 없음 (NOTICE:MANAGE 권한 필요)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",

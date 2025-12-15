@@ -2,6 +2,8 @@ package com.lshdainty.porest.schedule.controller;
 
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.schedule.controller.dto.ScheduleApiDto;
+import com.lshdainty.porest.security.annotation.LoginUser;
+import com.lshdainty.porest.user.domain.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,6 +42,7 @@ public interface ScheduleApi {
                     content = @Content(schema = @Schema(implementation = ScheduleApiDto.RegistScheduleReq.class))
             )
             @RequestBody ScheduleApiDto.RegistScheduleReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser,
             HttpServletRequest req
     );
 
@@ -71,7 +74,8 @@ public interface ScheduleApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = ScheduleApiDto.UpdateScheduleReq.class))
             )
-            @RequestBody ScheduleApiDto.UpdateScheduleReq data
+            @RequestBody ScheduleApiDto.UpdateScheduleReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -95,7 +99,8 @@ public interface ScheduleApi {
     @DeleteMapping("/api/v1/schedule/{id}")
     ApiResponse deleteSchedule(
             @Parameter(description = "일정 ID", example = "1", required = true)
-            @PathVariable("id") Long scheduleId
+            @PathVariable("id") Long scheduleId,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
