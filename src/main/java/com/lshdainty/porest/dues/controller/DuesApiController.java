@@ -23,7 +23,7 @@ public class DuesApiController implements DuesApi {
     private final DuesService duesService;
 
     @Override
-    @PreAuthorize("hasAuthority('DUES_MANAGE')")
+    @PreAuthorize("hasAuthority('DUES:MANAGE')")
     public ApiResponse registDues(DuesApiDto.RegistDuesReq data) {
         Long duesId = duesService.registDues(DuesServiceDto.builder()
                 .userName(data.getDuesUserName())
@@ -38,7 +38,7 @@ public class DuesApiController implements DuesApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DUES_READ')")
+    @PreAuthorize("hasAuthority('DUES:READ')")
     public ApiResponse searchYearDues(Integer year) {
         List<DuesServiceDto> dtos = duesService.searchYearDues(year);
         return ApiResponse.success(dtos.stream()
@@ -56,7 +56,7 @@ public class DuesApiController implements DuesApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DUES_READ')")
+    @PreAuthorize("hasAuthority('DUES:READ')")
     public ApiResponse searchYearOperationDues(Integer year) {
         DuesServiceDto serviceDto = duesService.searchYearOperationDues(year);
         return ApiResponse.success(new DuesApiDto.SearchYearOperationDuesResp(
@@ -67,14 +67,14 @@ public class DuesApiController implements DuesApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DUES_READ')")
+    @PreAuthorize("hasAuthority('DUES:READ')")
     public ApiResponse searchMonthBirthDues(Integer year, Integer month) {
         Long birthDues = duesService.searchMonthBirthDues(year, month);
         return ApiResponse.success(new DuesApiDto.SearchMonthBirthDuesResp(birthDues));
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DUES_READ')")
+    @PreAuthorize("hasAuthority('DUES:READ')")
     public ApiResponse searchUsersMonthBirthDues(Integer year) {
         List<DuesServiceDto> serviceDtos = duesService.searchUsersMonthBirthDues(year);
 
@@ -102,7 +102,7 @@ public class DuesApiController implements DuesApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DUES_MANAGE')")
+    @PreAuthorize("hasAuthority('DUES:MANAGE')")
     public ApiResponse editDues(Long id, DuesApiDto.EditDuesReq data) {
         duesService.editDues(DuesServiceDto.builder()
                 .id(id)
@@ -118,7 +118,7 @@ public class DuesApiController implements DuesApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DUES_MANAGE')")
+    @PreAuthorize("hasAuthority('DUES:MANAGE')")
     public ApiResponse deleteDues(Long id) {
         duesService.deleteDues(id);
         return ApiResponse.success();

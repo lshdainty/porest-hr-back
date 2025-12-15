@@ -33,7 +33,7 @@ public class VacationApiController implements VacationApi {
     private final VacationTimeFormatter vacationTimeFormatter;
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_REQUEST')")
+    @PreAuthorize("hasAuthority('VACATION:USE')")
     public ApiResponse useVacation(VacationApiDto.UseVacationReq data) {
         Long vacationUsageId = vacationService.useVacation(VacationServiceDto.builder()
                         .userId(data.getUserId())
@@ -49,7 +49,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:READ')")
     public ApiResponse getUserVacationHistory(String userId, Integer year) {
         VacationServiceDto vacationInfo = vacationService.getUserVacationHistory(userId, year);
 
@@ -87,7 +87,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:READ')")
     public ApiResponse getAllUsersVacationHistory() {
         List<VacationServiceDto> usersVacations = vacationService.getAllUsersVacationHistory();
 
@@ -138,7 +138,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:READ')")
     public ApiResponse getAvailableVacations(String userId, LocalDateTime startDate) {
         List<VacationServiceDto> availableVacations = vacationService.getAvailableVacations(userId, startDate);
 
@@ -167,7 +167,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_REQUEST')")
+    @PreAuthorize("hasAuthority('VACATION:USE')")
     public ApiResponse updateVacationUsage(Long vacationUsageId, VacationApiDto.UpdateVacationUsageReq data) {
         Long newVacationUsageId = vacationService.updateVacationUsage(
                 vacationUsageId,
@@ -185,14 +185,14 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_CANCEL')")
+    @PreAuthorize("hasAuthority('VACATION:USE')")
     public ApiResponse cancelVacationUsage(Long vacationUsageId) {
         vacationService.cancelVacationUsage(vacationUsageId);
         return ApiResponse.success();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:READ')")
     public ApiResponse getVacationUsagesByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         List<VacationServiceDto> histories = vacationService.getVacationUsagesByPeriod(startDate, endDate);
 
@@ -214,7 +214,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:READ')")
     public ApiResponse getUserVacationUsagesByPeriod(String userId, LocalDateTime startDate, LocalDateTime endDate) {
         List<VacationServiceDto> histories = vacationService.getUserVacationUsagesByPeriod(userId, startDate, endDate);
 
@@ -234,7 +234,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:READ')")
     public ApiResponse getUserMonthlyVacationStats(String userId, String year) {
         List<VacationServiceDto> histories = vacationService.getUserMonthlyVacationStats(userId, year);
 
@@ -250,7 +250,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:READ')")
     public ApiResponse getUserVacationStats(String userId, LocalDateTime baseDate) {
         VacationServiceDto stats = vacationService.getUserVacationStats(userId, baseDate);
 
@@ -275,7 +275,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_POLICY_MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:POLICY:MANAGE')")
     public ApiResponse createVacationPolicy(VacationApiDto.CreateVacationPolicyReq data) {
         Long vacationPolicyId = vacationService.createVacationPolicy(VacationPolicyServiceDto.builder()
                 .name(data.getVacationPolicyName())
@@ -302,7 +302,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
     public ApiResponse getVacationPolicy(Long vacationPolicyId) {
         VacationPolicyServiceDto policy = vacationService.getVacationPolicy(vacationPolicyId);
 
@@ -327,7 +327,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
     public ApiResponse getVacationPolicies() {
         List<VacationPolicyServiceDto> policies = vacationService.getVacationPolicies();
 
@@ -356,7 +356,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_POLICY_MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:POLICY:MANAGE')")
     public ApiResponse deleteVacationPolicy(Long vacationPolicyId) {
         Long deletedPolicyId = vacationService.deleteVacationPolicy(vacationPolicyId);
 
@@ -364,7 +364,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
     public ApiResponse getUserAssignedVacationPolicies(String userId, GrantMethod grantMethod) {
         List<VacationPolicyServiceDto> policies = vacationService.getUserAssignedVacationPolicies(userId, grantMethod);
 
@@ -397,7 +397,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:POLICY:READ')")
     public ApiResponse getUserAssignedVacationPoliciesWithFilters(String userId, VacationType vacationType, GrantMethod grantMethod) {
         List<VacationPolicyServiceDto> policies = vacationService.getUserAssignedVacationPoliciesWithFilters(
                 userId, vacationType, grantMethod);
@@ -427,7 +427,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_GRANT')")
+    @PreAuthorize("hasAuthority('VACATION:GRANT')")
     public ApiResponse manualGrantVacation(String userId, VacationApiDto.ManualGrantVacationReq data) {
 
         // DTO 변환
@@ -452,7 +452,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_GRANT')")
+    @PreAuthorize("hasAuthority('VACATION:GRANT')")
     public ApiResponse revokeVacationGrant(Long vacationGrantId) {
         VacationGrant grant = vacationService.revokeVacationGrant(vacationGrantId);
 
@@ -463,7 +463,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_REQUEST')")
+    @PreAuthorize("hasAuthority('VACATION:REQUEST')")
     public ApiResponse requestVacation(String userId, VacationApiDto.RequestVacationReq data) {
 
         Long vacationGrantId = vacationService.requestVacation(userId, VacationServiceDto.builder()
@@ -480,7 +480,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_APPROVE')")
+    @PreAuthorize("hasAuthority('VACATION:APPROVE')")
     public ApiResponse approveVacation(Long approvalId, String approverId) {
 
         Long processedApprovalId = vacationService.approveVacation(approvalId, approverId);
@@ -489,7 +489,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_APPROVE')")
+    @PreAuthorize("hasAuthority('VACATION:APPROVE')")
     public ApiResponse rejectVacation(Long approvalId, String approverId, VacationApiDto.RejectVacationReq data) {
 
         Long processedApprovalId = vacationService.rejectVacation(
@@ -504,7 +504,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_CANCEL')")
+    @PreAuthorize("hasAuthority('VACATION:REQUEST')")
     public ApiResponse cancelVacationRequest(Long vacationGrantId, String userId) {
 
         Long canceledVacationGrantId = vacationService.cancelVacationRequest(vacationGrantId, userId);
@@ -513,7 +513,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_APPROVE')")
+    @PreAuthorize("hasAuthority('VACATION:APPROVE')")
     public ApiResponse getAllVacationsByApprover(String approverId, Integer year, GrantStatus status) {
         List<VacationServiceDto> vacations = vacationService.getAllVacationsByApprover(approverId, year, status);
 
@@ -568,7 +568,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:REQUEST')")
     public ApiResponse getUserRequestedVacations(String userId, Integer year) {
         List<VacationServiceDto> requestedVacations = vacationService.getAllRequestedVacationsByUserId(userId, year);
 
@@ -623,7 +623,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_READ')")
+    @PreAuthorize("hasAuthority('VACATION:REQUEST')")
     public ApiResponse getUserRequestedVacationStats(String userId, Integer year) {
         VacationServiceDto stats = vacationService.getRequestedVacationStatsByUserId(userId, year);
 
@@ -644,7 +644,7 @@ public class VacationApiController implements VacationApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:POLICY:MANAGE')")
     public ApiResponse getVacationPolicyAssignmentStatus(String userId) {
         VacationServiceDto result = vacationService.getVacationPolicyAssignmentStatus(userId);
 
@@ -703,7 +703,7 @@ public class VacationApiController implements VacationApi {
     // ========== 전체 유저 휴가 통계 조회 ==========
 
     @Override
-    @PreAuthorize("hasAuthority('VACATION_MANAGE')")
+    @PreAuthorize("hasAuthority('VACATION:MANAGE')")
     public ApiResponse getAllUsersVacationSummary(Integer year) {
         List<VacationServiceDto> userVacationSummaries = vacationService.getAllUsersVacationSummary(year);
 

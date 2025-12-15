@@ -17,7 +17,7 @@ public class CompanyApiController implements CompanyApi {
     private final CompanyService companyService;
 
     @Override
-    @PreAuthorize("hasAuthority('COMPANY_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse registCompany(CompanyApiDto.RegistCompanyReq data) {
         String companyId = companyService.regist(CompanyServiceDto.builder()
                 .id(data.getCompanyId())
@@ -30,7 +30,7 @@ public class CompanyApiController implements CompanyApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('COMPANY_READ')")
+    @PreAuthorize("hasAuthority('COMPANY:READ')")
     public ApiResponse searchCompany() {
         CompanyServiceDto company = companyService.searchCompany();
 
@@ -46,7 +46,7 @@ public class CompanyApiController implements CompanyApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('COMPANY_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse editCompany(String companyId, CompanyApiDto.EditCompanyReq data) {
         companyService.edit(CompanyServiceDto.builder()
                 .id(companyId)
@@ -58,14 +58,14 @@ public class CompanyApiController implements CompanyApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('COMPANY_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse deleteCompany(String companyId) {
         companyService.delete(companyId);
         return ApiResponse.success();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('COMPANY_READ')")
+    @PreAuthorize("hasAuthority('COMPANY:READ')")
     public ApiResponse searchCompanyWithDepartments(String companyId) {
         CompanyServiceDto company = companyService.searchCompanyWithDepartments(companyId);
 

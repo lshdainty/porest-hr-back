@@ -25,7 +25,7 @@ public class ScheduleApiController implements ScheduleApi {
     private final MessageSource messageSource;
 
     @Override
-    @PreAuthorize("hasAuthority('SCHEDULE_CREATE')")
+    @PreAuthorize("hasAuthority('SCHEDULE:WRITE')")
     public ApiResponse registSchedule(ScheduleApiDto.RegistScheduleReq data, HttpServletRequest req) {
         Long scheduleId = scheduleService.registSchedule(ScheduleServiceDto.builder()
                 .userId(data.getUserId())
@@ -40,7 +40,7 @@ public class ScheduleApiController implements ScheduleApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('SCHEDULE_UPDATE')")
+    @PreAuthorize("hasAuthority('SCHEDULE:WRITE')")
     public ApiResponse updateSchedule(Long scheduleId, ScheduleApiDto.UpdateScheduleReq data) {
         Long newScheduleId = scheduleService.updateSchedule(
                 scheduleId,
@@ -57,14 +57,14 @@ public class ScheduleApiController implements ScheduleApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('SCHEDULE_DELETE')")
+    @PreAuthorize("hasAuthority('SCHEDULE:WRITE')")
     public ApiResponse deleteSchedule(Long scheduleId) {
         scheduleService.deleteSchedule(scheduleId);
         return ApiResponse.success();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('SCHEDULE_READ')")
+    @PreAuthorize("hasAuthority('SCHEDULE:READ')")
     public ApiResponse searchSchedulesByUser(String userId) {
         List<Schedule> schedules = scheduleService.searchSchedulesByUser(userId);
 
@@ -83,7 +83,7 @@ public class ScheduleApiController implements ScheduleApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('SCHEDULE_READ')")
+    @PreAuthorize("hasAuthority('SCHEDULE:READ')")
     public ApiResponse searchSchedulesByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(startDate, endDate);
 

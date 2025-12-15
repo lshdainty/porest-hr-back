@@ -35,7 +35,7 @@ public class WorkApiController implements WorkApi {
     // ========== 업무 내역 관리 ==========
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_CREATE')")
+    @PreAuthorize("hasAuthority('WORK:WRITE')")
     public ApiResponse createWorkHistory(WorkApiDto.CreateWorkHistoryReq data) {
         Long workHistoryId = workHistoryService.createWorkHistory(WorkHistoryServiceDto.builder()
                 .date(data.getWorkDate())
@@ -50,7 +50,7 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_CREATE')")
+    @PreAuthorize("hasAuthority('WORK:WRITE')")
     public ApiResponse createWorkHistories(WorkApiDto.BulkCreateWorkHistoryReq data) {
         List<WorkHistoryServiceDto> dtos = data.getWorkHistories().stream()
                 .map(req -> WorkHistoryServiceDto.builder()
@@ -69,7 +69,7 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    @PreAuthorize("hasAuthority('WORK:READ')")
     public ApiResponse findAllWorkHistories(WorkHistorySearchCondition condition) {
         List<WorkHistoryServiceDto> dtos = workHistoryService.findAllWorkHistories(condition);
         return ApiResponse.success(dtos.stream()
@@ -87,7 +87,7 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_READ')")
+    @PreAuthorize("hasAuthority('WORK:READ')")
     public ApiResponse findWorkHistory(Long id) {
         WorkHistoryServiceDto w = workHistoryService.findWorkHistory(id);
         return ApiResponse.success(new WorkApiDto.WorkHistoryResp(
@@ -103,7 +103,7 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_UPDATE')")
+    @PreAuthorize("hasAuthority('WORK:WRITE')")
     public ApiResponse updateWorkHistory(Long id, WorkApiDto.UpdateWorkHistoryReq data) {
         workHistoryService.updateWorkHistory(WorkHistoryServiceDto.builder()
                 .id(id)
@@ -119,20 +119,20 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_UPDATE')")
+    @PreAuthorize("hasAuthority('WORK:WRITE')")
     public ApiResponse deleteWorkHistory(Long id) {
         workHistoryService.deleteWorkHistory(id);
         return ApiResponse.success();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    @PreAuthorize("hasAuthority('WORK:READ')")
     public void downloadWorkHistoryExcel(HttpServletResponse response, WorkHistorySearchCondition condition) throws IOException {
         workHistoryService.downloadWorkHistoryExcel(response, condition);
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    @PreAuthorize("hasAuthority('WORK:READ')")
     public void downloadUnregisteredWorkHistoryExcel(HttpServletResponse response, Integer year, Integer month) throws IOException {
         workHistoryService.downloadUnregisteredWorkHistoryExcel(response, year, month);
     }
@@ -140,7 +140,7 @@ public class WorkApiController implements WorkApi {
     // ========== 업무 코드 관리 ==========
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    @PreAuthorize("hasAuthority('WORK:MANAGE')")
     public ApiResponse createWorkCode(WorkApiDto.CreateWorkCodeReq data) {
         Long workCodeId = workCodeService.createWorkCode(
                 data.getWorkCode(),
@@ -153,7 +153,7 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_READ')")
+    @PreAuthorize("hasAuthority('WORK:READ')")
     public ApiResponse getWorkCodes(String parentWorkCode, Long parentWorkCodeId, Boolean parentIsNull, CodeType type) {
         List<WorkCodeServiceDto> workCodes = workCodeService.findWorkCodes(parentWorkCode, parentWorkCodeId, parentIsNull, type);
         return ApiResponse.success(workCodes.stream()
@@ -162,7 +162,7 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    @PreAuthorize("hasAuthority('WORK:MANAGE')")
     public ApiResponse updateWorkCode(Long id, WorkApiDto.UpdateWorkCodeReq data) {
         workCodeService.updateWorkCode(
                 id,
@@ -175,7 +175,7 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('WORK_MANAGE')")
+    @PreAuthorize("hasAuthority('WORK:MANAGE')")
     public ApiResponse deleteWorkCode(Long id) {
         workCodeService.deleteWorkCode(id);
         return ApiResponse.success();

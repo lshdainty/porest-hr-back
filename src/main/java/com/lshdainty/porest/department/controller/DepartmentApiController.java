@@ -19,7 +19,7 @@ public class DepartmentApiController implements DepartmentApi {
     private final DepartmentService departmentService;
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse registDepartment(DepartmentApiDto.RegistDepartmentReq data) {
         Long departmentId = departmentService.regist(DepartmentServiceDto.builder()
                 .name(data.getDepartmentName())
@@ -36,7 +36,7 @@ public class DepartmentApiController implements DepartmentApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse editDepartment(Long departmentId, DepartmentApiDto.EditDepartmentReq data) {
         departmentService.edit(DepartmentServiceDto.builder()
                 .id(departmentId)
@@ -53,14 +53,14 @@ public class DepartmentApiController implements DepartmentApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse deleteDepartment(Long departmentId) {
         departmentService.delete(departmentId);
         return ApiResponse.success();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_READ')")
+    @PreAuthorize("hasAuthority('COMPANY:READ')")
     public ApiResponse searchDepartmentById(Long departmentId) {
         DepartmentServiceDto serviceDto = departmentService.searchDepartmentById(departmentId);
 
@@ -78,7 +78,7 @@ public class DepartmentApiController implements DepartmentApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_READ')")
+    @PreAuthorize("hasAuthority('COMPANY:READ')")
     public ApiResponse searchDepartmentByIdWithChildren(Long departmentId) {
         DepartmentServiceDto serviceDto = departmentService.searchDepartmentByIdWithChildren(departmentId);
         DepartmentApiDto.SearchDepartmentWithChildrenResp responseDto =
@@ -87,7 +87,7 @@ public class DepartmentApiController implements DepartmentApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse registDepartmentUsers(Long departmentId, DepartmentApiDto.RegistDepartmentUserReq data) {
         // DTO 변환
         List<UserDepartmentServiceDto> userDepartmentServiceDtos = data.getUsers().stream()
@@ -102,14 +102,14 @@ public class DepartmentApiController implements DepartmentApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_MANAGE')")
+    @PreAuthorize("hasAuthority('COMPANY:MANAGE')")
     public ApiResponse deleteDepartmentUsers(Long departmentId, DepartmentApiDto.DeleteDepartmentUserReq data) {
         departmentService.deleteUserDepartments(data.getUserIds(), departmentId);
         return ApiResponse.success();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('DEPARTMENT_READ')")
+    @PreAuthorize("hasAuthority('COMPANY:READ')")
     public ApiResponse getDepartmentUsers(Long departmentId) {
         DepartmentServiceDto serviceDto = departmentService.getUsersInAndNotInDepartment(departmentId);
 

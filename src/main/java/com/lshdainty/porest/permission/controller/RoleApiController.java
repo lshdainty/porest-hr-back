@@ -36,7 +36,7 @@ public class RoleApiController implements RoleApi {
      * @return List<RoleResp>
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<List<RoleApiDto.RoleResp>> getAllRoles() {
         List<Role> roles = roleService.getAllRoles();
         List<RoleApiDto.RoleResp> resp = roles.stream()
@@ -60,7 +60,7 @@ public class RoleApiController implements RoleApi {
      * @return RoleResp
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<RoleApiDto.RoleResp> getRole(String roleCode) {
         Role role = roleService.getRole(roleCode);
         return ApiResponse.success(new RoleApiDto.RoleResp(
@@ -81,7 +81,7 @@ public class RoleApiController implements RoleApi {
      * @return 생성된 역할 코드
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<String> createRole(RoleApiDto.CreateRoleReq req) {
         Role role;
         if (req.getPermissionCodes() != null && !req.getPermissionCodes().isEmpty()) {
@@ -106,7 +106,7 @@ public class RoleApiController implements RoleApi {
      * @return void
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<Void> updateRole(String roleCode, RoleApiDto.UpdateRoleReq req) {
         if (req.getPermissionCodes() != null && !req.getPermissionCodes().isEmpty()) {
             // 설명 + 권한 둘 다 수정
@@ -130,7 +130,7 @@ public class RoleApiController implements RoleApi {
      * @return void
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<Void> deleteRole(String roleCode) {
         roleService.deleteRole(roleCode);
         return ApiResponse.success();
@@ -146,7 +146,7 @@ public class RoleApiController implements RoleApi {
      * @return List<String>
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<List<String>> getRolePermissions(String roleCode) {
         Role role = roleService.getRole(roleCode);
         List<String> permissions = role.getPermissions().stream()
@@ -164,7 +164,7 @@ public class RoleApiController implements RoleApi {
      * @return void
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<Void> updateRolePermissions(String roleCode, RoleApiDto.UpdateRolePermissionsReq req) {
         roleService.updateRolePermissions(roleCode, req.getPermissionCodes());
         return ApiResponse.success();
@@ -179,7 +179,7 @@ public class RoleApiController implements RoleApi {
      * @return void
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<Void> addPermissionToRole(String roleCode, RoleApiDto.RolePermissionReq req) {
         roleService.addPermissionToRole(roleCode, req.getPermissionCode());
         return ApiResponse.success();
@@ -194,7 +194,7 @@ public class RoleApiController implements RoleApi {
      * @return void
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<Void> removePermissionFromRole(String roleCode, String permissionCode) {
         roleService.removePermissionFromRole(roleCode, permissionCode);
         return ApiResponse.success();
@@ -224,7 +224,7 @@ public class RoleApiController implements RoleApi {
      * @return List<PermissionResp>
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<List<RoleApiDto.PermissionResp>> getAllPermissions() {
         List<Permission> permissions = roleService.getAllPermissions();
         List<RoleApiDto.PermissionResp> resp = permissions.stream()
@@ -247,7 +247,7 @@ public class RoleApiController implements RoleApi {
      * @return PermissionResp
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<RoleApiDto.PermissionResp> getPermission(String permissionCode) {
         Permission permission = roleService.getPermission(permissionCode);
         return ApiResponse.success(new RoleApiDto.PermissionResp(
@@ -267,7 +267,7 @@ public class RoleApiController implements RoleApi {
      * @return List<PermissionResp>
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<List<RoleApiDto.PermissionResp>> getPermissionsByResource(String resource) {
         List<Permission> permissions = roleService.getPermissionsByResource(resource);
         List<RoleApiDto.PermissionResp> resp = permissions.stream()
@@ -290,7 +290,7 @@ public class RoleApiController implements RoleApi {
      * @return 생성된 권한 코드
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<String> createPermission(RoleApiDto.CreatePermissionReq req) {
         Permission permission = roleService.createPermission(
                 req.getCode(),
@@ -311,7 +311,7 @@ public class RoleApiController implements RoleApi {
      * @return void
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<Void> updatePermission(String permissionCode, RoleApiDto.UpdatePermissionReq req) {
         roleService.updatePermission(
                 permissionCode,
@@ -331,7 +331,7 @@ public class RoleApiController implements RoleApi {
      * @return void
      */
     @Override
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE:MANAGE')")
     public ApiResponse<Void> deletePermission(String permissionCode) {
         roleService.deletePermission(permissionCode);
         return ApiResponse.success();

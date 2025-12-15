@@ -45,7 +45,7 @@ public class UserApiController implements UserApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAuthority('USER:READ')")
     public ApiResponse searchUser(String userId) {
         UserServiceDto user = userService.searchUser(userId);
 
@@ -104,7 +104,7 @@ public class UserApiController implements UserApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAuthority('USER:READ')")
     public ApiResponse searchUsers() {
         List<UserServiceDto> users = userService.searchUsers();
 
@@ -163,7 +163,7 @@ public class UserApiController implements UserApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    @PreAuthorize("hasAuthority('USER:EDIT')")
     public ApiResponse editUser(String userId, UserApiDto.EditUserReq data) {
         userService.editUser(UserServiceDto.builder()
                 .id(userId)
@@ -225,7 +225,7 @@ public class UserApiController implements UserApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER_DELETE')")
+    @PreAuthorize("hasAuthority('USER:MANAGE')")
     public ApiResponse deleteUser(String userId) {
         userService.deleteUser(userId);
         return ApiResponse.success();
@@ -244,7 +244,7 @@ public class UserApiController implements UserApi {
      * 관리자가 사용자 초대
      */
     @Override
-    @PreAuthorize("hasAuthority('USER_CREATE')")
+    @PreAuthorize("hasAuthority('USER:MANAGE')")
     public ApiResponse inviteUser(UserApiDto.InviteUserReq data) {
         UserServiceDto result = userService.inviteUser(UserServiceDto.builder()
                 .id(data.getUserId())
@@ -276,7 +276,7 @@ public class UserApiController implements UserApi {
      * 초대된 사용자 정보 수정
      */
     @Override
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    @PreAuthorize("hasAuthority('USER:MANAGE')")
     public ApiResponse editInvitedUser(String userId, UserApiDto.EditInvitedUserReq data) {
         UserServiceDto result = userService.editInvitedUser(userId, UserServiceDto.builder()
                 .name(data.getUserName())
@@ -307,7 +307,7 @@ public class UserApiController implements UserApi {
      * 초대 이메일 재전송
      */
     @Override
-    @PreAuthorize("hasAuthority('USER_CREATE')")
+    @PreAuthorize("hasAuthority('USER:MANAGE')")
     public ApiResponse resendInvitation(String userId) {
         UserServiceDto result = userService.resendInvitation(userId);
 
@@ -340,7 +340,7 @@ public class UserApiController implements UserApi {
      * PATCH /api/v1/users/{userId}/dashboard
      */
     @Override
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    @PreAuthorize("hasAuthority('USER:EDIT')")
     public ApiResponse updateDashboard(String userId, UserApiDto.UpdateDashboardReq data) {
         UserServiceDto result = userService.updateDashboard(userId, data.getDashboard());
 

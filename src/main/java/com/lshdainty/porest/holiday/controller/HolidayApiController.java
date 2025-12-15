@@ -24,7 +24,7 @@ public class HolidayApiController implements HolidayApi {
     private final HolidayService holidayService;
 
     @Override
-    @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
+    @PreAuthorize("hasAuthority('HOLIDAY:MANAGE')")
     public ApiResponse registHoliday(HolidayApiDto.RegistHolidayReq data) {
         Long holidayId = holidayService.registHoliday(HolidayServiceDto.builder()
                 .name(data.getHolidayName())
@@ -41,7 +41,7 @@ public class HolidayApiController implements HolidayApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('HOLIDAY_READ')")
+    @PreAuthorize("hasAuthority('HOLIDAY:READ')")
     public ApiResponse searchHolidaysByStartEndDate(LocalDate start, LocalDate end, CountryCode countryCode, User loginUser) {
         // countryCode가 null이면 로그인 사용자의 국가 코드 사용
         CountryCode targetCountryCode = countryCode != null ? countryCode : loginUser.getCountryCode();
@@ -66,7 +66,7 @@ public class HolidayApiController implements HolidayApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('HOLIDAY_READ')")
+    @PreAuthorize("hasAuthority('HOLIDAY:READ')")
     public ApiResponse searchHolidaysByType(HolidayType type) {
         List<Holiday> holidays = holidayService.searchHolidaysByType(type);
 
@@ -88,7 +88,7 @@ public class HolidayApiController implements HolidayApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
+    @PreAuthorize("hasAuthority('HOLIDAY:MANAGE')")
     public ApiResponse editHoliday(Long id, HolidayApiDto.EditHolidayReq data) {
         holidayService.editHoliday(HolidayServiceDto.builder()
                 .id(id)
@@ -118,14 +118,14 @@ public class HolidayApiController implements HolidayApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
+    @PreAuthorize("hasAuthority('HOLIDAY:MANAGE')")
     public ApiResponse deleteHoliday(Long id) {
         holidayService.deleteHoliday(id);
         return ApiResponse.success();
     }
 
     @Override
-    @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
+    @PreAuthorize("hasAuthority('HOLIDAY:MANAGE')")
     public ApiResponse previewRecurringHolidays(Integer targetYear, CountryCode countryCode) {
         List<HolidayServiceDto> previews = holidayService.getRecurringHolidaysPreview(targetYear, countryCode);
 
@@ -146,7 +146,7 @@ public class HolidayApiController implements HolidayApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('HOLIDAY_MANAGE')")
+    @PreAuthorize("hasAuthority('HOLIDAY:MANAGE')")
     public ApiResponse bulkSaveHolidays(HolidayApiDto.BulkSaveHolidaysReq data) {
         List<HolidayServiceDto> serviceDtos = data.getHolidays().stream()
                 .map(item -> HolidayServiceDto.builder()
