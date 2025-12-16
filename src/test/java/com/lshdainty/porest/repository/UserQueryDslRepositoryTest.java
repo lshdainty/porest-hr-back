@@ -479,4 +479,73 @@ class UserQueryDslRepositoryTest {
         // then
         assertThat(users).isEmpty();
     }
+
+    @Test
+    @DisplayName("전체 유저 조회 시 SYSTEM 계정 제외")
+    void findUsersExcludesSystemAccount() {
+        // given
+        User normalUser = User.createUser(
+                "normalUser", "password", "일반유저", "normal@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User systemUser = User.createUser(
+                "systemUser", "password", "시스템유저", "system@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SYSTEM, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        userRepository.save(normalUser);
+        userRepository.save(systemUser);
+        em.flush();
+        em.clear();
+
+        // when
+        List<User> users = userRepository.findUsers();
+
+        // then
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0).getId()).isEqualTo("normalUser");
+        assertThat(users.get(0).getCompany()).isNotEqualTo(OriginCompanyType.SYSTEM);
+    }
+
+    @Test
+    @DisplayName("전체 유저를 역할과 권한과 함께 조회 시 SYSTEM 계정 제외")
+    void findUsersWithRolesAndPermissionsExcludesSystemAccount() {
+        // given
+        Permission permission = Permission.createPermission(
+                "USER:READ", "사용자 조회", "설명",
+                ResourceType.USER, ActionType.READ
+        );
+        em.persist(permission);
+
+        Role role = Role.createRole("ADMIN", "관리자", "시스템 관리자");
+        role.addPermission(permission);
+        em.persist(role);
+
+        User normalUser = User.createUser(
+                "normalUser", "password", "일반유저", "normal@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        normalUser.addRole(role);
+        userRepository.save(normalUser);
+
+        User systemUser = User.createUser(
+                "systemUser", "password", "시스템유저", "system@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SYSTEM, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        systemUser.addRole(role);
+        userRepository.save(systemUser);
+        em.flush();
+        em.clear();
+
+        // when
+        List<User> users = userRepository.findUsersWithRolesAndPermissions();
+
+        // then
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0).getId()).isEqualTo("normalUser");
+        assertThat(users.get(0).getCompany()).isNotEqualTo(OriginCompanyType.SYSTEM);
+    }
 }

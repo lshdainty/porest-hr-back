@@ -1,6 +1,7 @@
 package com.lshdainty.porest.user.repository;
 
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.user.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -44,7 +45,8 @@ public class UserQueryDslRepository implements UserRepository {
     public List<User> findUsers() {
         return query
                 .selectFrom(user)
-                .where(user.isDeleted.eq(YNType.N))
+                .where(user.isDeleted.eq(YNType.N)
+                        .and(user.company.ne(OriginCompanyType.SYSTEM)))
                 .fetch();
     }
 
@@ -96,7 +98,8 @@ public class UserQueryDslRepository implements UserRepository {
                 .distinct()
                 .leftJoin(user.userRoles, userRole).fetchJoin()
                 .leftJoin(userRole.role, role).fetchJoin()
-                .where(user.isDeleted.eq(YNType.N))
+                .where(user.isDeleted.eq(YNType.N)
+                        .and(user.company.ne(OriginCompanyType.SYSTEM)))
                 .fetch();
 
         if (users.isEmpty()) {
@@ -127,6 +130,7 @@ public class UserQueryDslRepository implements UserRepository {
         return query
                 .selectFrom(user)
                 .where(user.isDeleted.eq(YNType.Y)
+                        .and(user.company.ne(OriginCompanyType.SYSTEM))
                         .and(user.modifyDate.goe(startDate))
                         .and(user.modifyDate.lt(endDate)))
                 .fetch();

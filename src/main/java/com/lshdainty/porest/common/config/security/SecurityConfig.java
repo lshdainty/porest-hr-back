@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -41,12 +40,6 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final AppProperties appProperties;
     private final IpBlockFilter ipBlockFilter;
-
-    // password 암호화를 위한 bean 등록
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
@@ -85,6 +78,7 @@ public class SecurityConfig {
                         "/api/v1/login",        // 로그인
                         "/api/v1/login/check",  // 현재 로그인된 유저정보
                         "/api/v1/logout",       // 로그아웃
+                        "/api/v1/users/password/reset-request", // 비밀번호 초기화 요청 (비로그인)
                         "/oauth2/**",           // OAuth2 시작 URL
                         "/login/oauth2/**",     // OAuth2 콜백 URL (중요!)
                         "/css/**",              // css

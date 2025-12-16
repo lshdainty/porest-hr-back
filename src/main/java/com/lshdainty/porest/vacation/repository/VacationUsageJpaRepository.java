@@ -1,6 +1,7 @@
 package com.lshdainty.porest.vacation.repository;
 
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.vacation.domain.VacationUsage;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -73,10 +74,11 @@ public class VacationUsageJpaRepository implements VacationUsageRepository {
     public List<VacationUsage> findAllWithUser() {
         return em.createQuery(
                         "select vu from VacationUsage vu " +
-                                "join fetch vu.user " +
-                                "where vu.isDeleted = :isDeleted " +
+                                "join fetch vu.user u " +
+                                "where vu.isDeleted = :isDeleted and u.company != :systemCompany " +
                                 "order by vu.user.id asc, vu.startDate desc", VacationUsage.class)
                 .setParameter("isDeleted", YNType.N)
+                .setParameter("systemCompany", OriginCompanyType.SYSTEM)
                 .getResultList();
     }
 
@@ -84,12 +86,14 @@ public class VacationUsageJpaRepository implements VacationUsageRepository {
     public List<VacationUsage> findByPeriodWithUser(LocalDateTime startDate, LocalDateTime endDate) {
         return em.createQuery(
                         "select vu from VacationUsage vu " +
-                                "join fetch vu.user " +
+                                "join fetch vu.user u " +
                                 "where vu.isDeleted = :isDeleted " +
+                                "and u.company != :systemCompany " +
                                 "and vu.startDate >= :startDate " +
                                 "and vu.startDate <= :endDate " +
                                 "order by vu.startDate asc", VacationUsage.class)
                 .setParameter("isDeleted", YNType.N)
+                .setParameter("systemCompany", OriginCompanyType.SYSTEM)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .getResultList();

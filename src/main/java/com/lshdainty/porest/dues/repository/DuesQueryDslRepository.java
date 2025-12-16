@@ -1,5 +1,6 @@
 package com.lshdainty.porest.dues.repository;
 
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.dues.domain.Dues;
 import com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto;
 import com.lshdainty.porest.dues.type.DuesCalcType;
@@ -74,7 +75,13 @@ public class DuesQueryDslRepository implements DuesRepository {
 
     @Override
     public List<UsersMonthBirthDuesDto> findUsersMonthBirthDues(int year) {
-        return em.createQuery("select new com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto(d.userName, month(d.date), sum(d.amount), d.detail) from Dues d where year(d.date) = :year and d.type = :type and d.calc = :calc group by d.userName, month(d.date), d.detail", UsersMonthBirthDuesDto.class)
+        return em.createQuery(
+                        "select new com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto(d.userName, month(d.date), sum(d.amount), d.detail) " +
+                                "from Dues d, User u " +
+                                "where d.userName = u.name and u.company != :systemCompany " +
+                                "and year(d.date) = :year and d.type = :type and d.calc = :calc " +
+                                "group by d.userName, month(d.date), d.detail", UsersMonthBirthDuesDto.class)
+                .setParameter("systemCompany", OriginCompanyType.SYSTEM)
                 .setParameter("year", year)
                 .setParameter("type", DuesType.BIRTH)
                 .setParameter("calc", DuesCalcType.PLUS)

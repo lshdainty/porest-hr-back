@@ -51,18 +51,18 @@ public class InitDB {
 
 	@PostConstruct
 	public void init() {
-		initService.initSetRole();
-		initService.initSetDepartment();
-		initService.initSetMember();
-		initService.initSetUserDepartment();
-		initService.initSetSchedule();
-		initService.initSetDues();
-		initService.initSetVacationPolicy();
-		initService.initSetUserVacationPlan();
-		initService.initSetVacationGrant();
-		initService.initSetHoliday();
-		initService.initSetWorkCode();
-		initService.initSetWorkHistory();
+//		initService.initSetRole();
+//		initService.initSetDepartment();
+//		initService.initSetMember();
+//		initService.initSetUserDepartment();
+//		initService.initSetSchedule();
+//		initService.initSetDues();
+//		initService.initSetVacationPolicy();
+//		initService.initSetUserVacationPlan();
+//		initService.initSetVacationGrant();
+//		initService.initSetHoliday();
+//		initService.initSetWorkCode();
+//		initService.initSetWorkHistory();
 	}
 
 	@Component

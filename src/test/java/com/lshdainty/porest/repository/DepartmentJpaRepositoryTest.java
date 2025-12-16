@@ -482,4 +482,103 @@ class DepartmentJpaRepositoryTest {
         // then
         assertThat(approvers).isEmpty();
     }
+
+    @Test
+    @DisplayName("부서별 유저 조회 시 SYSTEM 계정 제외")
+    void findUsersInDepartmentExcludesSystemAccount() {
+        // given
+        User normalUser = User.createUser(
+                "normalUser", "password", "일반유저", "normal@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User systemUser = User.createUser(
+                "systemUser", "password", "시스템유저", "system@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SYSTEM, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        em.persist(normalUser);
+        em.persist(systemUser);
+
+        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
+        departmentRepository.save(department);
+
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(normalUser, department, YNType.Y));
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(systemUser, department, YNType.N));
+        em.flush();
+        em.clear();
+
+        // when
+        List<User> users = departmentRepository.findUsersInDepartment(department.getId());
+
+        // then
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0).getId()).isEqualTo("normalUser");
+        assertThat(users.get(0).getCompany()).isNotEqualTo(OriginCompanyType.SYSTEM);
+    }
+
+    @Test
+    @DisplayName("부서 미배치 유저 조회 시 SYSTEM 계정 제외")
+    void findUsersNotInDepartmentExcludesSystemAccount() {
+        // given
+        User normalUser = User.createUser(
+                "normalUser", "password", "일반유저", "normal@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User systemUser = User.createUser(
+                "systemUser", "password", "시스템유저", "system@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SYSTEM, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        em.persist(normalUser);
+        em.persist(systemUser);
+
+        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
+        departmentRepository.save(department);
+        em.flush();
+        em.clear();
+
+        // when
+        List<User> users = departmentRepository.findUsersNotInDepartment(department.getId());
+
+        // then
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0).getId()).isEqualTo("normalUser");
+        assertThat(users.get(0).getCompany()).isNotEqualTo(OriginCompanyType.SYSTEM);
+    }
+
+    @Test
+    @DisplayName("부서별 유저-부서 관계 조회 시 SYSTEM 계정 제외")
+    void findUserDepartmentsInDepartmentExcludesSystemAccount() {
+        // given
+        User normalUser = User.createUser(
+                "normalUser", "password", "일반유저", "normal@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User systemUser = User.createUser(
+                "systemUser", "password", "시스템유저", "system@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SYSTEM, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        em.persist(normalUser);
+        em.persist(systemUser);
+
+        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
+        departmentRepository.save(department);
+
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(normalUser, department, YNType.Y));
+        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(systemUser, department, YNType.N));
+        em.flush();
+        em.clear();
+
+        // when
+        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getId());
+
+        // then
+        assertThat(userDepartments).hasSize(1);
+        assertThat(userDepartments.get(0).getUser().getId()).isEqualTo("normalUser");
+        assertThat(userDepartments.get(0).getUser().getCompany()).isNotEqualTo(OriginCompanyType.SYSTEM);
+    }
 }

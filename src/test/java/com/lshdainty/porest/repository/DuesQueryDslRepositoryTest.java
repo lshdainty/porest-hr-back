@@ -1,10 +1,14 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CountryCode;
+import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.dues.domain.Dues;
 import com.lshdainty.porest.dues.repository.DuesQueryDslRepository;
 import com.lshdainty.porest.dues.repository.dto.UsersMonthBirthDuesDto;
 import com.lshdainty.porest.dues.type.DuesCalcType;
 import com.lshdainty.porest.dues.type.DuesType;
+import com.lshdainty.porest.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +169,20 @@ class DuesQueryDslRepositoryTest {
     @DisplayName("유저별 월별 생일비 입금내역 조회")
     void findUsersMonthBirthDues() {
         // given
+        // User 테이블과 JOIN하므로 해당 userName과 동일한 name을 가진 User가 필요
+        User user1 = User.createUser(
+                "user1", "password", "홍길동", "user1@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User user2 = User.createUser(
+                "user2", "password", "김철수", "user2@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        em.persist(user1);
+        em.persist(user2);
+
         duesRepository.save(Dues.createDues(
                 "홍길동", 30000L, DuesType.BIRTH, DuesCalcType.PLUS,
                 LocalDate.of(2025, 1, 15), "1월 생일비"
@@ -181,6 +199,42 @@ class DuesQueryDslRepositoryTest {
 
         // then
         assertThat(result).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("유저별 월별 생일비 입금내역 조회 시 SYSTEM 계정 제외")
+    void findUsersMonthBirthDuesExcludesSystemAccount() {
+        // given
+        User normalUser = User.createUser(
+                "normalUser", "password", "일반유저", "normal@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        User systemUser = User.createUser(
+                "systemUser", "password", "시스템유저", "system@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SYSTEM, "9 ~ 18",
+                YNType.N, null, null, CountryCode.KR
+        );
+        em.persist(normalUser);
+        em.persist(systemUser);
+
+        duesRepository.save(Dues.createDues(
+                "일반유저", 30000L, DuesType.BIRTH, DuesCalcType.PLUS,
+                LocalDate.of(2025, 1, 15), "1월 생일비"
+        ));
+        duesRepository.save(Dues.createDues(
+                "시스템유저", 30000L, DuesType.BIRTH, DuesCalcType.PLUS,
+                LocalDate.of(2025, 2, 15), "2월 생일비"
+        ));
+        em.flush();
+        em.clear();
+
+        // when
+        List<UsersMonthBirthDuesDto> result = duesRepository.findUsersMonthBirthDues(2025);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getUserName()).isEqualTo("일반유저");
     }
 
     @Test

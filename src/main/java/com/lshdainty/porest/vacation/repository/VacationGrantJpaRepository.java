@@ -1,6 +1,7 @@
 package com.lshdainty.porest.vacation.repository;
 
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
 import com.lshdainty.porest.vacation.type.GrantMethod;
 import com.lshdainty.porest.vacation.type.GrantStatus;
@@ -127,12 +128,13 @@ public class VacationGrantJpaRepository implements VacationGrantRepository {
     public List<VacationGrant> findAllWithUser() {
         return em.createQuery(
                         "select vg from VacationGrant vg " +
-                                "join fetch vg.user " +
+                                "join fetch vg.user u " +
                                 "join fetch vg.policy " +
-                                "where vg.isDeleted = :isDeleted and vg.status = :status " +
+                                "where vg.isDeleted = :isDeleted and vg.status = :status and u.company != :systemCompany " +
                                 "order by vg.user.id asc, vg.expiryDate asc", VacationGrant.class)
                 .setParameter("isDeleted", YNType.N)
                 .setParameter("status", GrantStatus.ACTIVE)
+                .setParameter("systemCompany", OriginCompanyType.SYSTEM)
                 .getResultList();
     }
 

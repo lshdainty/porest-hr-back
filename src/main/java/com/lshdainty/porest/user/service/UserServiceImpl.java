@@ -4,6 +4,7 @@ import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
 import com.lshdainty.porest.common.exception.DuplicateException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
 import com.lshdainty.porest.common.exception.ErrorCode;
+import com.lshdainty.porest.common.exception.InvalidValueException;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.util.MessageResolver;
 import com.lshdainty.porest.common.util.PorestFile;
@@ -18,6 +19,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final DepartmentRepository departmentRepository;
     private final EntityManager em;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${file.root-path}")
     private String fileRootPath;
@@ -590,5 +594,110 @@ public class UserServiceImpl implements UserService {
         }
 
         return Optional.of(user);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String userId, String newPassword) {
+        log.debug("비밀번호 초기화 시작: userId={}", userId);
+        User user = checkUserExist(userId);
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.updatePassword(encodedPassword);
+
+        log.info("비밀번호 초기화 완료: userId={}", userId);
+    }
+
+    @Override
+    @Transactional
+    public void requestPasswordReset(String userId, String email) {
+        log.debug("비밀번호 초기화 요청 시작: userId={}, email={}", userId, email);
+
+        // 1. 사용자 조회 (삭제 여부 확인 포함)
+        User user = userRepository.findById(userId)
+                .filter(u -> u.getIsDeleted() == YNType.N)
+                .orElseThrow(() -> new InvalidValueException(ErrorCode.USER_EMAIL_MISMATCH));
+
+        // 2. 이메일 일치 여부 확인
+        if (!email.equalsIgnoreCase(user.getEmail())) {
+            throw new InvalidValueException(ErrorCode.USER_EMAIL_MISMATCH);
+        }
+
+        // 3. 임시 비밀번호 생성
+        String tempPassword = generateTempPassword();
+
+        // 4. DB에 암호화된 비밀번호 저장
+        String encodedPassword = passwordEncoder.encode(tempPassword);
+        user.updatePassword(encodedPassword);
+
+        // 5. 이메일 발송
+        emailService.sendPasswordResetEmail(user.getEmail(), user.getName(), tempPassword);
+
+        log.info("비밀번호 초기화 요청 완료: userId={}", userId);
+    }
+
+    /**
+     * 임시 비밀번호 생성 (12자리)
+     * 대문자, 소문자, 숫자, 특수문자를 포함
+     */
+    private String generateTempPassword() {
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String special = "!@#$%^&*";
+        String all = upper + lower + digits + special;
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder();
+
+        // 각 카테고리에서 최소 1개씩 포함
+        password.append(upper.charAt(random.nextInt(upper.length())));
+        password.append(lower.charAt(random.nextInt(lower.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(special.charAt(random.nextInt(special.length())));
+
+        // 나머지 8자리는 전체 문자셋에서 랜덤 선택
+        for (int i = 0; i < 8; i++) {
+            password.append(all.charAt(random.nextInt(all.length())));
+        }
+
+        // 문자열 섞기
+        char[] chars = password.toString().toCharArray();
+        for (int i = chars.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            char temp = chars[i];
+            chars[i] = chars[j];
+            chars[j] = temp;
+        }
+
+        return new String(chars);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(String userId, String currentPassword, String newPassword, String newPasswordConfirm) {
+        log.debug("비밀번호 변경 시작: userId={}", userId);
+        User user = checkUserExist(userId);
+
+        // 1. 현재 비밀번호 일치 확인
+        if (!passwordEncoder.matches(currentPassword, user.getPwd())) {
+            throw new InvalidValueException(ErrorCode.USER_INVALID_PASSWORD);
+        }
+
+        // 2. 새 비밀번호 확인 일치 여부
+        if (!newPassword.equals(newPasswordConfirm)) {
+            throw new InvalidValueException(ErrorCode.USER_PASSWORD_CONFIRM_MISMATCH);
+        }
+
+        // 3. 새 비밀번호가 기존 비밀번호와 동일한지 확인
+        if (passwordEncoder.matches(newPassword, user.getPwd())) {
+            throw new InvalidValueException(ErrorCode.USER_SAME_PASSWORD);
+        }
+
+        // 4. 비밀번호 변경
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.updatePassword(encodedPassword);
+
+        log.info("비밀번호 변경 완료: userId={}", userId);
     }
 }

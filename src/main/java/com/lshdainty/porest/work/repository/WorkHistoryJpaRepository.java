@@ -1,6 +1,7 @@
 package com.lshdainty.porest.work.repository;
 
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.work.domain.WorkHistory;
 import com.lshdainty.porest.work.repository.dto.WorkHistorySearchCondition;
 import jakarta.persistence.EntityManager;
@@ -56,10 +57,11 @@ public class WorkHistoryJpaRepository implements WorkHistoryRepository {
                         "left join fetch wh.group " +
                         "left join fetch wh.part " +
                         "left join fetch wh.division " +
-                        "where wh.isDeleted = :isDeleted");
+                        "where wh.isDeleted = :isDeleted and wh.user.company != :systemCompany");
 
         Map<String, Object> params = new HashMap<>();
         params.put("isDeleted", YNType.N);
+        params.put("systemCompany", OriginCompanyType.SYSTEM);
 
         appendConditions(jpql, params, condition);
 

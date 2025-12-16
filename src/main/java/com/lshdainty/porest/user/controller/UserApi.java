@@ -321,4 +321,82 @@ public interface UserApi {
             @Parameter(description = "사용자 ID", example = "user123", required = true)
             @PathVariable("userId") String userId
     );
+
+    @Operation(
+            summary = "비밀번호 초기화",
+            description = "관리자가 특정 사용자의 비밀번호를 초기화합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "비밀번호 초기화 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (USER:MANAGE 필요)"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음"
+            )
+    })
+    @PatchMapping("/api/v1/users/{userId}/password")
+    ApiResponse resetPassword(
+            @Parameter(description = "사용자 ID", example = "user123", required = true)
+            @PathVariable("userId") String userId,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "새로운 비밀번호 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.ResetPasswordReq.class))
+            )
+            @RequestBody UserApiDto.ResetPasswordReq data
+    );
+
+    @Operation(
+            summary = "비밀번호 초기화 요청 (비로그인)",
+            description = "사용자가 비밀번호를 잊어버린 경우, ID와 이메일을 입력하여 임시 비밀번호를 이메일로 받습니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "임시 비밀번호 이메일 발송 완료"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "사용자 ID 또는 이메일이 일치하지 않음"
+            )
+    })
+    @PostMapping("/api/v1/users/password/reset-request")
+    ApiResponse requestPasswordReset(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "비밀번호 초기화 요청 정보 (ID, 이메일)",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.RequestPasswordResetReq.class))
+            )
+            @RequestBody UserApiDto.RequestPasswordResetReq data
+    );
+
+    @Operation(
+            summary = "비밀번호 변경",
+            description = "로그인한 사용자가 본인의 비밀번호를 변경합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "비밀번호 변경 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "현재 비밀번호 불일치 / 새 비밀번호 확인 불일치 / 동일한 비밀번호 사용"
+            )
+    })
+    @PatchMapping("/api/v1/users/me/password")
+    ApiResponse changePassword(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "비밀번호 변경 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.ChangePasswordReq.class))
+            )
+            @RequestBody UserApiDto.ChangePasswordReq data
+    );
 }

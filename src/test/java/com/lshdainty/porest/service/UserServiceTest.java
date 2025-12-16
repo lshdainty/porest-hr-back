@@ -3,6 +3,7 @@ package com.lshdainty.porest.service;
 import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
 import com.lshdainty.porest.common.exception.DuplicateException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
+import com.lshdainty.porest.common.exception.InvalidValueException;
 import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.util.PorestFile;
@@ -36,6 +37,7 @@ import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.permission.repository.RoleRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,6 +66,8 @@ class UserServiceTest {
     private RoleRepository roleRepository;
     @Mock
     private EntityManager em;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -1287,6 +1291,253 @@ class UserServiceTest {
             // then
             assertThat(result).isPresent();
             assertThat(result.get().getRoles()).contains(role);
+        }
+    }
+
+    @Nested
+    @DisplayName("비밀번호 초기화")
+    class ResetPassword {
+        @Test
+        @DisplayName("성공 - 비밀번호가 암호화되어 저장된다")
+        void resetPasswordSuccess() {
+            // given
+            String userId = "user1";
+            String newPassword = "newPassword123!";
+            String encodedPassword = "$2a$10$encodedPasswordHash";
+
+            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedPassword);
+
+            // when
+            userService.resetPassword(userId, newPassword);
+
+            // then
+            then(userRepository).should().findById(userId);
+            then(passwordEncoder).should().encode(newPassword);
+            assertThat(user.getPwd()).isEqualTo(encodedPassword);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void resetPasswordFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.resetPassword(userId, "newPassword"))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
+        void resetPasswordFailDeleted() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            user.deleteUser();
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.resetPassword(userId, "newPassword"))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("비밀번호 초기화 요청 (비로그인)")
+    class RequestPasswordReset {
+        @Test
+        @DisplayName("성공 - 임시 비밀번호가 생성되고 이메일이 발송된다")
+        void requestPasswordResetSuccess() {
+            // given
+            String userId = "user1";
+            String email = "test@test.com";
+            User user = User.createUser(userId, "oldPassword", "유저", email, LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.encode(anyString())).willReturn("encodedTempPassword");
+            willDoNothing().given(emailService).sendPasswordResetEmail(eq(email), eq("유저"), anyString());
+
+            // when
+            userService.requestPasswordReset(userId, email);
+
+            // then
+            then(userRepository).should().findById(userId);
+            then(passwordEncoder).should().encode(anyString());
+            then(emailService).should().sendPasswordResetEmail(eq(email), eq("유저"), anyString());
+            assertThat(user.getPwd()).isEqualTo("encodedTempPassword");
+        }
+
+        @Test
+        @DisplayName("성공 - 이메일 대소문자 무시하고 일치 확인")
+        void requestPasswordResetIgnoreCase() {
+            // given
+            String userId = "user1";
+            String email = "TEST@TEST.COM";
+            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.encode(anyString())).willReturn("encodedTempPassword");
+            willDoNothing().given(emailService).sendPasswordResetEmail(anyString(), anyString(), anyString());
+
+            // when
+            userService.requestPasswordReset(userId, email);
+
+            // then
+            then(emailService).should().sendPasswordResetEmail(anyString(), anyString(), anyString());
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void requestPasswordResetFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.requestPasswordReset(userId, "test@test.com"))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
+        void requestPasswordResetFailDeleted() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            user.deleteUser();
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.requestPasswordReset(userId, "test@test.com"))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 이메일이 일치하지 않으면 예외가 발생한다")
+        void requestPasswordResetFailEmailMismatch() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "oldPassword", "유저", "correct@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.requestPasswordReset(userId, "wrong@test.com"))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("비밀번호 변경")
+    class ChangePassword {
+        @Test
+        @DisplayName("성공 - 비밀번호가 변경된다")
+        void changePasswordSuccess() {
+            // given
+            String userId = "user1";
+            String currentPassword = "currentPassword123!";
+            String newPassword = "newPassword123!";
+            String newPasswordConfirm = "newPassword123!";
+            String encodedCurrentPassword = "$2a$10$encodedCurrentPassword";
+            String encodedNewPassword = "$2a$10$encodedNewPassword";
+
+            User user = User.createUser(userId, encodedCurrentPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(currentPassword, encodedCurrentPassword)).willReturn(true);
+            given(passwordEncoder.matches(newPassword, encodedCurrentPassword)).willReturn(false);
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
+
+            // when
+            userService.changePassword(userId, currentPassword, newPassword, newPasswordConfirm);
+
+            // then
+            then(userRepository).should().findById(userId);
+            then(passwordEncoder).should().encode(newPassword);
+            assertThat(user.getPwd()).isEqualTo(encodedNewPassword);
+        }
+
+        @Test
+        @DisplayName("실패 - 현재 비밀번호가 일치하지 않으면 예외가 발생한다")
+        void changePasswordFailCurrentPasswordMismatch() {
+            // given
+            String userId = "user1";
+            String wrongCurrentPassword = "wrongPassword";
+            String newPassword = "newPassword123!";
+            String encodedPassword = "$2a$10$encodedPassword";
+
+            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(wrongCurrentPassword, encodedPassword)).willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, wrongCurrentPassword, newPassword, newPassword))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 새 비밀번호 확인이 일치하지 않으면 예외가 발생한다")
+        void changePasswordFailConfirmMismatch() {
+            // given
+            String userId = "user1";
+            String currentPassword = "currentPassword123!";
+            String newPassword = "newPassword123!";
+            String newPasswordConfirm = "differentPassword!";
+            String encodedPassword = "$2a$10$encodedPassword";
+
+            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(currentPassword, encodedPassword)).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, currentPassword, newPassword, newPasswordConfirm))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 새 비밀번호가 기존 비밀번호와 같으면 예외가 발생한다")
+        void changePasswordFailSamePassword() {
+            // given
+            String userId = "user1";
+            String currentPassword = "samePassword123!";
+            String newPassword = "samePassword123!";
+            String encodedPassword = "$2a$10$encodedPassword";
+
+            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(currentPassword, encodedPassword)).willReturn(true);
+            given(passwordEncoder.matches(newPassword, encodedPassword)).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, currentPassword, newPassword, newPassword))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void changePasswordFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, "current", "new", "new"))
+                    .isInstanceOf(EntityNotFoundException.class);
         }
     }
 }

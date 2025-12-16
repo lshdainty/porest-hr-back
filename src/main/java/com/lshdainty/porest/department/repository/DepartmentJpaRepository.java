@@ -1,6 +1,7 @@
 package com.lshdainty.porest.department.repository;
 
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.department.domain.Department;
 import com.lshdainty.porest.department.domain.UserDepartment;
 import com.lshdainty.porest.user.domain.User;
@@ -86,20 +87,22 @@ public class DepartmentJpaRepository implements DepartmentRepository {
         return em.createQuery(
                 "select ud.user from UserDepartment ud " +
                 "join ud.user u join ud.department d " +
-                "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted", User.class)
+                "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted and u.company != :systemCompany", User.class)
                 .setParameter("departmentId", departmentId)
                 .setParameter("isDeleted", YNType.N)
+                .setParameter("systemCompany", OriginCompanyType.SYSTEM)
                 .getResultList();
     }
 
     @Override
     public List<User> findUsersNotInDepartment(Long departmentId) {
         return em.createQuery(
-                "select u from User u where u.isDeleted = :isDeleted and not exists (" +
+                "select u from User u where u.isDeleted = :isDeleted and u.company != :systemCompany and not exists (" +
                 "select 1 from UserDepartment ud join ud.department d " +
                 "where ud.user.id = u.id and ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted)", User.class)
                 .setParameter("departmentId", departmentId)
                 .setParameter("isDeleted", YNType.N)
+                .setParameter("systemCompany", OriginCompanyType.SYSTEM)
                 .getResultList();
     }
 
@@ -108,9 +111,10 @@ public class DepartmentJpaRepository implements DepartmentRepository {
         return em.createQuery(
                 "select ud from UserDepartment ud " +
                 "join fetch ud.user u join ud.department d " +
-                "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted", UserDepartment.class)
+                "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted and u.company != :systemCompany", UserDepartment.class)
                 .setParameter("departmentId", departmentId)
                 .setParameter("isDeleted", YNType.N)
+                .setParameter("systemCompany", OriginCompanyType.SYSTEM)
                 .getResultList();
     }
 

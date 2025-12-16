@@ -1,6 +1,7 @@
 package com.lshdainty.porest.department.repository;
 
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.department.domain.Department;
 import com.lshdainty.porest.department.domain.UserDepartment;
 import com.lshdainty.porest.user.domain.User;
@@ -113,7 +114,8 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                         userDepartment.department.id.eq(departmentId),
                         userDepartment.isDeleted.eq(YNType.N),
                         department.isDeleted.eq(YNType.N),
-                        user.isDeleted.eq(YNType.N)
+                        user.isDeleted.eq(YNType.N),
+                        user.company.ne(OriginCompanyType.SYSTEM)
                 )
                 .fetch();
     }
@@ -124,6 +126,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                 .selectFrom(user)
                 .where(
                         user.isDeleted.eq(YNType.N),
+                        user.company.ne(OriginCompanyType.SYSTEM),
                         JPAExpressions
                                 .selectFrom(userDepartment)
                                 .join(userDepartment.department, department)
@@ -148,7 +151,8 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                         userDepartment.department.id.eq(departmentId),
                         userDepartment.isDeleted.eq(YNType.N),
                         department.isDeleted.eq(YNType.N),
-                        user.isDeleted.eq(YNType.N)
+                        user.isDeleted.eq(YNType.N),
+                        user.company.ne(OriginCompanyType.SYSTEM)
                 )
                 .fetch();
     }
