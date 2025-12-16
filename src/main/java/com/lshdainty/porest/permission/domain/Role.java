@@ -129,10 +129,9 @@ public class Role extends AuditingFields {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(desc)) { this.desc = desc; }
         if (!Objects.isNull(permissions)) {
-            this.rolePermissions.clear();
+            clearPermissions();
             for (Permission permission : permissions) {
-                RolePermission rolePermission = RolePermission.createRolePermission(this, permission);
-                this.rolePermissions.add(rolePermission);
+                addPermission(permission);
             }
         }
     }
@@ -193,10 +192,12 @@ public class Role extends AuditingFields {
 
     /**
      * 모든 권한 제거<br>
-     * 역할의 모든 권한을 제거
+     * 역할의 모든 권한을 제거 (Soft Delete)
      */
     public void clearPermissions() {
-        this.rolePermissions.clear();
+        this.rolePermissions.stream()
+                .filter(rp -> YNType.isN(rp.getIsDeleted()))
+                .forEach(RolePermission::deleteRolePermission);
     }
 
     /**
