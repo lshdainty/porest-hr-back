@@ -410,6 +410,17 @@ public class User extends AuditingFields {
         this.dashboard = dashboard;
     }
 
+    /**
+     * 비밀번호 변경 함수<br>
+     * Entity의 경우 Setter없이 Getter만 사용<br>
+     * 해당 메소드를 통해 비밀번호 변경할 것
+     *
+     * @param encodedPassword 암호화된 비밀번호
+     */
+    public void updatePassword(String encodedPassword) {
+        this.pwd = encodedPassword;
+    }
+
     /* 비즈니스 편의 메소드 */
     /**
      * 사용자의 workTime에 맞춰<br>

@@ -186,4 +186,12 @@ public interface UserService {
      * @return User Optional
      */
     Optional<User> getUserWithRolesByInvitationToken(String token);
+
+    /**
+     * 관리자가 사용자 비밀번호 초기화
+     *
+     * @param userId 비밀번호를 초기화할 사용자 ID
+     * @param newPassword 새로운 비밀번호 (평문)
+     */
+    void resetPassword(String userId, String newPassword);
 }

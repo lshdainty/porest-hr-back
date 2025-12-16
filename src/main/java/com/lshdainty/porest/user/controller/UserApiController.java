@@ -408,6 +408,17 @@ public class UserApiController implements UserApi {
         ));
     }
 
+    /**
+     * 관리자가 사용자 비밀번호 초기화
+     * PATCH /api/v1/users/{userId}/password
+     */
+    @Override
+    @PreAuthorize("hasAuthority('USER:MANAGE')")
+    public ApiResponse resetPassword(String userId, UserApiDto.ResetPasswordReq data) {
+        userService.resetPassword(userId, data.getNewPassword());
+        return ApiResponse.success();
+    }
+
     private String getTranslatedName(OriginCompanyType type) {
         if (type == null) return null;
         return messageSource.getMessage(type.getMessageKey(), null, LocaleContextHolder.getLocale());

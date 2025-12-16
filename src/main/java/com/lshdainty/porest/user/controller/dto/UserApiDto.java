@@ -540,4 +540,13 @@ public class UserApiDto {
         @Schema(description = "권한 이름", example = "사용자 조회")
         private String permissionName;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "비밀번호 초기화 요청")
+    public static class ResetPasswordReq {
+        @Schema(description = "새로운 비밀번호", example = "newPassword123!")
+        private String newPassword;
+    }
 }

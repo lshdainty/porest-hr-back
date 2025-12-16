@@ -321,4 +321,34 @@ public interface UserApi {
             @Parameter(description = "사용자 ID", example = "user123", required = true)
             @PathVariable("userId") String userId
     );
+
+    @Operation(
+            summary = "비밀번호 초기화",
+            description = "관리자가 특정 사용자의 비밀번호를 초기화합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "비밀번호 초기화 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (USER:MANAGE 필요)"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음"
+            )
+    })
+    @PatchMapping("/api/v1/users/{userId}/password")
+    ApiResponse resetPassword(
+            @Parameter(description = "사용자 ID", example = "user123", required = true)
+            @PathVariable("userId") String userId,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "새로운 비밀번호 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.ResetPasswordReq.class))
+            )
+            @RequestBody UserApiDto.ResetPasswordReq data
+    );
 }

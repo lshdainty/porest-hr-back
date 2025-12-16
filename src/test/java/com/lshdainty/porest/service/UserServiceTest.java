@@ -36,6 +36,7 @@ import com.lshdainty.porest.permission.domain.Role;
 import com.lshdainty.porest.permission.repository.RoleRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,6 +65,8 @@ class UserServiceTest {
     private RoleRepository roleRepository;
     @Mock
     private EntityManager em;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -1287,6 +1290,59 @@ class UserServiceTest {
             // then
             assertThat(result).isPresent();
             assertThat(result.get().getRoles()).contains(role);
+        }
+    }
+
+    @Nested
+    @DisplayName("비밀번호 초기화")
+    class ResetPassword {
+        @Test
+        @DisplayName("성공 - 비밀번호가 암호화되어 저장된다")
+        void resetPasswordSuccess() {
+            // given
+            String userId = "user1";
+            String newPassword = "newPassword123!";
+            String encodedPassword = "$2a$10$encodedPasswordHash";
+
+            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedPassword);
+
+            // when
+            userService.resetPassword(userId, newPassword);
+
+            // then
+            then(userRepository).should().findById(userId);
+            then(passwordEncoder).should().encode(newPassword);
+            assertThat(user.getPwd()).isEqualTo(encodedPassword);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void resetPasswordFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.resetPassword(userId, "newPassword"))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
+        void resetPasswordFailDeleted() {
+            // given
+            String userId = "user1";
+            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            user.deleteUser();
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.resetPassword(userId, "newPassword"))
+                    .isInstanceOf(EntityNotFoundException.class);
         }
     }
 }

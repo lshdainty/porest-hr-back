@@ -18,6 +18,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -41,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final DepartmentRepository departmentRepository;
     private final EntityManager em;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${file.root-path}")
     private String fileRootPath;
@@ -590,5 +592,17 @@ public class UserServiceImpl implements UserService {
         }
 
         return Optional.of(user);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String userId, String newPassword) {
+        log.debug("비밀번호 초기화 시작: userId={}", userId);
+        User user = checkUserExist(userId);
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.updatePassword(encodedPassword);
+
+        log.info("비밀번호 초기화 완료: userId={}", userId);
     }
 }
