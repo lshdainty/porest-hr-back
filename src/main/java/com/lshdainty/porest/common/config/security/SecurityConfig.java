@@ -78,6 +78,7 @@ public class SecurityConfig {
                         "/api/v1/login",        // 로그인
                         "/api/v1/login/check",  // 현재 로그인된 유저정보
                         "/api/v1/logout",       // 로그아웃
+                        "/api/v1/users/password/reset-request", // 비밀번호 초기화 요청 (비로그인)
                         "/oauth2/**",           // OAuth2 시작 URL
                         "/login/oauth2/**",     // OAuth2 콜백 URL (중요!)
                         "/css/**",              // css

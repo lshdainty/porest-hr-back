@@ -145,4 +145,107 @@ class EmailServiceTest {
             then(mailSender).should().send(any(MimeMessage.class));
         }
     }
+
+    @Nested
+    @DisplayName("비밀번호 초기화 이메일 발송")
+    class SendPasswordResetEmail {
+        @Test
+        @DisplayName("성공 - 비밀번호 초기화 이메일이 발송된다")
+        void sendPasswordResetEmailSuccess() throws MessagingException {
+            // given
+            String toEmail = "user@test.com";
+            String userName = "테스트유저";
+            String tempPassword = "TempPass123!";
+
+            MimeMessage mimeMessage = mock(MimeMessage.class);
+            given(mailSender.createMimeMessage()).willReturn(mimeMessage);
+            willDoNothing().given(mailSender).send(any(MimeMessage.class));
+
+            AppProperties.Company company = new AppProperties.Company();
+            company.setName("테스트회사");
+            given(appProperties.getCompany()).willReturn(company);
+
+            AppProperties.Frontend frontend = new AppProperties.Frontend();
+            frontend.setBaseUrl("http://localhost:3000");
+            given(appProperties.getFrontend()).willReturn(frontend);
+
+            AppProperties.Email email = new AppProperties.Email();
+            AppProperties.Email.Logo logo = new AppProperties.Email.Logo();
+            logo.setPath("templates/email/logo.png");
+            email.setLogo(logo);
+            given(appProperties.getEmail()).willReturn(email);
+
+            // when
+            emailService.sendPasswordResetEmail(toEmail, userName, tempPassword);
+
+            // then
+            then(mailSender).should().send(any(MimeMessage.class));
+        }
+
+        @Test
+        @DisplayName("실패 - 이메일 발송 실패 시 예외가 발생한다")
+        void sendPasswordResetEmailFailure() throws MessagingException {
+            // given
+            String toEmail = "user@test.com";
+            String userName = "테스트유저";
+            String tempPassword = "TempPass123!";
+
+            MimeMessage mimeMessage = mock(MimeMessage.class);
+            given(mailSender.createMimeMessage()).willReturn(mimeMessage);
+
+            AppProperties.Company company = new AppProperties.Company();
+            company.setName("테스트회사");
+            given(appProperties.getCompany()).willReturn(company);
+
+            AppProperties.Frontend frontend = new AppProperties.Frontend();
+            frontend.setBaseUrl("http://localhost:3000");
+            given(appProperties.getFrontend()).willReturn(frontend);
+
+            AppProperties.Email email = new AppProperties.Email();
+            AppProperties.Email.Logo logo = new AppProperties.Email.Logo();
+            logo.setPath("nonexistent/path/logo.png");
+            email.setLogo(logo);
+            given(appProperties.getEmail()).willReturn(email);
+
+            willThrow(new RuntimeException("Mail send failed"))
+                    .given(mailSender).send(any(MimeMessage.class));
+
+            // when & then
+            assertThatThrownBy(() -> emailService.sendPasswordResetEmail(toEmail, userName, tempPassword))
+                    .isInstanceOf(RuntimeException.class);
+        }
+
+        @Test
+        @DisplayName("성공 - 로고 이미지 로드 실패해도 이메일은 발송된다")
+        void sendPasswordResetEmailWithoutLogo() throws MessagingException {
+            // given
+            String toEmail = "user@test.com";
+            String userName = "테스트유저";
+            String tempPassword = "TempPass123!";
+
+            MimeMessage mimeMessage = mock(MimeMessage.class);
+            given(mailSender.createMimeMessage()).willReturn(mimeMessage);
+            willDoNothing().given(mailSender).send(any(MimeMessage.class));
+
+            AppProperties.Company company = new AppProperties.Company();
+            company.setName("테스트회사");
+            given(appProperties.getCompany()).willReturn(company);
+
+            AppProperties.Frontend frontend = new AppProperties.Frontend();
+            frontend.setBaseUrl("http://localhost:3000");
+            given(appProperties.getFrontend()).willReturn(frontend);
+
+            AppProperties.Email email = new AppProperties.Email();
+            AppProperties.Email.Logo logo = new AppProperties.Email.Logo();
+            logo.setPath("nonexistent/path/logo.png"); // 존재하지 않는 경로
+            email.setLogo(logo);
+            given(appProperties.getEmail()).willReturn(email);
+
+            // when
+            emailService.sendPasswordResetEmail(toEmail, userName, tempPassword);
+
+            // then
+            then(mailSender).should().send(any(MimeMessage.class));
+        }
+    }
 }

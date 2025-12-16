@@ -351,4 +351,28 @@ public interface UserApi {
             )
             @RequestBody UserApiDto.ResetPasswordReq data
     );
+
+    @Operation(
+            summary = "비밀번호 초기화 요청 (비로그인)",
+            description = "사용자가 비밀번호를 잊어버린 경우, ID와 이메일을 입력하여 임시 비밀번호를 이메일로 받습니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "임시 비밀번호 이메일 발송 완료"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "사용자 ID 또는 이메일이 일치하지 않음"
+            )
+    })
+    @PostMapping("/api/v1/users/password/reset-request")
+    ApiResponse requestPasswordReset(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "비밀번호 초기화 요청 정보 (ID, 이메일)",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.RequestPasswordResetReq.class))
+            )
+            @RequestBody UserApiDto.RequestPasswordResetReq data
+    );
 }

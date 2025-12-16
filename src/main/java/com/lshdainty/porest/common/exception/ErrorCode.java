@@ -39,6 +39,7 @@ public enum ErrorCode {
     USER_INVALID_PASSWORD("USER_003", "error.user.invalid.password", HttpStatus.BAD_REQUEST),
     USER_INACTIVE("USER_004", "error.user.inactive", HttpStatus.FORBIDDEN),
     USER_DUPLICATE_EMAIL("USER_005", "error.user.duplicate.email", HttpStatus.CONFLICT),
+    USER_EMAIL_MISMATCH("USER_006", "error.user.email.mismatch", HttpStatus.BAD_REQUEST),
 
     // ========================================
     // VACATION (휴가)

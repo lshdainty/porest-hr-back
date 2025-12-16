@@ -419,6 +419,16 @@ public class UserApiController implements UserApi {
         return ApiResponse.success();
     }
 
+    /**
+     * 비밀번호 초기화 요청 (비로그인)
+     * POST /api/v1/users/password/reset-request
+     */
+    @Override
+    public ApiResponse requestPasswordReset(UserApiDto.RequestPasswordResetReq data) {
+        userService.requestPasswordReset(data.getUserId(), data.getEmail());
+        return ApiResponse.success();
+    }
+
     private String getTranslatedName(OriginCompanyType type) {
         if (type == null) return null;
         return messageSource.getMessage(type.getMessageKey(), null, LocaleContextHolder.getLocale());
