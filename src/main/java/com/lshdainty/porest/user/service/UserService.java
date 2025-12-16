@@ -203,4 +203,14 @@ public interface UserService {
      * @param email 사용자 이메일
      */
     void requestPasswordReset(String userId, String email);
+
+    /**
+     * 로그인 사용자 본인 비밀번호 변경
+     *
+     * @param userId 사용자 ID
+     * @param currentPassword 현재 비밀번호
+     * @param newPassword 새로운 비밀번호
+     * @param newPasswordConfirm 새로운 비밀번호 확인
+     */
+    void changePassword(String userId, String currentPassword, String newPassword, String newPasswordConfirm);
 }

@@ -561,4 +561,19 @@ public class UserApiDto {
         @Schema(description = "사용자 이메일", example = "user@example.com")
         private String email;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "비밀번호 변경 요청")
+    public static class ChangePasswordReq {
+        @Schema(description = "현재 비밀번호", example = "currentPassword123!")
+        private String currentPassword;
+
+        @Schema(description = "새 비밀번호", example = "newPassword123!")
+        private String newPassword;
+
+        @Schema(description = "새 비밀번호 확인", example = "newPassword123!")
+        private String newPasswordConfirm;
+    }
 }

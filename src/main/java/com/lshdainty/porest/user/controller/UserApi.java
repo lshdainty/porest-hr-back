@@ -375,4 +375,28 @@ public interface UserApi {
             )
             @RequestBody UserApiDto.RequestPasswordResetReq data
     );
+
+    @Operation(
+            summary = "비밀번호 변경",
+            description = "로그인한 사용자가 본인의 비밀번호를 변경합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "비밀번호 변경 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "현재 비밀번호 불일치 / 새 비밀번호 확인 불일치 / 동일한 비밀번호 사용"
+            )
+    })
+    @PatchMapping("/api/v1/users/me/password")
+    ApiResponse changePassword(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "비밀번호 변경 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.ChangePasswordReq.class))
+            )
+            @RequestBody UserApiDto.ChangePasswordReq data
+    );
 }

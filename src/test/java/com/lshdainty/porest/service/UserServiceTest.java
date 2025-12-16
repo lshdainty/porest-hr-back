@@ -1434,4 +1434,110 @@ class UserServiceTest {
                     .isInstanceOf(InvalidValueException.class);
         }
     }
+
+    @Nested
+    @DisplayName("비밀번호 변경")
+    class ChangePassword {
+        @Test
+        @DisplayName("성공 - 비밀번호가 변경된다")
+        void changePasswordSuccess() {
+            // given
+            String userId = "user1";
+            String currentPassword = "currentPassword123!";
+            String newPassword = "newPassword123!";
+            String newPasswordConfirm = "newPassword123!";
+            String encodedCurrentPassword = "$2a$10$encodedCurrentPassword";
+            String encodedNewPassword = "$2a$10$encodedNewPassword";
+
+            User user = User.createUser(userId, encodedCurrentPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(currentPassword, encodedCurrentPassword)).willReturn(true);
+            given(passwordEncoder.matches(newPassword, encodedCurrentPassword)).willReturn(false);
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
+
+            // when
+            userService.changePassword(userId, currentPassword, newPassword, newPasswordConfirm);
+
+            // then
+            then(userRepository).should().findById(userId);
+            then(passwordEncoder).should().encode(newPassword);
+            assertThat(user.getPwd()).isEqualTo(encodedNewPassword);
+        }
+
+        @Test
+        @DisplayName("실패 - 현재 비밀번호가 일치하지 않으면 예외가 발생한다")
+        void changePasswordFailCurrentPasswordMismatch() {
+            // given
+            String userId = "user1";
+            String wrongCurrentPassword = "wrongPassword";
+            String newPassword = "newPassword123!";
+            String encodedPassword = "$2a$10$encodedPassword";
+
+            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(wrongCurrentPassword, encodedPassword)).willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, wrongCurrentPassword, newPassword, newPassword))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 새 비밀번호 확인이 일치하지 않으면 예외가 발생한다")
+        void changePasswordFailConfirmMismatch() {
+            // given
+            String userId = "user1";
+            String currentPassword = "currentPassword123!";
+            String newPassword = "newPassword123!";
+            String newPasswordConfirm = "differentPassword!";
+            String encodedPassword = "$2a$10$encodedPassword";
+
+            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(currentPassword, encodedPassword)).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, currentPassword, newPassword, newPasswordConfirm))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 새 비밀번호가 기존 비밀번호와 같으면 예외가 발생한다")
+        void changePasswordFailSamePassword() {
+            // given
+            String userId = "user1";
+            String currentPassword = "samePassword123!";
+            String newPassword = "samePassword123!";
+            String encodedPassword = "$2a$10$encodedPassword";
+
+            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
+                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.matches(currentPassword, encodedPassword)).willReturn(true);
+            given(passwordEncoder.matches(newPassword, encodedPassword)).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, currentPassword, newPassword, newPassword))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void changePasswordFailNotFound() {
+            // given
+            String userId = "nonexistent";
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.changePassword(userId, "current", "new", "new"))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+    }
 }

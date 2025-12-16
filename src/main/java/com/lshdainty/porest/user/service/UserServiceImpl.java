@@ -672,4 +672,32 @@ public class UserServiceImpl implements UserService {
 
         return new String(chars);
     }
+
+    @Override
+    @Transactional
+    public void changePassword(String userId, String currentPassword, String newPassword, String newPasswordConfirm) {
+        log.debug("비밀번호 변경 시작: userId={}", userId);
+        User user = checkUserExist(userId);
+
+        // 1. 현재 비밀번호 일치 확인
+        if (!passwordEncoder.matches(currentPassword, user.getPwd())) {
+            throw new InvalidValueException(ErrorCode.USER_INVALID_PASSWORD);
+        }
+
+        // 2. 새 비밀번호 확인 일치 여부
+        if (!newPassword.equals(newPasswordConfirm)) {
+            throw new InvalidValueException(ErrorCode.USER_PASSWORD_CONFIRM_MISMATCH);
+        }
+
+        // 3. 새 비밀번호가 기존 비밀번호와 동일한지 확인
+        if (passwordEncoder.matches(newPassword, user.getPwd())) {
+            throw new InvalidValueException(ErrorCode.USER_SAME_PASSWORD);
+        }
+
+        // 4. 비밀번호 변경
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.updatePassword(encodedPassword);
+
+        log.info("비밀번호 변경 완료: userId={}", userId);
+    }
 }
