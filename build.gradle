@@ -28,7 +28,15 @@ repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
     maven {
-        name = "GitHubPackages"
+        name = "GitHubPackagesCommon"
+        url = uri("https://maven.pkg.github.com/lshdainty/porest-back-common")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") ?: ""
+            password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") ?: ""
+        }
+    }
+    maven {
+        name = "GitHubPackagesSkc"
         url = uri("https://maven.pkg.github.com/lshdainty/porest-back-skc")
         credentials {
             username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") ?: ""
@@ -39,7 +47,8 @@ repositories {
 
 dependencies {
     // ==================== Private Codes (GitHub Packages) ====================
-    implementation 'com.lshdainty:porest-back-skc:1.0.2'
+    implementation 'com.lshdainty:porest-back-common:1.0.0'
+    implementation 'com.lshdainty:porest-back-skc:1.0.3'
 
     // ==================== Spring Boot Starters ====================
     implementation 'org.springframework.boot:spring-boot-starter-web'
