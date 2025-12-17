@@ -3,7 +3,7 @@ package com.lshdainty.porest.work.controller.dto;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
 import com.lshdainty.porest.work.type.CodeType;
-import com.lshdainty.porest.work.type.SystemType;
+import com.lshdainty.porest.work.type.OriginSystemType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -216,7 +216,7 @@ public class WorkApiDto {
     @Schema(description = "시스템 체크 토글 요청")
     public static class ToggleSystemCheckReq {
         @Schema(description = "시스템 코드", example = "ERP")
-        private SystemType systemCode;
+        private OriginSystemType systemCode;
     }
 
     @Getter
@@ -237,7 +237,7 @@ public class WorkApiDto {
     @Schema(description = "시스템 체크 상태 조회 응답 (단일)")
     public static class CheckSystemStatusResp {
         @Schema(description = "시스템 코드", example = "ERP")
-        private SystemType systemCode;
+        private OriginSystemType systemCode;
 
         @Schema(description = "오늘 체크 여부", example = "true")
         private boolean checked;

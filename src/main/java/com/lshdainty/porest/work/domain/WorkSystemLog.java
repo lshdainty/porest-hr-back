@@ -1,7 +1,7 @@
 package com.lshdainty.porest.work.domain;
 
 import com.lshdainty.porest.common.domain.AuditingFields;
-import com.lshdainty.porest.work.type.SystemType;
+import com.lshdainty.porest.work.type.OriginSystemType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,7 +30,7 @@ public class WorkSystemLog extends AuditingFields {
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "system_code", nullable = false, length = 20)
-    private SystemType code;
+    private OriginSystemType code;
 
     /**
      * 시스템 로그 생성 정적 팩토리 메서드<br>
@@ -39,7 +39,7 @@ public class WorkSystemLog extends AuditingFields {
      * @param code 시스템 코드
      * @return WorkSystemLog
      */
-    public static WorkSystemLog of(SystemType code) {
+    public static WorkSystemLog of(OriginSystemType code) {
         WorkSystemLog log = new WorkSystemLog();
         log.code = code;
         return log;

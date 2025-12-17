@@ -47,8 +47,8 @@ repositories {
 
 dependencies {
     // ==================== Private Codes (GitHub Packages) ====================
-    implementation 'com.lshdainty:porest-back-common:1.0.0'
-    implementation 'com.lshdainty:porest-back-skc:1.0.3'
+    implementation 'com.lshdainty:porest-back-common:1.0.1'
+    implementation 'com.lshdainty:porest-back-skc:1.0.4'
 
     // ==================== Spring Boot Starters ====================
     implementation 'org.springframework.boot:spring-boot-starter-web'

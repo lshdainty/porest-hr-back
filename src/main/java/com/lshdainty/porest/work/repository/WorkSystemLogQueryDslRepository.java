@@ -2,7 +2,7 @@ package com.lshdainty.porest.work.repository;
 
 import com.lshdainty.porest.work.domain.QWorkSystemLog;
 import com.lshdainty.porest.work.domain.WorkSystemLog;
-import com.lshdainty.porest.work.type.SystemType;
+import com.lshdainty.porest.work.type.OriginSystemType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class WorkSystemLogQueryDslRepository implements WorkSystemLogRepository 
     }
 
     @Override
-    public Optional<WorkSystemLog> findByPeriodAndCode(LocalDateTime startDateTime, LocalDateTime endDateTime, SystemType code) {
+    public Optional<WorkSystemLog> findByPeriodAndCode(LocalDateTime startDateTime, LocalDateTime endDateTime, OriginSystemType code) {
         QWorkSystemLog workSystemLog = QWorkSystemLog.workSystemLog;
 
         WorkSystemLog result = query
@@ -46,7 +46,7 @@ public class WorkSystemLogQueryDslRepository implements WorkSystemLogRepository 
     }
 
     @Override
-    public List<SystemType> findCodesByPeriodAndCodes(LocalDateTime startDateTime, LocalDateTime endDateTime, List<SystemType> codes) {
+    public List<OriginSystemType> findCodesByPeriodAndCodes(LocalDateTime startDateTime, LocalDateTime endDateTime, List<OriginSystemType> codes) {
         QWorkSystemLog workSystemLog = QWorkSystemLog.workSystemLog;
 
         return query

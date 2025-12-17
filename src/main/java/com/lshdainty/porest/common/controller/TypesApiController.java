@@ -9,7 +9,7 @@ import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.holiday.type.HolidayType;
 import com.lshdainty.porest.schedule.type.ScheduleType;
 import com.lshdainty.porest.vacation.type.*;
-import com.lshdainty.porest.work.type.SystemType;
+import com.lshdainty.porest.work.type.OriginSystemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -39,7 +39,7 @@ public class TypesApiController implements TypesApi {
             Map.entry("schedule-type", ScheduleType.class),
             Map.entry("holiday-type", HolidayType.class),
             Map.entry("origin-company-type", OriginCompanyType.class),
-            Map.entry("system-type", SystemType.class),
+            Map.entry("system-type", OriginSystemType.class),
             Map.entry("country-code", CountryCode.class)
     );
 
