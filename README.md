@@ -16,56 +16,25 @@
     <img src="https://codecov.io/gh/lshdainty/porest-back/branch/main/graph/badge.svg" alt="codecov" />
   </a>
   <img src="https://img.shields.io/badge/Java-25-007396?logo=openjdk&logoColor=white" alt="Java" />
-  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.0-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot" />
 </p>
 
 ---
 
 ## 소개
 
-**POREST**는 사업장에 속한 근로자의 일정관리 및 휴가관리를 쉽게 관리하고자 만든 서비스입니다.
+**POREST Backend**는 [POREST](https://github.com/lshdainty/POREST) 서비스의 백엔드입니다.
 
 Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며, 기존 사용하던 Legacy 프로그램을 **JPA**, **QueryDSL** 등 실무에서 많이 사용중인 라이브러리를 사용하여 개선하고자 합니다.
 
 ---
 
-## 주요 기능
-
-### 📅 일정관리
-
-구성원들의 근무 및 휴가 일정을 캘린더 상에서 확인할 수 있습니다.
-
-- 사용자가 등록한 일정을 캘린더 상에서 쉽게 확인
-- 휴가뿐만 아니라 공통 일정 (예비군, 교육) 등 빠르고 간편하게 등록
-- 부서별, 개인별 일정 필터링 지원
-
-### 🏖️ 휴가관리
-
-직원들의 휴가 발생과 잔여 일수 관리 등을 체계적으로 관리할 수 있습니다.
-
-- 캘린더 상에서 쉽게 휴가 등록
-- 전체 휴가 부여 및 직원별 수동 휴가 등록
-- 휴가 발생/사용 내역 손쉬운 관리
-- 다양한 휴가 정책 지원 (연차, 병가, 경조사, 무급휴가 등)
-- 자동 휴가 차감 계산
-
-### 📝 전자결재
-
-보고가 필요한 근무의 경우 전자결재를 통해 관리가 가능합니다.
-
-- 야근, 휴일근무 등 연장 근무 사전 결재
-- 사전 보고된 결재를 통한 추가 휴가 부여
-
----
-
 ## 기술 스택
-
-### Backend
 
 | Category | Technology |
 |----------|------------|
 | **Language** | ![Java](https://img.shields.io/badge/Java_25-007396?style=flat-square&logo=openjdk&logoColor=white) |
-| **Framework** | ![Spring Boot](https://img.shields.io/badge/Spring_Boot_4.0.0-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white) |
+| **Framework** | ![Spring Boot](https://img.shields.io/badge/Spring_Boot_4.0-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white) |
 | **ORM** | ![JPA](https://img.shields.io/badge/JPA-59666C?style=flat-square&logo=hibernate&logoColor=white) ![QueryDSL](https://img.shields.io/badge/QueryDSL_7.1-0769AD?style=flat-square) |
 | **Database** | ![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=flat-square&logo=mariadb&logoColor=white) |
 | **Authentication** | ![OAuth2](https://img.shields.io/badge/OAuth2-EB5424?style=flat-square&logo=auth0&logoColor=white) Session-Based |
@@ -170,8 +139,6 @@ public class UserJpaRepository implements UserRepository { ... }
 
 ## 국제화 (i18n)
 
-한국어, 영어를 지원합니다.
-
 ```
 src/main/resources/message/
 ├── messages.properties      # 기본 (영어)
@@ -181,21 +148,11 @@ src/main/resources/message/
 
 ---
 
-## 개발 도구
-
-<p>
-  <img src="https://img.shields.io/badge/IntelliJ_IDEA-000000?style=for-the-badge&logo=intellijidea&logoColor=white" alt="IntelliJ IDEA" />
-  <img src="https://img.shields.io/badge/VS_Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="VS Code" />
-  <img src="https://img.shields.io/badge/Perplexity-1FB8CD?style=for-the-badge&logo=perplexity&logoColor=white" alt="Perplexity" />
-  <img src="https://img.shields.io/badge/Claude_Code-000000?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" />
-</p>
-
----
-
 ## 관련 저장소
 
 | Repository | Description |
 |------------|-------------|
+| [POREST](https://github.com/lshdainty/POREST) | 통합 레포지토리 (서비스 소개) |
 | [porest-front](https://github.com/lshdainty/porest-front) | React 기반 프론트엔드 |
 | [porest-back-common](https://github.com/lshdainty/porest-back-common) | 공통 라이브러리 |
 
