@@ -10,6 +10,9 @@ pipeline {
         JAR_NAME = 'porest-0.0.1-SNAPSHOT.jar'
         CONFIG_PATH = '/home/porest/porest-back/config'
         IP_BLACKLIST_FILE = 'ip-blacklist.txt'
+        // GitHub Packages 인증
+        GITHUB_ACTOR = 'lshdainty'
+        GITHUB_TOKEN = credentials('github-packages-token')
     }
     
     stages {
