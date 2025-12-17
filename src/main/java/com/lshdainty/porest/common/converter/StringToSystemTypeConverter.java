@@ -33,6 +33,15 @@ public class StringToSystemTypeConverter implements Converter<String, SystemType
         }
     }
 
+    /**
+     * 새로운 SystemType 구현체 등록
+     * 테스트 등에서 호출하여 구현체를 등록
+     */
+    @SuppressWarnings("unchecked")
+    public static void register(Class<? extends Enum<?>> implClass) {
+        IMPLEMENTATIONS.add((Class<? extends Enum<? extends SystemType>>) implClass);
+    }
+
     @Override
     public SystemType convert(String source) {
         if (source == null || source.isEmpty()) {

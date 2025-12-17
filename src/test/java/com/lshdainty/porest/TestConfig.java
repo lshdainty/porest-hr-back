@@ -1,5 +1,8 @@
 package com.lshdainty.porest;
 
+import com.lshdainty.porest.common.converter.StringToSystemTypeConverter;
+import com.lshdainty.porest.common.converter.SystemTypeConverter;
+import com.lshdainty.porest.work.type.TestSystemType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -8,6 +11,12 @@ import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class TestConfig {
+
+    static {
+        // 테스트용 SystemType 구현체 등록
+        SystemTypeConverter.register(TestSystemType.class);
+        StringToSystemTypeConverter.register(TestSystemType.class);
+    }
     @PersistenceContext
     private EntityManager em;
 

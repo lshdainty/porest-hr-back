@@ -3,7 +3,8 @@ package com.lshdainty.porest.common.converter;
 import com.lshdainty.porest.common.exception.InvalidValueException;
 import com.lshdainty.porest.common.type.DefaultSystemType;
 import com.lshdainty.porest.common.type.SystemType;
-import com.lshdainty.porest.work.type.OriginSystemType;
+import com.lshdainty.porest.work.type.TestSystemType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class StringToSystemTypeConverterTest {
 
     private StringToSystemTypeConverter converter;
+
+    @BeforeAll
+    static void setUpClass() {
+        // 테스트용 SystemType 구현체 등록
+        StringToSystemTypeConverter.register(TestSystemType.class);
+    }
 
     @BeforeEach
     void setUp() {
@@ -52,19 +59,19 @@ class StringToSystemTypeConverterTest {
     }
 
     @Test
-    @DisplayName("OriginSystemType 변환 성공")
+    @DisplayName("TestSystemType 변환 성공")
     void convert_originSystemType_success() {
         // when
         SystemType result = converter.convert("ERP");
 
         // then
-        assertThat(result).isEqualTo(OriginSystemType.ERP);
+        assertThat(result).isEqualTo(TestSystemType.ERP);
     }
 
     @Test
-    @DisplayName("OriginSystemType의 모든 값 변환 성공")
-    void convert_allOriginSystemTypes_success() {
-        for (OriginSystemType type : OriginSystemType.values()) {
+    @DisplayName("TestSystemType의 모든 값 변환 성공")
+    void convert_allTestSystemTypes_success() {
+        for (TestSystemType type : TestSystemType.values()) {
             // when
             SystemType result = converter.convert(type.name());
 

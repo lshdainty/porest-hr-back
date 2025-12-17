@@ -3,7 +3,7 @@ package com.lshdainty.porest.repository;
 import com.lshdainty.porest.work.domain.WorkSystemLog;
 import com.lshdainty.porest.work.repository.WorkSystemLogJpaRepository;
 import com.lshdainty.porest.common.type.SystemType;
-import com.lshdainty.porest.work.type.OriginSystemType;
+import com.lshdainty.porest.work.type.TestSystemType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ class WorkSystemLogJpaRepositoryTest {
     @DisplayName("시스템 로그 저장")
     void save() {
         // given
-        WorkSystemLog log = WorkSystemLog.of(OriginSystemType.ERP);
+        WorkSystemLog log = WorkSystemLog.of(TestSystemType.ERP);
 
         // when
         workSystemLogRepository.save(log);
@@ -42,14 +42,14 @@ class WorkSystemLogJpaRepositoryTest {
 
         // then
         assertThat(log.getId()).isNotNull();
-        assertThat(log.getCode()).isEqualTo(OriginSystemType.ERP);
+        assertThat(log.getCode()).isEqualTo(TestSystemType.ERP);
     }
 
     @Test
     @DisplayName("기간과 코드로 시스템 로그 조회")
     void findByPeriodAndCode() {
         // given
-        WorkSystemLog log = WorkSystemLog.of(OriginSystemType.ERP);
+        WorkSystemLog log = WorkSystemLog.of(TestSystemType.ERP);
         workSystemLogRepository.save(log);
         em.flush();
         em.clear();
@@ -57,12 +57,12 @@ class WorkSystemLogJpaRepositoryTest {
         // when
         LocalDateTime now = LocalDateTime.now();
         Optional<WorkSystemLog> findLog = workSystemLogRepository.findByPeriodAndCode(
-                now.minusMinutes(1), now.plusMinutes(1), OriginSystemType.ERP
+                now.minusMinutes(1), now.plusMinutes(1), TestSystemType.ERP
         );
 
         // then
         assertThat(findLog.isPresent()).isTrue();
-        assertThat(findLog.get().getCode()).isEqualTo(OriginSystemType.ERP);
+        assertThat(findLog.get().getCode()).isEqualTo(TestSystemType.ERP);
     }
 
     @Test
@@ -72,7 +72,7 @@ class WorkSystemLogJpaRepositoryTest {
         Optional<WorkSystemLog> findLog = workSystemLogRepository.findByPeriodAndCode(
                 LocalDateTime.now().minusDays(1),
                 LocalDateTime.now(),
-                OriginSystemType.MES
+                TestSystemType.MES
         );
 
         // then
@@ -83,28 +83,28 @@ class WorkSystemLogJpaRepositoryTest {
     @DisplayName("기간과 코드로 조회 시 다른 코드는 제외")
     void findByPeriodAndCodeFiltersByCode() {
         // given
-        workSystemLogRepository.save(WorkSystemLog.of(OriginSystemType.ERP));
-        workSystemLogRepository.save(WorkSystemLog.of(OriginSystemType.MES));
+        workSystemLogRepository.save(WorkSystemLog.of(TestSystemType.ERP));
+        workSystemLogRepository.save(WorkSystemLog.of(TestSystemType.MES));
         em.flush();
         em.clear();
 
         // when
         LocalDateTime now = LocalDateTime.now();
         Optional<WorkSystemLog> findLog = workSystemLogRepository.findByPeriodAndCode(
-                now.minusMinutes(1), now.plusMinutes(1), OriginSystemType.ERP
+                now.minusMinutes(1), now.plusMinutes(1), TestSystemType.ERP
         );
 
         // then
         assertThat(findLog.isPresent()).isTrue();
-        assertThat(findLog.get().getCode()).isEqualTo(OriginSystemType.ERP);
+        assertThat(findLog.get().getCode()).isEqualTo(TestSystemType.ERP);
     }
 
     @Test
     @DisplayName("기간과 여러 코드로 존재하는 코드 목록 조회")
     void findCodesByPeriodAndCodes() {
         // given
-        workSystemLogRepository.save(WorkSystemLog.of(OriginSystemType.ERP));
-        workSystemLogRepository.save(WorkSystemLog.of(OriginSystemType.MES));
+        workSystemLogRepository.save(WorkSystemLog.of(TestSystemType.ERP));
+        workSystemLogRepository.save(WorkSystemLog.of(TestSystemType.MES));
         em.flush();
         em.clear();
 
@@ -112,19 +112,19 @@ class WorkSystemLogJpaRepositoryTest {
         LocalDateTime now = LocalDateTime.now();
         List<SystemType> codes = workSystemLogRepository.findCodesByPeriodAndCodes(
                 now.minusMinutes(1), now.plusMinutes(1),
-                List.of(OriginSystemType.ERP, OriginSystemType.MES, OriginSystemType.WMS)
+                List.of(TestSystemType.ERP, TestSystemType.MES, TestSystemType.WMS)
         );
 
         // then
         assertThat(codes).hasSize(2);
-        assertThat(codes).containsExactlyInAnyOrder(OriginSystemType.ERP, OriginSystemType.MES);
+        assertThat(codes).containsExactlyInAnyOrder(TestSystemType.ERP, TestSystemType.MES);
     }
 
     @Test
     @DisplayName("기간 외의 로그는 조회되지 않음")
     void findCodesByPeriodAndCodesOutOfRange() {
         // given
-        workSystemLogRepository.save(WorkSystemLog.of(OriginSystemType.ERP));
+        workSystemLogRepository.save(WorkSystemLog.of(TestSystemType.ERP));
         em.flush();
         em.clear();
 
@@ -133,7 +133,7 @@ class WorkSystemLogJpaRepositoryTest {
         List<SystemType> codes = workSystemLogRepository.findCodesByPeriodAndCodes(
                 LocalDateTime.now().minusDays(10),
                 LocalDateTime.now().minusDays(5),
-                List.of(OriginSystemType.ERP)
+                List.of(TestSystemType.ERP)
         );
 
         // then
@@ -144,7 +144,7 @@ class WorkSystemLogJpaRepositoryTest {
     @DisplayName("시스템 로그 삭제")
     void delete() {
         // given
-        WorkSystemLog log = WorkSystemLog.of(OriginSystemType.ERP);
+        WorkSystemLog log = WorkSystemLog.of(TestSystemType.ERP);
         workSystemLogRepository.save(log);
         em.flush();
         em.clear();
@@ -152,7 +152,7 @@ class WorkSystemLogJpaRepositoryTest {
         // when
         LocalDateTime now = LocalDateTime.now();
         WorkSystemLog foundLog = workSystemLogRepository.findByPeriodAndCode(
-                now.minusMinutes(1), now.plusMinutes(1), OriginSystemType.ERP
+                now.minusMinutes(1), now.plusMinutes(1), TestSystemType.ERP
         ).orElseThrow();
         workSystemLogRepository.delete(foundLog);
         em.flush();
@@ -160,7 +160,7 @@ class WorkSystemLogJpaRepositoryTest {
 
         // then
         Optional<WorkSystemLog> deletedLog = workSystemLogRepository.findByPeriodAndCode(
-                now.minusMinutes(1), now.plusMinutes(1), OriginSystemType.ERP
+                now.minusMinutes(1), now.plusMinutes(1), TestSystemType.ERP
         );
         assertThat(deletedLog.isEmpty()).isTrue();
     }
@@ -169,8 +169,8 @@ class WorkSystemLogJpaRepositoryTest {
     @DisplayName("여러 시스템 로그 저장 후 일부만 조회")
     void findCodesByPeriodAndCodesPartial() {
         // given
-        workSystemLogRepository.save(WorkSystemLog.of(OriginSystemType.ERP));
-        workSystemLogRepository.save(WorkSystemLog.of(OriginSystemType.CRM));
+        workSystemLogRepository.save(WorkSystemLog.of(TestSystemType.ERP));
+        workSystemLogRepository.save(WorkSystemLog.of(TestSystemType.CRM));
         em.flush();
         em.clear();
 
@@ -178,11 +178,11 @@ class WorkSystemLogJpaRepositoryTest {
         LocalDateTime now = LocalDateTime.now();
         List<SystemType> codes = workSystemLogRepository.findCodesByPeriodAndCodes(
                 now.minusMinutes(1), now.plusMinutes(1),
-                List.of(OriginSystemType.ERP, OriginSystemType.MES)  // MES는 저장 안함
+                List.of(TestSystemType.ERP, TestSystemType.MES)  // MES는 저장 안함
         );
 
         // then
         assertThat(codes).hasSize(1);
-        assertThat(codes).containsExactly(OriginSystemType.ERP);
+        assertThat(codes).containsExactly(TestSystemType.ERP);
     }
 }
