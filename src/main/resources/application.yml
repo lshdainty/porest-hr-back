@@ -2,7 +2,7 @@ spring:
   application:
     name: porest
   messages:
-    basename: message/messages
+    basename: message/messages,message/messages-skc
     encoding: utf-8
 
   # DB 연결 드라이버 설정
