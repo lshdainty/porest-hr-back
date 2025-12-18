@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -132,8 +132,8 @@ public class User extends AuditingFields {
     private CountryCode countryCode;
 
     /**
-     * 회원가입 토큰 UUID<br>
-     * 회원가입 초대 시 사용되는 고유 토큰
+     * 회원가입 초대 토큰/코드<br>
+     * 회원가입 초대 시 사용되는 토큰 (초대 코드의 경우 8자리 영숫자)
      */
     @Column(name = "invitation_token", length = 36)
     private String invitationToken;
@@ -174,6 +174,14 @@ public class User extends AuditingFields {
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
+
+    /**
+     * 비밀번호 변경 필요 여부<br>
+     * 임시 비밀번호로 초대된 사용자의 첫 로그인 시 비밀번호 변경 강제
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pwd_change_required", nullable = false, length = 1)
+    private YNType passwordChangeRequired = YNType.N;
 
     /**
      * 대시보드 레이아웃 정보<br>
@@ -274,8 +282,24 @@ public class User extends AuditingFields {
     }
 
     /**
+     * 8자리 초대 코드 생성 (숫자 + 대문자)<br>
+     * 사용자가 직접 입력해야 하므로 짧고 입력하기 쉬운 형태로 생성
+     *
+     * @return 8자리 영숫자 코드 (예: A3B7K9X2)
+     */
+    private static String generateInvitationCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(8);
+        for (int i = 0; i < 8; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    /**
      * 관리자가 초대용 사용자 생성<br>
-     * 초대 토큰과 만료 시간을 자동으로 생성하여 PENDING 상태의 사용자 생성
+     * 8자리 초대 코드와 만료 시간을 자동으로 생성하여 PENDING 상태의 사용자 생성
      *
      * @return User
      */
@@ -293,8 +317,8 @@ public class User extends AuditingFields {
         user.lunarYN = YNType.N;
         user.isDeleted = YNType.N;
 
-        // 초대 토큰 생성 (48시간 유효)
-        user.invitationToken = UUID.randomUUID().toString();
+        // 8자리 초대 코드 생성 (48시간 유효)
+        user.invitationToken = generateInvitationCode();
         user.invitationSentAt = LocalDateTime.now();
         user.invitationExpiresAt = LocalDateTime.now().plusHours(48);
 
@@ -302,10 +326,10 @@ public class User extends AuditingFields {
     }
 
     /**
-     * 초대 이메일 재전송을 위한 토큰 갱신
+     * 초대 이메일 재전송을 위한 코드 갱신
      */
     public void renewInvitationToken() {
-        this.invitationToken = UUID.randomUUID().toString();
+        this.invitationToken = generateInvitationCode();
         this.invitationSentAt = LocalDateTime.now();
         this.invitationExpiresAt = LocalDateTime.now().plusHours(48);
         this.invitationStatus = StatusType.PENDING;
@@ -335,16 +359,46 @@ public class User extends AuditingFields {
     }
 
     /**
-     * 회원가입 완료 처리
+     * 회원가입 완료 처리<br>
+     * 초대받은 사용자가 회원가입을 완료할 때 호출<br>
+     * 새 ID/PW로 변경하고 추가 정보를 입력하여 회원가입 완료
+     *
+     * @param newId 새로운 사용자 ID
+     * @param newEmail 새로운 이메일 (null이면 변경하지 않음)
+     * @param newEncodedPassword 암호화된 새 비밀번호
+     * @param birth 생년월일
+     * @param lunarYN 음력 여부
      */
-    public void completeRegistration(LocalDate birth, YNType lunarYN) {
+    public void completeRegistration(String newId, String newEmail, String newEncodedPassword, LocalDate birth, YNType lunarYN) {
+        this.id = newId;
+        if (newEmail != null && !newEmail.isBlank()) {
+            this.email = newEmail;
+        }
+        this.pwd = newEncodedPassword;
         this.birth = birth;
         this.lunarYN = lunarYN;
         this.invitationStatus = StatusType.ACTIVE;
         this.registeredAt = LocalDateTime.now();
+        // 초대 관련 필드 정리
+        this.invitationToken = null;
         this.invitationSentAt = null;
         this.invitationExpiresAt = null;
-        this.invitationToken = null; // 토큰 제거
+    }
+
+    /**
+     * OAuth 기반 회원가입 완료
+     * OAuth 연동 후 생년월일과 음력 여부만 설정하여 회원가입 완료
+     * (ID/PW는 OAuth로 대체되므로 변경하지 않음)
+     */
+    public void completeOAuthRegistration(LocalDate birth, YNType lunarYN) {
+        this.birth = birth;
+        this.lunarYN = lunarYN;
+        this.invitationStatus = StatusType.ACTIVE;
+        this.registeredAt = LocalDateTime.now();
+        // 초대 관련 필드 정리
+        this.invitationToken = null;
+        this.invitationSentAt = null;
+        this.invitationExpiresAt = null;
     }
 
     /**

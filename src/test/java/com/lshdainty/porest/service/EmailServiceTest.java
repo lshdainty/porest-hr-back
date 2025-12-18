@@ -52,7 +52,8 @@ class EmailServiceTest {
             // given
             String toEmail = "user@test.com";
             String userName = "테스트유저";
-            String invitationToken = "test-token-123";
+            String userId = "testuser";
+            String invitationCode = "ABC12345";
 
             MimeMessage mimeMessage = mock(MimeMessage.class);
             given(mailSender.createMimeMessage()).willReturn(mimeMessage);
@@ -73,7 +74,7 @@ class EmailServiceTest {
             given(appProperties.getEmail()).willReturn(email);
 
             // when
-            emailService.sendInvitationEmail(toEmail, userName, invitationToken);
+            emailService.sendInvitationEmail(toEmail, userName, userId, invitationCode);
 
             // then
             then(mailSender).should().send(any(MimeMessage.class));
@@ -85,7 +86,8 @@ class EmailServiceTest {
             // given
             String toEmail = "user@test.com";
             String userName = "테스트유저";
-            String invitationToken = "test-token-123";
+            String userId = "testuser";
+            String invitationCode = "ABC12345";
 
             MimeMessage mimeMessage = mock(MimeMessage.class);
             given(mailSender.createMimeMessage()).willReturn(mimeMessage);
@@ -108,7 +110,7 @@ class EmailServiceTest {
                     .given(mailSender).send(any(MimeMessage.class));
 
             // when & then
-            assertThatThrownBy(() -> emailService.sendInvitationEmail(toEmail, userName, invitationToken))
+            assertThatThrownBy(() -> emailService.sendInvitationEmail(toEmail, userName, userId, invitationCode))
                     .isInstanceOf(RuntimeException.class);
         }
 
@@ -118,7 +120,8 @@ class EmailServiceTest {
             // given
             String toEmail = "user@test.com";
             String userName = "테스트유저";
-            String invitationToken = "test-token-123";
+            String userId = "testuser";
+            String invitationCode = "ABC12345";
 
             MimeMessage mimeMessage = mock(MimeMessage.class);
             given(mailSender.createMimeMessage()).willReturn(mimeMessage);
@@ -139,7 +142,7 @@ class EmailServiceTest {
             given(appProperties.getEmail()).willReturn(email);
 
             // when
-            emailService.sendInvitationEmail(toEmail, userName, invitationToken);
+            emailService.sendInvitationEmail(toEmail, userName, userId, invitationCode);
 
             // then
             then(mailSender).should().send(any(MimeMessage.class));

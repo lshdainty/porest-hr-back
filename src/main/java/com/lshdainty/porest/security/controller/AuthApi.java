@@ -74,62 +74,6 @@ public interface AuthApi {
     @GetMapping("/api/v1/login/check")
     ApiResponse<AuthApiDto.LoginUserInfo> getUserInfo();
 
-    @Operation(
-            summary = "초대 토큰 유효성 검증",
-            description = "초대 토큰의 유효성을 검증하고 초대된 사용자 정보를 반환합니다. 검증 성공 시 세션에 토큰과 사용자 정보를 저장합니다."
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "토큰 검증 성공",
-                    content = @Content(schema = @Schema(implementation = AuthApiDto.ValidateInvitationResp.class))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "유효하지 않은 토큰"
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    description = "토큰에 해당하는 사용자를 찾을 수 없음"
-            )
-    })
-    @GetMapping("/oauth2/signup/validate")
-    ApiResponse<AuthApiDto.ValidateInvitationResp> validateInvitationToken(
-            @Parameter(description = "초대 토큰", example = "abc123def456", required = true)
-            @RequestParam("token") String token,
-            HttpSession session
-    );
-
-    @Operation(
-            summary = "초대받은 사용자 회원가입 완료",
-            description = "초대받은 사용자의 추가 정보(생년월일, 음력여부)를 입력받아 회원가입을 완료합니다. 완료 후 세션 정보를 정리합니다."
-    )
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "회원가입 완료 성공",
-                    content = @Content(schema = @Schema(implementation = AuthApiDto.CompleteInvitationResp.class))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "400",
-                    description = "유효하지 않은 토큰 또는 요청 데이터"
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    description = "토큰에 해당하는 사용자를 찾을 수 없음"
-            )
-    })
-    @PostMapping("/oauth2/signup/invitation/complete")
-    ApiResponse<AuthApiDto.CompleteInvitationResp> completeInvitedUserRegistration(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "회원가입 완료 정보 (초대 토큰, 생년월일, 음력여부)",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = AuthApiDto.CompleteInvitationReq.class))
-            )
-            @RequestBody AuthApiDto.CompleteInvitationReq data,
-            HttpSession session
-    );
-
     // ========== IP 블랙리스트 관리 (개발 환경 전용) ==========
 
     @Operation(

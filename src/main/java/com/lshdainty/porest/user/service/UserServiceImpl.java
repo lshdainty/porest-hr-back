@@ -328,6 +328,7 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
+        // 8자리 초대 코드와 함께 PENDING 상태 사용자 생성
         User user = User.createInvitedUser(
                 data.getId(),
                 data.getName(),
@@ -337,10 +338,10 @@ public class UserServiceImpl implements UserService {
                 data.getJoinDate(),
                 data.getCountryCode()
         );
-
         userRepository.save(user);
 
-        emailService.sendInvitationEmail(user.getEmail(), user.getName(), user.getInvitationToken());
+        // 초대 이메일 발송 (userId, userName, userEmail, 초대코드 포함)
+        emailService.sendInvitationEmail(user.getEmail(), user.getName(), user.getId(), user.getInvitationToken());
         log.info("사용자 초대 완료: id={}, email={}", user.getId(), user.getEmail());
 
         return UserServiceDto.builder()
@@ -365,7 +366,7 @@ public class UserServiceImpl implements UserService {
         User user = checkUserExist(userId);
         user.renewInvitationToken();
 
-        emailService.sendInvitationEmail(user.getEmail(), user.getName(), user.getInvitationToken());
+        emailService.sendInvitationEmail(user.getEmail(), user.getName(), user.getId(), user.getInvitationToken());
         log.info("초대 이메일 재전송 완료: userId={}, email={}", userId, user.getEmail());
 
         return UserServiceDto.builder()
@@ -408,7 +409,7 @@ public class UserServiceImpl implements UserService {
 
         if (emailChanged) {
             log.debug("이메일 변경으로 초대 이메일 재전송: userId={}, oldEmail={}, newEmail={}", userId, oldEmail, data.getEmail());
-            emailService.sendInvitationEmail(user.getEmail(), user.getName(), user.getInvitationToken());
+            emailService.sendInvitationEmail(user.getEmail(), user.getName(), user.getId(), user.getInvitationToken());
         }
         log.info("초대된 사용자 정보 수정 완료: userId={}", userId);
 
@@ -428,28 +429,72 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public String completeInvitedUserRegistration(UserServiceDto data) {
-        log.debug("초대 수락 및 회원가입 시작: token={}", data.getInvitationToken());
+    public boolean validateRegistration(UserServiceDto data) {
+        log.debug("초대 확인 시작: userId={}, userName={}, userEmail={}, invitationCode={}",
+                data.getId(), data.getName(), data.getEmail(), data.getInvitationToken());
+
+        // 1. 초대 코드로 사용자 조회
         Optional<User> findUser = userRepository.findByInvitationToken(data.getInvitationToken());
         if (findUser.isEmpty()) {
-            log.warn("회원가입 실패 - 초대 토큰 없음: token={}", data.getInvitationToken());
+            log.warn("초대 확인 실패 - 초대 코드 없음: code={}", data.getInvitationToken());
             throw new EntityNotFoundException(ErrorCode.INVITATION_NOT_FOUND);
         }
 
         User user = findUser.get();
+
+        // 2. 4개 값 모두 일치 확인 (userId, userName, userEmail, invitationCode)
+        if (!user.getId().equals(data.getId()) ||
+            !user.getName().equals(data.getName()) ||
+            !user.getEmail().equalsIgnoreCase(data.getEmail())) {
+            log.warn("초대 확인 실패 - 정보 불일치: inputId={}, inputName={}, inputEmail={}",
+                    data.getId(), data.getName(), data.getEmail());
+            throw new InvalidValueException(ErrorCode.USER_EMAIL_MISMATCH);
+        }
+
+        // 3. 초대 유효성 확인 (PENDING 상태, 만료 여부)
         if (!user.isInvitationValid()) {
-            log.warn("회원가입 실패 - 초대 만료: userId={}", user.getId());
+            log.warn("초대 확인 실패 - 초대 만료 또는 이미 완료됨: userId={}", user.getId());
             throw new BusinessRuleViolationException(ErrorCode.INVITATION_EXPIRED);
         }
 
-        user.completeRegistration(
-                data.getBirth(),
-                data.getLunarYN()
-        );
-        log.info("회원가입 완료: userId={}", user.getId());
+        log.info("초대 확인 완료: userId={}", user.getId());
+        return true;
+    }
 
-        return user.getId();
+    @Override
+    @Transactional
+    public String completeRegistration(UserServiceDto data, String invitedUserId) {
+        log.debug("회원가입 완료 시작: invitedUserId={}, newUserId={}", invitedUserId, data.getNewUserId());
+
+        // 1. 초대된 사용자 조회
+        User user = checkUserExist(invitedUserId);
+
+        // 2. PENDING 상태 확인
+        if (user.getInvitationStatus() != StatusType.PENDING) {
+            log.warn("회원가입 완료 실패 - PENDING 상태가 아님: userId={}, status={}", invitedUserId, user.getInvitationStatus());
+            throw new BusinessRuleViolationException(ErrorCode.USER_INACTIVE);
+        }
+
+        // 3. 새 ID 중복 체크 (기존 ID와 다른 경우)
+        if (!invitedUserId.equals(data.getNewUserId())) {
+            if (checkUserIdDuplicate(data.getNewUserId())) {
+                log.warn("회원가입 완료 실패 - 새 ID 중복: newUserId={}", data.getNewUserId());
+                throw new DuplicateException(ErrorCode.USER_ALREADY_EXISTS);
+            }
+        }
+
+        // 4. 새 비밀번호 확인
+        if (!data.getNewPassword().equals(data.getNewPasswordConfirm())) {
+            log.warn("회원가입 완료 실패 - 비밀번호 확인 불일치: invitedUserId={}", invitedUserId);
+            throw new InvalidValueException(ErrorCode.USER_PASSWORD_CONFIRM_MISMATCH);
+        }
+
+        // 5. 회원가입 완료
+        String encodedPassword = passwordEncoder.encode(data.getNewPassword());
+        user.completeRegistration(data.getNewUserId(), data.getEmail(), encodedPassword, data.getBirth(), data.getLunarYN());
+
+        log.info("회원가입 완료: newUserId={}", data.getNewUserId());
+        return data.getNewUserId();
     }
 
     @Override

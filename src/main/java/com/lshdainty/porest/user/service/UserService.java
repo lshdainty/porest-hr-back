@@ -128,12 +128,23 @@ public interface UserService {
     UserServiceDto editInvitedUser(String userId, UserServiceDto data);
 
     /**
-     * 사용자가 초대를 수락하고 회원가입 완료
+     * 초대 확인 (회원가입 1단계)
+     * 사용자가 입력한 정보(userId, userName, userEmail, invitationCode)가 초대 정보와 일치하는지 확인
      *
-     * @param data 회원가입 정보 (초대 토큰 포함)
-     * @return 생성된 사용자 ID
+     * @param data 초대 확인 정보
+     * @return 확인 성공 여부
      */
-    String completeInvitedUserRegistration(UserServiceDto data);
+    boolean validateRegistration(UserServiceDto data);
+
+    /**
+     * 회원가입 완료 (회원가입 2단계)
+     * 초대 확인 후 새로운 ID/PW와 추가 정보를 입력하여 회원가입 완료
+     *
+     * @param data 회원가입 완료 정보 (newUserId, newPassword, birth, lunarYN)
+     * @param invitedUserId 세션에서 가져온 초대된 사용자 ID
+     * @return 새로운 사용자 ID
+     */
+    String completeRegistration(UserServiceDto data, String invitedUserId);
 
     /**
      * 아이디 중복 체크

@@ -79,6 +79,9 @@ public class SecurityConfig {
                         "/api/v1/login/check",  // 현재 로그인된 유저정보
                         "/api/v1/logout",       // 로그아웃
                         "/api/v1/users/password/reset-request", // 비밀번호 초기화 요청 (비로그인)
+                        "/api/v1/users/registration/validate",  // 회원가입 1단계: 초대 확인 (비로그인)
+                        "/api/v1/users/registration/complete",  // 회원가입 2단계: 가입 완료 (비로그인)
+                        "/api/v1/users/check-duplicate",        // 회원가입 시 ID 중복 확인 (비로그인)
                         "/oauth2/**",           // OAuth2 시작 URL
                         "/login/oauth2/**",     // OAuth2 콜백 URL (중요!)
                         "/css/**",              // css

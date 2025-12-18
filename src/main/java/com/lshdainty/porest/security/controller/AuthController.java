@@ -7,7 +7,6 @@ import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.security.controller.dto.AuthApiDto;
 import com.lshdainty.porest.security.principal.UserPrincipal;
 import com.lshdainty.porest.security.service.IpBlacklistService;
-import com.lshdainty.porest.security.service.SecurityService;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Tag(name = "Auth", description = "인증/보안 API")
 public class AuthController implements AuthApi {
-    private final SecurityService securityService;
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final IpBlacklistService ipBlacklistService;
@@ -114,7 +112,9 @@ public class AuthController implements AuthApi {
                 allPermissions,  // 모든 권한 코드
                 YNType.Y,
                 StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
-                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null
+                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null,
+                user.getPasswordChangeRequired(),  // 비밀번호 변경 필요 여부
+                user.getInvitationStatus()  // 초대 상태
         );
 
         log.info("user info : {}, {}, {}, roles: {}, permissions: {}, {}",
@@ -122,48 +122,6 @@ public class AuthController implements AuthApi {
                 result.getUserRoles(), result.getPermissions(), result.getProfileUrl());
 
         return ApiResponse.success(result);
-    }
-
-    @Override
-    public ApiResponse<AuthApiDto.ValidateInvitationResp> validateInvitationToken(String token, HttpSession session) {
-        UserServiceDto user = securityService.validateInvitationToken(token);
-
-        // ✅ 검증 성공 시 세션에 초대 토큰과 사용자 정보 저장
-        session.setAttribute("invitationToken", token);
-        session.setAttribute("oauthStep", "signup");
-        session.setAttribute("invitedUserId", user.getId()); // 추가 보안
-
-        return ApiResponse.success(new AuthApiDto.ValidateInvitationResp(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getCompany(),
-                user.getWorkTime(),
-                user.getJoinDate(),
-                user.getRoleNames(),
-                user.getInvitationSentAt(),
-                user.getInvitationExpiresAt(),
-                user.getInvitationStatus()
-        ));
-    }
-
-    @Override
-    public ApiResponse<AuthApiDto.CompleteInvitationResp> completeInvitedUserRegistration(AuthApiDto.CompleteInvitationReq data, HttpSession session) {
-        String userId = userService.completeInvitedUserRegistration(UserServiceDto.builder()
-                .invitationToken(data.getInvitationToken())
-                .birth(data.getUserBirth())
-                .lunarYN(data.getLunarYn())
-                .build()
-        );
-
-        // 회원가입 완료 후 세션 정리
-        if (userId != null) {
-            session.removeAttribute("invitationToken");
-            session.removeAttribute("oauthStep");
-            session.removeAttribute("invitedUserId");
-        }
-
-        return ApiResponse.success(new AuthApiDto.CompleteInvitationResp(userId));
     }
 
     // ========== IP 블랙리스트 관리 (개발 환경 전용) ==========

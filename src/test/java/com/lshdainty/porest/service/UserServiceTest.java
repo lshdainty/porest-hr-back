@@ -525,14 +525,14 @@ class UserServiceTest {
 
             given(userRepository.findById("newuser")).willReturn(Optional.empty());
             willDoNothing().given(userRepository).save(any(User.class));
-            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
+            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString(), anyString());
 
             // when
             UserServiceDto result = userService.inviteUser(data);
 
             // then
             then(userRepository).should().save(any(User.class));
-            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("신규유저"), anyString());
+            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("신규유저"), eq("newuser"), anyString());
             assertThat(result.getId()).isEqualTo("newuser");
             assertThat(result.getInvitationStatus()).isEqualTo(StatusType.PENDING);
         }
@@ -567,13 +567,13 @@ class UserServiceTest {
             User user = User.createInvitedUser(userId, "유저", "user@test.com",
                     OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
+            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString(), anyString());
 
             // when
             UserServiceDto result = userService.resendInvitation(userId);
 
             // then
-            then(emailService).should().sendInvitationEmail(eq("user@test.com"), eq("유저"), anyString());
+            then(emailService).should().sendInvitationEmail(eq("user@test.com"), eq("유저"), eq(userId), anyString());
             assertThat(result.getInvitationStatus()).isEqualTo(StatusType.PENDING);
         }
     }
@@ -610,7 +610,7 @@ class UserServiceTest {
             User user = User.createInvitedUser(userId, "유저", "old@test.com",
                     OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString());
+            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString(), anyString());
 
             UserServiceDto data = UserServiceDto.builder()
                     .name("유저")
@@ -621,7 +621,7 @@ class UserServiceTest {
             userService.editInvitedUser(userId, data);
 
             // then
-            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("유저"), anyString());
+            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("유저"), eq(userId), anyString());
         }
 
         @Test
@@ -631,7 +631,7 @@ class UserServiceTest {
             String userId = "user1";
             User user = User.createInvitedUser(userId, "유저", "user@test.com",
                     OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            user.completeRegistration(LocalDate.now(), YNType.N);
+            user.completeOAuthRegistration(LocalDate.now(), YNType.N);
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -639,73 +639,6 @@ class UserServiceTest {
 
             // when & then
             assertThatThrownBy(() -> userService.editInvitedUser(userId, data))
-                    .isInstanceOf(BusinessRuleViolationException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("회원가입 완료")
-    class CompleteInvitedUserRegistration {
-        @Test
-        @DisplayName("성공 - 초대된 유저가 회원가입을 완료한다")
-        void completeRegistrationSuccess() {
-            // given
-            User user = User.createInvitedUser("user1", "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            String token = user.getInvitationToken();
-
-            given(userRepository.findByInvitationToken(token)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .invitationToken(token)
-                    .birth(LocalDate.of(1990, 1, 1))
-                    .lunarYN(YNType.N)
-                    .build();
-
-            // when
-            String result = userService.completeInvitedUserRegistration(data);
-
-            // then
-            assertThat(result).isEqualTo("user1");
-            assertThat(user.getInvitationStatus()).isEqualTo(StatusType.ACTIVE);
-        }
-
-        @Test
-        @DisplayName("실패 - 존재하지 않는 토큰이면 예외가 발생한다")
-        void completeRegistrationFailInvalidToken() {
-            // given
-            given(userRepository.findByInvitationToken("invalid-token")).willReturn(Optional.empty());
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .invitationToken("invalid-token")
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.completeInvitedUserRegistration(data))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 만료된 초대 토큰이면 예외가 발생한다")
-        void completeRegistrationFailExpiredToken() {
-            // given
-            User user = User.createInvitedUser("user1", "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            String token = user.getInvitationToken();
-
-            // 만료일을 과거로 설정
-            ReflectionTestUtils.setField(user, "invitationExpiresAt", LocalDateTime.now().minusDays(1));
-
-            given(userRepository.findByInvitationToken(token)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .invitationToken(token)
-                    .birth(LocalDate.of(1990, 1, 1))
-                    .lunarYN(YNType.N)
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.completeInvitedUserRegistration(data))
                     .isInstanceOf(BusinessRuleViolationException.class);
         }
     }
@@ -1537,6 +1470,264 @@ class UserServiceTest {
 
             // when & then
             assertThatThrownBy(() -> userService.changePassword(userId, "current", "new", "new"))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("초대 확인 (validateRegistration)")
+    class ValidateRegistration {
+        @Test
+        @DisplayName("성공 - 초대 정보가 일치하면 true를 반환한다")
+        void validateRegistrationSuccess() {
+            // given
+            User user = User.createInvitedUser("user1", "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+            String invitationCode = user.getInvitationToken();
+
+            given(userRepository.findByInvitationToken(invitationCode)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("user1")
+                    .name("유저")
+                    .email("user@test.com")
+                    .invitationToken(invitationCode)
+                    .build();
+
+            // when
+            boolean result = userService.validateRegistration(data);
+
+            // then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 초대 코드이면 예외가 발생한다")
+        void validateRegistrationFailInvalidCode() {
+            // given
+            given(userRepository.findByInvitationToken("invalid-code")).willReturn(Optional.empty());
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("user1")
+                    .name("유저")
+                    .email("user@test.com")
+                    .invitationToken("invalid-code")
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.validateRegistration(data))
+                    .isInstanceOf(EntityNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 만료된 초대이면 예외가 발생한다")
+        void validateRegistrationFailExpired() {
+            // given
+            User user = User.createInvitedUser("user1", "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+            String invitationCode = user.getInvitationToken();
+
+            // 만료일을 과거로 설정
+            ReflectionTestUtils.setField(user, "invitationExpiresAt", LocalDateTime.now().minusDays(1));
+
+            given(userRepository.findByInvitationToken(invitationCode)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("user1")
+                    .name("유저")
+                    .email("user@test.com")
+                    .invitationToken(invitationCode)
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.validateRegistration(data))
+                    .isInstanceOf(BusinessRuleViolationException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 사용자 정보가 일치하지 않으면 예외가 발생한다")
+        void validateRegistrationFailInfoMismatch() {
+            // given
+            User user = User.createInvitedUser("user1", "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+            String invitationCode = user.getInvitationToken();
+
+            given(userRepository.findByInvitationToken(invitationCode)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .id("wrongUser")  // 불일치
+                    .name("유저")
+                    .email("user@test.com")
+                    .invitationToken(invitationCode)
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.validateRegistration(data))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원가입 완료 (completeRegistration)")
+    class CompleteRegistration {
+        @Test
+        @DisplayName("성공 - 새 ID/PW로 회원가입을 완료한다")
+        void completeRegistrationSuccess() {
+            // given
+            String invitedUserId = "tempUser";
+            String newUserId = "newUser";
+            String newPassword = "newPwd123!";
+            String encodedNewPassword = "$2a$10$encodedNewPassword";
+
+            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+
+            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
+            given(userRepository.findById(newUserId)).willReturn(Optional.empty());
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .newUserId(newUserId)
+                    .newPassword(newPassword)
+                    .newPasswordConfirm(newPassword)
+                    .birth(LocalDate.of(1990, 1, 1))
+                    .lunarYN(YNType.N)
+                    .build();
+
+            // when
+            String result = userService.completeRegistration(data, invitedUserId);
+
+            // then
+            assertThat(result).isEqualTo(newUserId);
+            assertThat(user.getId()).isEqualTo(newUserId);
+            assertThat(user.getPwd()).isEqualTo(encodedNewPassword);
+            assertThat(user.getInvitationStatus()).isEqualTo(StatusType.ACTIVE);
+        }
+
+        @Test
+        @DisplayName("성공 - ID 변경 없이 회원가입을 완료한다")
+        void completeRegistrationSameIdSuccess() {
+            // given
+            String userId = "user1";
+            String newPassword = "newPwd123!";
+            String encodedNewPassword = "$2a$10$encodedNewPassword";
+
+            User user = User.createInvitedUser(userId, "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .newUserId(userId)  // 동일한 ID
+                    .newPassword(newPassword)
+                    .newPasswordConfirm(newPassword)
+                    .birth(LocalDate.of(1990, 1, 1))
+                    .lunarYN(YNType.N)
+                    .build();
+
+            // when
+            String result = userService.completeRegistration(data, userId);
+
+            // then
+            assertThat(result).isEqualTo(userId);
+            assertThat(user.getInvitationStatus()).isEqualTo(StatusType.ACTIVE);
+        }
+
+        @Test
+        @DisplayName("실패 - 새 ID가 중복되면 예외가 발생한다")
+        void completeRegistrationFailDuplicateNewId() {
+            // given
+            String invitedUserId = "tempUser";
+            String newUserId = "existingUser";
+
+            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+            User existingUser = User.createUser(newUserId);
+
+            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
+            given(userRepository.findById(newUserId)).willReturn(Optional.of(existingUser));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .newUserId(newUserId)
+                    .newPassword("newPwd123!")
+                    .newPasswordConfirm("newPwd123!")
+                    .birth(LocalDate.of(1990, 1, 1))
+                    .lunarYN(YNType.N)
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
+                    .isInstanceOf(DuplicateException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 비밀번호 확인이 일치하지 않으면 예외가 발생한다")
+        void completeRegistrationFailPasswordMismatch() {
+            // given
+            String invitedUserId = "tempUser";
+            String newUserId = "newUser";
+
+            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+
+            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
+            given(userRepository.findById(newUserId)).willReturn(Optional.empty());
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .newUserId(newUserId)
+                    .newPassword("newPwd123!")
+                    .newPasswordConfirm("differentPwd!")  // 불일치
+                    .birth(LocalDate.of(1990, 1, 1))
+                    .lunarYN(YNType.N)
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - PENDING 상태가 아닌 유저면 예외가 발생한다")
+        void completeRegistrationFailNotPending() {
+            // given
+            String invitedUserId = "user1";
+
+            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
+                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
+            // 이미 회원가입 완료된 상태로 변경
+            user.completeOAuthRegistration(LocalDate.now(), YNType.N);
+
+            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .newUserId("newUser")
+                    .newPassword("newPwd123!")
+                    .newPasswordConfirm("newPwd123!")
+                    .birth(LocalDate.of(1990, 1, 1))
+                    .lunarYN(YNType.N)
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
+                    .isInstanceOf(BusinessRuleViolationException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
+        void completeRegistrationFailNotFound() {
+            // given
+            String invitedUserId = "nonexistent";
+            given(userRepository.findById(invitedUserId)).willReturn(Optional.empty());
+
+            UserServiceDto data = UserServiceDto.builder()
+                    .newUserId("newUser")
+                    .newPassword("newPwd123!")
+                    .newPasswordConfirm("newPwd123!")
+                    .build();
+
+            // when & then
+            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
                     .isInstanceOf(EntityNotFoundException.class);
         }
     }

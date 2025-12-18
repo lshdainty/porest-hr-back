@@ -1,7 +1,9 @@
 package com.lshdainty.porest.user.controller.dto;
 
 import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonDeserialize;
 import tools.jackson.databind.annotation.JsonNaming;
+import com.lshdainty.porest.common.converter.CompanyTypeJsonDeserializer;
 import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.type.CompanyType;
@@ -37,6 +39,7 @@ public class UserApiDto {
         private LocalDate userBirth;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
@@ -100,6 +103,7 @@ public class UserApiDto {
         private List<String> permissions;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "소속 회사명", example = "카카오")
@@ -154,6 +158,7 @@ public class UserApiDto {
         private List<String> userRoles;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
@@ -208,6 +213,7 @@ public class UserApiDto {
         private List<String> permissions;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "소속 회사명", example = "카카오")
@@ -262,6 +268,7 @@ public class UserApiDto {
         private String userEmail;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
@@ -289,6 +296,7 @@ public class UserApiDto {
         private String userEmail;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
@@ -328,6 +336,7 @@ public class UserApiDto {
         private String userEmail;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
@@ -364,6 +373,7 @@ public class UserApiDto {
         private String userEmail;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
@@ -391,6 +401,7 @@ public class UserApiDto {
         private String userEmail;
 
         @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
         private CompanyType userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
@@ -575,5 +586,68 @@ public class UserApiDto {
 
         @Schema(description = "새 비밀번호 확인", example = "newPassword123!")
         private String newPasswordConfirm;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "초대 확인 요청 (회원가입 1단계)")
+    public static class ValidateRegistrationReq {
+        @Schema(description = "임시 사용자 ID", example = "temp_user123")
+        private String userId;
+
+        @Schema(description = "사용자 이름", example = "홍길동")
+        private String userName;
+
+        @Schema(description = "사용자 이메일", example = "user@example.com")
+        private String userEmail;
+
+        @Schema(description = "8자리 초대 코드", example = "A3B7K9X2")
+        private String invitationCode;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "초대 확인 응답 (회원가입 1단계)")
+    public static class ValidateRegistrationResp {
+        @Schema(description = "검증 성공 여부", example = "true")
+        private boolean valid;
+
+        @Schema(description = "메시지", example = "초대 확인이 완료되었습니다.")
+        private String message;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "회원가입 완료 요청 (회원가입 2단계)")
+    public static class CompleteRegistrationReq {
+        @Schema(description = "새로운 사용자 ID", example = "user123")
+        private String newUserId;
+
+        @Schema(description = "새로운 이메일", example = "user@example.com")
+        private String newUserEmail;
+
+        @Schema(description = "비밀번호", example = "newPassword123!")
+        private String password;
+
+        @Schema(description = "비밀번호 확인", example = "newPassword123!")
+        private String passwordConfirm;
+
+        @Schema(description = "생년월일", example = "1990-01-01")
+        private LocalDate userBirth;
+
+        @Schema(description = "음력 여부", example = "N")
+        private YNType lunarYn;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "회원가입 완료 응답 (회원가입 2단계)")
+    public static class CompleteRegistrationResp {
+        @Schema(description = "등록된 사용자 ID", example = "user123")
+        private String userId;
     }
 }

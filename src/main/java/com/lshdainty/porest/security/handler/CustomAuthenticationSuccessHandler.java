@@ -69,7 +69,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 allPermissions,  // 모든 권한 코드
                 YNType.Y,
                 StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
-                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null
+                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null,
+                user.getPasswordChangeRequired(),  // 비밀번호 변경 필요 여부
+                user.getInvitationStatus()  // 초대 상태
         ));
         String jsonResponse = objectMapper.writeValueAsString(apiResponse);
         response.getWriter().write(jsonResponse);

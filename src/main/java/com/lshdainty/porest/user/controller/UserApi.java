@@ -399,4 +399,68 @@ public interface UserApi {
             )
             @RequestBody UserApiDto.ChangePasswordReq data
     );
+
+    @Operation(
+            summary = "초대 확인 (회원가입 1단계)",
+            description = "사용자가 입력한 정보(userId, userName, userEmail, invitationCode)가 초대 정보와 일치하는지 확인합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "초대 확인 성공",
+                    content = @Content(schema = @Schema(implementation = UserApiDto.ValidateRegistrationResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "입력 정보 불일치"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "초대 정보를 찾을 수 없음"
+            )
+    })
+    @PostMapping("/api/v1/users/registration/validate")
+    ApiResponse<UserApiDto.ValidateRegistrationResp> validateRegistration(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "초대 확인 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.ValidateRegistrationReq.class))
+            )
+            @RequestBody UserApiDto.ValidateRegistrationReq data,
+            jakarta.servlet.http.HttpSession session
+    );
+
+    @Operation(
+            summary = "회원가입 완료 (회원가입 2단계)",
+            description = "초대 확인 후 새로운 ID/PW와 추가 정보를 입력하여 회원가입을 완료합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "회원가입 완료 성공",
+                    content = @Content(schema = @Schema(implementation = UserApiDto.CompleteRegistrationResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "비밀번호 확인 불일치"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "초대 확인이 완료되지 않음 (세션 만료 등)"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409",
+                    description = "새 ID 중복"
+            )
+    })
+    @PostMapping("/api/v1/users/registration/complete")
+    ApiResponse<UserApiDto.CompleteRegistrationResp> completeRegistration(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "회원가입 완료 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.CompleteRegistrationReq.class))
+            )
+            @RequestBody UserApiDto.CompleteRegistrationReq data,
+            jakarta.servlet.http.HttpSession session
+    );
 }

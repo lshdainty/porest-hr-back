@@ -10,6 +10,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,9 +35,10 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Async("emailTaskExecutor")
     @Override
-    public void sendInvitationEmail(String toEmail, String userName, String invitationToken) {
-        log.debug("초대 이메일 발송 시작: toEmail={}, userName={}", toEmail, userName);
+    public void sendInvitationEmail(String toEmail, String userName, String userId, String invitationCode) {
+        log.debug("초대 이메일 발송 시작: toEmail={}, userName={}, userId={}", toEmail, userName, userId);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -48,7 +50,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(toEmail);
             helper.setSubject(String.format("%s 회원가입 초대", companyName));
 
-            String invitationLink = String.format("%s/signup?token=%s", frontendBaseUrl, invitationToken);
+            String signupLink = String.format("%s/signup", frontendBaseUrl);
 
             String htmlContent = String.format("""
                 <!DOCTYPE html>
@@ -62,9 +64,28 @@ public class EmailServiceImpl implements EmailService {
                         <div style="padding: 40px 30px;">
                             <h2 style="color: #333333; margin-top: 0; font-size: 24px;">%s 회원가입 초대</h2>
                             <p style="color: #666666; line-height: 1.6; margin: 16px 0;">안녕하세요, %s님</p>
-                            <p style="color: #666666; line-height: 1.6; margin: 16px 0;">아래 링크를 클릭하여 회원가입을 완료해주세요.</p>
+                            <p style="color: #666666; line-height: 1.6; margin: 16px 0;">%s 서비스에 초대되셨습니다. 아래 정보를 사용하여 회원가입을 진행해주세요.</p>
+                            <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin: 24px 0;">
+                                <div style="margin-bottom: 12px;">
+                                    <p style="color: #666666; font-size: 14px; margin: 0 0 4px 0;">아이디 (임시)</p>
+                                    <p style="color: #333333; font-size: 16px; font-weight: bold; margin: 0;">%s</p>
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <p style="color: #666666; font-size: 14px; margin: 0 0 4px 0;">이름</p>
+                                    <p style="color: #333333; font-size: 16px; font-weight: bold; margin: 0;">%s</p>
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <p style="color: #666666; font-size: 14px; margin: 0 0 4px 0;">이메일</p>
+                                    <p style="color: #333333; font-size: 16px; font-weight: bold; margin: 0;">%s</p>
+                                </div>
+                                <div>
+                                    <p style="color: #666666; font-size: 14px; margin: 0 0 4px 0;">초대 코드</p>
+                                    <p style="color: #007bff; font-size: 24px; font-weight: bold; margin: 0; letter-spacing: 2px;">%s</p>
+                                </div>
+                            </div>
+                            <p style="color: #666666; line-height: 1.6; margin: 16px 0;">아래 버튼을 클릭하여 회원가입 페이지로 이동한 후, 위 정보를 입력해주세요.</p>
                             <a href="%s" style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin: 24px 0; font-weight: 500;">회원가입 하기</a>
-                            <p style="color: #999999; font-size: 14px; line-height: 1.6; margin: 16px 0;">이 링크는 48시간 후에 만료됩니다.</p>
+                            <p style="color: #999999; font-size: 14px; line-height: 1.6; margin: 16px 0;">이 초대는 48시간 후에 만료됩니다.</p>
                         </div>
                         <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e9ecef;">
                             <div style="margin-bottom: 16px;">
@@ -75,7 +96,7 @@ public class EmailServiceImpl implements EmailService {
                     </div>
                 </body>
                 </html>
-                """, companyName, userName, invitationLink, companyName);
+                """, companyName, userName, companyName, userId, userName, toEmail, invitationCode, signupLink, companyName);
 
             helper.setText(htmlContent, true);
 
@@ -83,7 +104,6 @@ public class EmailServiceImpl implements EmailService {
             byte[] logoImageBytes = loadLogoImage();
             if (logoImageBytes != null) {
                 String logoPath = appProperties.getEmail().getLogo().getPath();
-                String fileName = logoPath.substring(logoPath.lastIndexOf("/") + 1);
                 String contentType = logoPath.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg";
                 helper.addInline("logo", new ByteArrayResource(logoImageBytes), contentType);
             } else {
@@ -98,6 +118,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Async("emailTaskExecutor")
     @Override
     public void sendPasswordResetEmail(String toEmail, String userName, String tempPassword) {
         log.debug("비밀번호 초기화 이메일 발송 시작: toEmail={}, userName={}", toEmail, userName);

@@ -38,6 +38,12 @@ public class UserServiceDto {
     private LocalDateTime invitationExpiresAt; // 초대 토큰 만료 시간
     private StatusType invitationStatus; // 초대 상태
     private LocalDateTime registeredAt; // 회원가입 완료 시간
+    private YNType passwordChangeRequired; // 비밀번호 변경 필요 여부
+
+    // 회원가입 완료 관련 필드 (세션 기반)
+    private String newUserId; // 새로운 ID
+    private String newPassword; // 새 비밀번호
+    private String newPasswordConfirm; // 새 비밀번호 확인
 
     // 메인 부서 정보
     private String mainDepartmentNameKR; // 메인 부서의 한글명

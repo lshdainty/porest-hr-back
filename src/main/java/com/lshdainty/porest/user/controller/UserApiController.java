@@ -6,6 +6,7 @@ import com.lshdainty.porest.user.controller.dto.UserApiDto;
 import com.lshdainty.porest.common.controller.ApiResponse;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.user.service.dto.UserServiceDto;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -441,6 +442,64 @@ public class UserApiController implements UserApi {
         String userId = authentication.getName();
         userService.changePassword(userId, data.getCurrentPassword(), data.getNewPassword(), data.getNewPasswordConfirm());
         return ApiResponse.success();
+    }
+
+    /**
+     * 초대 확인 (회원가입 1단계)
+     * POST /api/v1/users/registration/validate
+     */
+    @Override
+    public ApiResponse<UserApiDto.ValidateRegistrationResp> validateRegistration(UserApiDto.ValidateRegistrationReq data, HttpSession session) {
+        UserServiceDto dto = UserServiceDto.builder()
+                .id(data.getUserId())
+                .name(data.getUserName())
+                .email(data.getUserEmail())
+                .invitationToken(data.getInvitationCode())
+                .build();
+
+        boolean valid = userService.validateRegistration(dto);
+
+        if (valid) {
+            // 세션에 초대된 사용자 ID 저장
+            session.setAttribute("invitedUserId", data.getUserId());
+            session.setAttribute("registrationStep", "validated");
+        }
+
+        return ApiResponse.success(new UserApiDto.ValidateRegistrationResp(valid, "초대 확인이 완료되었습니다."));
+    }
+
+    /**
+     * 회원가입 완료 (회원가입 2단계)
+     * POST /api/v1/users/registration/complete
+     */
+    @Override
+    public ApiResponse<UserApiDto.CompleteRegistrationResp> completeRegistration(UserApiDto.CompleteRegistrationReq data, HttpSession session) {
+        // 세션에서 초대된 사용자 ID 확인
+        String invitedUserId = (String) session.getAttribute("invitedUserId");
+        String step = (String) session.getAttribute("registrationStep");
+
+        if (invitedUserId == null || !"validated".equals(step)) {
+            throw new com.lshdainty.porest.common.exception.UnauthorizedException(
+                    com.lshdainty.porest.common.exception.ErrorCode.UNAUTHORIZED
+            );
+        }
+
+        UserServiceDto dto = UserServiceDto.builder()
+                .newUserId(data.getNewUserId())
+                .email(data.getNewUserEmail())
+                .newPassword(data.getPassword())
+                .newPasswordConfirm(data.getPasswordConfirm())
+                .birth(data.getUserBirth())
+                .lunarYN(data.getLunarYn())
+                .build();
+
+        String newUserId = userService.completeRegistration(dto, invitedUserId);
+
+        // 세션 정리
+        session.removeAttribute("invitedUserId");
+        session.removeAttribute("registrationStep");
+
+        return ApiResponse.success(new UserApiDto.CompleteRegistrationResp(newUserId));
     }
 
     private String getTranslatedName(CompanyType type) {

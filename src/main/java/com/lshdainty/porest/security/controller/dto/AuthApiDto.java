@@ -3,14 +3,10 @@ package com.lshdainty.porest.security.controller.dto;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
 import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.type.CompanyType;
 import java.util.List;
 import com.lshdainty.porest.user.type.StatusType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class AuthApiDto {
     @Getter
@@ -26,6 +22,8 @@ public class AuthApiDto {
         private List<String> permissions;      // 모든 권한 코드 목록
         private YNType isLogin;
         private String profileUrl;
+        private YNType passwordChangeRequired; // 비밀번호 변경 필요 여부
+        private StatusType invitationStatus;   // 초대 상태 (PENDING, ACTIVE 등)
     }
 
     @Getter
@@ -60,35 +58,4 @@ public class AuthApiDto {
         private String encodedPw;
     }
 
-    @Getter
-    @AllArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class ValidateInvitationResp {
-        private String userId;
-        private String userName;
-        private String userEmail;
-        private CompanyType userCompanyType;
-        private String userWorkTime;
-        private LocalDate joinDate;
-        private List<String> userRoles;
-        private LocalDateTime invitationSentAt;
-        private LocalDateTime invitationExpiresAt;
-        private StatusType invitationStatus;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class CompleteInvitationReq {
-        private String invitationToken;
-        private LocalDate userBirth;
-        private YNType lunarYn;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    public static class CompleteInvitationResp {
-        private String userId;
-    }
 }

@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -40,40 +39,8 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
 
         log.info("OAuth2 인증 성공");
 
-        HttpSession session = request.getSession();
-        String invitationToken = (String) session.getAttribute("invitationToken");
-        String oauthStep = (String) session.getAttribute("oauthStep");
-
-        // 회원가입 중 OAuth2 연동인 경우
-        if (invitationToken != null && "signup".equals(oauthStep)) {
-            handleSignupOAuthConnect(request, response, authentication, invitationToken);
-        } else {
-            // 일반 로그인 성공
-            handleNormalLogin(request, response, authentication);
-        }
-    }
-
-    /**
-     * 회원가입 중 OAuth2 연동 처리
-     */
-    private void handleSignupOAuthConnect(HttpServletRequest request,
-                                          HttpServletResponse response,
-                                          Authentication authentication,
-                                          String invitationToken) throws IOException {
-
-        HttpSession session = request.getSession();
-
-        // OAuth2 제공자 이름 추출
-        String provider = getProviderFromAuthentication(authentication);
-
-        log.info("회원가입 OAuth2 연동 성공 - Provider: {}, Token: {}", provider, invitationToken);
-
-        // React 회원가입 페이지로 리다이렉트 (연동 성공 상태)
-        String redirectUrl = String.format("%s/signup?token=%s&oauth=%s&status=connected",
-                frontendBaseUrl, invitationToken, provider);
-        log.info("redirectUrl test log : {}", redirectUrl);
-
-        response.sendRedirect(redirectUrl);
+        // 일반 로그인 성공 처리
+        handleNormalLogin(request, response, authentication);
     }
 
     /**
@@ -119,23 +86,14 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
                 allPermissions,  // 모든 권한 코드
                 YNType.Y,
                 StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
-                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null
+                        userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null,
+                user.getPasswordChangeRequired(),  // 비밀번호 변경 필요 여부
+                user.getInvitationStatus()  // 초대 상태
         ));
         log.info("세션에 사용자 정보 저장 완료 - userId: {}, userName: {}", user.getId(), user.getName());
 
         // 로그인 페이지로 리다이렉트 (프론트에서 세션 정보 조회)
         String redirectUrl = frontendBaseUrl + "/login?status=success";
         response.sendRedirect(redirectUrl);
-    }
-
-    /**
-     * Authentication에서 OAuth2 제공자 이름 추출
-     */
-    private String getProviderFromAuthentication(Authentication authentication) {
-        if (authentication instanceof OAuth2AuthenticationToken) {
-            OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-            return oauthToken.getAuthorizedClientRegistrationId();
-        }
-        return "unknown";
     }
 }
