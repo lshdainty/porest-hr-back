@@ -1,10 +1,5 @@
 package com.lshdainty.porest.user.service;
 
-// TODO: Password 초기화 이메일 전송 후 DB에 password 변경 플래그 업데이트 관련 기능 개발 필요
-//       - User 엔티티에 passwordChangeRequired 필드 추가
-//       - 임시 비밀번호 발급 시 해당 플래그 true로 설정
-//       - 로그인 시 플래그 확인하여 비밀번호 변경 페이지로 리다이렉트
-
 import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
 import com.lshdainty.porest.common.exception.DuplicateException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
@@ -676,9 +671,10 @@ public class UserServiceImpl implements UserService {
         // 3. 임시 비밀번호 생성
         String tempPassword = generateTempPassword();
 
-        // 4. DB에 암호화된 비밀번호 저장
+        // 4. DB에 암호화된 비밀번호 저장 및 비밀번호 변경 필요 플래그 설정
         String encodedPassword = passwordEncoder.encode(tempPassword);
         user.updatePassword(encodedPassword);
+        user.requirePasswordChange();
 
         // 5. 이메일 발송
         emailService.sendPasswordResetEmail(user.getEmail(), user.getName(), tempPassword);
@@ -744,9 +740,10 @@ public class UserServiceImpl implements UserService {
             throw new InvalidValueException(ErrorCode.USER_SAME_PASSWORD);
         }
 
-        // 4. 비밀번호 변경
+        // 4. 비밀번호 변경 및 비밀번호 변경 필요 플래그 해제
         String encodedPassword = passwordEncoder.encode(newPassword);
         user.updatePassword(encodedPassword);
+        user.clearPasswordChangeRequired();
 
         log.info("비밀번호 변경 완료: userId={}", userId);
     }

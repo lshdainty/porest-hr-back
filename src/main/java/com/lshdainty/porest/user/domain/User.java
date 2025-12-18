@@ -476,6 +476,22 @@ public class User extends AuditingFields {
         this.pwd = encodedPassword;
     }
 
+    /**
+     * 비밀번호 변경 필요 플래그 설정<br>
+     * 임시 비밀번호 발급 시 호출
+     */
+    public void requirePasswordChange() {
+        this.passwordChangeRequired = YNType.Y;
+    }
+
+    /**
+     * 비밀번호 변경 완료 후 플래그 해제<br>
+     * 사용자가 비밀번호 변경 완료 시 호출
+     */
+    public void clearPasswordChangeRequired() {
+        this.passwordChangeRequired = YNType.N;
+    }
+
     /* 비즈니스 편의 메소드 */
     /**
      * 사용자의 workTime에 맞춰<br>

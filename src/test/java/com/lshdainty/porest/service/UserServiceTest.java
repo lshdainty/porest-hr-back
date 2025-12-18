@@ -1304,6 +1304,7 @@ class UserServiceTest {
             then(passwordEncoder).should().encode(anyString());
             then(emailService).should().sendPasswordResetEmail(eq(email), eq("유저"), anyString());
             assertThat(user.getPwd()).isEqualTo("encodedTempPassword");
+            assertThat(user.getPasswordChangeRequired()).isEqualTo(YNType.Y);
         }
 
         @Test
@@ -1384,6 +1385,7 @@ class UserServiceTest {
 
             User user = User.createUser(userId, encodedCurrentPassword, "유저", "test@test.com", LocalDate.now(),
                     OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            user.requirePasswordChange(); // 비밀번호 변경 필요 상태로 설정
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             given(passwordEncoder.matches(currentPassword, encodedCurrentPassword)).willReturn(true);
@@ -1397,6 +1399,7 @@ class UserServiceTest {
             then(userRepository).should().findById(userId);
             then(passwordEncoder).should().encode(newPassword);
             assertThat(user.getPwd()).isEqualTo(encodedNewPassword);
+            assertThat(user.getPasswordChangeRequired()).isEqualTo(YNType.N);
         }
 
         @Test
