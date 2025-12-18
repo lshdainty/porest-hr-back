@@ -1,5 +1,10 @@
 package com.lshdainty.porest.user.service;
 
+// TODO: Password 초기화 이메일 전송 후 DB에 password 변경 플래그 업데이트 관련 기능 개발 필요
+//       - User 엔티티에 passwordChangeRequired 필드 추가
+//       - 임시 비밀번호 발급 시 해당 플래그 true로 설정
+//       - 로그인 시 플래그 확인하여 비밀번호 변경 페이지로 리다이렉트
+
 import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
 import com.lshdainty.porest.common.exception.DuplicateException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
