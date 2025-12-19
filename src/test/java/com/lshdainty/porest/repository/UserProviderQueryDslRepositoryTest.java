@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -199,5 +200,44 @@ class UserProviderQueryDslRepositoryTest {
         // fetch join으로 인해 추가 쿼리 없이 user 접근 가능
         assertThat(findProvider.get().getUser()).isNotNull();
         assertThat(findProvider.get().getUser().getId()).isEqualTo("user1");
+    }
+
+    @Test
+    @DisplayName("사용자 ID로 프로바이더 목록 조회")
+    void findByUserId() {
+        // given
+        UserProvider googleProvider = UserProvider.createProvider(user, "GOOGLE", "google_12345");
+        UserProvider kakaoProvider = UserProvider.createProvider(user, "KAKAO", "kakao_67890");
+        userProviderRepository.save(googleProvider);
+        userProviderRepository.save(kakaoProvider);
+        em.flush();
+        em.clear();
+
+        // when
+        List<UserProvider> providers = userProviderRepository.findByUserId("user1");
+
+        // then
+        assertThat(providers).hasSize(2);
+        assertThat(providers).extracting("type").containsExactlyInAnyOrder("GOOGLE", "KAKAO");
+    }
+
+    @Test
+    @DisplayName("사용자 ID로 프로바이더 조회 - 프로바이더가 없는 경우")
+    void findByUserIdEmpty() {
+        // when
+        List<UserProvider> providers = userProviderRepository.findByUserId("user1");
+
+        // then
+        assertThat(providers).isEmpty();
+    }
+
+    @Test
+    @DisplayName("사용자 ID로 프로바이더 조회 - 존재하지 않는 사용자")
+    void findByUserIdNotExist() {
+        // when
+        List<UserProvider> providers = userProviderRepository.findByUserId("nonexistent");
+
+        // then
+        assertThat(providers).isEmpty();
     }
 }
