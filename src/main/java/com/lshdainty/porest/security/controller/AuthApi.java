@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Tag(name = "Auth", description = "인증 및 보안 API")
@@ -73,6 +74,48 @@ public interface AuthApi {
     })
     @GetMapping("/api/v1/login/check")
     ApiResponse<AuthApiDto.LoginUserInfo> getUserInfo();
+
+    // ========== OAuth 연동 관리 ==========
+
+    @Operation(
+            summary = "OAuth 연동 시작",
+            description = "로그인된 사용자의 소셜 계정 연동을 시작합니다. 세션에 연동 정보를 저장하고 OAuth 인증 URL을 반환합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "OAuth 연동 시작 성공",
+                    content = @Content(schema = @Schema(implementation = AuthApiDto.OAuthLinkStartResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 필요 (로그인되지 않음)"
+            )
+    })
+    @PostMapping("/api/v1/oauth/link/start")
+    ApiResponse<AuthApiDto.OAuthLinkStartResp> startOAuthLink(
+            @Parameter(description = "OAuth 제공자 (google, kakao, naver)", example = "google", required = true)
+            @RequestParam String provider,
+            HttpSession session
+    );
+
+    @Operation(
+            summary = "연동된 OAuth 제공자 목록 조회",
+            description = "현재 로그인된 사용자에게 연동된 OAuth 제공자 목록을 조회합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(schema = @Schema(implementation = AuthApiDto.LinkedProviderResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 필요 (로그인되지 않음)"
+            )
+    })
+    @GetMapping("/api/v1/oauth/providers")
+    ApiResponse<List<AuthApiDto.LinkedProviderResp>> getLinkedProviders();
 
     // ========== IP 블랙리스트 관리 (개발 환경 전용) ==========
 

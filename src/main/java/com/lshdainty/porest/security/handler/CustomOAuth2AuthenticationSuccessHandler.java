@@ -39,8 +39,30 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
 
         log.info("OAuth2 인증 성공");
 
-        // 일반 로그인 성공 처리
-        handleNormalLogin(request, response, authentication);
+        HttpSession session = request.getSession(false);
+        String oauthStep = session != null ? (String) session.getAttribute("oauthStep") : null;
+
+        // OAuth 연동인 경우
+        if ("link".equals(oauthStep)) {
+            handleOAuthLink(request, response);
+        } else {
+            // 일반 로그인 성공 처리
+            handleNormalLogin(request, response, authentication);
+        }
+    }
+
+    /**
+     * OAuth 계정 연동 성공 처리
+     */
+    private void handleOAuthLink(HttpServletRequest request,
+                                 HttpServletResponse response) throws IOException {
+        log.info("OAuth 연동 성공");
+
+        // 세션 정리 (oauthStep, loginUserId는 CustomOAuth2UserService에서 이미 정리됨)
+
+        // 프론트엔드로 리다이렉트 (성공)
+        String redirectUrl = frontendBaseUrl + "/?oauth_link=success";
+        response.sendRedirect(redirectUrl);
     }
 
     /**

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.lshdainty.porest.user.domain.QUserProvider.userProvider;
@@ -32,5 +33,13 @@ public class UserProviderQueryDslRepository implements UserProviderRepository {
                         .and(userProvider.id.eq(id)))
                 .fetchOne();
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<UserProvider> findByUserId(String userId) {
+        return query
+                .selectFrom(userProvider)
+                .where(userProvider.user.id.eq(userId))
+                .fetch();
     }
 }

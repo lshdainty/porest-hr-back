@@ -29,19 +29,23 @@ public class CustomOAuth2AuthenticationFailureHandler implements AuthenticationF
         log.error("OAuth2 인증 실패: {}", exception.getMessage());
 
         HttpSession session = request.getSession(false);
-        String invitationToken = null;
+        String oauthStep = session != null ? (String) session.getAttribute("oauthStep") : null;
 
-        if (session != null) {
-            invitationToken = (String) session.getAttribute("invitationToken");
-        }
+        // OAuth 연동 중이었다면
+        if ("link".equals(oauthStep)) {
+            String errorCode = exception.getMessage();  // "already_linked_self", "already_linked_other" 등
+            String redirectUrl = String.format("%s/?oauth_link=error&code=%s",
+                    frontendBaseUrl, URLEncoder.encode(errorCode, StandardCharsets.UTF_8));
 
-        // 회원가입 중이었다면 회원가입 페이지로, 아니면 로그인 페이지로
-        if (invitationToken != null) {
-            String errorMessage = URLEncoder.encode("소셜 로그인 연동에 실패했습니다.", StandardCharsets.UTF_8);
-            String redirectUrl = String.format("%s/signup?token=%s&error=%s",
-                    frontendBaseUrl, invitationToken, errorMessage);
+            // 세션 정리
+            if (session != null) {
+                session.removeAttribute("oauthStep");
+                session.removeAttribute("loginUserId");
+            }
+
             response.sendRedirect(redirectUrl);
         } else {
+            // 로그인 실패
             String errorMessage = URLEncoder.encode("소셜 로그인에 실패했습니다.", StandardCharsets.UTF_8);
             String redirectUrl = String.format("%s/login?error=%s", frontendBaseUrl, errorMessage);
             response.sendRedirect(redirectUrl);

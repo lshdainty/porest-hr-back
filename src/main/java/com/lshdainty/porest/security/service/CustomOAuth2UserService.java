@@ -18,10 +18,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import com.lshdainty.porest.permission.domain.Role;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -67,67 +65,92 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private User processOAuth2User(OAuthAttributes attributes) {
-        // 1. 세션에 저장된 토큰정보 가져오기
-        String invitationToken = (String) httpSession.getAttribute("invitationToken");
+        // 1. 세션에 저장된 정보 가져오기
         String oauthStep = (String) httpSession.getAttribute("oauthStep");
-        String invitedUserId = (String) httpSession.getAttribute("invitedUserId");
+        String loginUserId = (String) httpSession.getAttribute("loginUserId");
 
-        log.info("Invitation Token: " + invitationToken);
-        log.info("OAuth Step: " + oauthStep);
-        log.info("Invited UserId: " + invitedUserId);
+        log.info("OAuth Step: {}", oauthStep);
+        log.info("Login UserId: {}", loginUserId);
 
-        // 2. 3가지의 값이 다 있다면 회원가입 아니면 로그인으로 간주
-        if (invitationToken != null && "signup".equals(oauthStep) && invitedUserId != null) {
-            // 회원 가입 부분
-            // 2-1. 초대 토큰으로 사용자 찾기
-            User user = userRepository.findByInvitationToken(invitationToken)
-                    .orElseThrow(() -> {
-                        log.warn("OAuth2 회원가입 실패 - 유효하지 않은 초대 토큰: token={}", invitationToken);
-                        return new OAuth2AuthenticationException("유효하지 않은 초대 토큰입니다.");
-                    });
-
-            // 2-2. 토큰 재검증
-            if (!user.isInvitationValid()) {
-                log.warn("OAuth2 회원가입 실패 - 만료된 초대 토큰: userId={}, expiresAt={}", user.getId(), user.getInvitationExpiresAt());
-                throw new OAuth2AuthenticationException("초대 토큰이 만료되었거나 유효하지 않습니다.");
-            }
-
-            if (!user.getId().equals(invitedUserId)) {
-                log.warn("OAuth2 회원가입 실패 - 사용자 ID 불일치: invitedUserId={}, actualUserId={}", invitedUserId, user.getId());
-                throw new OAuth2AuthenticationException("초대된 사용자 정보가 일치하지 않습니다.");
-            }
-
-            // 2-3. OAuth2 제공자 연결
-            UserProvider userProvider = UserProvider.createProvider(
-                    user,
-                    attributes.getProvider(),
-                    attributes.getProviderId()
-            );
-            userProviderRepository.save(userProvider);
-
-            log.info("OAuth2 신규 연결 완료: userId={}, provider={}", user.getId(), attributes.getProvider());
-            return user;
+        // 2. OAuth 연동 또는 로그인으로 분기
+        if ("link".equals(oauthStep) && loginUserId != null) {
+            // OAuth 연동 (로그인된 사용자가 소셜 계정 연동)
+            return processOAuthLink(attributes, loginUserId);
         } else {
-            // 로그인 부분
-            // 기존 소셜 로그인 연결 확인
-            UserProvider userProvider = userProviderRepository
-                    .findByProviderTypeAndProviderId(attributes.getProvider(), attributes.getProviderId())
-                    .orElseThrow(() -> {
-                        log.warn("OAuth2 로그인 실패 - 등록되지 않은 소셜 계정: provider={}, providerId={}", attributes.getProvider(), attributes.getProviderId());
-                        return new OAuth2AuthenticationException("등록되지 않은 소셜 계정입니다. 먼저 회원가입을 진행해주세요.");
-                    });
-
-            // 사용자 id를 기반으로 한 유저 권한 정보 및 역할 조회 (역할 및 권한 정보 포함)
-            String userId = userProvider.getUser().getId();
-            User user = userRepository.findByIdWithRolesAndPermissions(userId)
-                    .orElseThrow(() -> {
-                        log.warn("OAuth2 로그인 실패 - 사용자 정보 없음: userId={}", userId);
-                        return new OAuth2AuthenticationException("사용자 정보를 찾을 수 없습니다.");
-                    });
-
-            log.info("OAuth2 로그인 성공: userId={}, provider={}", user.getId(), attributes.getProvider());
-            return user;
+            // 로그인 (기존 소셜 계정으로 로그인)
+            return processOAuthLogin(attributes);
         }
+    }
+
+    /**
+     * OAuth 계정 연동 처리
+     * 로그인된 사용자에게 소셜 계정을 연동합니다.
+     */
+    private User processOAuthLink(OAuthAttributes attributes, String loginUserId) {
+        // 1. 해당 OAuth 계정이 이미 연동되어 있는지 확인
+        Optional<UserProvider> existingProvider = userProviderRepository
+                .findByProviderTypeAndProviderId(attributes.getProvider(), attributes.getProviderId());
+
+        if (existingProvider.isPresent()) {
+            String linkedUserId = existingProvider.get().getUser().getId();
+            if (linkedUserId.equals(loginUserId)) {
+                // 이미 본인 계정에 연동됨
+                log.warn("OAuth 연동 실패 - 이미 연동된 계정: userId={}, provider={}", loginUserId, attributes.getProvider());
+                throw new OAuth2AuthenticationException("already_linked_self");
+            } else {
+                // 다른 사용자에게 연동됨
+                log.warn("OAuth 연동 실패 - 다른 사용자와 연동된 계정: provider={}, linkedUserId={}", attributes.getProvider(), linkedUserId);
+                throw new OAuth2AuthenticationException("already_linked_other");
+            }
+        }
+
+        // 2. 로그인된 사용자 조회
+        User user = userRepository.findByIdWithRolesAndPermissions(loginUserId)
+                .orElseThrow(() -> {
+                    log.warn("OAuth 연동 실패 - 사용자 없음: userId={}", loginUserId);
+                    return new OAuth2AuthenticationException("user_not_found");
+                });
+
+        // 3. 새 OAuth 제공자 연결
+        UserProvider userProvider = UserProvider.createProvider(
+                user,
+                attributes.getProvider(),
+                attributes.getProviderId()
+        );
+        userProviderRepository.save(userProvider);
+
+        log.info("OAuth 연동 완료: userId={}, provider={}", loginUserId, attributes.getProvider());
+
+        // 4. 세션 정리
+        httpSession.removeAttribute("oauthStep");
+        httpSession.removeAttribute("loginUserId");
+
+        return user;
+    }
+
+    /**
+     * OAuth 로그인 처리
+     * 기존에 연동된 소셜 계정으로 로그인합니다.
+     */
+    private User processOAuthLogin(OAuthAttributes attributes) {
+        // 기존 소셜 로그인 연결 확인
+        UserProvider userProvider = userProviderRepository
+                .findByProviderTypeAndProviderId(attributes.getProvider(), attributes.getProviderId())
+                .orElseThrow(() -> {
+                    log.warn("OAuth2 로그인 실패 - 등록되지 않은 소셜 계정: provider={}, providerId={}", attributes.getProvider(), attributes.getProviderId());
+                    return new OAuth2AuthenticationException("등록되지 않은 소셜 계정입니다. 먼저 회원가입을 진행해주세요.");
+                });
+
+        // 사용자 id를 기반으로 한 유저 권한 정보 및 역할 조회 (역할 및 권한 정보 포함)
+        String userId = userProvider.getUser().getId();
+        User user = userRepository.findByIdWithRolesAndPermissions(userId)
+                .orElseThrow(() -> {
+                    log.warn("OAuth2 로그인 실패 - 사용자 정보 없음: userId={}", userId);
+                    return new OAuth2AuthenticationException("사용자 정보를 찾을 수 없습니다.");
+                });
+
+        log.info("OAuth2 로그인 성공: userId={}, provider={}", user.getId(), attributes.getProvider());
+        return user;
     }
 }
 

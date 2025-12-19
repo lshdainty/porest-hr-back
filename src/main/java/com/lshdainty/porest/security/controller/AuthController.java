@@ -24,7 +24,10 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import com.lshdainty.porest.permission.domain.Role;
+import com.lshdainty.porest.user.domain.UserProvider;
+import com.lshdainty.porest.user.repository.UserProviderRepository;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,6 +38,7 @@ public class AuthController implements AuthApi {
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final IpBlacklistService ipBlacklistService;
+    private final UserProviderRepository userProviderRepository;
 
     /**
      * CSRF 토큰 발급
@@ -121,6 +125,67 @@ public class AuthController implements AuthApi {
                 result.getUserId(), result.getUserName(), result.getUserEmail(),
                 result.getUserRoles(), result.getPermissions(), result.getProfileUrl());
 
+        return ApiResponse.success(result);
+    }
+
+    // ========== OAuth 연동 관리 ==========
+
+    @Override
+    public ApiResponse<AuthApiDto.OAuthLinkStartResp> startOAuthLink(String provider, HttpSession session) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserPrincipal)) {
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        UserPrincipal userPrincipal = (UserPrincipal) principal;
+        String loginUserId = userPrincipal.getUser().getId();
+
+        // 세션에 OAuth 연동 정보 저장
+        session.setAttribute("oauthStep", "link");
+        session.setAttribute("loginUserId", loginUserId);
+
+        log.info("OAuth 연동 시작: userId={}, provider={}", loginUserId, provider);
+
+        // OAuth 인증 URL 반환
+        String authUrl = "/oauth2/authorization/" + provider.toLowerCase();
+        return ApiResponse.success(new AuthApiDto.OAuthLinkStartResp(authUrl));
+    }
+
+    @Override
+    public ApiResponse<List<AuthApiDto.LinkedProviderResp>> getLinkedProviders() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserPrincipal)) {
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
+        }
+
+        UserPrincipal userPrincipal = (UserPrincipal) principal;
+        String loginUserId = userPrincipal.getUser().getId();
+
+        List<UserProvider> providers = userProviderRepository.findByUserId(loginUserId);
+
+        List<AuthApiDto.LinkedProviderResp> result = providers.stream()
+                .map(p -> new AuthApiDto.LinkedProviderResp(
+                        p.getSeq(),
+                        p.getType(),
+                        p.getCreateDate()
+                ))
+                .collect(Collectors.toList());
+
+        log.info("연동된 OAuth 제공자 조회: userId={}, count={}", loginUserId, result.size());
         return ApiResponse.success(result);
     }
 
