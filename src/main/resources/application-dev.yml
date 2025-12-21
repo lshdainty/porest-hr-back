@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
 
   # OAuth2 설정 (개발용 - 테스트 키 사용)
   security:
