@@ -31,21 +31,6 @@ public class PermissionQueryDslRepository implements PermissionRepository {
     }
 
     @Override
-    public Optional<Permission> findById(Long id) {
-        QPermission permission = QPermission.permission;
-
-        Permission result = queryFactory
-                .selectFrom(permission)
-                .where(
-                        permission.id.eq(id),
-                        permission.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
     public Optional<Permission> findByCode(String code) {
         QPermission permission = QPermission.permission;
 
@@ -84,23 +69,5 @@ public class PermissionQueryDslRepository implements PermissionRepository {
                 )
                 .orderBy(permission.action.asc())
                 .fetch();
-    }
-
-    @Override
-    public Optional<Permission> findByResourceAndAction(String resource, String action) {
-        QPermission permission = QPermission.permission;
-        ResourceType resourceType = ResourceType.valueOf(resource);
-        ActionType actionType = ActionType.valueOf(action);
-
-        Permission result = queryFactory
-                .selectFrom(permission)
-                .where(
-                        permission.resource.eq(resourceType),
-                        permission.action.eq(actionType),
-                        permission.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
     }
 }

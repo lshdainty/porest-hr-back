@@ -69,29 +69,6 @@ class VacationUsageJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("휴가사용 다건 저장")
-    void saveAll() {
-        // given
-        List<VacationUsage> usages = List.of(
-                VacationUsage.createVacationUsage(user, "연차1", VacationTimeType.DAYOFF,
-                        LocalDateTime.of(2025, 6, 1, 9, 0), LocalDateTime.of(2025, 6, 1, 18, 0),
-                        new BigDecimal("1.0000")),
-                VacationUsage.createVacationUsage(user, "연차2", VacationTimeType.DAYOFF,
-                        LocalDateTime.of(2025, 6, 2, 9, 0), LocalDateTime.of(2025, 6, 2, 18, 0),
-                        new BigDecimal("1.0000"))
-        );
-
-        // when
-        vacationUsageRepository.saveAll(usages);
-        em.flush();
-        em.clear();
-
-        // then
-        List<VacationUsage> result = vacationUsageRepository.findByUserId("user1");
-        assertThat(result).hasSize(2);
-    }
-
-    @Test
     @DisplayName("단건 조회 시 휴가사용이 없으면 빈 Optional 반환")
     void findByIdEmpty() {
         // when
@@ -99,54 +76,6 @@ class VacationUsageJpaRepositoryTest {
 
         // then
         assertThat(result.isEmpty()).isTrue();
-    }
-
-    @Test
-    @DisplayName("유저 ID로 휴가사용 목록 조회")
-    void findByUserId() {
-        // given
-        vacationUsageRepository.save(VacationUsage.createVacationUsage(
-                user, "연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 6, 1, 9, 0), LocalDateTime.of(2025, 6, 1, 18, 0),
-                new BigDecimal("1.0000")
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationUsage> result = vacationUsageRepository.findByUserId("user1");
-
-        // then
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getDesc()).isEqualTo("연차");
-    }
-
-    @Test
-    @DisplayName("유저 ID로 조회 시 삭제된 사용 내역 제외")
-    void findByUserIdExcludesDeleted() {
-        // given
-        VacationUsage activeUsage = VacationUsage.createVacationUsage(
-                user, "활성 연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 6, 1, 9, 0), LocalDateTime.of(2025, 6, 1, 18, 0),
-                new BigDecimal("1.0000")
-        );
-        VacationUsage deletedUsage = VacationUsage.createVacationUsage(
-                user, "삭제 연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 6, 2, 9, 0), LocalDateTime.of(2025, 6, 2, 18, 0),
-                new BigDecimal("1.0000")
-        );
-        vacationUsageRepository.save(activeUsage);
-        vacationUsageRepository.save(deletedUsage);
-        deletedUsage.deleteVacationUsage();
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationUsage> result = vacationUsageRepository.findByUserId("user1");
-
-        // then
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getDesc()).isEqualTo("활성 연차");
     }
 
     @Test
@@ -266,83 +195,6 @@ class VacationUsageJpaRepositoryTest {
 
         // when
         List<VacationUsage> result = vacationUsageRepository.findByUserIdAndPeriodWithUser(
-                "user1",
-                LocalDateTime.of(2025, 6, 1, 0, 0),
-                LocalDateTime.of(2025, 6, 30, 23, 59)
-        );
-
-        // then
-        assertThat(result).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("기준시간 이전 사용한 휴가 조회")
-    void findUsedByUserIdAndBaseTime() {
-        // given
-        vacationUsageRepository.save(VacationUsage.createVacationUsage(
-                user, "과거연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 5, 1, 9, 0), LocalDateTime.of(2025, 5, 1, 18, 0),
-                new BigDecimal("1.0000")
-        ));
-        vacationUsageRepository.save(VacationUsage.createVacationUsage(
-                user, "미래연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 7, 1, 9, 0), LocalDateTime.of(2025, 7, 1, 18, 0),
-                new BigDecimal("1.0000")
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationUsage> result = vacationUsageRepository.findUsedByUserIdAndBaseTime(
-                "user1", LocalDateTime.of(2025, 6, 1, 0, 0)
-        );
-
-        // then
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getDesc()).isEqualTo("과거연차");
-    }
-
-    @Test
-    @DisplayName("기준시간 이후 예정된 휴가 조회")
-    void findExpectedByUserIdAndBaseTime() {
-        // given
-        vacationUsageRepository.save(VacationUsage.createVacationUsage(
-                user, "과거연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 5, 1, 9, 0), LocalDateTime.of(2025, 5, 1, 18, 0),
-                new BigDecimal("1.0000")
-        ));
-        vacationUsageRepository.save(VacationUsage.createVacationUsage(
-                user, "미래연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 7, 1, 9, 0), LocalDateTime.of(2025, 7, 1, 18, 0),
-                new BigDecimal("1.0000")
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationUsage> result = vacationUsageRepository.findExpectedByUserIdAndBaseTime(
-                "user1", LocalDateTime.of(2025, 6, 1, 0, 0)
-        );
-
-        // then
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getDesc()).isEqualTo("미래연차");
-    }
-
-    @Test
-    @DisplayName("유저와 기간으로 휴가사용 조회 (between)")
-    void findByUserIdAndPeriod() {
-        // given
-        vacationUsageRepository.save(VacationUsage.createVacationUsage(
-                user, "6월 연차", VacationTimeType.DAYOFF,
-                LocalDateTime.of(2025, 6, 15, 9, 0), LocalDateTime.of(2025, 6, 15, 18, 0),
-                new BigDecimal("1.0000")
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationUsage> result = vacationUsageRepository.findByUserIdAndPeriod(
                 "user1",
                 LocalDateTime.of(2025, 6, 1, 0, 0),
                 LocalDateTime.of(2025, 6, 30, 23, 59)

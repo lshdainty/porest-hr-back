@@ -72,63 +72,6 @@ class DepartmentQueryDslRepositoryTest {
     }
 
     @Test
-    @DisplayName("부서와 자식 부서를 함께 조회")
-    void findByIdWithChildren() {
-        // given
-        Department parent = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
-        departmentRepository.save(parent);
-
-        departmentRepository.save(Department.createDepartment("프론트엔드", "프론트엔드", parent, null, 2L, "프론트엔드 팀", "#00FF00", company));
-        departmentRepository.save(Department.createDepartment("백엔드", "백엔드", parent, null, 2L, "백엔드 팀", "#0000FF", company));
-
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Department> findDepartment = departmentRepository.findByIdWithChildren(parent.getId());
-
-        // then
-        assertThat(findDepartment.isPresent()).isTrue();
-        assertThat(findDepartment.get().getChildren()).hasSize(2);
-    }
-
-    @Test
-    @DisplayName("자식 부서 존재 여부 확인 - 있음")
-    void hasActiveChildrenTrue() {
-        // given
-        Department parent = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
-        departmentRepository.save(parent);
-
-        departmentRepository.save(Department.createDepartment("프론트엔드", "프론트엔드", parent, null, 2L, "프론트엔드 팀", "#00FF00", company));
-
-        em.flush();
-        em.clear();
-
-        // when
-        boolean hasChildren = departmentRepository.hasActiveChildren(parent.getId());
-
-        // then
-        assertThat(hasChildren).isTrue();
-    }
-
-    @Test
-    @DisplayName("자식 부서 존재 여부 확인 - 없음")
-    void hasActiveChildrenFalse() {
-        // given
-        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
-        departmentRepository.save(department);
-
-        em.flush();
-        em.clear();
-
-        // when
-        boolean hasChildren = departmentRepository.hasActiveChildren(department.getId());
-
-        // then
-        assertThat(hasChildren).isFalse();
-    }
-
-    @Test
     @DisplayName("유저-부서 연결 저장")
     void saveUserDepartment() {
         // given
@@ -148,9 +91,9 @@ class DepartmentQueryDslRepositoryTest {
         em.clear();
 
         // then
-        List<User> users = departmentRepository.findUsersInDepartment(department.getId());
-        assertThat(users).hasSize(1);
-        assertThat(users.get(0).getId()).isEqualTo("user1");
+        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getId());
+        assertThat(userDepartments).hasSize(1);
+        assertThat(userDepartments.get(0).getUser().getId()).isEqualTo("user1");
     }
 
     @Test
@@ -202,38 +145,6 @@ class DepartmentQueryDslRepositoryTest {
 
         // then
         assertThat(found.isPresent()).isTrue();
-    }
-
-    @Test
-    @DisplayName("특정 부서에 속한 유저 조회")
-    void findUsersInDepartment() {
-        // given
-        User user1 = User.createUser(
-                "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        em.persist(user1);
-        em.persist(user2);
-
-        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
-        departmentRepository.save(department);
-
-        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user1, department, YNType.Y));
-        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(user2, department, YNType.Y));
-        em.flush();
-        em.clear();
-
-        // when
-        List<User> users = departmentRepository.findUsersInDepartment(department.getId());
-
-        // then
-        assertThat(users).hasSize(2);
     }
 
     @Test
@@ -482,40 +393,6 @@ class DepartmentQueryDslRepositoryTest {
 
         // then
         assertThat(approvers).isEmpty();
-    }
-
-    @Test
-    @DisplayName("부서별 유저 조회 시 SYSTEM 계정 제외")
-    void findUsersInDepartmentExcludesSystemAccount() {
-        // given
-        User normalUser = User.createUser(
-                "normalUser", "password", "일반유저", "normal@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        User systemUser = User.createUser(
-                "systemUser", "password", "시스템유저", "system@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        em.persist(normalUser);
-        em.persist(systemUser);
-
-        Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
-        departmentRepository.save(department);
-
-        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(normalUser, department, YNType.Y));
-        departmentRepository.saveUserDepartment(UserDepartment.createUserDepartment(systemUser, department, YNType.N));
-        em.flush();
-        em.clear();
-
-        // when
-        List<User> users = departmentRepository.findUsersInDepartment(department.getId());
-
-        // then
-        assertThat(users).hasSize(1);
-        assertThat(users.get(0).getId()).isEqualTo("normalUser");
-        assertThat(users.get(0).getCompany()).isNotEqualTo(DefaultCompanyType.SYSTEM);
     }
 
     @Test

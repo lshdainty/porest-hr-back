@@ -29,7 +29,7 @@ class PermissionQueryDslRepositoryTest {
     private TestEntityManager em;
 
     @Test
-    @DisplayName("권한 저장 및 ID로 조회")
+    @DisplayName("권한 저장 및 코드로 조회")
     void save() {
         // given
         Permission permission = Permission.createPermission(
@@ -43,40 +43,10 @@ class PermissionQueryDslRepositoryTest {
         em.clear();
 
         // then
-        Optional<Permission> findPermission = permissionRepository.findById(permission.getId());
+        Optional<Permission> findPermission = permissionRepository.findByCode("USER:READ");
         assertThat(findPermission.isPresent()).isTrue();
         assertThat(findPermission.get().getCode()).isEqualTo("USER:READ");
         assertThat(findPermission.get().getName()).isEqualTo("사용자 조회");
-    }
-
-    @Test
-    @DisplayName("ID로 조회 시 삭제된 권한 제외")
-    void findByIdExcludesDeleted() {
-        // given
-        Permission permission = Permission.createPermission(
-                "USER:READ", "사용자 조회", "사용자 정보 조회 권한",
-                ResourceType.USER, ActionType.READ
-        );
-        permissionRepository.save(permission);
-        permission.deletePermission();
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Permission> findPermission = permissionRepository.findById(permission.getId());
-
-        // then
-        assertThat(findPermission.isEmpty()).isTrue();
-    }
-
-    @Test
-    @DisplayName("ID로 조회 시 없으면 빈 Optional 반환")
-    void findByIdEmpty() {
-        // when
-        Optional<Permission> findPermission = permissionRepository.findById(999L);
-
-        // then
-        assertThat(findPermission.isEmpty()).isTrue();
     }
 
     @Test
@@ -273,59 +243,6 @@ class PermissionQueryDslRepositoryTest {
     }
 
     @Test
-    @DisplayName("리소스와 액션으로 권한 조회")
-    void findByResourceAndAction() {
-        // given
-        permissionRepository.save(Permission.createPermission(
-                "USER:READ", "사용자 조회", "설명",
-                ResourceType.USER, ActionType.READ
-        ));
-        permissionRepository.save(Permission.createPermission(
-                "USER:WRITE", "사용자 수정", "설명",
-                ResourceType.USER, ActionType.WRITE
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Permission> permission = permissionRepository.findByResourceAndAction("USER", "READ");
-
-        // then
-        assertThat(permission.isPresent()).isTrue();
-        assertThat(permission.get().getCode()).isEqualTo("USER:READ");
-    }
-
-    @Test
-    @DisplayName("리소스와 액션으로 조회 시 삭제된 권한 제외")
-    void findByResourceAndActionExcludesDeleted() {
-        // given
-        Permission permission = Permission.createPermission(
-                "USER:READ", "사용자 조회", "설명",
-                ResourceType.USER, ActionType.READ
-        );
-        permissionRepository.save(permission);
-        permission.deletePermission();
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Permission> findPermission = permissionRepository.findByResourceAndAction("USER", "READ");
-
-        // then
-        assertThat(findPermission.isEmpty()).isTrue();
-    }
-
-    @Test
-    @DisplayName("리소스와 액션으로 조회 시 없으면 빈 Optional 반환")
-    void findByResourceAndActionEmpty() {
-        // when
-        Optional<Permission> permission = permissionRepository.findByResourceAndAction("USER", "MANAGE");
-
-        // then
-        assertThat(permission.isEmpty()).isTrue();
-    }
-
-    @Test
     @DisplayName("권한 수정")
     void updatePermission() {
         // given
@@ -338,13 +255,13 @@ class PermissionQueryDslRepositoryTest {
         em.clear();
 
         // when
-        Permission foundPermission = permissionRepository.findById(permission.getId()).orElseThrow();
+        Permission foundPermission = permissionRepository.findByCode("USER:READ").orElseThrow();
         foundPermission.updatePermission("수정된 이름", "수정된 설명", ResourceType.VACATION, ActionType.WRITE);
         em.flush();
         em.clear();
 
         // then
-        Permission updatedPermission = permissionRepository.findById(permission.getId()).orElseThrow();
+        Permission updatedPermission = permissionRepository.findByCode("USER:READ").orElseThrow();
         assertThat(updatedPermission.getName()).isEqualTo("수정된 이름");
         assertThat(updatedPermission.getDesc()).isEqualTo("수정된 설명");
         assertThat(updatedPermission.getResource()).isEqualTo(ResourceType.VACATION);

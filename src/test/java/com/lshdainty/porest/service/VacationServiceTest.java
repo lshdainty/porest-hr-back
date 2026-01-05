@@ -56,9 +56,6 @@ class VacationServiceTest {
     private UserVacationPlanRepository userVacationPlanRepository;
 
     @Mock
-    private VacationPlanPolicyRepository vacationPlanPolicyRepository;
-
-    @Mock
     private HolidayRepository holidayRepository;
 
     @Mock
@@ -608,7 +605,7 @@ class VacationServiceTest {
 
             given(vacationUsageRepository.findByPeriodWithUser(startDate, endDate))
                     .willReturn(List.of(usage));
-            given(vacationUsageDeductionRepository.findByUsageId(1L)).willReturn(List.of());
+            given(vacationUsageDeductionRepository.findByUsageIds(anyList())).willReturn(List.of());
 
             // when
             List<VacationServiceDto> result = vacationService.getVacationUsagesByPeriod(startDate, endDate);
@@ -1319,7 +1316,7 @@ class VacationServiceTest {
 
             given(vacationUsageRepository.findByPeriodWithUser(startDate, endDate))
                     .willReturn(List.of(usage));
-            given(vacationUsageDeductionRepository.findByUsageId(1L)).willReturn(List.of(deduction));
+            given(vacationUsageDeductionRepository.findByUsageIds(anyList())).willReturn(List.of(deduction));
 
             // when
             List<VacationServiceDto> result = vacationService.getVacationUsagesByPeriod(startDate, endDate);

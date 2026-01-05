@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 public class VacationServiceImpl implements VacationService {
     private final VacationPolicyRepository vacationPolicyRepository;
     private final UserVacationPlanRepository userVacationPlanRepository;
-    private final VacationPlanPolicyRepository vacationPlanPolicyRepository;
     private final HolidayRepository holidayRepository;
     private final UserService userService;
     private final VacationPolicyStrategyFactory vacationPolicyStrategyFactory;

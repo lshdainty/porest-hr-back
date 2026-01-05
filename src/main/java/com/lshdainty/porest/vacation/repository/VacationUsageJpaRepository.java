@@ -22,13 +22,6 @@ public class VacationUsageJpaRepository implements VacationUsageRepository {
     }
 
     @Override
-    public void saveAll(List<VacationUsage> vacationUsages) {
-        for (VacationUsage vu : vacationUsages) {
-            em.persist(vu);
-        }
-    }
-
-    @Override
     public Optional<VacationUsage> findById(Long vacationUsageId) {
         List<VacationUsage> result = em.createQuery(
                         "select vu from VacationUsage vu " +
@@ -37,18 +30,6 @@ public class VacationUsageJpaRepository implements VacationUsageRepository {
                 .setParameter("id", vacationUsageId)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public List<VacationUsage> findByUserId(String userId) {
-        return em.createQuery(
-                        "select vu from VacationUsage vu " +
-                                "join fetch vu.user " +
-                                "where vu.user.id = :userId and vu.isDeleted = :isDeleted " +
-                                "order by vu.startDate asc", VacationUsage.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
     }
 
     @Override
@@ -113,48 +94,6 @@ public class VacationUsageJpaRepository implements VacationUsageRepository {
                 .setParameter("isDeleted", YNType.N)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationUsage> findUsedByUserIdAndBaseTime(String userId, LocalDateTime baseTime) {
-        return em.createQuery(
-                        "select vu from VacationUsage vu " +
-                                "join fetch vu.user " +
-                                "where vu.user.id = :userId " +
-                                "and vu.isDeleted = :isDeleted " +
-                                "and vu.startDate <= :baseTime", VacationUsage.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .setParameter("baseTime", baseTime)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationUsage> findExpectedByUserIdAndBaseTime(String userId, LocalDateTime baseTime) {
-        return em.createQuery(
-                        "select vu from VacationUsage vu " +
-                                "join fetch vu.user " +
-                                "where vu.user.id = :userId " +
-                                "and vu.isDeleted = :isDeleted " +
-                                "and vu.startDate > :baseTime", VacationUsage.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .setParameter("baseTime", baseTime)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationUsage> findByUserIdAndPeriod(String userId, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod) {
-        return em.createQuery(
-                        "select vu from VacationUsage vu " +
-                                "where vu.user.id = :userId " +
-                                "and vu.startDate between :startOfPeriod and :endOfPeriod " +
-                                "and vu.isDeleted = :isDeleted", VacationUsage.class)
-                .setParameter("userId", userId)
-                .setParameter("startOfPeriod", startOfPeriod)
-                .setParameter("endOfPeriod", endOfPeriod)
-                .setParameter("isDeleted", YNType.N)
                 .getResultList();
     }
 

@@ -18,14 +18,6 @@ public interface PermissionRepository {
     void save(Permission permission);
 
     /**
-     * 권한 ID로 권한 조회
-     *
-     * @param id 권한 ID
-     * @return Optional<Permission>
-     */
-    Optional<Permission> findById(Long id);
-
-    /**
      * 권한 코드로 권한 조회
      *
      * @param code 권한 코드
@@ -47,13 +39,4 @@ public interface PermissionRepository {
      * @return List<Permission>
      */
     List<Permission> findByResource(String resource);
-
-    /**
-     * 리소스와 액션으로 권한 조회
-     *
-     * @param resource 리소스명
-     * @param action 액션명
-     * @return Optional<Permission>
-     */
-    Optional<Permission> findByResourceAndAction(String resource, String action);
 }

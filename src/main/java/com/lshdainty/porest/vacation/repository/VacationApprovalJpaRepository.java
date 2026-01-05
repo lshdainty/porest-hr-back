@@ -15,11 +15,6 @@ public class VacationApprovalJpaRepository implements VacationApprovalRepository
     private final EntityManager em;
 
     @Override
-    public void save(VacationApproval vacationApproval) {
-        em.persist(vacationApproval);
-    }
-
-    @Override
     public void saveAll(List<VacationApproval> vacationApprovals) {
         for (VacationApproval va : vacationApprovals) {
             em.persist(va);
@@ -39,16 +34,6 @@ public class VacationApprovalJpaRepository implements VacationApprovalRepository
     }
 
     @Override
-    public List<Long> findAllVacationGrantIdsByApproverId(String approverId) {
-        return em.createQuery(
-                        "select distinct va.vacationGrant.id from VacationApproval va " +
-                                "where va.approver.id = :approverId and va.isDeleted = :isDeleted", Long.class)
-                .setParameter("approverId", approverId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
     public List<Long> findAllVacationGrantIdsByApproverIdAndYear(String approverId, Integer year) {
         return em.createQuery(
                         "select distinct va.vacationGrant.id from VacationApproval va " +
@@ -59,17 +44,6 @@ public class VacationApprovalJpaRepository implements VacationApprovalRepository
                 .setParameter("isDeleted", YNType.N)
                 .setParameter("year", year)
                 .getResultList();
-    }
-
-    @Override
-    public Optional<VacationApproval> findById(Long id) {
-        List<VacationApproval> result = em.createQuery(
-                        "select va from VacationApproval va " +
-                                "where va.id = :id and va.isDeleted = :isDeleted", VacationApproval.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     @Override

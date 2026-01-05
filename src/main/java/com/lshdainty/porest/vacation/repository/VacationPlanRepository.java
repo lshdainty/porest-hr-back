@@ -18,14 +18,6 @@ public interface VacationPlanRepository {
     void save(VacationPlan vacationPlan);
 
     /**
-     * 휴가 플랜 ID로 조회
-     *
-     * @param id 플랜 ID
-     * @return Optional<VacationPlan>
-     */
-    Optional<VacationPlan> findById(Long id);
-
-    /**
      * 휴가 플랜 ID로 조회 (정책 포함 - fetch join)
      *
      * @param id 플랜 ID
@@ -48,21 +40,6 @@ public interface VacationPlanRepository {
      * @return Optional<VacationPlan>
      */
     Optional<VacationPlan> findByCodeWithPolicies(String code);
-
-    /**
-     * 휴가 플랜 이름으로 조회
-     *
-     * @param name 플랜 이름
-     * @return Optional<VacationPlan>
-     */
-    Optional<VacationPlan> findByName(String name);
-
-    /**
-     * 전체 휴가 플랜 목록 조회 (삭제되지 않은 것만)
-     *
-     * @return List<VacationPlan>
-     */
-    List<VacationPlan> findAll();
 
     /**
      * 전체 휴가 플랜 목록 조회 (정책 포함 - fetch join)

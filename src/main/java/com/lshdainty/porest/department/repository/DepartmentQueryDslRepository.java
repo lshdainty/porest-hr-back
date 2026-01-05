@@ -45,34 +45,6 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
     }
 
     @Override
-    public Optional<Department> findByIdWithChildren(Long id) {
-        return Optional.ofNullable(query
-                .selectFrom(department)
-                .leftJoin(department.children).fetchJoin()
-                .where(
-                        department.id.eq(id),
-                        department.isDeleted.eq(YNType.N)
-                )
-                .distinct()
-                .fetchOne()
-        );
-    }
-
-    @Override
-    public boolean hasActiveChildren(Long departmentId) {
-        Long count = query
-                .select(department.count())
-                .from(department)
-                .where(
-                        department.parent.id.eq(departmentId),
-                        department.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return count != null && count > 0;
-    }
-
-    @Override
     public void saveUserDepartment(UserDepartment userDepartment) {
         em.persist(userDepartment);
     }
@@ -101,23 +73,6 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                 )
                 .fetchOne()
         );
-    }
-
-    @Override
-    public List<User> findUsersInDepartment(Long departmentId) {
-        return query
-                .select(userDepartment.user)
-                .from(userDepartment)
-                .join(userDepartment.user, user)
-                .join(userDepartment.department, department)
-                .where(
-                        userDepartment.department.id.eq(departmentId),
-                        userDepartment.isDeleted.eq(YNType.N),
-                        department.isDeleted.eq(YNType.N),
-                        user.isDeleted.eq(YNType.N),
-                        user.company.ne(DefaultCompanyType.SYSTEM)
-                )
-                .fetch();
     }
 
     @Override

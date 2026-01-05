@@ -27,22 +27,6 @@ public interface DepartmentRepository {
     Optional<Department> findById(Long id);
 
     /**
-     * 자식 부서까지 모두 조회
-     *
-     * @param id 부서 ID
-     * @return Optional&lt;Department&gt;
-     */
-    Optional<Department> findByIdWithChildren(Long id);
-
-    /**
-     * 자식 부서가 존재하는지 체크
-     *
-     * @param departmentId 부서 ID
-     * @return 자식 부서 존재 여부
-     */
-    boolean hasActiveChildren(Long departmentId);
-
-    /**
      * 유저-부서 연결 저장
      *
      * @param userDepartment 저장할 유저-부서 연결
@@ -65,14 +49,6 @@ public interface DepartmentRepository {
      * @return Optional&lt;UserDepartment&gt;
      */
     Optional<UserDepartment> findUserDepartment(String userId, Long departmentId);
-
-    /**
-     * 특정 부서에 속한 유저 조회
-     *
-     * @param departmentId 부서 ID
-     * @return List&lt;User&gt;
-     */
-    List<User> findUsersInDepartment(Long departmentId);
 
     /**
      * 특정 부서에 속하지 않은 유저 조회

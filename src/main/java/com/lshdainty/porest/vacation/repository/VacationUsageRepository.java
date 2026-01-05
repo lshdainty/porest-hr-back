@@ -13,19 +13,9 @@ public interface VacationUsageRepository {
     void save(VacationUsage vacationUsage);
 
     /**
-     * VacationUsage 일괄 저장
-     */
-    void saveAll(List<VacationUsage> vacationUsages);
-
-    /**
      * ID로 VacationUsage 조회
      */
     Optional<VacationUsage> findById(Long vacationUsageId);
-
-    /**
-     * 유저 ID로 VacationUsage 조회
-     */
-    List<VacationUsage> findByUserId(String userId);
 
     /**
      * 유저 ID와 년도로 VacationUsage 조회
@@ -65,37 +55,6 @@ public interface VacationUsageRepository {
      * @return 기간 내 VacationUsage 리스트
      */
     List<VacationUsage> findByUserIdAndPeriodWithUser(String userId, LocalDateTime startDate, LocalDateTime endDate);
-
-    /**
-     * baseTime 이전에 사용한 VacationUsage 조회
-     * startDate <= baseTime인 휴가 사용 내역 조회
-     *
-     * @param userId 유저 ID
-     * @param baseTime 기준 시간
-     * @return baseTime 이전 VacationUsage 리스트
-     */
-    List<VacationUsage> findUsedByUserIdAndBaseTime(String userId, LocalDateTime baseTime);
-
-    /**
-     * baseTime 이후 사용 예정인 VacationUsage 조회
-     * startDate > baseTime인 휴가 사용 내역 조회
-     *
-     * @param userId 유저 ID
-     * @param baseTime 기준 시간
-     * @return baseTime 이후 VacationUsage 리스트
-     */
-    List<VacationUsage> findExpectedByUserIdAndBaseTime(String userId, LocalDateTime baseTime);
-
-    /**
-     * 특정 사용자의 특정 기간 내 VacationUsage 조회
-     * startDate가 startOfPeriod와 endOfPeriod 사이에 있는 휴가 사용 내역 조회
-     *
-     * @param userId 사용자 ID
-     * @param startOfPeriod 조회 기간 시작일
-     * @param endOfPeriod 조회 기간 종료일
-     * @return 해당 기간 내 VacationUsage 리스트
-     */
-    List<VacationUsage> findByUserIdAndPeriod(String userId, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod);
 
     /**
      * 특정 사용자의 기간 내 VacationUsage 조회 (일별 집계용)

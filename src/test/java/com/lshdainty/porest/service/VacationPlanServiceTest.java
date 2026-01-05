@@ -12,7 +12,6 @@ import com.lshdainty.porest.vacation.domain.VacationPlanPolicy;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
 import com.lshdainty.porest.vacation.repository.UserVacationPlanRepository;
 import com.lshdainty.porest.vacation.repository.VacationGrantScheduleRepository;
-import com.lshdainty.porest.vacation.repository.VacationPlanPolicyRepository;
 import com.lshdainty.porest.vacation.repository.VacationPlanRepository;
 import com.lshdainty.porest.vacation.repository.VacationPolicyRepository;
 import com.lshdainty.porest.vacation.service.VacationPlanServiceImpl;
@@ -55,9 +54,6 @@ class VacationPlanServiceTest {
 
     @Mock
     private VacationPlanRepository vacationPlanRepository;
-
-    @Mock
-    private VacationPlanPolicyRepository vacationPlanPolicyRepository;
 
     @Mock
     private UserVacationPlanRepository userVacationPlanRepository;

@@ -33,22 +33,6 @@ public class VacationGrantJpaRepository implements VacationGrantRepository {
     }
 
     @Override
-    public List<VacationGrant> findByUserId(String userId) {
-        return em.createQuery(
-                        "select vg from VacationGrant vg " +
-                                "join fetch vg.user " +
-                                "join fetch vg.policy " +
-                                "where vg.user.id = :userId " +
-                                "and vg.isDeleted = :isDeleted " +
-                                "and vg.status = :status " +
-                                "order by vg.grantDate asc", VacationGrant.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .setParameter("status", GrantStatus.ACTIVE)
-                .getResultList();
-    }
-
-    @Override
     public List<VacationGrant> findByUserIdAndYear(String userId, int year) {
         LocalDateTime startOfYear = LocalDateTime.of(year, 1, 1, 0, 0, 0);
         LocalDateTime endOfYear = LocalDateTime.of(year, 12, 31, 23, 59, 59);
@@ -80,24 +64,6 @@ public class VacationGrantJpaRepository implements VacationGrantRepository {
                                 "where vg.policy.id = :policyId and vg.isDeleted = :isDeleted", VacationGrant.class)
                 .setParameter("policyId", policyId)
                 .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationGrant> findAvailableGrantsByUserIdOrderByExpiryDate(String userId) {
-        return em.createQuery(
-                        "select vg from VacationGrant vg " +
-                                "join fetch vg.user " +
-                                "join fetch vg.policy " +
-                                "where vg.user.id = :userId " +
-                                "and vg.isDeleted = :isDeleted " +
-                                "and vg.status = :status " +
-                                "and vg.remainTime > :zero " +
-                                "order by vg.expiryDate asc, vg.grantDate asc", VacationGrant.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .setParameter("status", GrantStatus.ACTIVE)
-                .setParameter("zero", BigDecimal.ZERO)
                 .getResultList();
     }
 
@@ -205,22 +171,6 @@ public class VacationGrantJpaRepository implements VacationGrantRepository {
     }
 
     @Override
-    public List<VacationGrant> findAllRequestedVacationsByUserId(String userId) {
-        return em.createQuery(
-                        "select vg from VacationGrant vg " +
-                                "join fetch vg.user " +
-                                "join fetch vg.policy " +
-                                "where vg.user.id = :userId " +
-                                "and vg.isDeleted = :isDeleted " +
-                                "and vg.policy.grantMethod = :grantMethod " +
-                                "order by vg.requestStartTime desc", VacationGrant.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .setParameter("grantMethod", GrantMethod.ON_REQUEST)
-                .getResultList();
-    }
-
-    @Override
     public List<VacationGrant> findAllRequestedVacationsByUserIdAndYear(String userId, Integer year) {
         return em.createQuery(
                         "select vg from VacationGrant vg " +
@@ -251,39 +201,6 @@ public class VacationGrantJpaRepository implements VacationGrantRepository {
                                 "where vg.id in :ids and vg.isDeleted = :isDeleted " +
                                 "order by vg.createDate desc", VacationGrant.class)
                 .setParameter("ids", vacationGrantIds)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationGrant> findByUserIdAndValidPeriod(String userId, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod) {
-        return em.createQuery(
-                        "select vg from VacationGrant vg " +
-                                "where vg.user.id = :userId " +
-                                "and vg.grantDate <= :endOfPeriod " +
-                                "and vg.expiryDate >= :startOfPeriod " +
-                                "and vg.status in :statuses " +
-                                "and vg.isDeleted = :isDeleted", VacationGrant.class)
-                .setParameter("userId", userId)
-                .setParameter("startOfPeriod", startOfPeriod)
-                .setParameter("endOfPeriod", endOfPeriod)
-                .setParameter("statuses", List.of(GrantStatus.ACTIVE, GrantStatus.EXHAUSTED))
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationGrant> findByUserIdAndStatusesAndPeriod(String userId, List<GrantStatus> statuses, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod) {
-        return em.createQuery(
-                        "select vg from VacationGrant vg " +
-                                "where vg.user.id = :userId " +
-                                "and vg.status in :statuses " +
-                                "and vg.requestStartTime between :startOfPeriod and :endOfPeriod " +
-                                "and vg.isDeleted = :isDeleted", VacationGrant.class)
-                .setParameter("userId", userId)
-                .setParameter("statuses", statuses)
-                .setParameter("startOfPeriod", startOfPeriod)
-                .setParameter("endOfPeriod", endOfPeriod)
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
     }

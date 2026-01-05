@@ -22,16 +22,6 @@ public class PermissionJpaRepository implements PermissionRepository {
     }
 
     @Override
-    public Optional<Permission> findById(Long id) {
-        List<Permission> result = em.createQuery(
-                "select p from Permission p where p.id = :id and p.isDeleted = :isDeleted", Permission.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
     public Optional<Permission> findByCode(String code) {
         List<Permission> result = em.createQuery(
                 "select p from Permission p where p.code = :code and p.isDeleted = :isDeleted", Permission.class)
@@ -57,18 +47,5 @@ public class PermissionJpaRepository implements PermissionRepository {
                 .setParameter("resource", resourceType)
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
-    }
-
-    @Override
-    public Optional<Permission> findByResourceAndAction(String resource, String action) {
-        ResourceType resourceType = ResourceType.valueOf(resource);
-        ActionType actionType = ActionType.valueOf(action);
-        List<Permission> result = em.createQuery(
-                "select p from Permission p where p.resource = :resource and p.action = :action and p.isDeleted = :isDeleted", Permission.class)
-                .setParameter("resource", resourceType)
-                .setParameter("action", actionType)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 }

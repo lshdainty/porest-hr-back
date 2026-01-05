@@ -28,21 +28,6 @@ public class RoleQueryDslRepository implements RoleRepository {
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
-        QRole role = QRole.role;
-
-        Role result = queryFactory
-                .selectFrom(role)
-                .where(
-                        role.id.eq(id),
-                        role.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
     public Optional<Role> findByCode(String code) {
         QRole role = QRole.role;
 
@@ -51,41 +36,6 @@ public class RoleQueryDslRepository implements RoleRepository {
                 .where(
                         role.code.eq(code),
                         role.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
-    public Optional<Role> findByName(String name) {
-        QRole role = QRole.role;
-
-        Role result = queryFactory
-                .selectFrom(role)
-                .where(
-                        role.name.eq(name),
-                        role.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
-    public Optional<Role> findByIdWithPermissions(Long id) {
-        QRole role = QRole.role;
-        QRolePermission rolePermission = QRolePermission.rolePermission;
-        QPermission permission = QPermission.permission;
-
-        Role result = queryFactory
-                .selectFrom(role)
-                .leftJoin(role.rolePermissions, rolePermission).fetchJoin()
-                .leftJoin(rolePermission.permission, permission).fetchJoin()
-                .where(
-                        role.id.eq(id),
-                        role.isDeleted.eq(YNType.N),
-                        rolePermission.isDeleted.eq(YNType.N).or(rolePermission.isNull())
                 )
                 .fetchOne();
 
@@ -110,17 +60,6 @@ public class RoleQueryDslRepository implements RoleRepository {
                 .fetchOne();
 
         return Optional.ofNullable(result);
-    }
-
-    @Override
-    public List<Role> findAllRoles() {
-        QRole role = QRole.role;
-
-        return queryFactory
-                .selectFrom(role)
-                .where(role.isDeleted.eq(YNType.N))
-                .orderBy(role.code.asc())
-                .fetch();
     }
 
     @Override

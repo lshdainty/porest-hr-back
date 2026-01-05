@@ -18,60 +18,12 @@ public interface UserVacationPlanRepository {
     void save(UserVacationPlan userVacationPlan);
 
     /**
-     * 사용자-플랜 매핑 일괄 저장
-     *
-     * @param userVacationPlans 저장할 사용자-플랜 매핑 목록
-     */
-    void saveAll(List<UserVacationPlan> userVacationPlans);
-
-    /**
-     * 사용자-플랜 매핑 ID로 조회
-     *
-     * @param id 매핑 ID
-     * @return Optional<UserVacationPlan>
-     */
-    Optional<UserVacationPlan> findById(Long id);
-
-    /**
-     * 사용자 ID로 사용자-플랜 매핑 목록 조회
-     *
-     * @param userId 사용자 ID
-     * @return List<UserVacationPlan>
-     */
-    List<UserVacationPlan> findByUserId(String userId);
-
-    /**
-     * 사용자 ID로 사용자-플랜 매핑 목록 조회 (플랜 정보 포함 - fetch join)
-     *
-     * @param userId 사용자 ID
-     * @return List<UserVacationPlan>
-     */
-    List<UserVacationPlan> findByUserIdWithPlan(String userId);
-
-    /**
      * 사용자 ID로 사용자-플랜 매핑 목록 조회 (플랜 및 정책 정보 포함 - fetch join)
      *
      * @param userId 사용자 ID
      * @return List<UserVacationPlan>
      */
     List<UserVacationPlan> findByUserIdWithPlanAndPolicies(String userId);
-
-    /**
-     * 플랜 ID로 사용자-플랜 매핑 목록 조회
-     *
-     * @param planId 플랜 ID
-     * @return List<UserVacationPlan>
-     */
-    List<UserVacationPlan> findByPlanId(Long planId);
-
-    /**
-     * 사용자 ID와 플랜 ID로 사용자-플랜 매핑 조회
-     *
-     * @param userId 사용자 ID
-     * @param planId 플랜 ID
-     * @return Optional<UserVacationPlan>
-     */
-    Optional<UserVacationPlan> findByUserIdAndPlanId(String userId, Long planId);
 
     /**
      * 사용자 ID와 플랜 코드로 사용자-플랜 매핑 조회
@@ -81,15 +33,6 @@ public interface UserVacationPlanRepository {
      * @return Optional<UserVacationPlan>
      */
     Optional<UserVacationPlan> findByUserIdAndPlanCode(String userId, String planCode);
-
-    /**
-     * 사용자 ID와 플랜 ID로 매핑 존재 여부 확인
-     *
-     * @param userId 사용자 ID
-     * @param planId 플랜 ID
-     * @return 존재 여부
-     */
-    boolean existsByUserIdAndPlanId(String userId, Long planId);
 
     /**
      * 사용자 ID와 플랜 코드로 매핑 존재 여부 확인

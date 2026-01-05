@@ -69,12 +69,4 @@ public interface NoticeRepository {
      * @return Page&lt;Notice&gt;
      */
     Page<Notice> findPinnedNotices(Pageable pageable);
-
-    /**
-     * 활성 공지사항 개수 조회
-     *
-     * @param now 현재 날짜
-     * @return 활성 공지사항 개수
-     */
-    long countActiveNotices(LocalDate now);
 }

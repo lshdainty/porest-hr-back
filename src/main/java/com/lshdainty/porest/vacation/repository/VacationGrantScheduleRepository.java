@@ -19,37 +19,6 @@ public interface VacationGrantScheduleRepository {
     void save(VacationGrantSchedule schedule);
 
     /**
-     * 스케줄 일괄 저장
-     *
-     * @param schedules 저장할 스케줄 목록
-     */
-    void saveAll(List<VacationGrantSchedule> schedules);
-
-    /**
-     * 스케줄 ID로 조회
-     *
-     * @param id 스케줄 ID
-     * @return Optional<VacationGrantSchedule>
-     */
-    Optional<VacationGrantSchedule> findById(Long id);
-
-    /**
-     * 사용자 ID로 스케줄 목록 조회
-     *
-     * @param userId 사용자 ID
-     * @return List<VacationGrantSchedule>
-     */
-    List<VacationGrantSchedule> findByUserId(String userId);
-
-    /**
-     * 정책 ID로 스케줄 목록 조회
-     *
-     * @param policyId 정책 ID
-     * @return List<VacationGrantSchedule>
-     */
-    List<VacationGrantSchedule> findByPolicyId(Long policyId);
-
-    /**
      * 사용자 ID와 정책 ID로 스케줄 조회
      *
      * @param userId 사용자 ID
@@ -76,13 +45,4 @@ public interface VacationGrantScheduleRepository {
      * @return List<VacationGrantSchedule>
      */
     List<VacationGrantSchedule> findRepeatGrantTargetsForToday(LocalDate today);
-
-    /**
-     * 사용자의 특정 정책 ID 목록에 해당하는 스케줄 목록 조회
-     *
-     * @param userId 사용자 ID
-     * @param policyIds 정책 ID 목록
-     * @return List<VacationGrantSchedule>
-     */
-    List<VacationGrantSchedule> findByUserIdAndPolicyIds(String userId, List<Long> policyIds);
 }

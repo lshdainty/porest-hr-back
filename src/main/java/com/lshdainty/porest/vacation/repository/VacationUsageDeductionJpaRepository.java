@@ -14,11 +14,6 @@ public class VacationUsageDeductionJpaRepository implements VacationUsageDeducti
     private final EntityManager em;
 
     @Override
-    public void save(VacationUsageDeduction deduction) {
-        em.persist(deduction);
-    }
-
-    @Override
     public void saveAll(List<VacationUsageDeduction> deductions) {
         for (VacationUsageDeduction deduction : deductions) {
             em.persist(deduction);
@@ -33,17 +28,6 @@ public class VacationUsageDeductionJpaRepository implements VacationUsageDeducti
                                 "join fetch vud.grant " +
                                 "where vud.usage.id = :usageId", VacationUsageDeduction.class)
                 .setParameter("usageId", usageId)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationUsageDeduction> findByGrantId(Long grantId) {
-        return em.createQuery(
-                        "select vud from VacationUsageDeduction vud " +
-                                "join fetch vud.usage " +
-                                "join fetch vud.grant " +
-                                "where vud.grant.id = :grantId", VacationUsageDeduction.class)
-                .setParameter("grantId", grantId)
                 .getResultList();
     }
 

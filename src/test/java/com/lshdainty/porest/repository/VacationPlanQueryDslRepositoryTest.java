@@ -49,59 +49,11 @@ class VacationPlanQueryDslRepositoryTest {
             em.clear();
 
             // then
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findById(plan.getId());
+            Optional<VacationPlan> findPlan = vacationPlanRepository.findByCode("FULL_TIME");
             assertThat(findPlan).isPresent();
             assertThat(findPlan.get().getCode()).isEqualTo("FULL_TIME");
             assertThat(findPlan.get().getName()).isEqualTo("정규직 플랜");
             assertThat(findPlan.get().getDesc()).isEqualTo("정규직 직원용 휴가 플랜");
-        }
-    }
-
-    @Nested
-    @DisplayName("findById")
-    class FindById {
-        @Test
-        @DisplayName("ID로 플랜 조회 성공")
-        void findByIdSuccess() {
-            // given
-            VacationPlan plan = VacationPlan.createPlan("DEFAULT", "기본 플랜", "기본 휴가 플랜");
-            vacationPlanRepository.save(plan);
-            em.flush();
-            em.clear();
-
-            // when
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findById(plan.getId());
-
-            // then
-            assertThat(findPlan).isPresent();
-            assertThat(findPlan.get().getCode()).isEqualTo("DEFAULT");
-        }
-
-        @Test
-        @DisplayName("존재하지 않는 ID로 조회 시 빈 Optional 반환")
-        void findByIdNotFound() {
-            // given & when
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findById(999L);
-
-            // then
-            assertThat(findPlan).isEmpty();
-        }
-
-        @Test
-        @DisplayName("삭제된 플랜은 조회되지 않음")
-        void findByIdDeletedPlan() {
-            // given
-            VacationPlan plan = VacationPlan.createPlan("DELETED", "삭제된 플랜", "삭제된 플랜");
-            vacationPlanRepository.save(plan);
-            plan.deletePlan();
-            em.flush();
-            em.clear();
-
-            // when
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findById(plan.getId());
-
-            // then
-            assertThat(findPlan).isEmpty();
         }
     }
 
@@ -244,107 +196,6 @@ class VacationPlanQueryDslRepositoryTest {
 
             // then
             assertThat(findPlan).isEmpty();
-        }
-    }
-
-    @Nested
-    @DisplayName("findByName")
-    class FindByName {
-        @Test
-        @DisplayName("이름으로 플랜 조회 성공")
-        void findByNameSuccess() {
-            // given
-            VacationPlan plan = VacationPlan.createPlan("INTERN", "인턴 플랜", "인턴용 플랜");
-            vacationPlanRepository.save(plan);
-            em.flush();
-            em.clear();
-
-            // when
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findByName("인턴 플랜");
-
-            // then
-            assertThat(findPlan).isPresent();
-            assertThat(findPlan.get().getCode()).isEqualTo("INTERN");
-        }
-
-        @Test
-        @DisplayName("존재하지 않는 이름으로 조회 시 빈 Optional 반환")
-        void findByNameNotFound() {
-            // given & when
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findByName("존재하지 않는 플랜");
-
-            // then
-            assertThat(findPlan).isEmpty();
-        }
-
-        @Test
-        @DisplayName("삭제된 플랜은 이름으로 조회되지 않음")
-        void findByNameDeletedPlan() {
-            // given
-            VacationPlan plan = VacationPlan.createPlan("DELETED", "삭제될 플랜", "삭제될 플랜");
-            vacationPlanRepository.save(plan);
-            plan.deletePlan();
-            em.flush();
-            em.clear();
-
-            // when
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findByName("삭제될 플랜");
-
-            // then
-            assertThat(findPlan).isEmpty();
-        }
-    }
-
-    @Nested
-    @DisplayName("findAll")
-    class FindAll {
-        @Test
-        @DisplayName("전체 플랜 조회 성공")
-        void findAllSuccess() {
-            // given
-            vacationPlanRepository.save(VacationPlan.createPlan("FULL_TIME", "정규직 플랜", "정규직용"));
-            vacationPlanRepository.save(VacationPlan.createPlan("CONTRACT", "계약직 플랜", "계약직용"));
-            vacationPlanRepository.save(VacationPlan.createPlan("INTERN", "인턴 플랜", "인턴용"));
-            em.flush();
-            em.clear();
-
-            // when
-            List<VacationPlan> plans = vacationPlanRepository.findAll();
-
-            // then
-            assertThat(plans).hasSize(3);
-            assertThat(plans).extracting("code")
-                    .containsExactly("CONTRACT", "FULL_TIME", "INTERN"); // code 오름차순
-        }
-
-        @Test
-        @DisplayName("플랜이 없으면 빈 리스트 반환")
-        void findAllEmpty() {
-            // given & when
-            List<VacationPlan> plans = vacationPlanRepository.findAll();
-
-            // then
-            assertThat(plans).isEmpty();
-        }
-
-        @Test
-        @DisplayName("삭제된 플랜은 전체 조회에서 제외")
-        void findAllExcludesDeleted() {
-            // given
-            VacationPlan activePlan = VacationPlan.createPlan("ACTIVE", "활성 플랜", "활성");
-            VacationPlan deletedPlan = VacationPlan.createPlan("DELETED", "삭제된 플랜", "삭제됨");
-            vacationPlanRepository.save(activePlan);
-            vacationPlanRepository.save(deletedPlan);
-            deletedPlan.deletePlan();
-            em.flush();
-            em.clear();
-
-            // when
-            List<VacationPlan> plans = vacationPlanRepository.findAll();
-
-            // then
-            assertThat(plans).hasSize(1);
-            assertThat(plans.get(0).getCode()).isEqualTo("ACTIVE");
         }
     }
 

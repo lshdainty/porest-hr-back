@@ -90,39 +90,6 @@ class VacationGrantJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("유저 ID로 휴가부여 목록 조회")
-    void findByUserId() {
-        // given
-        vacationGrantRepository.save(VacationGrant.createVacationGrant(
-                user, policy, "연차1", VacationType.ANNUAL, new BigDecimal("8.0"),
-                LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        ));
-        vacationGrantRepository.save(VacationGrant.createVacationGrant(
-                user, policy, "연차2", VacationType.ANNUAL, new BigDecimal("8.0"),
-                LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationGrant> grants = vacationGrantRepository.findByUserId("user1");
-
-        // then
-        assertThat(grants).hasSize(2);
-        assertThat(grants).extracting("desc").containsExactlyInAnyOrder("연차1", "연차2");
-    }
-
-    @Test
-    @DisplayName("유저 ID로 조회 시 휴가부여가 없어도 Null이 반환되면 안된다.")
-    void findByUserIdEmpty() {
-        // given & when
-        List<VacationGrant> grants = vacationGrantRepository.findByUserId("user1");
-
-        // then
-        assertThat(grants.isEmpty()).isTrue();
-    }
-
-    @Test
     @DisplayName("정책 ID로 휴가부여 목록 조회")
     void findByPolicyId() {
         // given
@@ -139,29 +106,6 @@ class VacationGrantJpaRepositoryTest {
         // then
         assertThat(grants).hasSize(1);
         assertThat(grants.get(0).getDesc()).isEqualTo("연차");
-    }
-
-    @Test
-    @DisplayName("사용 가능한 휴가부여 만료일 순 조회")
-    void findAvailableGrantsByUserIdOrderByExpiryDate() {
-        // given
-        vacationGrantRepository.save(VacationGrant.createVacationGrant(
-                user, policy, "연차1", VacationType.ANNUAL, new BigDecimal("8.0"),
-                LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 6, 30, 23, 59, 59)
-        ));
-        vacationGrantRepository.save(VacationGrant.createVacationGrant(
-                user, policy, "연차2", VacationType.ANNUAL, new BigDecimal("8.0"),
-                LocalDateTime.of(2025, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59)
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationGrant> grants = vacationGrantRepository.findAvailableGrantsByUserIdOrderByExpiryDate("user1");
-
-        // then
-        assertThat(grants).hasSize(2);
-        assertThat(grants.get(0).getDesc()).isEqualTo("연차1");
     }
 
     @Test
@@ -233,7 +177,7 @@ class VacationGrantJpaRepositoryTest {
         em.clear();
 
         // then
-        List<VacationGrant> savedGrants = vacationGrantRepository.findByUserId("user1");
+        List<VacationGrant> savedGrants = vacationGrantRepository.findByUserIdAndYear("user1", 2025);
         assertThat(savedGrants).hasSize(2);
     }
 
@@ -376,31 +320,6 @@ class VacationGrantJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("유저별 신청 휴가 목록 조회")
-    void findAllRequestedVacationsByUserId() {
-        // given
-        VacationPolicy onRequestPolicy = VacationPolicy.createOnRequestPolicy(
-                "신청연차", "신청 정책", VacationType.ANNUAL, new BigDecimal("1.0"),
-                YNType.N, YNType.N, 1, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
-        );
-        em.persist(onRequestPolicy);
-
-        VacationGrant pendingGrant = VacationGrant.createPendingVacationGrant(
-                user, onRequestPolicy, "연차 신청", VacationType.ANNUAL, new BigDecimal("1.0"),
-                LocalDateTime.of(2025, 6, 1, 9, 0), LocalDateTime.of(2025, 6, 1, 18, 0), "개인 사유"
-        );
-        em.persist(pendingGrant);
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationGrant> grants = vacationGrantRepository.findAllRequestedVacationsByUserId("user1");
-
-        // then
-        assertThat(grants).hasSize(1);
-    }
-
-    @Test
     @DisplayName("ID 목록으로 휴가부여 조회")
     void findByIdsWithUserAndPolicy() {
         // given
@@ -444,58 +363,6 @@ class VacationGrantJpaRepositoryTest {
 
         // then
         assertThat(grants).isEmpty();
-    }
-
-    @Test
-    @DisplayName("기간 내 유효한 휴가부여 조회")
-    void findByUserIdAndValidPeriod() {
-        // given
-        vacationGrantRepository.save(VacationGrant.createVacationGrant(
-                user, policy, "연차", VacationType.ANNUAL, new BigDecimal("8.0"),
-                LocalDateTime.of(2025, 1, 1, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59)
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationGrant> grants = vacationGrantRepository.findByUserIdAndValidPeriod(
-                "user1",
-                LocalDateTime.of(2025, 6, 1, 0, 0),
-                LocalDateTime.of(2025, 6, 30, 23, 59)
-        );
-
-        // then
-        assertThat(grants).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("상태와 기간으로 휴가부여 조회")
-    void findByUserIdAndStatusesAndPeriod() {
-        // given
-        VacationPolicy onRequestPolicy = VacationPolicy.createOnRequestPolicy(
-                "신청연차", "신청 정책", VacationType.ANNUAL, new BigDecimal("1.0"),
-                YNType.N, YNType.N, 1, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
-        );
-        em.persist(onRequestPolicy);
-
-        VacationGrant pendingGrant = VacationGrant.createPendingVacationGrant(
-                user, onRequestPolicy, "연차 신청", VacationType.ANNUAL, new BigDecimal("1.0"),
-                LocalDateTime.of(2025, 6, 15, 9, 0), LocalDateTime.of(2025, 6, 15, 18, 0), "개인 사유"
-        );
-        em.persist(pendingGrant);
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationGrant> grants = vacationGrantRepository.findByUserIdAndStatusesAndPeriod(
-                "user1",
-                List.of(GrantStatus.PENDING),
-                LocalDateTime.of(2025, 6, 1, 0, 0),
-                LocalDateTime.of(2025, 6, 30, 23, 59)
-        );
-
-        // then
-        assertThat(grants).hasSize(1);
     }
 
     @Test

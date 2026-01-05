@@ -12,7 +12,6 @@ import com.lshdainty.porest.vacation.domain.VacationPlan;
 import com.lshdainty.porest.vacation.domain.VacationPolicy;
 import com.lshdainty.porest.vacation.repository.UserVacationPlanRepository;
 import com.lshdainty.porest.vacation.repository.VacationGrantScheduleRepository;
-import com.lshdainty.porest.vacation.repository.VacationPlanPolicyRepository;
 import com.lshdainty.porest.vacation.repository.VacationPlanRepository;
 import com.lshdainty.porest.vacation.repository.VacationPolicyRepository;
 import com.lshdainty.porest.vacation.service.dto.VacationPlanServiceDto;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class VacationPlanServiceImpl implements VacationPlanService {
     private final VacationPlanRepository vacationPlanRepository;
-    private final VacationPlanPolicyRepository vacationPlanPolicyRepository;
     private final UserVacationPlanRepository userVacationPlanRepository;
     private final VacationPolicyRepository vacationPolicyRepository;
     private final VacationGrantScheduleRepository vacationGrantScheduleRepository;

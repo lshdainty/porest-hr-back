@@ -33,62 +33,6 @@ public class VacationGrantScheduleQueryDslRepository implements VacationGrantSch
     }
 
     @Override
-    public void saveAll(List<VacationGrantSchedule> schedules) {
-        for (VacationGrantSchedule schedule : schedules) {
-            em.persist(schedule);
-        }
-    }
-
-    @Override
-    public Optional<VacationGrantSchedule> findById(Long id) {
-        QVacationGrantSchedule schedule = QVacationGrantSchedule.vacationGrantSchedule;
-        QUser user = QUser.user;
-        QVacationPolicy policy = QVacationPolicy.vacationPolicy;
-
-        VacationGrantSchedule result = queryFactory
-                .selectFrom(schedule)
-                .leftJoin(schedule.user, user).fetchJoin()
-                .leftJoin(schedule.vacationPolicy, policy).fetchJoin()
-                .where(
-                        schedule.id.eq(id),
-                        schedule.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
-    public List<VacationGrantSchedule> findByUserId(String userId) {
-        QVacationGrantSchedule schedule = QVacationGrantSchedule.vacationGrantSchedule;
-        QVacationPolicy policy = QVacationPolicy.vacationPolicy;
-
-        return queryFactory
-                .selectFrom(schedule)
-                .leftJoin(schedule.vacationPolicy, policy).fetchJoin()
-                .where(
-                        schedule.user.id.eq(userId),
-                        schedule.isDeleted.eq(YNType.N)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<VacationGrantSchedule> findByPolicyId(Long policyId) {
-        QVacationGrantSchedule schedule = QVacationGrantSchedule.vacationGrantSchedule;
-        QUser user = QUser.user;
-
-        return queryFactory
-                .selectFrom(schedule)
-                .leftJoin(schedule.user, user).fetchJoin()
-                .where(
-                        schedule.vacationPolicy.id.eq(policyId),
-                        schedule.isDeleted.eq(YNType.N)
-                )
-                .fetch();
-    }
-
-    @Override
     public Optional<VacationGrantSchedule> findByUserIdAndPolicyId(String userId, Long policyId) {
         QVacationGrantSchedule schedule = QVacationGrantSchedule.vacationGrantSchedule;
         QUser user = QUser.user;
@@ -142,22 +86,6 @@ public class VacationGrantScheduleQueryDslRepository implements VacationGrantSch
                         user.isDeleted.eq(YNType.N),
                         schedule.nextGrantDate.isNull()
                                 .or(schedule.nextGrantDate.loe(today))
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<VacationGrantSchedule> findByUserIdAndPolicyIds(String userId, List<Long> policyIds) {
-        QVacationGrantSchedule schedule = QVacationGrantSchedule.vacationGrantSchedule;
-        QVacationPolicy policy = QVacationPolicy.vacationPolicy;
-
-        return queryFactory
-                .selectFrom(schedule)
-                .leftJoin(schedule.vacationPolicy, policy).fetchJoin()
-                .where(
-                        schedule.user.id.eq(userId),
-                        schedule.vacationPolicy.id.in(policyIds),
-                        schedule.isDeleted.eq(YNType.N)
                 )
                 .fetch();
     }

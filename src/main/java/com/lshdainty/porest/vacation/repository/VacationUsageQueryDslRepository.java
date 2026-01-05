@@ -28,13 +28,6 @@ public class VacationUsageQueryDslRepository implements VacationUsageRepository 
     }
 
     @Override
-    public void saveAll(List<VacationUsage> vacationUsages) {
-        for (VacationUsage vu : vacationUsages) {
-            em.persist(vu);
-        }
-    }
-
-    @Override
     public Optional<VacationUsage> findById(Long vacationUsageId) {
         return Optional.ofNullable(query
                 .selectFrom(vacationUsage)
@@ -42,17 +35,6 @@ public class VacationUsageQueryDslRepository implements VacationUsageRepository 
                 .where(vacationUsage.id.eq(vacationUsageId))
                 .fetchOne()
         );
-    }
-
-    @Override
-    public List<VacationUsage> findByUserId(String userId) {
-        return query
-                .selectFrom(vacationUsage)
-                .join(vacationUsage.user).fetchJoin()
-                .where(vacationUsage.user.id.eq(userId)
-                        .and(vacationUsage.isDeleted.eq(YNType.N)))
-                .orderBy(vacationUsage.startDate.asc())
-                .fetch();
     }
 
     @Override
@@ -104,38 +86,6 @@ public class VacationUsageQueryDslRepository implements VacationUsageRepository 
                         .and(vacationUsage.startDate.goe(startDate))
                         .and(vacationUsage.startDate.loe(endDate)))
                 .orderBy(vacationUsage.startDate.asc())
-                .fetch();
-    }
-
-    @Override
-    public List<VacationUsage> findUsedByUserIdAndBaseTime(String userId, LocalDateTime baseTime) {
-        return query
-                .selectFrom(vacationUsage)
-                .join(vacationUsage.user).fetchJoin()
-                .where(vacationUsage.user.id.eq(userId)
-                        .and(vacationUsage.isDeleted.eq(YNType.N))
-                        .and(vacationUsage.startDate.loe(baseTime)))
-                .fetch();
-    }
-
-    @Override
-    public List<VacationUsage> findExpectedByUserIdAndBaseTime(String userId, LocalDateTime baseTime) {
-        return query
-                .selectFrom(vacationUsage)
-                .join(vacationUsage.user).fetchJoin()
-                .where(vacationUsage.user.id.eq(userId)
-                        .and(vacationUsage.isDeleted.eq(YNType.N))
-                        .and(vacationUsage.startDate.gt(baseTime)))
-                .fetch();
-    }
-
-    @Override
-    public List<VacationUsage> findByUserIdAndPeriod(String userId, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod) {
-        return query
-                .selectFrom(vacationUsage)
-                .where(vacationUsage.user.id.eq(userId)
-                        .and(vacationUsage.startDate.between(startOfPeriod, endOfPeriod))
-                        .and(vacationUsage.isDeleted.eq(YNType.N)))
                 .fetch();
     }
 

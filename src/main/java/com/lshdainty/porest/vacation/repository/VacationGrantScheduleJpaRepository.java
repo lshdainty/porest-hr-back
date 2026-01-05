@@ -26,48 +26,6 @@ public class VacationGrantScheduleJpaRepository implements VacationGrantSchedule
     }
 
     @Override
-    public void saveAll(List<VacationGrantSchedule> schedules) {
-        for (VacationGrantSchedule schedule : schedules) {
-            em.persist(schedule);
-        }
-    }
-
-    @Override
-    public Optional<VacationGrantSchedule> findById(Long id) {
-        List<VacationGrantSchedule> result = em.createQuery(
-                "select s from VacationGrantSchedule s " +
-                "left join fetch s.user u " +
-                "left join fetch s.vacationPolicy p " +
-                "where s.id = :id and s.isDeleted = :isDeleted", VacationGrantSchedule.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public List<VacationGrantSchedule> findByUserId(String userId) {
-        return em.createQuery(
-                "select s from VacationGrantSchedule s " +
-                "left join fetch s.vacationPolicy p " +
-                "where s.user.id = :userId and s.isDeleted = :isDeleted", VacationGrantSchedule.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationGrantSchedule> findByPolicyId(Long policyId) {
-        return em.createQuery(
-                "select s from VacationGrantSchedule s " +
-                "left join fetch s.user u " +
-                "where s.vacationPolicy.id = :policyId and s.isDeleted = :isDeleted", VacationGrantSchedule.class)
-                .setParameter("policyId", policyId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
     public Optional<VacationGrantSchedule> findByUserIdAndPolicyId(String userId, Long policyId) {
         List<VacationGrantSchedule> result = em.createQuery(
                 "select s from VacationGrantSchedule s " +
@@ -110,19 +68,6 @@ public class VacationGrantScheduleJpaRepository implements VacationGrantSchedule
                 .setParameter("isDeleted", YNType.N)
                 .setParameter("grantMethod", GrantMethod.REPEAT_GRANT)
                 .setParameter("today", today)
-                .getResultList();
-    }
-
-    @Override
-    public List<VacationGrantSchedule> findByUserIdAndPolicyIds(String userId, List<Long> policyIds) {
-        return em.createQuery(
-                "select s from VacationGrantSchedule s " +
-                "left join fetch s.vacationPolicy p " +
-                "where s.user.id = :userId and s.vacationPolicy.id in :policyIds " +
-                "and s.isDeleted = :isDeleted", VacationGrantSchedule.class)
-                .setParameter("userId", userId)
-                .setParameter("policyIds", policyIds)
-                .setParameter("isDeleted", YNType.N)
                 .getResultList();
     }
 }

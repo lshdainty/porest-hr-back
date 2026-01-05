@@ -31,21 +31,6 @@ public class VacationPlanQueryDslRepository implements VacationPlanRepository {
     }
 
     @Override
-    public Optional<VacationPlan> findById(Long id) {
-        QVacationPlan plan = QVacationPlan.vacationPlan;
-
-        VacationPlan result = queryFactory
-                .selectFrom(plan)
-                .where(
-                        plan.id.eq(id),
-                        plan.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
     public Optional<VacationPlan> findByIdWithPolicies(Long id) {
         QVacationPlan plan = QVacationPlan.vacationPlan;
         QVacationPlanPolicy planPolicy = QVacationPlanPolicy.vacationPlanPolicy;
@@ -98,32 +83,6 @@ public class VacationPlanQueryDslRepository implements VacationPlanRepository {
                 .fetchOne();
 
         return Optional.ofNullable(result);
-    }
-
-    @Override
-    public Optional<VacationPlan> findByName(String name) {
-        QVacationPlan plan = QVacationPlan.vacationPlan;
-
-        VacationPlan result = queryFactory
-                .selectFrom(plan)
-                .where(
-                        plan.name.eq(name),
-                        plan.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
-    public List<VacationPlan> findAll() {
-        QVacationPlan plan = QVacationPlan.vacationPlan;
-
-        return queryFactory
-                .selectFrom(plan)
-                .where(plan.isDeleted.eq(YNType.N))
-                .orderBy(plan.code.asc())
-                .fetch();
     }
 
     @Override

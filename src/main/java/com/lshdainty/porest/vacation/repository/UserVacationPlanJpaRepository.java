@@ -24,47 +24,6 @@ public class UserVacationPlanJpaRepository implements UserVacationPlanRepository
     }
 
     @Override
-    public void saveAll(List<UserVacationPlan> userVacationPlans) {
-        for (UserVacationPlan userVacationPlan : userVacationPlans) {
-            em.persist(userVacationPlan);
-        }
-    }
-
-    @Override
-    public Optional<UserVacationPlan> findById(Long id) {
-        List<UserVacationPlan> result = em.createQuery(
-                "select uvp from UserVacationPlan uvp " +
-                "left join fetch uvp.vacationPlan vp " +
-                "where uvp.id = :id and uvp.isDeleted = :isDeleted", UserVacationPlan.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public List<UserVacationPlan> findByUserId(String userId) {
-        return em.createQuery(
-                "select uvp from UserVacationPlan uvp " +
-                "where uvp.user.id = :userId and uvp.isDeleted = :isDeleted", UserVacationPlan.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
-    public List<UserVacationPlan> findByUserIdWithPlan(String userId) {
-        return em.createQuery(
-                "select uvp from UserVacationPlan uvp " +
-                "left join fetch uvp.vacationPlan vp " +
-                "where uvp.user.id = :userId and uvp.isDeleted = :isDeleted " +
-                "and vp.isDeleted = :isDeleted", UserVacationPlan.class)
-                .setParameter("userId", userId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
     public List<UserVacationPlan> findByUserIdWithPlanAndPolicies(String userId) {
         return em.createQuery(
                 "select distinct uvp from UserVacationPlan uvp " +
@@ -80,30 +39,6 @@ public class UserVacationPlanJpaRepository implements UserVacationPlanRepository
     }
 
     @Override
-    public List<UserVacationPlan> findByPlanId(Long planId) {
-        return em.createQuery(
-                "select uvp from UserVacationPlan uvp " +
-                "where uvp.vacationPlan.id = :planId and uvp.isDeleted = :isDeleted", UserVacationPlan.class)
-                .setParameter("planId", planId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-    }
-
-    @Override
-    public Optional<UserVacationPlan> findByUserIdAndPlanId(String userId, Long planId) {
-        List<UserVacationPlan> result = em.createQuery(
-                "select uvp from UserVacationPlan uvp " +
-                "left join fetch uvp.vacationPlan vp " +
-                "where uvp.user.id = :userId and uvp.vacationPlan.id = :planId " +
-                "and uvp.isDeleted = :isDeleted", UserVacationPlan.class)
-                .setParameter("userId", userId)
-                .setParameter("planId", planId)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
     public Optional<UserVacationPlan> findByUserIdAndPlanCode(String userId, String planCode) {
         List<UserVacationPlan> result = em.createQuery(
                 "select uvp from UserVacationPlan uvp " +
@@ -115,20 +50,6 @@ public class UserVacationPlanJpaRepository implements UserVacationPlanRepository
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public boolean existsByUserIdAndPlanId(String userId, Long planId) {
-        List<UserVacationPlan> result = em.createQuery(
-                "select uvp from UserVacationPlan uvp " +
-                "where uvp.user.id = :userId and uvp.vacationPlan.id = :planId " +
-                "and uvp.isDeleted = :isDeleted", UserVacationPlan.class)
-                .setParameter("userId", userId)
-                .setParameter("planId", planId)
-                .setParameter("isDeleted", YNType.N)
-                .setMaxResults(1)
-                .getResultList();
-        return !result.isEmpty();
     }
 
     @Override

@@ -34,28 +34,6 @@ public class DepartmentJpaRepository implements DepartmentRepository {
     }
 
     @Override
-    public Optional<Department> findByIdWithChildren(Long id) {
-        List<Department> result = em.createQuery(
-                "select distinct d from Department d " +
-                "left join fetch d.children " +
-                "where d.id = :id and d.isDeleted = :isDeleted", Department.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public boolean hasActiveChildren(Long departmentId) {
-        Long count = em.createQuery(
-                "select count(d) from Department d where d.parent.id = :departmentId and d.isDeleted = :isDeleted", Long.class)
-                .setParameter("departmentId", departmentId)
-                .setParameter("isDeleted", YNType.N)
-                .getSingleResult();
-        return count != null && count > 0;
-    }
-
-    @Override
     public void saveUserDepartment(UserDepartment userDepartment) {
         em.persist(userDepartment);
     }
@@ -80,18 +58,6 @@ public class DepartmentJpaRepository implements DepartmentRepository {
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public List<User> findUsersInDepartment(Long departmentId) {
-        return em.createQuery(
-                "select ud.user from UserDepartment ud " +
-                "join ud.user u join ud.department d " +
-                "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted and u.company != :systemCompany", User.class)
-                .setParameter("departmentId", departmentId)
-                .setParameter("isDeleted", YNType.N)
-                .setParameter("systemCompany", DefaultCompanyType.SYSTEM)
-                .getResultList();
     }
 
     @Override

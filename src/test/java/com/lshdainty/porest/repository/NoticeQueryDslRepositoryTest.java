@@ -308,40 +308,6 @@ class NoticeQueryDslRepositoryTest {
     }
 
     @Nested
-    @DisplayName("활성 공지사항 수 조회")
-    class CountActiveNotices {
-        @Test
-        @DisplayName("현재 활성화된 공지사항 수 반환")
-        void countActiveNotices() {
-            // given
-            LocalDate now = LocalDate.now();
-            Notice activeNotice1 = Notice.createNotice(
-                    writer, "활성 공지1", "내용", NoticeType.GENERAL,
-                    YNType.N, now.minusDays(1), now.plusDays(30)
-            );
-            Notice activeNotice2 = Notice.createNotice(
-                    writer, "활성 공지2", "내용", NoticeType.GENERAL,
-                    YNType.N, now.minusDays(1), now.plusDays(30)
-            );
-            Notice expiredNotice = Notice.createNotice(
-                    writer, "만료 공지", "내용", NoticeType.GENERAL,
-                    YNType.N, now.minusDays(30), now.minusDays(1)
-            );
-            noticeRepository.save(activeNotice1);
-            noticeRepository.save(activeNotice2);
-            noticeRepository.save(expiredNotice);
-            em.flush();
-            em.clear();
-
-            // when
-            long count = noticeRepository.countActiveNotices(now);
-
-            // then
-            assertThat(count).isEqualTo(2);
-        }
-    }
-
-    @Nested
     @DisplayName("공지사항 수정 및 삭제")
     class UpdateAndDelete {
         @Test

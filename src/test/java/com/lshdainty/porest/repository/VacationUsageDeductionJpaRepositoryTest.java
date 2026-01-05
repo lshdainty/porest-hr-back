@@ -75,25 +75,6 @@ class VacationUsageDeductionJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("차감 저장")
-    void save() {
-        // given
-        VacationUsageDeduction deduction = VacationUsageDeduction.createVacationUsageDeduction(
-                usage, grant, new BigDecimal("1.0000")
-        );
-
-        // when
-        deductionRepository.save(deduction);
-        em.flush();
-        em.clear();
-
-        // then
-        List<VacationUsageDeduction> result = deductionRepository.findByUsageId(usage.getId());
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getDeductedTime()).isEqualByComparingTo(new BigDecimal("1.0000"));
-    }
-
-    @Test
     @DisplayName("차감 다건 저장")
     void saveAll() {
         // given
@@ -122,33 +103,14 @@ class VacationUsageDeductionJpaRepositoryTest {
     @DisplayName("사용 ID로 차감 조회")
     void findByUsageId() {
         // given
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage, grant, new BigDecimal("1.0000")
-        ));
+        )));
         em.flush();
         em.clear();
 
         // when
         List<VacationUsageDeduction> result = deductionRepository.findByUsageId(usage.getId());
-
-        // then
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUsage()).isNotNull();
-        assertThat(result.get(0).getGrant()).isNotNull();
-    }
-
-    @Test
-    @DisplayName("부여 ID로 차감 조회")
-    void findByGrantId() {
-        // given
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
-                usage, grant, new BigDecimal("1.0000")
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationUsageDeduction> result = deductionRepository.findByGrantId(grant.getId());
 
         // then
         assertThat(result).hasSize(1);
@@ -164,47 +126,6 @@ class VacationUsageDeductionJpaRepositoryTest {
 
         // then
         assertThat(result).isEmpty();
-    }
-
-    @Test
-    @DisplayName("부여 ID로 조회 시 없으면 빈 리스트 반환")
-    void findByGrantIdEmpty() {
-        // when
-        List<VacationUsageDeduction> result = deductionRepository.findByGrantId(999L);
-
-        // then
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    @DisplayName("여러 사용에 대한 차감 저장 및 조회")
-    void saveMultipleUsageDeductions() {
-        // given
-        VacationUsage usage2 = VacationUsage.createVacationUsage(
-                user, "연차 사용2", VacationTimeType.MORNINGOFF,
-                LocalDateTime.of(2025, 6, 2, 9, 0), LocalDateTime.of(2025, 6, 2, 13, 0),
-                new BigDecimal("0.5000")
-        );
-        em.persist(usage2);
-
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
-                usage, grant, new BigDecimal("1.0000")
-        ));
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
-                usage2, grant, new BigDecimal("0.5000")
-        ));
-        em.flush();
-        em.clear();
-
-        // when
-        List<VacationUsageDeduction> resultByGrant = deductionRepository.findByGrantId(grant.getId());
-        List<VacationUsageDeduction> resultByUsage1 = deductionRepository.findByUsageId(usage.getId());
-        List<VacationUsageDeduction> resultByUsage2 = deductionRepository.findByUsageId(usage2.getId());
-
-        // then
-        assertThat(resultByGrant).hasSize(2);
-        assertThat(resultByUsage1).hasSize(1);
-        assertThat(resultByUsage2).hasSize(1);
     }
 
     @Test
@@ -224,12 +145,12 @@ class VacationUsageDeductionJpaRepositoryTest {
         );
         em.persist(usage2);
 
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage, grant, new BigDecimal("1.0000")
-        ));
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        )));
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage2, grant2, new BigDecimal("0.5000")
-        ));
+        )));
         em.flush();
         em.clear();
 
@@ -274,12 +195,12 @@ class VacationUsageDeductionJpaRepositoryTest {
         em.persist(deletedUsage);
         deletedUsage.deleteVacationUsage();
 
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage, grant, new BigDecimal("1.0000")
-        ));
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        )));
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 deletedUsage, grant, new BigDecimal("1.0000")
-        ));
+        )));
         em.flush();
         em.clear();
 
@@ -295,9 +216,9 @@ class VacationUsageDeductionJpaRepositoryTest {
     @DisplayName("여러 부여 ID로 조회 시 존재하지 않는 ID가 포함되어도 정상 조회")
     void findByGrantIdsWithNonExistentId() {
         // given
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage, grant, new BigDecimal("1.0000")
-        ));
+        )));
         em.flush();
         em.clear();
 
@@ -320,12 +241,12 @@ class VacationUsageDeductionJpaRepositoryTest {
         );
         em.persist(usage2);
 
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage, grant, new BigDecimal("1.0000")
-        ));
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        )));
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage2, grant, new BigDecimal("0.5000")
-        ));
+        )));
         em.flush();
         em.clear();
 
@@ -362,9 +283,9 @@ class VacationUsageDeductionJpaRepositoryTest {
     @DisplayName("여러 사용 ID로 조회 시 존재하지 않는 ID가 포함되어도 정상 조회")
     void findByUsageIdsWithNonExistentId() {
         // given
-        deductionRepository.save(VacationUsageDeduction.createVacationUsageDeduction(
+        deductionRepository.saveAll(List.of(VacationUsageDeduction.createVacationUsageDeduction(
                 usage, grant, new BigDecimal("1.0000")
-        ));
+        )));
         em.flush();
         em.clear();
 

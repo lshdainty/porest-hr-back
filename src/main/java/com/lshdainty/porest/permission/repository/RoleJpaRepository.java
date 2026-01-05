@@ -20,30 +20,6 @@ public class RoleJpaRepository implements RoleRepository {
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
-        List<Role> result = em.createQuery(
-                "select r from Role r where r.id = :id and r.isDeleted = :isDeleted", Role.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public Optional<Role> findByIdWithPermissions(Long id) {
-        List<Role> result = em.createQuery(
-                "select distinct r from Role r " +
-                "left join fetch r.rolePermissions rp " +
-                "left join fetch rp.permission p " +
-                "where r.id = :id and r.isDeleted = :isDeleted " +
-                "and (rp.isDeleted = :isDeleted or rp is null)", Role.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
     public Optional<Role> findByCode(String code) {
         List<Role> result = em.createQuery(
                 "select r from Role r where r.code = :code and r.isDeleted = :isDeleted", Role.class)
@@ -65,24 +41,6 @@ public class RoleJpaRepository implements RoleRepository {
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public Optional<Role> findByName(String name) {
-        List<Role> result = em.createQuery(
-                "select r from Role r where r.name = :name and r.isDeleted = :isDeleted", Role.class)
-                .setParameter("name", name)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public List<Role> findAllRoles() {
-        return em.createQuery(
-                "select r from Role r where r.isDeleted = :isDeleted order by r.code asc", Role.class)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
     }
 
     @Override

@@ -24,16 +24,6 @@ public class VacationPlanJpaRepository implements VacationPlanRepository {
     }
 
     @Override
-    public Optional<VacationPlan> findById(Long id) {
-        List<VacationPlan> result = em.createQuery(
-                "select vp from VacationPlan vp where vp.id = :id and vp.isDeleted = :isDeleted", VacationPlan.class)
-                .setParameter("id", id)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
     public Optional<VacationPlan> findByIdWithPolicies(Long id) {
         List<VacationPlan> result = em.createQuery(
                 "select distinct vp from VacationPlan vp " +
@@ -69,24 +59,6 @@ public class VacationPlanJpaRepository implements VacationPlanRepository {
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public Optional<VacationPlan> findByName(String name) {
-        List<VacationPlan> result = em.createQuery(
-                "select vp from VacationPlan vp where vp.name = :name and vp.isDeleted = :isDeleted", VacationPlan.class)
-                .setParameter("name", name)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-    }
-
-    @Override
-    public List<VacationPlan> findAll() {
-        return em.createQuery(
-                "select vp from VacationPlan vp where vp.isDeleted = :isDeleted order by vp.code asc", VacationPlan.class)
-                .setParameter("isDeleted", YNType.N)
-                .getResultList();
     }
 
     @Override

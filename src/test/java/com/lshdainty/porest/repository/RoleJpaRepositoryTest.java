@@ -30,7 +30,7 @@ class RoleJpaRepositoryTest {
     private TestEntityManager em;
 
     @Test
-    @DisplayName("역할 저장 및 ID로 조회")
+    @DisplayName("역할 저장 및 코드로 조회")
     void save() {
         // given
         Role role = Role.createRole("ADMIN", "관리자", "시스템 관리자");
@@ -41,37 +41,10 @@ class RoleJpaRepositoryTest {
         em.clear();
 
         // then
-        Optional<Role> findRole = roleRepository.findById(role.getId());
+        Optional<Role> findRole = roleRepository.findByCode("ADMIN");
         assertThat(findRole.isPresent()).isTrue();
         assertThat(findRole.get().getCode()).isEqualTo("ADMIN");
         assertThat(findRole.get().getName()).isEqualTo("관리자");
-    }
-
-    @Test
-    @DisplayName("ID로 조회 시 삭제된 역할 제외")
-    void findByIdExcludesDeleted() {
-        // given
-        Role role = Role.createRole("ADMIN", "관리자", "시스템 관리자");
-        roleRepository.save(role);
-        role.deleteRole();
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Role> findRole = roleRepository.findById(role.getId());
-
-        // then
-        assertThat(findRole.isEmpty()).isTrue();
-    }
-
-    @Test
-    @DisplayName("ID로 조회 시 없으면 빈 Optional 반환")
-    void findByIdEmpty() {
-        // when
-        Optional<Role> findRole = roleRepository.findById(999L);
-
-        // then
-        assertThat(findRole.isEmpty()).isTrue();
     }
 
     @Test
@@ -113,189 +86,6 @@ class RoleJpaRepositoryTest {
     void findByCodeEmpty() {
         // when
         Optional<Role> findRole = roleRepository.findByCode("NONEXISTENT");
-
-        // then
-        assertThat(findRole.isEmpty()).isTrue();
-    }
-
-    @Test
-    @DisplayName("이름으로 역할 조회")
-    void findByName() {
-        // given
-        Role role = Role.createRole("USER", "일반 사용자", "기본 사용자");
-        roleRepository.save(role);
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Role> findRole = roleRepository.findByName("일반 사용자");
-
-        // then
-        assertThat(findRole.isPresent()).isTrue();
-        assertThat(findRole.get().getCode()).isEqualTo("USER");
-    }
-
-    @Test
-    @DisplayName("이름으로 조회 시 삭제된 역할 제외")
-    void findByNameExcludesDeleted() {
-        // given
-        Role role = Role.createRole("USER", "일반 사용자", "기본 사용자");
-        roleRepository.save(role);
-        role.deleteRole();
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Role> findRole = roleRepository.findByName("일반 사용자");
-
-        // then
-        assertThat(findRole.isEmpty()).isTrue();
-    }
-
-    @Test
-    @DisplayName("이름으로 조회 시 없으면 빈 Optional 반환")
-    void findByNameEmpty() {
-        // when
-        Optional<Role> findRole = roleRepository.findByName("존재하지 않는 역할");
-
-        // then
-        assertThat(findRole.isEmpty()).isTrue();
-    }
-
-    @Test
-    @DisplayName("전체 역할 조회")
-    void findAllRoles() {
-        // given
-        roleRepository.save(Role.createRole("ADMIN", "관리자", "시스템 관리자"));
-        roleRepository.save(Role.createRole("MANAGER", "매니저", "부서 관리자"));
-        roleRepository.save(Role.createRole("USER", "일반 사용자", "기본 사용자"));
-        em.flush();
-        em.clear();
-
-        // when
-        List<Role> roles = roleRepository.findAllRoles();
-
-        // then
-        assertThat(roles).hasSize(3);
-    }
-
-    @Test
-    @DisplayName("전체 역할 조회 시 삭제된 역할 제외")
-    void findAllRolesExcludesDeleted() {
-        // given
-        Role activeRole = Role.createRole("ADMIN", "관리자", "시스템 관리자");
-        Role deletedRole = Role.createRole("DELETED", "삭제된 역할", "삭제됨");
-        roleRepository.save(activeRole);
-        roleRepository.save(deletedRole);
-        deletedRole.deleteRole();
-        em.flush();
-        em.clear();
-
-        // when
-        List<Role> roles = roleRepository.findAllRoles();
-
-        // then
-        assertThat(roles).hasSize(1);
-        assertThat(roles.get(0).getCode()).isEqualTo("ADMIN");
-    }
-
-    @Test
-    @DisplayName("전체 역할 조회 시 코드순 정렬")
-    void findAllRolesOrdered() {
-        // given
-        roleRepository.save(Role.createRole("USER", "일반 사용자", "기본 사용자"));
-        roleRepository.save(Role.createRole("ADMIN", "관리자", "시스템 관리자"));
-        roleRepository.save(Role.createRole("MANAGER", "매니저", "부서 관리자"));
-        em.flush();
-        em.clear();
-
-        // when
-        List<Role> roles = roleRepository.findAllRoles();
-
-        // then
-        assertThat(roles).hasSize(3);
-        assertThat(roles.get(0).getCode()).isEqualTo("ADMIN");
-        assertThat(roles.get(1).getCode()).isEqualTo("MANAGER");
-        assertThat(roles.get(2).getCode()).isEqualTo("USER");
-    }
-
-    @Test
-    @DisplayName("전체 역할이 없으면 빈 리스트 반환")
-    void findAllRolesEmpty() {
-        // when
-        List<Role> roles = roleRepository.findAllRoles();
-
-        // then
-        assertThat(roles).isEmpty();
-    }
-
-    @Test
-    @DisplayName("권한과 함께 역할 생성 및 조회")
-    void createRoleWithPermissions() {
-        // given
-        Permission permission1 = Permission.createPermission(
-                "USER:READ", "사용자 조회", "설명",
-                ResourceType.USER, ActionType.READ
-        );
-        Permission permission2 = Permission.createPermission(
-                "USER:WRITE", "사용자 수정", "설명",
-                ResourceType.USER, ActionType.WRITE
-        );
-        em.persist(permission1);
-        em.persist(permission2);
-
-        Role role = Role.createRoleWithPermissions(
-                "ADMIN", "관리자", "시스템 관리자",
-                List.of(permission1, permission2)
-        );
-        roleRepository.save(role);
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Role> findRole = roleRepository.findByIdWithPermissions(role.getId());
-
-        // then
-        assertThat(findRole.isPresent()).isTrue();
-        assertThat(findRole.get().getRolePermissions()).hasSize(2);
-    }
-
-    @Test
-    @DisplayName("ID로 권한과 함께 역할 조회")
-    void findByIdWithPermissions() {
-        // given
-        Permission permission = Permission.createPermission(
-                "USER:READ", "사용자 조회", "설명",
-                ResourceType.USER, ActionType.READ
-        );
-        em.persist(permission);
-
-        Role role = Role.createRole("ADMIN", "관리자", "시스템 관리자");
-        role.addPermission(permission);
-        roleRepository.save(role);
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Role> findRole = roleRepository.findByIdWithPermissions(role.getId());
-
-        // then
-        assertThat(findRole.isPresent()).isTrue();
-        assertThat(findRole.get().getPermissions()).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("ID로 권한과 함께 조회 시 삭제된 역할 제외")
-    void findByIdWithPermissionsExcludesDeleted() {
-        // given
-        Role role = Role.createRole("ADMIN", "관리자", "시스템 관리자");
-        roleRepository.save(role);
-        role.deleteRole();
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<Role> findRole = roleRepository.findByIdWithPermissions(role.getId());
 
         // then
         assertThat(findRole.isEmpty()).isTrue();
@@ -385,13 +175,13 @@ class RoleJpaRepositoryTest {
         em.clear();
 
         // when
-        Role foundRole = roleRepository.findById(role.getId()).orElseThrow();
+        Role foundRole = roleRepository.findByCode("ADMIN").orElseThrow();
         foundRole.updateRole("수정된 이름", "수정된 설명", null);
         em.flush();
         em.clear();
 
         // then
-        Role updatedRole = roleRepository.findById(role.getId()).orElseThrow();
+        Role updatedRole = roleRepository.findByCode("ADMIN").orElseThrow();
         assertThat(updatedRole.getName()).isEqualTo("수정된 이름");
         assertThat(updatedRole.getDesc()).isEqualTo("수정된 설명");
     }
@@ -412,13 +202,13 @@ class RoleJpaRepositoryTest {
         em.clear();
 
         // when
-        Role foundRole = roleRepository.findById(role.getId()).orElseThrow();
+        Role foundRole = roleRepository.findByCode("ADMIN").orElseThrow();
         foundRole.addPermission(permission);
         em.flush();
         em.clear();
 
         // then
-        Role updatedRole = roleRepository.findByIdWithPermissions(role.getId()).orElseThrow();
+        Role updatedRole = roleRepository.findByCodeWithPermissions("ADMIN").orElseThrow();
         assertThat(updatedRole.getPermissions()).hasSize(1);
     }
 
@@ -439,13 +229,13 @@ class RoleJpaRepositoryTest {
         em.clear();
 
         // when
-        Role foundRole = roleRepository.findByIdWithPermissions(role.getId()).orElseThrow();
+        Role foundRole = roleRepository.findByCodeWithPermissions("ADMIN").orElseThrow();
         foundRole.removePermission(permission);
         em.flush();
         em.clear();
 
-        // then - findById로 역할 조회하고 getPermissions()로 권한 확인 (soft delete 필터링)
-        Role updatedRole = roleRepository.findById(role.getId()).orElseThrow();
+        // then - findByCode로 역할 조회하고 getPermissions()로 권한 확인 (soft delete 필터링)
+        Role updatedRole = roleRepository.findByCode("ADMIN").orElseThrow();
         assertThat(updatedRole.getPermissions()).isEmpty();
     }
 }

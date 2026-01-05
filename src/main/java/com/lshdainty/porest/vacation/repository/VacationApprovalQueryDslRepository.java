@@ -2,7 +2,6 @@ package com.lshdainty.porest.vacation.repository;
 
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.vacation.domain.VacationApproval;
-import com.lshdainty.porest.vacation.type.ApprovalStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +19,6 @@ import static com.lshdainty.porest.vacation.domain.QVacationApproval.vacationApp
 public class VacationApprovalQueryDslRepository implements VacationApprovalRepository {
     private final EntityManager em;
     private final JPAQueryFactory query;
-
-    @Override
-    public void save(VacationApproval vacationApproval) {
-        em.persist(vacationApproval);
-    }
 
     @Override
     public void saveAll(List<VacationApproval> vacationApprovals) {
@@ -45,17 +39,6 @@ public class VacationApprovalQueryDslRepository implements VacationApprovalRepos
     }
 
     @Override
-    public List<Long> findAllVacationGrantIdsByApproverId(String approverId) {
-        return query
-                .select(vacationApproval.vacationGrant.id)
-                .from(vacationApproval)
-                .where(vacationApproval.approver.id.eq(approverId)
-                        .and(vacationApproval.isDeleted.eq(YNType.N)))
-                .distinct()
-                .fetch();
-    }
-
-    @Override
     public List<Long> findAllVacationGrantIdsByApproverIdAndYear(String approverId, Integer year) {
         return query
                 .select(vacationApproval.vacationGrant.id)
@@ -65,16 +48,6 @@ public class VacationApprovalQueryDslRepository implements VacationApprovalRepos
                         .and(vacationApproval.vacationGrant.createDate.year().eq(year)))
                 .distinct()
                 .fetch();
-    }
-
-    @Override
-    public Optional<VacationApproval> findById(Long id) {
-        VacationApproval result = query
-                .selectFrom(vacationApproval)
-                .where(vacationApproval.id.eq(id)
-                        .and(vacationApproval.isDeleted.eq(YNType.N)))
-                .fetchOne();
-        return Optional.ofNullable(result);
     }
 
     @Override

@@ -32,59 +32,6 @@ public class UserVacationPlanQueryDslRepository implements UserVacationPlanRepos
     }
 
     @Override
-    public void saveAll(List<UserVacationPlan> userVacationPlans) {
-        for (UserVacationPlan userVacationPlan : userVacationPlans) {
-            em.persist(userVacationPlan);
-        }
-    }
-
-    @Override
-    public Optional<UserVacationPlan> findById(Long id) {
-        QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
-        QVacationPlan plan = QVacationPlan.vacationPlan;
-
-        UserVacationPlan result = queryFactory
-                .selectFrom(userPlan)
-                .leftJoin(userPlan.vacationPlan, plan).fetchJoin()
-                .where(
-                        userPlan.id.eq(id),
-                        userPlan.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
-    public List<UserVacationPlan> findByUserId(String userId) {
-        QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
-
-        return queryFactory
-                .selectFrom(userPlan)
-                .where(
-                        userPlan.user.id.eq(userId),
-                        userPlan.isDeleted.eq(YNType.N)
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<UserVacationPlan> findByUserIdWithPlan(String userId) {
-        QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
-        QVacationPlan plan = QVacationPlan.vacationPlan;
-
-        return queryFactory
-                .selectFrom(userPlan)
-                .leftJoin(userPlan.vacationPlan, plan).fetchJoin()
-                .where(
-                        userPlan.user.id.eq(userId),
-                        userPlan.isDeleted.eq(YNType.N),
-                        plan.isDeleted.eq(YNType.N)
-                )
-                .fetch();
-    }
-
-    @Override
     public List<UserVacationPlan> findByUserIdWithPlanAndPolicies(String userId) {
         QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
         QVacationPlan plan = QVacationPlan.vacationPlan;
@@ -107,37 +54,6 @@ public class UserVacationPlanQueryDslRepository implements UserVacationPlanRepos
     }
 
     @Override
-    public List<UserVacationPlan> findByPlanId(Long planId) {
-        QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
-
-        return queryFactory
-                .selectFrom(userPlan)
-                .where(
-                        userPlan.vacationPlan.id.eq(planId),
-                        userPlan.isDeleted.eq(YNType.N)
-                )
-                .fetch();
-    }
-
-    @Override
-    public Optional<UserVacationPlan> findByUserIdAndPlanId(String userId, Long planId) {
-        QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
-        QVacationPlan plan = QVacationPlan.vacationPlan;
-
-        UserVacationPlan result = queryFactory
-                .selectFrom(userPlan)
-                .leftJoin(userPlan.vacationPlan, plan).fetchJoin()
-                .where(
-                        userPlan.user.id.eq(userId),
-                        userPlan.vacationPlan.id.eq(planId),
-                        userPlan.isDeleted.eq(YNType.N)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
-
-    @Override
     public Optional<UserVacationPlan> findByUserIdAndPlanCode(String userId, String planCode) {
         QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
         QVacationPlan plan = QVacationPlan.vacationPlan;
@@ -154,23 +70,6 @@ public class UserVacationPlanQueryDslRepository implements UserVacationPlanRepos
                 .fetchOne();
 
         return Optional.ofNullable(result);
-    }
-
-    @Override
-    public boolean existsByUserIdAndPlanId(String userId, Long planId) {
-        QUserVacationPlan userPlan = QUserVacationPlan.userVacationPlan;
-
-        Integer result = queryFactory
-                .selectOne()
-                .from(userPlan)
-                .where(
-                        userPlan.user.id.eq(userId),
-                        userPlan.vacationPlan.id.eq(planId),
-                        userPlan.isDeleted.eq(YNType.N)
-                )
-                .fetchFirst();
-
-        return result != null;
     }
 
     @Override

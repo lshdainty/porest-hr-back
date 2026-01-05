@@ -149,17 +149,4 @@ public class NoticeJpaRepository implements NoticeRepository {
 
         return new PageImpl<>(content, pageable, total);
     }
-
-    @Override
-    public long countActiveNotices(LocalDate now) {
-        Long count = em.createQuery(
-                        "select count(n) from Notice n " +
-                                "where n.startDate <= :now " +
-                                "and (n.endDate >= :now or n.endDate is null) " +
-                                "and n.isDeleted = :isDeleted", Long.class)
-                .setParameter("now", now)
-                .setParameter("isDeleted", YNType.N)
-                .getSingleResult();
-        return count != null ? count : 0L;
-    }
 }

@@ -147,17 +147,6 @@ public class NoticeQueryDslRepository implements NoticeRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    @Override
-    public long countActiveNotices(LocalDate now) {
-        Long count = query
-                .select(notice.count())
-                .from(notice)
-                .where(isActiveNotice(now)
-                        .and(isNotDeleted()))
-                .fetchOne();
-        return count != null ? count : 0L;
-    }
-
     private BooleanExpression isNotDeleted() {
         return notice.isDeleted.eq(YNType.N);
     }

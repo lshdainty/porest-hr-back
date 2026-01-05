@@ -20,11 +20,6 @@ public interface VacationGrantRepository {
     void saveAll(List<VacationGrant> vacationGrants);
 
     /**
-     * 유저 ID로 VacationGrant 조회
-     */
-    List<VacationGrant> findByUserId(String userId);
-
-    /**
      * 유저 ID와 년도로 VacationGrant 조회
      * - grantDate 또는 expiryDate가 해당 년도에 포함되는 VacationGrant 조회
      *
@@ -38,15 +33,6 @@ public interface VacationGrantRepository {
      * 휴가 정책 ID로 VacationGrant 조회
      */
     List<VacationGrant> findByPolicyId(Long policyId);
-
-    /**
-     * 유저의 사용 가능한 VacationGrant 조회 (FIFO용)
-     * 만료일이 가까운 순서로 정렬하여 반환
-     *
-     * @param userId 유저 ID
-     * @return 만료일 오름차순으로 정렬된 VacationGrant 리스트
-     */
-    List<VacationGrant> findAvailableGrantsByUserIdOrderByExpiryDate(String userId);
 
     /**
      * 유저의 사용 가능한 VacationGrant 조회 (FIFO용 - VacationType 필터링 + 날짜 범위 체크)
@@ -113,16 +99,6 @@ public interface VacationGrantRepository {
     Optional<VacationGrant> findById(Long id);
 
     /**
-     * 사용자 ID로 ON_REQUEST 방식의 모든 VacationGrant 조회 (모든 상태 포함)
-     * - 승인대기, 활성, 소진, 만료, 회수, 거부 등 모든 상태 포함
-     * - 신청일시 최신순으로 정렬
-     *
-     * @param userId 사용자 ID
-     * @return ON_REQUEST 방식의 모든 VacationGrant 리스트
-     */
-    List<VacationGrant> findAllRequestedVacationsByUserId(String userId);
-
-    /**
      * 사용자 ID와 년도로 ON_REQUEST 방식의 모든 VacationGrant 조회 (모든 상태 포함)
      * - createDate가 해당 년도에 해당하는 것만 조회
      * - 승인대기, 활성, 소진, 만료, 회수, 거부 등 모든 상태 포함
@@ -143,34 +119,6 @@ public interface VacationGrantRepository {
      * @return VacationGrant 리스트
      */
     List<VacationGrant> findByIdsWithUserAndPolicy(List<Long> vacationGrantIds);
-
-    /**
-     * 특정 사용자의 특정 기간 내에 유효한 VacationGrant 조회
-     * - grantDate <= endOfPeriod
-     * - expiryDate >= startOfPeriod
-     * - status: ACTIVE 또는 EXHAUSTED
-     * - isDeleted == N
-     *
-     * @param userId 사용자 ID
-     * @param startOfPeriod 조회 기간 시작일
-     * @param endOfPeriod 조회 기간 종료일
-     * @return 해당 기간 내 유효한 VacationGrant 리스트
-     */
-    List<VacationGrant> findByUserIdAndValidPeriod(String userId, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod);
-
-    /**
-     * 특정 사용자의 특정 상태들 & 특정 기간 내 VacationGrant 조회
-     * - status IN (상태 리스트)
-     * - requestStartTime이 startOfPeriod와 endOfPeriod 사이에 있음
-     * - isDeleted == N
-     *
-     * @param userId 사용자 ID
-     * @param statuses 조회할 상태 리스트 (예: PENDING, PROGRESS)
-     * @param startOfPeriod 조회 기간 시작일
-     * @param endOfPeriod 조회 기간 종료일
-     * @return 조건에 맞는 VacationGrant 리스트
-     */
-    List<VacationGrant> findByUserIdAndStatusesAndPeriod(String userId, List<GrantStatus> statuses, LocalDateTime startOfPeriod, LocalDateTime endOfPeriod);
 
     /**
      * 여러 사용자의 특정 기간 내에 유효한 VacationGrant 일괄 조회
