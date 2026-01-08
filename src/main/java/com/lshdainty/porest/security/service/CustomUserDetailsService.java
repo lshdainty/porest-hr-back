@@ -1,5 +1,6 @@
 package com.lshdainty.porest.security.service;
 
+import com.lshdainty.porest.common.type.DefaultCompanyType;
 import com.lshdainty.porest.security.principal.UserPrincipal;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.repository.UserRepository;
@@ -29,8 +30,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("Attempting to load user: {}", username);
-
         // 사용자 id를 기반으로 한 유저 권한 정보 및 역할 조회
         User user = userRepository.findByIdWithRolesAndPermissions(username)
                 .orElseThrow(() -> {
@@ -38,10 +37,14 @@ public class CustomUserDetailsService implements UserDetailsService {
                     return new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username);
                 });
 
-        log.info("User found: {}, Roles: {}, Authorities: {}",
-                user.getId(),
-                user.getRoles().stream().map(Role::getCode).collect(Collectors.joining(", ")),
-                String.join(", ", user.getAllAuthorities()));
+        // SYSTEM 유저는 모니터링 도구(Prometheus 등)이므로 info 로그 생략
+        if (!DefaultCompanyType.SYSTEM.equals(user.getCompany())) {
+            log.info("Attempting to load user: {}", username);
+            log.info("User found: {}, Roles: {}, Authorities: {}",
+                    user.getId(),
+                    user.getRoles().stream().map(Role::getCode).collect(Collectors.joining(", ")),
+                    String.join(", ", user.getAllAuthorities()));
+        }
 
         return new CustomUserDetails(user);
     }

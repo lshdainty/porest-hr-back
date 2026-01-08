@@ -58,6 +58,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(tokenRepository)
                 .csrfTokenRequestHandler(requestHandler)
+                .ignoringRequestMatchers("/actuator/**")  // Prometheus 등 모니터링 도구는 CSRF 제외
         );
 
         // CORS 설정
