@@ -5,6 +5,8 @@ on:
     branches: [ main, master ]
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'  # v1.0.0, v1.0.1 등 버전 태그
 
 jobs:
   # [1] 테스트 실행
@@ -53,13 +55,14 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
 
-  # [2] Docker 이미지 빌드 & Push (main 브랜치 push 시에만)
+  # [2] Docker 이미지 빌드 & Push
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     outputs:
       image_tag: ${{ steps.meta.outputs.version }}
+      is_release: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - name: Checkout Branch
         uses: actions/checkout@v4
@@ -94,8 +97,12 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/porest-back
           tags: |
-            type=sha,prefix=
-            type=raw,value=latest
+            # main push: latest + sha
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=sha,prefix=,enable=${{ github.ref == 'refs/heads/main' }}
+            # tag push: 버전 태그 (v1.0.0 -> 1.0.0)
+            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
@@ -106,10 +113,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # [3] Jenkins 배포 트리거
+  # [3] Jenkins 배포 트리거 (main push만 - 개발 자동 배포)
   trigger-deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Trigger Jenkins Deployment
         run: |
@@ -118,4 +126,24 @@ jobs:
             --fail --silent --show-error
 
       - name: Deployment Triggered
-        run: echo "Jenkins 배포 파이프라인이 트리거되었습니다. Jenkins에서 dev 배포 후 approve하면 prod에 배포됩니다."
+        run: echo "Jenkins 배포 파이프라인이 트리거되었습니다."
+
+  # [4] 릴리스 노트 생성 (tag push만)
+  create-release:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Created
+        run: echo "릴리스 ${{ github.ref_name }} 생성 완료. Docker 이미지: porest/porest-back:${{ github.ref_name }}"
