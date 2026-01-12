@@ -8,6 +8,9 @@ on:
     tags:
       - 'v*'  # v1.0.0, v1.0.1 등 버전 태그
 
+permissions:
+  contents: write
+
 jobs:
   # [1] 테스트 실행
   test:
