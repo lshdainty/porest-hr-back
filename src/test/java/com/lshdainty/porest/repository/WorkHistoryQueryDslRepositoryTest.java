@@ -43,13 +43,18 @@ class WorkHistoryQueryDslRepositoryTest {
     private WorkCode part;
     private WorkCode division;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
-        user = User.createUser(
-                "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        user = createTestUser("user1", "테스트유저1", "user1@test.com");
         em.persist(user);
 
         group = WorkCode.createWorkCode("GRP001", "개발팀", CodeType.LABEL, null, 1);
@@ -273,11 +278,7 @@ class WorkHistoryQueryDslRepositoryTest {
     @DisplayName("여러 사용자의 기간별 일일 업무시간 합계 조회")
     void findDailyWorkHoursByUsersAndPeriod() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "테스트유저2", "user2@test.com");
         em.persist(user2);
 
         workHistoryRepository.save(WorkHistory.createWorkHistory(
@@ -396,11 +397,7 @@ class WorkHistoryQueryDslRepositoryTest {
     @DisplayName("사용자 이름으로 검색")
     void findAllWithUserNameFilter() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "김철수", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "김철수", "user2@test.com");
         em.persist(user2);
 
         workHistoryRepository.save(WorkHistory.createWorkHistory(

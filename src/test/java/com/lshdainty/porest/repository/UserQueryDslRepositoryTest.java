@@ -3,6 +3,7 @@ package com.lshdainty.porest.repository;
 import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.type.DefaultCompanyType;
+import com.lshdainty.porest.common.type.CompanyType;
 import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.permission.domain.Permission;
 import com.lshdainty.porest.permission.domain.Role;
@@ -36,15 +37,24 @@ class UserQueryDslRepositoryTest {
     @Autowired
     private TestEntityManager em;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email, CompanyType company) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), company, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
+    private User createTestUser(String id, String name, String email) {
+        return createTestUser(id, name, email, OriginCompanyType.DTOL);
+    }
+
     @Test
     @DisplayName("유저 저장 및 단건 조회")
     void save() {
         // given
-        User user = User.createUser(
-                "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user = createTestUser("testUser", "홍길동", "hong@test.com");
 
         // when
         userRepository.save(user);
@@ -72,11 +82,7 @@ class UserQueryDslRepositoryTest {
     @DisplayName("삭제된 유저도 findById로 조회됨 (em.find 사용)")
     void findByIdIncludesDeleted() {
         // given
-        User user = User.createUser(
-                "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user = createTestUser("deletedUser", "삭제유저", "deleted@test.com");
         userRepository.save(user);
         user.deleteUser();
         em.flush();
@@ -94,16 +100,8 @@ class UserQueryDslRepositoryTest {
     @DisplayName("전체 유저 조회")
     void findUsers() {
         // given
-        userRepository.save(User.createUser(
-                "user1", "password", "유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        ));
-        userRepository.save(User.createUser(
-                "user2", "password", "유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
-                YNType.N, null, null, CountryCode.KR
-        ));
+        userRepository.save(createTestUser("user1", "유저1", "user1@test.com"));
+        userRepository.save(createTestUser("user2", "유저2", "user2@test.com"));
         em.flush();
         em.clear();
 
@@ -119,16 +117,8 @@ class UserQueryDslRepositoryTest {
     @DisplayName("전체 유저 조회 시 삭제된 유저 제외")
     void findUsersExcludesDeleted() {
         // given
-        User activeUser = User.createUser(
-                "activeUser", "password", "활성유저", "active@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        User deletedUser = User.createUser(
-                "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User activeUser = createTestUser("activeUser", "활성유저", "active@test.com");
+        User deletedUser = createTestUser("deletedUser", "삭제유저", "deleted@test.com");
         userRepository.save(activeUser);
         userRepository.save(deletedUser);
         deletedUser.deleteUser();
@@ -157,11 +147,7 @@ class UserQueryDslRepositoryTest {
     @DisplayName("유저 수정")
     void updateUser() {
         // given
-        User user = User.createUser(
-                "testUser", "password", "원래이름", "original@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user = createTestUser("testUser", "원래이름", "original@test.com");
         userRepository.save(user);
         em.flush();
         em.clear();
@@ -185,11 +171,7 @@ class UserQueryDslRepositoryTest {
     @DisplayName("유저 삭제 (소프트 딜리트)")
     void deleteUser() {
         // given
-        User user = User.createUser(
-                "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user = createTestUser("testUser", "홍길동", "hong@test.com");
         userRepository.save(user);
         em.flush();
         em.clear();
@@ -211,61 +193,6 @@ class UserQueryDslRepositoryTest {
     }
 
     @Test
-    @DisplayName("초대된 유저 생성 및 조회")
-    void createInvitedUser() {
-        // given
-        User invitedUser = User.createInvitedUser(
-                "invitedUser", "초대유저", "invited@test.com",
-                OriginCompanyType.DTOL, "9 ~ 18",
-                LocalDate.of(2025, 1, 1), CountryCode.KR
-        );
-
-        // when
-        userRepository.save(invitedUser);
-        em.flush();
-        em.clear();
-
-        // then
-        Optional<User> findUser = userRepository.findById("invitedUser");
-        assertThat(findUser.isPresent()).isTrue();
-        assertThat(findUser.get().getName()).isEqualTo("초대유저");
-        assertThat(findUser.get().getInvitationToken()).isNotNull();
-        assertThat(findUser.get().isInvitationValid()).isTrue();
-    }
-
-    @Test
-    @DisplayName("초대 토큰으로 유저 조회")
-    void findByInvitationToken() {
-        // given
-        User invitedUser = User.createInvitedUser(
-                "invitedUser", "초대유저", "invited@test.com",
-                OriginCompanyType.DTOL, "9 ~ 18",
-                LocalDate.of(2025, 1, 1), CountryCode.KR
-        );
-        userRepository.save(invitedUser);
-        String token = invitedUser.getInvitationToken();
-        em.flush();
-        em.clear();
-
-        // when
-        Optional<User> findUser = userRepository.findByInvitationToken(token);
-
-        // then
-        assertThat(findUser.isPresent()).isTrue();
-        assertThat(findUser.get().getId()).isEqualTo("invitedUser");
-    }
-
-    @Test
-    @DisplayName("초대 토큰으로 조회 시 없으면 빈 Optional 반환")
-    void findByInvitationTokenEmpty() {
-        // when
-        Optional<User> findUser = userRepository.findByInvitationToken("invalid-token");
-
-        // then
-        assertThat(findUser.isEmpty()).isTrue();
-    }
-
-    @Test
     @DisplayName("역할과 권한과 함께 유저 조회")
     void findByIdWithRolesAndPermissions() {
         // given
@@ -279,11 +206,7 @@ class UserQueryDslRepositoryTest {
         role.addPermission(permission);
         em.persist(role);
 
-        User user = User.createUser(
-                "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user = createTestUser("testUser", "홍길동", "hong@test.com");
         user.addRole(role);
         userRepository.save(user);
         em.flush();
@@ -312,11 +235,7 @@ class UserQueryDslRepositoryTest {
     @DisplayName("역할과 권한과 함께 유저 조회 - 역할이 없는 유저")
     void findByIdWithRolesAndPermissionsNoRoles() {
         // given
-        User user = User.createUser(
-                "testUser", "password", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user = createTestUser("testUser", "홍길동", "hong@test.com");
         userRepository.save(user);
         em.flush();
         em.clear();
@@ -343,19 +262,11 @@ class UserQueryDslRepositoryTest {
         role.addPermission(permission);
         em.persist(role);
 
-        User user1 = User.createUser(
-                "user1", "password", "유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user1 = createTestUser("user1", "유저1", "user1@test.com");
         user1.addRole(role);
         userRepository.save(user1);
 
-        User user2 = User.createUser(
-                "user2", "password", "유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "유저2", "user2@test.com");
         userRepository.save(user2);
         em.flush();
         em.clear();
@@ -381,18 +292,10 @@ class UserQueryDslRepositoryTest {
     @DisplayName("전체 유저를 역할과 권한과 함께 조회 - 역할이 없는 유저들")
     void findUsersWithRolesAndPermissionsNoRoles() {
         // given
-        User user1 = User.createUser(
-                "user1", "password", "유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user1 = createTestUser("user1", "유저1", "user1@test.com");
         userRepository.save(user1);
 
-        User user2 = User.createUser(
-                "user2", "password", "유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "8 ~ 17",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "유저2", "user2@test.com");
         userRepository.save(user2);
         em.flush();
         em.clear();
@@ -409,11 +312,7 @@ class UserQueryDslRepositoryTest {
     @DisplayName("수정일 기간으로 삭제된 유저 조회")
     void findDeletedUsersByModifyDateBetween() {
         // given
-        User deletedUser = User.createUser(
-                "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User deletedUser = createTestUser("deletedUser", "삭제유저", "deleted@test.com");
         userRepository.save(deletedUser);
         deletedUser.deleteUser();
         em.flush();
@@ -436,11 +335,7 @@ class UserQueryDslRepositoryTest {
     @DisplayName("수정일 기간으로 삭제된 유저 조회 - 활성 유저는 제외")
     void findDeletedUsersByModifyDateBetweenExcludesActive() {
         // given
-        User activeUser = User.createUser(
-                "activeUser", "password", "활성유저", "active@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User activeUser = createTestUser("activeUser", "활성유저", "active@test.com");
         userRepository.save(activeUser);
         em.flush();
         em.clear();
@@ -460,11 +355,7 @@ class UserQueryDslRepositoryTest {
     @DisplayName("수정일 기간으로 삭제된 유저 조회 - 기간 외 제외")
     void findDeletedUsersByModifyDateBetweenOutOfRange() {
         // given
-        User deletedUser = User.createUser(
-                "deletedUser", "password", "삭제유저", "deleted@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User deletedUser = createTestUser("deletedUser", "삭제유저", "deleted@test.com");
         userRepository.save(deletedUser);
         deletedUser.deleteUser();
         em.flush();
@@ -485,16 +376,8 @@ class UserQueryDslRepositoryTest {
     @DisplayName("전체 유저 조회 시 SYSTEM 계정 제외")
     void findUsersExcludesSystemAccount() {
         // given
-        User normalUser = User.createUser(
-                "normalUser", "password", "일반유저", "normal@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        User systemUser = User.createUser(
-                "systemUser", "password", "시스템유저", "system@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com", OriginCompanyType.DTOL);
+        User systemUser = createTestUser("systemUser", "시스템유저", "system@test.com", DefaultCompanyType.SYSTEM);
         userRepository.save(normalUser);
         userRepository.save(systemUser);
         em.flush();
@@ -523,19 +406,11 @@ class UserQueryDslRepositoryTest {
         role.addPermission(permission);
         em.persist(role);
 
-        User normalUser = User.createUser(
-                "normalUser", "password", "일반유저", "normal@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com", OriginCompanyType.DTOL);
         normalUser.addRole(role);
         userRepository.save(normalUser);
 
-        User systemUser = User.createUser(
-                "systemUser", "password", "시스템유저", "system@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User systemUser = createTestUser("systemUser", "시스템유저", "system@test.com", DefaultCompanyType.SYSTEM);
         systemUser.addRole(role);
         userRepository.save(systemUser);
         em.flush();
@@ -548,5 +423,37 @@ class UserQueryDslRepositoryTest {
         assertThat(users).hasSize(1);
         assertThat(users.get(0).getId()).isEqualTo("normalUser");
         assertThat(users.get(0).getCompany()).isNotEqualTo(DefaultCompanyType.SYSTEM);
+    }
+
+    @Test
+    @DisplayName("SSO User No로 유저 조회")
+    void findBySsoUserNo() {
+        // given
+        User user = User.createUser(
+                100L, "testUser", "홍길동", "hong@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+        userRepository.save(user);
+        em.flush();
+        em.clear();
+
+        // when
+        Optional<User> findUser = userRepository.findBySsoUserNo(100L);
+
+        // then
+        assertThat(findUser.isPresent()).isTrue();
+        assertThat(findUser.get().getId()).isEqualTo("testUser");
+        assertThat(findUser.get().getSsoUserNo()).isEqualTo(100L);
+    }
+
+    @Test
+    @DisplayName("SSO User No로 유저 조회 - 없으면 빈 Optional")
+    void findBySsoUserNoEmpty() {
+        // when
+        Optional<User> findUser = userRepository.findBySsoUserNo(999L);
+
+        // then
+        assertThat(findUser.isEmpty()).isTrue();
     }
 }

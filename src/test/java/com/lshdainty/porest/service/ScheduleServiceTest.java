@@ -4,7 +4,9 @@ import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
 import com.lshdainty.porest.common.exception.ErrorCode;
 import com.lshdainty.porest.common.exception.InvalidValueException;
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.schedule.domain.Schedule;
 import com.lshdainty.porest.schedule.repository.ScheduleRepository;
 import com.lshdainty.porest.schedule.service.ScheduleService;
@@ -22,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +46,15 @@ class ScheduleServiceTest {
     @InjectMocks
     private ScheduleServiceImpl scheduleService;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id) {
+        return User.createUser(
+                null, id, "테스트유저", "test@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @Nested
     @DisplayName("스케줄 등록")
     class RegistSchedule {
@@ -51,7 +63,7 @@ class ScheduleServiceTest {
         void registScheduleSuccess() {
             // given
             String userId = "test1";
-            User user = User.createUser(userId);
+            User user = createTestUser(userId);
             LocalDateTime start = LocalDateTime.now().plusDays(1);
             LocalDateTime end = start.plusHours(8);
 
@@ -97,7 +109,7 @@ class ScheduleServiceTest {
         void registScheduleFailStartAfterEnd() {
             // given
             String userId = "test1";
-            User user = User.createUser(userId);
+            User user = createTestUser(userId);
             LocalDateTime start = LocalDateTime.now().plusDays(2);
             LocalDateTime end = start.minusDays(1);
 
@@ -125,7 +137,7 @@ class ScheduleServiceTest {
         void searchSchedulesByUserSuccess() {
             // given
             String userId = "test1";
-            User user = User.createUser(userId);
+            User user = createTestUser(userId);
             List<Schedule> schedules = List.of(
                     Schedule.createSchedule(user, "교육", ScheduleType.EDUCATION,
                             LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)),
@@ -154,7 +166,7 @@ class ScheduleServiceTest {
             // given
             LocalDateTime start = LocalDateTime.of(2025, 1, 1, 0, 0);
             LocalDateTime end = LocalDateTime.of(2025, 12, 31, 23, 59);
-            User user = User.createUser("test1");
+            User user = createTestUser("test1");
 
             List<Schedule> schedules = List.of(
                     Schedule.createSchedule(user, "교육", ScheduleType.EDUCATION,
@@ -195,7 +207,7 @@ class ScheduleServiceTest {
             // given
             Long scheduleId = 1L;
             String userId = "test1";
-            User user = User.createUser(userId);
+            User user = createTestUser(userId);
             LocalDateTime futureStart = LocalDateTime.now().plusDays(1);
             LocalDateTime futureEnd = futureStart.plusHours(8);
 
@@ -234,7 +246,7 @@ class ScheduleServiceTest {
         void deleteScheduleSuccess() {
             // given
             Long scheduleId = 1L;
-            User user = User.createUser("test1");
+            User user = createTestUser("test1");
             LocalDateTime futureStart = LocalDateTime.now().plusDays(1);
             LocalDateTime futureEnd = futureStart.plusHours(8);
 
@@ -269,7 +281,7 @@ class ScheduleServiceTest {
         void deleteScheduleFailAlreadyDeleted() {
             // given
             Long scheduleId = 1L;
-            User user = User.createUser("test1");
+            User user = createTestUser("test1");
             LocalDateTime futureStart = LocalDateTime.now().plusDays(1);
             LocalDateTime futureEnd = futureStart.plusHours(8);
 
@@ -289,7 +301,7 @@ class ScheduleServiceTest {
         void deleteScheduleFailPastSchedule() {
             // given
             Long scheduleId = 1L;
-            User user = User.createUser("test1");
+            User user = createTestUser("test1");
             LocalDateTime pastStart = LocalDateTime.now().minusDays(3);
             LocalDateTime pastEnd = pastStart.plusHours(8);
 
@@ -313,7 +325,7 @@ class ScheduleServiceTest {
         void checkScheduleExistSuccess() {
             // given
             Long scheduleId = 1L;
-            User user = User.createUser("test1");
+            User user = createTestUser("test1");
             Schedule schedule = Schedule.createSchedule(user, "교육", ScheduleType.EDUCATION,
                     LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
             setScheduleId(schedule, scheduleId);
@@ -344,7 +356,7 @@ class ScheduleServiceTest {
         void checkScheduleExistFailDeleted() {
             // given
             Long scheduleId = 1L;
-            User user = User.createUser("test1");
+            User user = createTestUser("test1");
             Schedule schedule = Schedule.createSchedule(user, "교육", ScheduleType.EDUCATION,
                     LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
             schedule.deleteSchedule();

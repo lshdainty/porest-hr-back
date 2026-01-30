@@ -172,14 +172,14 @@ class DuesJpaRepositoryTest {
         // given
         // User 테이블과 JOIN하므로 해당 userName과 동일한 name을 가진 User가 필요
         User user1 = User.createUser(
-                "user1", "password", "홍길동", "user1@test.com",
+                null, "user1", "홍길동", "user1@test.com",
                 LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         User user2 = User.createUser(
-                "user2", "password", "김철수", "user2@test.com",
+                null, "user2", "김철수", "user2@test.com",
                 LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         em.persist(user1);
         em.persist(user2);
@@ -207,14 +207,14 @@ class DuesJpaRepositoryTest {
     void findUsersMonthBirthDuesExcludesSystemAccount() {
         // given
         User normalUser = User.createUser(
-                "normalUser", "password", "일반유저", "normal@test.com",
+                null, "normalUser", "일반유저", "normal@test.com",
                 LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         User systemUser = User.createUser(
-                "systemUser", "password", "시스템유저", "system@test.com",
+                null, "systemUser", "시스템유저", "system@test.com",
                 LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         em.persist(normalUser);
         em.persist(systemUser);

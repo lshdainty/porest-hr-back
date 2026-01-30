@@ -71,9 +71,13 @@ class WorkHistoryServiceTest {
     @InjectMocks
     private WorkHistoryServiceImpl workHistoryService;
 
+    // 테스트용 User 생성 헬퍼 메소드
     private User createTestUser(String userId) {
-        return User.createUser(userId, "password", "테스트유저", "test@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+        return User.createUser(
+                null, userId, "테스트유저", "test@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
     }
 
     private WorkCode createTestWorkCode(Long id, String code, String name, CodeType type) {

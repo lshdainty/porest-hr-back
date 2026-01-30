@@ -43,13 +43,18 @@ class UserVacationPlanJpaRepositoryTest {
     private User user;
     private VacationPlan plan;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
-        user = User.createUser(
-                "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        user = createTestUser("user1", "테스트유저1", "user1@test.com");
         plan = VacationPlan.createPlan("DEFAULT", "기본 플랜", "기본 휴가 플랜");
         em.persist(user);
         em.persist(plan);

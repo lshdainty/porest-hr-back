@@ -3,7 +3,9 @@ package com.lshdainty.porest.service;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
 import com.lshdainty.porest.common.exception.ErrorCode;
 import com.lshdainty.porest.common.exception.InvalidValueException;
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.notice.domain.Notice;
 import com.lshdainty.porest.notice.repository.NoticeRepository;
 import com.lshdainty.porest.notice.service.NoticeService;
@@ -49,6 +51,15 @@ class NoticeServiceTest {
     @InjectMocks
     private NoticeServiceImpl noticeService;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id) {
+        return User.createUser(
+                null, id, "테스트유저", "test@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @Nested
     @DisplayName("공지사항 등록")
     class CreateNotice {
@@ -57,7 +68,7 @@ class NoticeServiceTest {
         void createNoticeSuccess() {
             // given
             String writerId = "admin";
-            User writer = User.createUser(writerId);
+            User writer = createTestUser(writerId);
             LocalDate start = LocalDate.now();
             LocalDate end = start.plusDays(30);
 
@@ -107,7 +118,7 @@ class NoticeServiceTest {
         void createNoticeFailStartAfterEnd() {
             // given
             String writerId = "admin";
-            User writer = User.createUser(writerId);
+            User writer = createTestUser(writerId);
             LocalDate start = LocalDate.now().plusDays(30);
             LocalDate end = LocalDate.now();
 
@@ -135,7 +146,7 @@ class NoticeServiceTest {
         void searchNoticeSuccess() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "테스트 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -158,7 +169,7 @@ class NoticeServiceTest {
         void searchNoticeAndIncreaseViewCountSuccess() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "테스트 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -191,7 +202,7 @@ class NoticeServiceTest {
         void searchNoticeFailDeleted() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제된 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -213,7 +224,7 @@ class NoticeServiceTest {
         @DisplayName("성공 - 공지사항 목록 페이지네이션 조회")
         void searchNoticesSuccess() {
             // given
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice1 = Notice.createNotice(
                     writer, "공지1", "내용1", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -240,7 +251,7 @@ class NoticeServiceTest {
         @DisplayName("성공 - 유형별 공지사항 조회")
         void searchNoticesByTypeSuccess() {
             // given
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "긴급 공지", "내용", NoticeType.URGENT,
                     YNType.Y, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -264,7 +275,7 @@ class NoticeServiceTest {
         @DisplayName("성공 - 키워드로 공지사항 검색")
         void searchNoticesByKeywordSuccess() {
             // given
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "시스템 점검 안내", "내용", NoticeType.MAINTENANCE,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -287,7 +298,7 @@ class NoticeServiceTest {
         @DisplayName("성공 - 활성 공지사항 조회")
         void searchActiveNoticesSuccess() {
             // given
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "활성 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now().minusDays(1), LocalDate.now().plusDays(30)
@@ -311,7 +322,7 @@ class NoticeServiceTest {
         @DisplayName("성공 - 고정 공지사항 조회")
         void searchPinnedNoticesSuccess() {
             // given
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "고정 공지", "내용", NoticeType.URGENT,
                     YNType.Y, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -340,7 +351,7 @@ class NoticeServiceTest {
         void updateNoticeSuccess() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "원본 제목", "원본 내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -389,7 +400,7 @@ class NoticeServiceTest {
         void updateNoticeFailInvalidDate() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "원본 제목", "원본 내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -418,7 +429,7 @@ class NoticeServiceTest {
         void deleteNoticeSuccess() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제할 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -451,7 +462,7 @@ class NoticeServiceTest {
         void deleteNoticeFailAlreadyDeleted() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제된 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -474,7 +485,7 @@ class NoticeServiceTest {
         void checkNoticeExistSuccess() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "테스트 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
@@ -507,7 +518,7 @@ class NoticeServiceTest {
         void checkNoticeExistFailDeleted() {
             // given
             Long noticeId = 1L;
-            User writer = User.createUser("admin");
+            User writer = createTestUser("admin");
             Notice notice = Notice.createNotice(
                     writer, "삭제된 공지", "내용", NoticeType.GENERAL,
                     YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)

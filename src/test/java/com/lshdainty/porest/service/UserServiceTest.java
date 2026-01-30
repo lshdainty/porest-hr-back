@@ -72,6 +72,15 @@ class UserServiceTest {
     @InjectMocks
     private UserServiceImpl userService;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(userService, "fileRootPath", "/var/www/media");
@@ -176,8 +185,7 @@ class UserServiceTest {
         void searchUserSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "test@test.com");
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
             // when
@@ -205,8 +213,7 @@ class UserServiceTest {
         void searchUserFailDeleted() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "test@test.com");
             user.deleteUser();
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
@@ -220,8 +227,11 @@ class UserServiceTest {
         void searchUserWithProfileSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, "test.jpg", "some-uuid", CountryCode.KR);
+            User user = User.createUser(
+                    null, userId, "이서준", "test@test.com",
+                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18",
+                    LocalDate.now(), YNType.N, "test.jpg", "some-uuid", CountryCode.KR
+            );
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
             try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
@@ -243,8 +253,11 @@ class UserServiceTest {
         void searchUserWithOnlyProfileName() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, "test.jpg", null, CountryCode.KR);
+            User user = User.createUser(
+                    null, userId, "이서준", "test@test.com",
+                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18",
+                    LocalDate.now(), YNType.N, "test.jpg", null, CountryCode.KR
+            );
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
             // when
@@ -260,8 +273,7 @@ class UserServiceTest {
         void searchUserWithMainDepartment() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "test@test.com");
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "개발팀", null, null, 1L, "desc", "#000", company);
@@ -282,8 +294,7 @@ class UserServiceTest {
         void searchUserWithDeletedMainDepartment() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "test@test.com");
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "개발팀", null, null, 1L, "desc", "#000", company);
@@ -305,8 +316,7 @@ class UserServiceTest {
         void searchUserWithNonMainDepartment() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "test@test.com");
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "개발팀", null, null, 1L, "desc", "#000", company);
@@ -331,8 +341,8 @@ class UserServiceTest {
         void searchUsersSuccess() {
             // given
             given(userRepository.findUsersWithRolesAndPermissions()).willReturn(List.of(
-                    User.createUser("user1", "", "이서준", "", LocalDate.now(), OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR),
-                    User.createUser("user2", "", "김서연", "", LocalDate.now(), OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR)
+                    createTestUser("user1", "이서준", "user1@test.com"),
+                    createTestUser("user2", "김서연", "user2@test.com")
             ));
 
             // when
@@ -366,8 +376,8 @@ class UserServiceTest {
         void findAllUsersSuccess() {
             // given
             List<User> users = List.of(
-                    User.createUser("user1", "", "이서준", "", LocalDate.now(), OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR),
-                    User.createUser("user2", "", "김서연", "", LocalDate.now(), OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR)
+                    createTestUser("user1", "이서준", "user1@test.com"),
+                    createTestUser("user2", "김서연", "user2@test.com")
             );
             given(userRepository.findUsersWithRolesAndPermissions()).willReturn(users);
 
@@ -402,8 +412,7 @@ class UserServiceTest {
         void editUserSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             UserServiceDto data = UserServiceDto.builder()
@@ -440,8 +449,7 @@ class UserServiceTest {
         void editUserDashboardSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             UserServiceDto data = UserServiceDto.builder()
@@ -462,8 +470,7 @@ class UserServiceTest {
         void editUserRolesSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
@@ -492,8 +499,7 @@ class UserServiceTest {
         void deleteUserSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "이서준", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "이서준", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             // when
@@ -543,141 +549,7 @@ class UserServiceTest {
         }
     }
 
-    @Nested
-    @DisplayName("유저 초대")
-    class InviteUser {
-        @Test
-        @DisplayName("성공 - 유저가 초대되고 이메일이 발송된다")
-        void inviteUserSuccess() {
-            // given
-            UserServiceDto data = UserServiceDto.builder()
-                    .id("newuser")
-                    .name("신규유저")
-                    .email("new@test.com")
-                    .company(OriginCompanyType.SKAX)
-                    .workTime("9 ~ 18")
-                    .joinDate(LocalDate.now())
-                    .build();
-
-            given(userRepository.findById("newuser")).willReturn(Optional.empty());
-            willDoNothing().given(userRepository).save(any(User.class));
-            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString(), anyString());
-
-            // when
-            UserServiceDto result = userService.inviteUser(data);
-
-            // then
-            then(userRepository).should().save(any(User.class));
-            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("신규유저"), eq("newuser"), anyString());
-            assertThat(result.getId()).isEqualTo("newuser");
-            assertThat(result.getInvitationStatus()).isEqualTo(StatusType.PENDING);
-        }
-
-        @Test
-        @DisplayName("실패 - 중복된 ID로 초대하면 예외가 발생한다")
-        void inviteUserFailDuplicateId() {
-            // given
-            UserServiceDto data = UserServiceDto.builder()
-                    .id("existinguser")
-                    .name("신규유저")
-                    .email("new@test.com")
-                    .build();
-
-            User existingUser = User.createUser("existinguser");
-            given(userRepository.findById("existinguser")).willReturn(Optional.of(existingUser));
-
-            // when & then
-            assertThatThrownBy(() -> userService.inviteUser(data))
-                    .isInstanceOf(DuplicateException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("초대 재전송")
-    class ResendInvitation {
-        @Test
-        @DisplayName("성공 - 초대가 재전송된다")
-        void resendInvitationSuccess() {
-            // given
-            String userId = "user1";
-            User user = User.createInvitedUser(userId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString(), anyString());
-
-            // when
-            UserServiceDto result = userService.resendInvitation(userId);
-
-            // then
-            then(emailService).should().sendInvitationEmail(eq("user@test.com"), eq("유저"), eq(userId), anyString());
-            assertThat(result.getInvitationStatus()).isEqualTo(StatusType.PENDING);
-        }
-    }
-
-    @Nested
-    @DisplayName("초대된 유저 정보 수정")
-    class EditInvitedUser {
-        @Test
-        @DisplayName("성공 - PENDING 상태 유저의 정보가 수정된다")
-        void editInvitedUserSuccess() {
-            // given
-            String userId = "user1";
-            User user = User.createInvitedUser(userId, "유저", "old@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .name("수정된유저")
-                    .email("old@test.com")
-                    .build();
-
-            // when
-            UserServiceDto result = userService.editInvitedUser(userId, data);
-
-            // then
-            assertThat(user.getName()).isEqualTo("수정된유저");
-        }
-
-        @Test
-        @DisplayName("성공 - 이메일 변경 시 초대 이메일이 재발송된다")
-        void editInvitedUserEmailChangedSuccess() {
-            // given
-            String userId = "user1";
-            User user = User.createInvitedUser(userId, "유저", "old@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            willDoNothing().given(emailService).sendInvitationEmail(anyString(), anyString(), anyString(), anyString());
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .name("유저")
-                    .email("new@test.com")
-                    .build();
-
-            // when
-            userService.editInvitedUser(userId, data);
-
-            // then
-            then(emailService).should().sendInvitationEmail(eq("new@test.com"), eq("유저"), eq(userId), anyString());
-        }
-
-        @Test
-        @DisplayName("실패 - PENDING 상태가 아닌 유저를 수정하면 예외가 발생한다")
-        void editInvitedUserFailNotPending() {
-            // given
-            String userId = "user1";
-            User user = User.createInvitedUser(userId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            user.completeOAuthRegistration(LocalDate.now(), YNType.N);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder().name("수정").build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.editInvitedUser(userId, data))
-                    .isInstanceOf(BusinessRuleViolationException.class);
-        }
-    }
+    // SSO 분리로 인해 유저 초대/초대 재전송/초대된 유저 수정 테스트는 porest-sso로 이동됨
 
     @Nested
     @DisplayName("아이디 중복 확인")
@@ -686,7 +558,7 @@ class UserServiceTest {
         @DisplayName("성공 - 중복이면 true를 반환한다")
         void checkUserIdDuplicateTrue() {
             // given
-            User user = User.createUser("user1");
+            User user = createTestUser("user1", "유저", "user1@test.com");
             given(userRepository.findById("user1")).willReturn(Optional.of(user));
 
             // when
@@ -718,8 +590,7 @@ class UserServiceTest {
         void checkUserHasMainDepartmentY() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             given(departmentRepository.hasMainDepartment(userId)).willReturn(true);
 
@@ -735,8 +606,7 @@ class UserServiceTest {
         void checkUserHasMainDepartmentN() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             given(departmentRepository.hasMainDepartment(userId)).willReturn(false);
 
@@ -756,8 +626,7 @@ class UserServiceTest {
         void checkUserExistSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             // when
@@ -783,8 +652,7 @@ class UserServiceTest {
         void checkUserExistFailDeleted() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             user.deleteUser();
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -947,8 +815,7 @@ class UserServiceTest {
         void updateDashboardSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             String dashboardData = "{\"widgets\": [{\"type\": \"chart\", \"position\": 1}]}";
@@ -968,8 +835,7 @@ class UserServiceTest {
         void updateDashboardWithNull() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             user.updateDashboard("{\"old\": \"data\"}");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -998,8 +864,7 @@ class UserServiceTest {
         void updateDashboardFailDeleted() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             user.deleteUser();
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -1017,12 +882,10 @@ class UserServiceTest {
         void getUserApproversSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
-            User approver = User.createUser("head1", "", "부서장", "head@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User approver = createTestUser("head1", "부서장", "head@test.com");
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "부서KR", null, approver, 1L, "desc", "#000", company);
@@ -1045,8 +908,7 @@ class UserServiceTest {
         void getUserApproversWithNullApprover() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             Company company = Company.createCompany("회사", "Company", "desc");
@@ -1067,12 +929,10 @@ class UserServiceTest {
         void getUserApproversWithDeletedApprover() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
-            User deletedApprover = User.createUser("deleted", "", "삭제된부서장", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User deletedApprover = createTestUser("deleted", "삭제된부서장", "deleted@test.com");
             deletedApprover.deleteUser();
 
             Company company = Company.createCompany("회사", "Company", "desc");
@@ -1094,8 +954,7 @@ class UserServiceTest {
         void getUserApproversEmpty() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "", LocalDate.now(),
-                    OriginCompanyType.SKAX, "", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "user1@test.com");
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of());
 
@@ -1116,8 +975,7 @@ class UserServiceTest {
         void getUserWithRolesByIdSuccess() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "test@test.com");
 
             TypedQuery<User> userQuery = mock(TypedQuery.class);
             given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
@@ -1159,8 +1017,7 @@ class UserServiceTest {
         void getUserWithRolesByIdWithRoles() {
             // given
             String userId = "user1";
-            User user = User.createUser(userId, "", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
+            User user = createTestUser(userId, "유저", "test@test.com");
             Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
             user.addRole(role);
 
@@ -1185,589 +1042,5 @@ class UserServiceTest {
         }
     }
 
-    @Nested
-    @DisplayName("초대 토큰으로 Role 포함 유저 조회")
-    class GetUserWithRolesByInvitationToken {
-        @Test
-        @DisplayName("성공 - Role과 Permission을 포함한 유저를 반환한다")
-        @SuppressWarnings("unchecked")
-        void getUserWithRolesByInvitationTokenSuccess() {
-            // given
-            User user = User.createInvitedUser("user1", "유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            String token = user.getInvitationToken();
-
-            TypedQuery<User> userQuery = mock(TypedQuery.class);
-            given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
-            given(userQuery.setParameter(eq("token"), eq(token))).willReturn(userQuery);
-            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
-            given(userQuery.getResultList()).willReturn(List.of(user));
-
-            // when
-            Optional<User> result = userService.getUserWithRolesByInvitationToken(token);
-
-            // then
-            assertThat(result).isPresent();
-            assertThat(result.get().getInvitationToken()).isEqualTo(token);
-        }
-
-        @Test
-        @DisplayName("성공 - 토큰이 없으면 빈 Optional을 반환한다")
-        @SuppressWarnings("unchecked")
-        void getUserWithRolesByInvitationTokenNotFound() {
-            // given
-            String token = "invalid-token";
-
-            TypedQuery<User> userQuery = mock(TypedQuery.class);
-            given(em.createQuery(anyString(), eq(User.class))).willReturn(userQuery);
-            given(userQuery.setParameter(eq("token"), eq(token))).willReturn(userQuery);
-            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
-            given(userQuery.getResultList()).willReturn(List.of());
-
-            // when
-            Optional<User> result = userService.getUserWithRolesByInvitationToken(token);
-
-            // then
-            assertThat(result).isEmpty();
-        }
-
-        @Test
-        @DisplayName("성공 - Role이 있는 유저의 Permission도 조회한다")
-        @SuppressWarnings("unchecked")
-        void getUserWithRolesByInvitationTokenWithRoles() {
-            // given
-            User user = User.createInvitedUser("user1", "유저", "test@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            String token = user.getInvitationToken();
-            Role role = Role.createRole("ADMIN", "관리자", "관리자 역할");
-            user.addRole(role);
-
-            TypedQuery<User> userQuery = mock(TypedQuery.class);
-            TypedQuery<Role> roleQuery = mock(TypedQuery.class);
-
-            given(em.createQuery(contains("from User"), eq(User.class))).willReturn(userQuery);
-            given(userQuery.setParameter(eq("token"), eq(token))).willReturn(userQuery);
-            given(userQuery.setParameter(eq("isDeleted"), eq(YNType.N))).willReturn(userQuery);
-            given(userQuery.getResultList()).willReturn(List.of(user));
-
-            given(em.createQuery(contains("from Role"), eq(Role.class))).willReturn(roleQuery);
-            given(roleQuery.setParameter(eq("roles"), anyList())).willReturn(roleQuery);
-            given(roleQuery.getResultList()).willReturn(List.of(role));
-
-            // when
-            Optional<User> result = userService.getUserWithRolesByInvitationToken(token);
-
-            // then
-            assertThat(result).isPresent();
-            assertThat(result.get().getRoles()).contains(role);
-        }
-    }
-
-    @Nested
-    @DisplayName("비밀번호 초기화")
-    class ResetPassword {
-        @Test
-        @DisplayName("성공 - 비밀번호가 암호화되어 저장된다")
-        void resetPasswordSuccess() {
-            // given
-            String userId = "user1";
-            String newPassword = "newPassword123!";
-            String encodedPassword = "$2a$10$encodedPasswordHash";
-
-            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.encode(newPassword)).willReturn(encodedPassword);
-
-            // when
-            userService.resetPassword(userId, newPassword);
-
-            // then
-            then(userRepository).should().findById(userId);
-            then(passwordEncoder).should().encode(newPassword);
-            assertThat(user.getPwd()).isEqualTo(encodedPassword);
-        }
-
-        @Test
-        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
-        void resetPasswordFailNotFound() {
-            // given
-            String userId = "nonexistent";
-            given(userRepository.findById(userId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> userService.resetPassword(userId, "newPassword"))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
-        void resetPasswordFailDeleted() {
-            // given
-            String userId = "user1";
-            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-            user.deleteUser();
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-            // when & then
-            assertThatThrownBy(() -> userService.resetPassword(userId, "newPassword"))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("비밀번호 초기화 요청 (비로그인)")
-    class RequestPasswordReset {
-        @Test
-        @DisplayName("성공 - 임시 비밀번호가 생성되고 이메일이 발송된다")
-        void requestPasswordResetSuccess() {
-            // given
-            String userId = "user1";
-            String email = "test@test.com";
-            User user = User.createUser(userId, "oldPassword", "유저", email, LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.encode(anyString())).willReturn("encodedTempPassword");
-            willDoNothing().given(emailService).sendPasswordResetEmail(eq(email), eq("유저"), anyString());
-
-            // when
-            userService.requestPasswordReset(userId, email);
-
-            // then
-            then(userRepository).should().findById(userId);
-            then(passwordEncoder).should().encode(anyString());
-            then(emailService).should().sendPasswordResetEmail(eq(email), eq("유저"), anyString());
-            assertThat(user.getPwd()).isEqualTo("encodedTempPassword");
-            assertThat(user.getPasswordChangeRequired()).isEqualTo(YNType.Y);
-        }
-
-        @Test
-        @DisplayName("성공 - 이메일 대소문자 무시하고 일치 확인")
-        void requestPasswordResetIgnoreCase() {
-            // given
-            String userId = "user1";
-            String email = "TEST@TEST.COM";
-            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.encode(anyString())).willReturn("encodedTempPassword");
-            willDoNothing().given(emailService).sendPasswordResetEmail(anyString(), anyString(), anyString());
-
-            // when
-            userService.requestPasswordReset(userId, email);
-
-            // then
-            then(emailService).should().sendPasswordResetEmail(anyString(), anyString(), anyString());
-        }
-
-        @Test
-        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
-        void requestPasswordResetFailNotFound() {
-            // given
-            String userId = "nonexistent";
-            given(userRepository.findById(userId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> userService.requestPasswordReset(userId, "test@test.com"))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 삭제된 유저면 예외가 발생한다")
-        void requestPasswordResetFailDeleted() {
-            // given
-            String userId = "user1";
-            User user = User.createUser(userId, "oldPassword", "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-            user.deleteUser();
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-            // when & then
-            assertThatThrownBy(() -> userService.requestPasswordReset(userId, "test@test.com"))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 이메일이 일치하지 않으면 예외가 발생한다")
-        void requestPasswordResetFailEmailMismatch() {
-            // given
-            String userId = "user1";
-            User user = User.createUser(userId, "oldPassword", "유저", "correct@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-            // when & then
-            assertThatThrownBy(() -> userService.requestPasswordReset(userId, "wrong@test.com"))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("비밀번호 변경")
-    class ChangePassword {
-        @Test
-        @DisplayName("성공 - 비밀번호가 변경된다")
-        void changePasswordSuccess() {
-            // given
-            String userId = "user1";
-            String currentPassword = "currentPassword123!";
-            String newPassword = "newPassword123!";
-            String newPasswordConfirm = "newPassword123!";
-            String encodedCurrentPassword = "$2a$10$encodedCurrentPassword";
-            String encodedNewPassword = "$2a$10$encodedNewPassword";
-
-            User user = User.createUser(userId, encodedCurrentPassword, "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-            user.requirePasswordChange(); // 비밀번호 변경 필요 상태로 설정
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.matches(currentPassword, encodedCurrentPassword)).willReturn(true);
-            given(passwordEncoder.matches(newPassword, encodedCurrentPassword)).willReturn(false);
-            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
-
-            // when
-            userService.changePassword(userId, currentPassword, newPassword, newPasswordConfirm);
-
-            // then
-            then(userRepository).should().findById(userId);
-            then(passwordEncoder).should().encode(newPassword);
-            assertThat(user.getPwd()).isEqualTo(encodedNewPassword);
-            assertThat(user.getPasswordChangeRequired()).isEqualTo(YNType.N);
-        }
-
-        @Test
-        @DisplayName("실패 - 현재 비밀번호가 일치하지 않으면 예외가 발생한다")
-        void changePasswordFailCurrentPasswordMismatch() {
-            // given
-            String userId = "user1";
-            String wrongCurrentPassword = "wrongPassword";
-            String newPassword = "newPassword123!";
-            String encodedPassword = "$2a$10$encodedPassword";
-
-            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.matches(wrongCurrentPassword, encodedPassword)).willReturn(false);
-
-            // when & then
-            assertThatThrownBy(() -> userService.changePassword(userId, wrongCurrentPassword, newPassword, newPassword))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 새 비밀번호 확인이 일치하지 않으면 예외가 발생한다")
-        void changePasswordFailConfirmMismatch() {
-            // given
-            String userId = "user1";
-            String currentPassword = "currentPassword123!";
-            String newPassword = "newPassword123!";
-            String newPasswordConfirm = "differentPassword!";
-            String encodedPassword = "$2a$10$encodedPassword";
-
-            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.matches(currentPassword, encodedPassword)).willReturn(true);
-
-            // when & then
-            assertThatThrownBy(() -> userService.changePassword(userId, currentPassword, newPassword, newPasswordConfirm))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 새 비밀번호가 기존 비밀번호와 같으면 예외가 발생한다")
-        void changePasswordFailSamePassword() {
-            // given
-            String userId = "user1";
-            String currentPassword = "samePassword123!";
-            String newPassword = "samePassword123!";
-            String encodedPassword = "$2a$10$encodedPassword";
-
-            User user = User.createUser(userId, encodedPassword, "유저", "test@test.com", LocalDate.now(),
-                    OriginCompanyType.SKAX, "9 ~ 18", YNType.N, null, null, CountryCode.KR);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.matches(currentPassword, encodedPassword)).willReturn(true);
-            given(passwordEncoder.matches(newPassword, encodedPassword)).willReturn(true);
-
-            // when & then
-            assertThatThrownBy(() -> userService.changePassword(userId, currentPassword, newPassword, newPassword))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
-        void changePasswordFailNotFound() {
-            // given
-            String userId = "nonexistent";
-            given(userRepository.findById(userId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> userService.changePassword(userId, "current", "new", "new"))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("초대 확인 (validateRegistration)")
-    class ValidateRegistration {
-        @Test
-        @DisplayName("성공 - 초대 정보가 일치하면 true를 반환한다")
-        void validateRegistrationSuccess() {
-            // given
-            User user = User.createInvitedUser("user1", "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            String invitationCode = user.getInvitationToken();
-
-            given(userRepository.findByInvitationToken(invitationCode)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .id("user1")
-                    .name("유저")
-                    .email("user@test.com")
-                    .invitationToken(invitationCode)
-                    .build();
-
-            // when
-            boolean result = userService.validateRegistration(data);
-
-            // then
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        @DisplayName("실패 - 존재하지 않는 초대 코드이면 예외가 발생한다")
-        void validateRegistrationFailInvalidCode() {
-            // given
-            given(userRepository.findByInvitationToken("invalid-code")).willReturn(Optional.empty());
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .id("user1")
-                    .name("유저")
-                    .email("user@test.com")
-                    .invitationToken("invalid-code")
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.validateRegistration(data))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 만료된 초대이면 예외가 발생한다")
-        void validateRegistrationFailExpired() {
-            // given
-            User user = User.createInvitedUser("user1", "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            String invitationCode = user.getInvitationToken();
-
-            // 만료일을 과거로 설정
-            ReflectionTestUtils.setField(user, "invitationExpiresAt", LocalDateTime.now().minusDays(1));
-
-            given(userRepository.findByInvitationToken(invitationCode)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .id("user1")
-                    .name("유저")
-                    .email("user@test.com")
-                    .invitationToken(invitationCode)
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.validateRegistration(data))
-                    .isInstanceOf(BusinessRuleViolationException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 사용자 정보가 일치하지 않으면 예외가 발생한다")
-        void validateRegistrationFailInfoMismatch() {
-            // given
-            User user = User.createInvitedUser("user1", "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            String invitationCode = user.getInvitationToken();
-
-            given(userRepository.findByInvitationToken(invitationCode)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .id("wrongUser")  // 불일치
-                    .name("유저")
-                    .email("user@test.com")
-                    .invitationToken(invitationCode)
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.validateRegistration(data))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("회원가입 완료 (completeRegistration)")
-    class CompleteRegistration {
-        @Test
-        @DisplayName("성공 - 새 ID/PW로 회원가입을 완료한다")
-        void completeRegistrationSuccess() {
-            // given
-            String invitedUserId = "tempUser";
-            String newUserId = "newUser";
-            String newPassword = "newPwd123!";
-            String encodedNewPassword = "$2a$10$encodedNewPassword";
-
-            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-
-            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
-            given(userRepository.findById(newUserId)).willReturn(Optional.empty());
-            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .newUserId(newUserId)
-                    .newPassword(newPassword)
-                    .newPasswordConfirm(newPassword)
-                    .birth(LocalDate.of(1990, 1, 1))
-                    .lunarYN(YNType.N)
-                    .build();
-
-            // when
-            String result = userService.completeRegistration(data, invitedUserId);
-
-            // then
-            assertThat(result).isEqualTo(newUserId);
-            assertThat(user.getId()).isEqualTo(newUserId);
-            assertThat(user.getPwd()).isEqualTo(encodedNewPassword);
-            assertThat(user.getInvitationStatus()).isEqualTo(StatusType.ACTIVE);
-        }
-
-        @Test
-        @DisplayName("성공 - ID 변경 없이 회원가입을 완료한다")
-        void completeRegistrationSameIdSuccess() {
-            // given
-            String userId = "user1";
-            String newPassword = "newPwd123!";
-            String encodedNewPassword = "$2a$10$encodedNewPassword";
-
-            User user = User.createInvitedUser(userId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .newUserId(userId)  // 동일한 ID
-                    .newPassword(newPassword)
-                    .newPasswordConfirm(newPassword)
-                    .birth(LocalDate.of(1990, 1, 1))
-                    .lunarYN(YNType.N)
-                    .build();
-
-            // when
-            String result = userService.completeRegistration(data, userId);
-
-            // then
-            assertThat(result).isEqualTo(userId);
-            assertThat(user.getInvitationStatus()).isEqualTo(StatusType.ACTIVE);
-        }
-
-        @Test
-        @DisplayName("실패 - 새 ID가 중복되면 예외가 발생한다")
-        void completeRegistrationFailDuplicateNewId() {
-            // given
-            String invitedUserId = "tempUser";
-            String newUserId = "existingUser";
-
-            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            User existingUser = User.createUser(newUserId);
-
-            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
-            given(userRepository.findById(newUserId)).willReturn(Optional.of(existingUser));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .newUserId(newUserId)
-                    .newPassword("newPwd123!")
-                    .newPasswordConfirm("newPwd123!")
-                    .birth(LocalDate.of(1990, 1, 1))
-                    .lunarYN(YNType.N)
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
-                    .isInstanceOf(DuplicateException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 비밀번호 확인이 일치하지 않으면 예외가 발생한다")
-        void completeRegistrationFailPasswordMismatch() {
-            // given
-            String invitedUserId = "tempUser";
-            String newUserId = "newUser";
-
-            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-
-            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
-            given(userRepository.findById(newUserId)).willReturn(Optional.empty());
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .newUserId(newUserId)
-                    .newPassword("newPwd123!")
-                    .newPasswordConfirm("differentPwd!")  // 불일치
-                    .birth(LocalDate.of(1990, 1, 1))
-                    .lunarYN(YNType.N)
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
-                    .isInstanceOf(InvalidValueException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - PENDING 상태가 아닌 유저면 예외가 발생한다")
-        void completeRegistrationFailNotPending() {
-            // given
-            String invitedUserId = "user1";
-
-            User user = User.createInvitedUser(invitedUserId, "유저", "user@test.com",
-                    OriginCompanyType.SKAX, "9 ~ 18", LocalDate.now(), CountryCode.KR);
-            // 이미 회원가입 완료된 상태로 변경
-            user.completeOAuthRegistration(LocalDate.now(), YNType.N);
-
-            given(userRepository.findById(invitedUserId)).willReturn(Optional.of(user));
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .newUserId("newUser")
-                    .newPassword("newPwd123!")
-                    .newPasswordConfirm("newPwd123!")
-                    .birth(LocalDate.of(1990, 1, 1))
-                    .lunarYN(YNType.N)
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
-                    .isInstanceOf(BusinessRuleViolationException.class);
-        }
-
-        @Test
-        @DisplayName("실패 - 존재하지 않는 유저면 예외가 발생한다")
-        void completeRegistrationFailNotFound() {
-            // given
-            String invitedUserId = "nonexistent";
-            given(userRepository.findById(invitedUserId)).willReturn(Optional.empty());
-
-            UserServiceDto data = UserServiceDto.builder()
-                    .newUserId("newUser")
-                    .newPassword("newPwd123!")
-                    .newPasswordConfirm("newPwd123!")
-                    .build();
-
-            // when & then
-            assertThatThrownBy(() -> userService.completeRegistration(data, invitedUserId))
-                    .isInstanceOf(EntityNotFoundException.class);
-        }
-    }
+    // SSO 분리로 인해 초대 토큰, 비밀번호 초기화/변경, 회원가입 관련 테스트는 porest-sso로 이동됨
 }

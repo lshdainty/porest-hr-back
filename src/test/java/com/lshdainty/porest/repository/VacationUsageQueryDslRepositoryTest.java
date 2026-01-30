@@ -37,13 +37,18 @@ class VacationUsageQueryDslRepositoryTest {
 
     private User user;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
-        user = User.createUser(
-                "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        user = createTestUser("user1", "테스트유저1", "user1@test.com");
         em.persist(user);
     }
 
@@ -82,11 +87,7 @@ class VacationUsageQueryDslRepositoryTest {
     @DisplayName("모든 휴가사용 목록 조회")
     void findAllWithUser() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "테스트유저2", "user2@test.com");
         em.persist(user2);
 
         vacationUsageRepository.save(VacationUsage.createVacationUsage(
@@ -237,11 +238,7 @@ class VacationUsageQueryDslRepositoryTest {
     @DisplayName("여러 유저의 일별 휴가사용 조회")
     void findByUserIdsAndPeriodForDaily() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "테스트유저2", "user2@test.com");
         em.persist(user2);
 
         vacationUsageRepository.save(VacationUsage.createVacationUsage(
@@ -353,11 +350,7 @@ class VacationUsageQueryDslRepositoryTest {
     @DisplayName("여러 유저의 기간 내 휴가사용 일괄 조회")
     void findByUserIdsAndPeriod() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "테스트유저2", "user2@test.com");
         em.persist(user2);
 
         vacationUsageRepository.save(VacationUsage.createVacationUsage(

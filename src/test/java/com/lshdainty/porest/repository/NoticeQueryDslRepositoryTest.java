@@ -41,9 +41,9 @@ class NoticeQueryDslRepositoryTest {
     @BeforeEach
     void setUp() {
         writer = User.createUser(
-                "admin", "password", "관리자", "admin@test.com",
+                null, "admin", "관리자", "admin@test.com",
                 LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         em.persist(writer);
     }

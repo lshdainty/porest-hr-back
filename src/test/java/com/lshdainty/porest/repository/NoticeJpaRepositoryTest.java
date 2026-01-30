@@ -38,13 +38,18 @@ class NoticeJpaRepositoryTest {
 
     private User writer;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
-        writer = User.createUser(
-                "admin", "password", "관리자", "admin@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        writer = createTestUser("admin", "관리자", "admin@test.com");
         em.persist(writer);
     }
 

@@ -1,5 +1,6 @@
 package com.lshdainty.porest.repository;
 
+import com.lshdainty.porest.common.type.CompanyType;
 import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
 import com.lshdainty.porest.common.type.DefaultCompanyType;
@@ -34,6 +35,19 @@ class DuesQueryDslRepositoryTest {
 
     @Autowired
     private TestEntityManager em;
+
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email, CompanyType company) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), company, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
+    private User createTestUser(String id, String name, String email) {
+        return createTestUser(id, name, email, OriginCompanyType.DTOL);
+    }
 
     @Test
     @DisplayName("회비 저장 및 단건 조회")
@@ -171,16 +185,8 @@ class DuesQueryDslRepositoryTest {
     void findUsersMonthBirthDues() {
         // given
         // User 테이블과 JOIN하므로 해당 userName과 동일한 name을 가진 User가 필요
-        User user1 = User.createUser(
-                "user1", "password", "홍길동", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        User user2 = User.createUser(
-                "user2", "password", "김철수", "user2@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user1 = createTestUser("user1", "홍길동", "user1@test.com");
+        User user2 = createTestUser("user2", "김철수", "user2@test.com");
         em.persist(user1);
         em.persist(user2);
 
@@ -206,16 +212,8 @@ class DuesQueryDslRepositoryTest {
     @DisplayName("유저별 월별 생일비 입금내역 조회 시 SYSTEM 계정 제외")
     void findUsersMonthBirthDuesExcludesSystemAccount() {
         // given
-        User normalUser = User.createUser(
-                "normalUser", "password", "일반유저", "normal@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        User systemUser = User.createUser(
-                "systemUser", "password", "시스템유저", "system@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com");
+        User systemUser = createTestUser("systemUser", "시스템유저", "system@test.com", DefaultCompanyType.SYSTEM);
         em.persist(normalUser);
         em.persist(systemUser);
 

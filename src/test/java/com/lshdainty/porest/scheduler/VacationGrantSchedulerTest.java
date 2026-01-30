@@ -1,6 +1,8 @@
 package com.lshdainty.porest.scheduler;
 
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.vacation.domain.VacationGrant;
 import com.lshdainty.porest.vacation.domain.VacationGrantSchedule;
@@ -48,6 +50,15 @@ class VacationGrantSchedulerTest {
     @InjectMocks
     private VacationGrantScheduler scheduler;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id) {
+        return User.createUser(
+                null, id, "테스트유저", "test@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @Nested
     @DisplayName("휴가 만료 처리")
     class ExpireVacationsDaily {
@@ -55,7 +66,7 @@ class VacationGrantSchedulerTest {
         @DisplayName("성공 - 만료 대상 휴가를 만료 처리한다")
         void expireVacationsDailySuccess() {
             // given
-            User user = User.createUser("user1");
+            User user = createTestUser("user1");
             VacationPolicy policy = createTestPolicy();
             VacationGrant grant = VacationGrant.createVacationGrant(
                     user, policy, "연차", VacationType.ANNUAL, new BigDecimal("15.0"),
@@ -95,7 +106,7 @@ class VacationGrantSchedulerTest {
         void grantVacationsDailySuccess() {
             // given
             LocalDate today = LocalDate.now();
-            User user = User.createUser("user1");
+            User user = createTestUser("user1");
             VacationPolicy policy = VacationPolicy.createRepeatGrantPolicy(
                     "연차", "연차 정책", VacationType.ANNUAL,
                     new BigDecimal("15.0"), YNType.N, RepeatUnit.YEARLY, 1, null, null,

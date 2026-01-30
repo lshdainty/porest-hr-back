@@ -42,13 +42,27 @@ class VacationGrantQueryDslRepositoryTest {
     private User user;
     private VacationPolicy policy;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
+    // 테스트용 User 생성 헬퍼 메소드 (생년월일 지정)
+    private User createTestUser(String id, String name, String email, LocalDate birth) {
+        return User.createUser(
+                null, id, name, email,
+                birth, OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
-        user = User.createUser(
-                "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        user = createTestUser("user1", "테스트유저1", "user1@test.com");
         em.persist(user);
 
         policy = VacationPolicy.createManualGrantPolicy(
@@ -135,11 +149,7 @@ class VacationGrantQueryDslRepositoryTest {
     @DisplayName("전체 휴가부여와 유저 함께 조회")
     void findAllWithUser() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "테스트유저2", "user2@test.com", LocalDate.of(1991, 2, 2));
         em.persist(user2);
 
         vacationGrantRepository.save(VacationGrant.createVacationGrant(
@@ -438,11 +448,7 @@ class VacationGrantQueryDslRepositoryTest {
     @DisplayName("여러 유저의 기간 내 유효한 휴가부여 일괄 조회")
     void findByUserIdsAndValidPeriod() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "테스트유저2", "user2@test.com", LocalDate.of(1991, 2, 2));
         em.persist(user2);
 
         vacationGrantRepository.save(VacationGrant.createVacationGrant(
@@ -499,11 +505,7 @@ class VacationGrantQueryDslRepositoryTest {
     @DisplayName("여러 유저의 상태와 기간으로 휴가부여 일괄 조회")
     void findByUserIdsAndStatusesAndPeriod() {
         // given
-        User user2 = User.createUser(
-                "user2", "password", "테스트유저2", "user2@test.com",
-                LocalDate.of(1991, 2, 2), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User user2 = createTestUser("user2", "테스트유저2", "user2@test.com", LocalDate.of(1991, 2, 2));
         em.persist(user2);
 
         VacationPolicy onRequestPolicy = VacationPolicy.createOnRequestPolicy(

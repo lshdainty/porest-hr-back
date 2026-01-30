@@ -44,20 +44,21 @@ class VacationApprovalJpaRepositoryTest {
     private VacationPolicy policy;
     private VacationGrant grant;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id, String name, String email) {
+        return User.createUser(
+                null, id, name, email,
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
-        user = User.createUser(
-                "user1", "password", "테스트유저1", "user1@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        user = createTestUser("user1", "테스트유저1", "user1@test.com");
         em.persist(user);
 
-        approver = User.createUser(
-                "approver1", "password", "결재자1", "approver1@test.com",
-                LocalDate.of(1985, 5, 5), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        approver = createTestUser("approver1", "결재자1", "approver1@test.com");
         em.persist(approver);
 
         policy = VacationPolicy.createOnRequestPolicy(
@@ -77,11 +78,7 @@ class VacationApprovalJpaRepositoryTest {
     @DisplayName("승인 다건 저장")
     void saveAll() {
         // given
-        User approver2 = User.createUser(
-                "approver2", "password", "결재자2", "approver2@test.com",
-                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User approver2 = createTestUser("approver2", "결재자2", "approver2@test.com");
         em.persist(approver2);
 
         List<VacationApproval> approvals = List.of(
@@ -120,11 +117,7 @@ class VacationApprovalJpaRepositoryTest {
     @DisplayName("부여 ID로 조회 시 삭제된 승인 제외")
     void findByVacationGrantIdExcludesDeleted() {
         // given
-        User approver2 = User.createUser(
-                "approver2", "password", "결재자2", "approver2@test.com",
-                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User approver2 = createTestUser("approver2", "결재자2", "approver2@test.com");
         em.persist(approver2);
 
         VacationApproval activeApproval = VacationApproval.createVacationApproval(grant, approver, 1);
@@ -188,16 +181,8 @@ class VacationApprovalJpaRepositoryTest {
     @DisplayName("다단계 승인 저장 및 조회")
     void multipleApproversForSameGrant() {
         // given
-        User approver2 = User.createUser(
-                "approver2", "password", "결재자2", "approver2@test.com",
-                LocalDate.of(1986, 6, 6), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
-        User approver3 = User.createUser(
-                "approver3", "password", "결재자3", "approver3@test.com",
-                LocalDate.of(1987, 7, 7), OriginCompanyType.DTOL, "9 ~ 18",
-                YNType.N, null, null, CountryCode.KR
-        );
+        User approver2 = createTestUser("approver2", "결재자2", "approver2@test.com");
+        User approver3 = createTestUser("approver3", "결재자3", "approver3@test.com");
         em.persist(approver2);
         em.persist(approver3);
 

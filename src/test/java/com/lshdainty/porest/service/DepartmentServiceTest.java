@@ -4,7 +4,9 @@ import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
 import com.lshdainty.porest.common.exception.DuplicateException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
 import com.lshdainty.porest.common.exception.InvalidValueException;
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.company.domain.Company;
 import com.lshdainty.porest.company.service.CompanyService;
 import com.lshdainty.porest.department.domain.Department;
@@ -25,6 +27,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +49,15 @@ class DepartmentServiceTest {
 
     @InjectMocks
     private DepartmentServiceImpl departmentService;
+
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id) {
+        return User.createUser(
+                null, id, "테스트유저", "test@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
 
     @Nested
     @DisplayName("부서 등록")
@@ -389,7 +401,7 @@ class DepartmentServiceTest {
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
-            User user = User.createUser("user1");
+            User user = createTestUser("user1");
 
             List<UserDepartmentServiceDto> userDataList = List.of(
                     UserDepartmentServiceDto.builder()
@@ -420,7 +432,7 @@ class DepartmentServiceTest {
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
-            User user = User.createUser("user1");
+            User user = createTestUser("user1");
             UserDepartment existingMain = UserDepartment.createUserDepartment(user, department, YNType.Y);
 
             List<UserDepartmentServiceDto> userDataList = List.of(
@@ -446,7 +458,7 @@ class DepartmentServiceTest {
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
-            User user = User.createUser("user1");
+            User user = createTestUser("user1");
 
             List<UserDepartmentServiceDto> userDataList = List.of(
                     UserDepartmentServiceDto.builder()
@@ -482,7 +494,7 @@ class DepartmentServiceTest {
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
-            User user = User.createUser("user1");
+            User user = createTestUser("user1");
             UserDepartment userDepartment = UserDepartment.createUserDepartment(user, department, YNType.N);
 
             given(departmentRepository.findUserDepartment("user1", 1L)).willReturn(Optional.of(userDepartment));
@@ -518,8 +530,8 @@ class DepartmentServiceTest {
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
-            User userIn = User.createUser("user1");
-            User userNotIn = User.createUser("user2");
+            User userIn = createTestUser("user1");
+            User userNotIn = createTestUser("user2");
             UserDepartment userDepartment = UserDepartment.createUserDepartment(userIn, department, YNType.Y);
 
             given(departmentRepository.findById(1L)).willReturn(Optional.of(department));
@@ -545,7 +557,7 @@ class DepartmentServiceTest {
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
-            User userNotIn = User.createUser("user1");
+            User userNotIn = createTestUser("user1");
 
             given(departmentRepository.findById(1L)).willReturn(Optional.of(department));
             given(departmentRepository.findUserDepartmentsInDepartment(1L)).willReturn(List.of());

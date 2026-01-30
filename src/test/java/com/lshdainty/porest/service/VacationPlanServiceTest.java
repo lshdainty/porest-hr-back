@@ -2,7 +2,9 @@ package com.lshdainty.porest.service;
 
 import com.lshdainty.porest.common.exception.DuplicateException;
 import com.lshdainty.porest.common.exception.EntityNotFoundException;
+import com.lshdainty.porest.common.type.CountryCode;
 import com.lshdainty.porest.common.type.YNType;
+import com.lshdainty.porest.company.type.OriginCompanyType;
 import com.lshdainty.porest.user.domain.User;
 import com.lshdainty.porest.user.service.UserService;
 import com.lshdainty.porest.vacation.domain.UserVacationPlan;
@@ -32,6 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,9 +78,18 @@ class VacationPlanServiceTest {
     private VacationPolicy policy;
     private VacationPolicy repeatPolicy;
 
+    // 테스트용 User 생성 헬퍼 메소드
+    private User createTestUser(String id) {
+        return User.createUser(
+                null, id, "테스트유저", "test@test.com",
+                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.now(), YNType.N, null, null, CountryCode.KR
+        );
+    }
+
     @BeforeEach
     void setUp() {
-        user = User.createUser("user1");
+        user = createTestUser("user1");
 
         plan = VacationPlan.createPlan("DEFAULT", "기본 플랜", "기본 휴가 플랜");
         ReflectionTestUtils.setField(plan, "id", 1L);
