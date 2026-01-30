@@ -97,6 +97,7 @@ class UserServiceTest {
         void joinUserSuccess() {
             // given
             UserServiceDto data = UserServiceDto.builder()
+                    .ssoUserNo(1L)
                     .id("user1")
                     .name("테스트유저")
                     .email("test@test.com")
@@ -116,6 +117,7 @@ class UserServiceTest {
         void joinUserWithProfileSuccess() {
             // given
             UserServiceDto data = UserServiceDto.builder()
+                    .ssoUserNo(1L)
                     .id("user1")
                     .name("테스트유저")
                     .profileUrl("/media/temp/profile/test.jpg_some-uuid")
@@ -143,6 +145,7 @@ class UserServiceTest {
         void joinUserWithOnlyProfileUUID() {
             // given
             UserServiceDto data = UserServiceDto.builder()
+                    .ssoUserNo(1L)
                     .id("user1")
                     .name("테스트유저")
                     .profileUUID("some-uuid")
@@ -162,6 +165,7 @@ class UserServiceTest {
         void joinUserWithOnlyProfileUrl() {
             // given
             UserServiceDto data = UserServiceDto.builder()
+                    .ssoUserNo(1L)
                     .id("user1")
                     .name("테스트유저")
                     .profileUrl("/media/temp/profile/test.jpg")
