@@ -4,7 +4,7 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT:6379}
-      database: 2  # HR Prod
+      database: 1  # HR Prod
 
   # DB 연결 드라이버 설정
   datasource:

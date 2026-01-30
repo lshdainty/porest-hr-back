@@ -24,6 +24,15 @@ public class UserJpaRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findBySsoUserNo(Long ssoUserNo) {
+        List<User> result = em.createQuery(
+                        "select u from User u where u.ssoUserNo = :ssoUserNo", User.class)
+                .setParameter("ssoUserNo", ssoUserNo)
+                .getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    }
+
+    @Override
     public Optional<User> findById(String userId) {
         List<User> result = em.createQuery(
                         "select u from User u where u.id = :userId", User.class)

@@ -33,6 +33,15 @@ public class UserQueryDslRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findBySsoUserNo(Long ssoUserNo) {
+        return Optional.ofNullable(query
+                .selectFrom(user)
+                .where(user.ssoUserNo.eq(ssoUserNo))
+                .fetchOne()
+        );
+    }
+
+    @Override
     public Optional<User> findById(String userId) {
         return Optional.ofNullable(query
                 .selectFrom(user)

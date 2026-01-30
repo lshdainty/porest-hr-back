@@ -141,7 +141,7 @@ public class JwtTokenProvider {
                 .issuedAt(now)
                 .expiration(expiration)
                 .claim(TOKEN_TYPE_CLAIM, TOKEN_TYPE_HR_ACCESS)
-                .claim("userNo", user.getNo())
+                .claim("ssoUserNo", user.getSsoUserNo())
                 .claim("name", user.getName())
                 .claim("email", user.getEmail())
                 .claim("roles", roles)
@@ -272,5 +272,66 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    // ==================== HR JWT Claims 추출 메서드 ====================
+
+    /**
+     * HR JWT 토큰에서 SSO 사용자 번호 추출
+     *
+     * @param token JWT 토큰
+     * @return SSO 사용자 번호
+     */
+    public Long getSsoUserNoFromHrToken(String token) {
+        Claims claims = getHrClaims(token);
+        return claims.get("ssoUserNo", Long.class);
+    }
+
+    /**
+     * HR JWT 토큰에서 사용자 이름 추출
+     *
+     * @param token JWT 토큰
+     * @return 사용자 이름
+     */
+    public String getNameFromHrToken(String token) {
+        Claims claims = getHrClaims(token);
+        return claims.get("name", String.class);
+    }
+
+    /**
+     * HR JWT 토큰에서 이메일 추출
+     *
+     * @param token JWT 토큰
+     * @return 이메일
+     */
+    public String getEmailFromHrToken(String token) {
+        Claims claims = getHrClaims(token);
+        return claims.get("email", String.class);
+    }
+
+    /**
+     * HR JWT 토큰에서 역할 목록 추출
+     *
+     * @param token JWT 토큰
+     * @return 역할 코드 목록
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getRolesFromHrToken(String token) {
+        Claims claims = getHrClaims(token);
+        List<String> roles = claims.get("roles", List.class);
+        return roles != null ? roles : Collections.emptyList();
+    }
+
+    /**
+     * HR JWT 토큰에서 권한 목록 추출
+     *
+     * @param token JWT 토큰
+     * @return 권한 코드 목록
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getPermissionsFromHrToken(String token) {
+        Claims claims = getHrClaims(token);
+        List<String> permissions = claims.get("permissions", List.class);
+        return permissions != null ? permissions : Collections.emptyList();
     }
 }

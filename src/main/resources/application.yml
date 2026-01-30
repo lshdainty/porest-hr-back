@@ -1,6 +1,8 @@
 spring:
   application:
     name: porest
+  main:
+    allow-bean-definition-overriding: true
   messages:
     basename: message/messages,message/messages-skc
     encoding: utf-8

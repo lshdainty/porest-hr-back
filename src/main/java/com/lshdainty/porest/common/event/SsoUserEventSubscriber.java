@@ -66,19 +66,19 @@ public class SsoUserEventSubscriber {
      * HR 사용자가 없으면 로깅만 수행 (HR 관리자가 직접 생성해야 함)
      */
     private void handleUserCreated(UserEvent event) {
-        log.info("Processing USER_CREATED event: userNo={}, userId={}", event.getUserNo(), event.getUserId());
+        log.info("Processing USER_CREATED event: ssoUserNo={}, userId={}", event.getUserNo(), event.getUserId());
 
-        Optional<User> existingUser = userRepository.findById(event.getUserId());
+        Optional<User> existingUser = userRepository.findBySsoUserNo(event.getUserNo());
         if (existingUser.isPresent()) {
-            log.info("User already exists in HR, syncing SSO fields: userId={}", event.getUserId());
+            log.info("User already exists in HR, syncing SSO fields: ssoUserNo={}", event.getUserNo());
             syncSsoFields(existingUser.get(), event);
             return;
         }
 
         // HR에 사용자가 없으면 로깅만 수행
         // HR 관리자가 회사, 근무시간, 입사일 등 HR 필수 정보와 함께 사용자를 생성해야 함
-        log.info("User not found in HR, awaiting HR admin creation: userId={}, email={}",
-                event.getUserId(), event.getEmail());
+        log.info("User not found in HR, awaiting HR admin creation: ssoUserNo={}, userId={}, email={}",
+                event.getUserNo(), event.getUserId(), event.getEmail());
     }
 
     /**
@@ -86,16 +86,16 @@ public class SsoUserEventSubscriber {
      * SSO에서 사용자 정보가 변경되면 HR 캐시도 업데이트
      */
     private void handleUserUpdated(UserEvent event) {
-        log.info("Processing USER_UPDATED event: userNo={}, userId={}", event.getUserNo(), event.getUserId());
+        log.info("Processing USER_UPDATED event: ssoUserNo={}, userId={}", event.getUserNo(), event.getUserId());
 
-        Optional<User> userOpt = userRepository.findById(event.getUserId());
+        Optional<User> userOpt = userRepository.findBySsoUserNo(event.getUserNo());
         if (userOpt.isEmpty()) {
-            log.warn("User not found in HR for update: userId={}", event.getUserId());
+            log.warn("User not found in HR for update: ssoUserNo={}", event.getUserNo());
             return;
         }
 
         syncSsoFields(userOpt.get(), event);
-        log.info("User updated from SSO event: userId={}", event.getUserId());
+        log.info("User updated from SSO event: ssoUserNo={}", event.getUserNo());
     }
 
     /**
@@ -103,22 +103,17 @@ public class SsoUserEventSubscriber {
      * SSO에서 사용자가 삭제되면 HR에서도 Soft Delete
      */
     private void handleUserDeleted(UserEvent event) {
-        log.info("Processing USER_DELETED event: userNo={}", event.getUserNo());
+        log.info("Processing USER_DELETED event: ssoUserNo={}", event.getUserNo());
 
-        if (event.getUserId() == null) {
-            log.warn("Cannot delete user: userId not provided in event, userNo={}", event.getUserNo());
-            return;
-        }
-
-        Optional<User> userOpt = userRepository.findById(event.getUserId());
+        Optional<User> userOpt = userRepository.findBySsoUserNo(event.getUserNo());
         if (userOpt.isEmpty()) {
-            log.warn("User not found in HR for deletion: userId={}", event.getUserId());
+            log.warn("User not found in HR for deletion: ssoUserNo={}", event.getUserNo());
             return;
         }
 
         User user = userOpt.get();
         user.deleteUser();
-        log.info("User deleted from SSO event: userId={}", event.getUserId());
+        log.info("User deleted from SSO event: ssoUserNo={}", event.getUserNo());
     }
 
     /**

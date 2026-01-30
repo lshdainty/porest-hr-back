@@ -54,7 +54,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String joinUser(UserServiceDto data) {
-        log.debug("사용자 생성 시작: id={}, name={}, email={}", data.getId(), data.getName(), data.getEmail());
+        log.debug("사용자 생성 시작: ssoUserNo={}, id={}, name={}, email={}",
+                data.getSsoUserNo(), data.getId(), data.getName(), data.getEmail());
+
+        if (data.getSsoUserNo() == null) {
+            throw new IllegalArgumentException("ssoUserNo는 필수입니다. SSO에서 사용자 생성 후 진행해주세요.");
+        }
 
         UserServiceDto profileDto = UserServiceDto.builder().build();
         if (StringUtils.hasText(data.getProfileUUID()) && StringUtils.hasText(data.getProfileUrl())) {
@@ -63,6 +68,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = User.createUser(
+                data.getSsoUserNo(),
                 data.getId(),
                 data.getName(),
                 data.getEmail(),
@@ -77,7 +83,7 @@ public class UserServiceImpl implements UserService {
         );
 
         userRepository.save(user);
-        log.info("사용자 생성 완료: id={}", user.getId());
+        log.info("사용자 생성 완료: ssoUserNo={}, id={}", user.getSsoUserNo(), user.getId());
         return user.getId();
     }
 

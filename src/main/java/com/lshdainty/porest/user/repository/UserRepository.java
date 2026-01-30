@@ -18,6 +18,14 @@ public interface UserRepository {
     void save(User user);
 
     /**
+     * SSO User No로 단일 유저 검색
+     *
+     * @param ssoUserNo SSO에서 발급한 사용자 순번
+     * @return Optional&lt;User&gt;
+     */
+    Optional<User> findBySsoUserNo(Long ssoUserNo);
+
+    /**
      * userId로 단일 유저 검색
      *
      * @param userId 유저 ID

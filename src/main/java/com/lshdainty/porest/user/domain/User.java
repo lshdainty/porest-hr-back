@@ -34,12 +34,20 @@ import java.util.stream.Collectors;
 @Table(name = "users")
 public class User extends AuditingFields {
     /**
-     * 사용자 순번<br>
-     * 테이블 관리용 Primary Key (자동 생성)
+     * 유저 순번<br>
+     * HR 내부 관리용 PK (auto increment)
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_no")
     private Long no;
+
+    /**
+     * SSO 사용자 순번<br>
+     * SSO에서 발급한 row_id<br>
+     * SSO와 HR 간 사용자 연결 키 (nullable - SSO 연동 전 사용자 존재 가능)
+     */
+    @Column(name = "sso_user_no", unique = true)
+    private Long ssoUserNo;
 
     /**
      * 사용자 아이디<br>
@@ -190,12 +198,14 @@ public class User extends AuditingFields {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 유저 생성할 것
      *
+     * @param ssoUserNo SSO에서 발급한 row_id (nullable - SSO 연동 전 사용자)
      * @return User
      */
-    public static User createUser(String id, String name, String email, LocalDate birth,
+    public static User createUser(Long ssoUserNo, String id, String name, String email, LocalDate birth,
                                   CompanyType company, String workTime, LocalDate joinDate,
                                   YNType lunarYN, String profileName, String profileUUID, CountryCode countryCode) {
         User user = new User();
+        user.ssoUserNo = ssoUserNo;
         user.id = id;
         user.name = name;
         user.email = email;
@@ -211,11 +221,34 @@ public class User extends AuditingFields {
         return user;
     }
 
-    public static User createUser(String id) {
+    /**
+     * SSO 이벤트 기반 유저 생성 (최소 정보)<br>
+     * SSO에서 사용자 생성 이벤트 수신 시 사용
+     *
+     * @param ssoUserNo SSO에서 발급한 row_id
+     * @param id 사용자 아이디
+     * @param name 사용자명
+     * @param email 이메일
+     * @return User
+     */
+    public static User createUserFromSso(Long ssoUserNo, String id, String name, String email) {
         User user = new User();
+        user.ssoUserNo = ssoUserNo;
         user.id = id;
+        user.name = name;
+        user.email = email;
         user.isDeleted = YNType.N;
         return user;
+    }
+
+    /**
+     * SSO 연동 - ssoUserNo 설정<br>
+     * 기존 사용자에 SSO 연결
+     *
+     * @param ssoUserNo SSO에서 발급한 row_id
+     */
+    public void linkToSso(Long ssoUserNo) {
+        this.ssoUserNo = ssoUserNo;
     }
 
     /**

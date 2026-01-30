@@ -55,7 +55,8 @@ public class AuthController implements AuthApi {
         UserPrincipal userPrincipal = (UserPrincipal) principal;
 
         // 최신 사용자 정보 재조회 (프로필 이미지 변경 등 세션 외 데이터 반영)
-        User user = userService.findUserById(userPrincipal.getUser().getId());
+        // getUserId()는 JWT Claims에서 직접 반환하므로 DB 조회 없음
+        User user = userService.findUserById(userPrincipal.getUserId());
 
         // 역할 상세 정보 생성
         List<AuthApiDto.RoleInfo> roleInfos = user.getRoles().stream()
