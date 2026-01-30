@@ -88,7 +88,7 @@ server:
 # LOG 설정 (개발 환경 - 상세 로깅)
 logging:
   level:
-    com.lshdainty.porest: debug
+    com.porest.hr: debug
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
     root: info

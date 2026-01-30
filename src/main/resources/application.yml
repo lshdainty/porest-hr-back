@@ -54,10 +54,10 @@ server:
 # LOG 설정
 logging:
   level:
-    com.lshdainty.porest.api: ${LOG_LEVEL:info}
-    com.lshdainty.porest.repository: ${LOG_LEVEL:info}
-    com.lshdainty.porest.service: ${LOG_LEVEL:info}
-    com.lshdainty.porest.domain: ${LOG_LEVEL:info}
+    com.porest.hr.api: ${LOG_LEVEL:info}
+    com.porest.hr.repository: ${LOG_LEVEL:info}
+    com.porest.hr.service: ${LOG_LEVEL:info}
+    com.porest.hr.domain: ${LOG_LEVEL:info}
     p6spy: info
 
 # 파일 업로드 경로 설정
