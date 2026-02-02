@@ -1,7 +1,7 @@
 package com.porest.hr.common.converter;
 
-import com.lshdainty.porest.common.type.SystemType;
-import com.lshdainty.porest.common.type.DefaultSystemType;
+import com.porest.hr.common.type.SystemType;
+import com.porest.hr.common.type.DefaultSystemType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

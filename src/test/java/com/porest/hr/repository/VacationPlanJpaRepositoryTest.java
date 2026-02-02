@@ -1,6 +1,6 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.vacation.domain.VacationPlan;
 import com.porest.hr.vacation.domain.VacationPlanPolicy;
 import com.porest.hr.vacation.domain.VacationPolicy;

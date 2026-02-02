@@ -1,10 +1,10 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.util.PorestFile;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
+import com.porest.core.util.PorestFile;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.repository.DepartmentRepository;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.user.repository.UserRepository;
@@ -23,7 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.lshdainty.porest.common.util.MessageResolver;
+import com.porest.core.util.MessageResolver;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -72,7 +72,7 @@ class UserServiceTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
@@ -229,7 +229,7 @@ class UserServiceTest {
             String userId = "user1";
             User user = User.createUser(
                     null, userId, "이서준", "test@test.com",
-                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18",
+                    LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                     LocalDate.now(), YNType.N, "test.jpg", "some-uuid", CountryCode.KR
             );
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
@@ -255,7 +255,7 @@ class UserServiceTest {
             String userId = "user1";
             User user = User.createUser(
                     null, userId, "이서준", "test@test.com",
-                    LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18",
+                    LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                     LocalDate.now(), YNType.N, "test.jpg", null, CountryCode.KR
             );
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));

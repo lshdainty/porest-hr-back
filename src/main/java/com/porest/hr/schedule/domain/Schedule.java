@@ -1,7 +1,7 @@
 package com.porest.hr.schedule.domain;
 
 import com.porest.hr.common.domain.AuditingFields;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.schedule.type.ScheduleType;
 import com.porest.hr.user.domain.User;
 import jakarta.persistence.*;

@@ -1,6 +1,6 @@
 package com.porest.hr.holiday.service;
 
-import com.lshdainty.porest.common.type.CountryCode;
+import com.porest.core.type.CountryCode;
 import com.porest.hr.holiday.domain.Holiday;
 import com.porest.hr.holiday.service.dto.HolidayServiceDto;
 import com.porest.hr.holiday.type.HolidayType;
@@ -75,7 +75,7 @@ public interface HolidayService {
      *
      * @param holidayId 확인할 공휴일 ID
      * @return 공휴일 엔티티
-     * @throws com.lshdainty.porest.common.exception.EntityNotFoundException 공휴일이 존재하지 않을 경우
+     * @throws com.porest.core.exception.EntityNotFoundException 공휴일이 존재하지 않을 경우
      */
     Holiday checkHolidayExist(Long holidayId);
 
@@ -93,7 +93,7 @@ public interface HolidayService {
      *
      * @param holidays 저장할 공휴일 목록
      * @return 저장된 공휴일 수
-     * @throws com.lshdainty.porest.common.exception.DuplicateException 중복된 공휴일이 존재할 경우
+     * @throws com.porest.core.exception.DuplicateException 중복된 공휴일이 존재할 경우
      */
     int bulkSaveHolidays(List<HolidayServiceDto> holidays);
 }

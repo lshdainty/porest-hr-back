@@ -1,10 +1,10 @@
 package com.porest.hr.holiday.service;
 
-import com.lshdainty.porest.common.exception.DuplicateException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.DuplicateException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
 import com.porest.hr.holiday.domain.Holiday;
 import com.porest.hr.holiday.repository.HolidayRepository;
 import com.porest.hr.holiday.service.dto.HolidayServiceDto;
@@ -101,7 +101,7 @@ public class HolidayServiceImpl implements HolidayService {
         return holidayRepository.findById(holidayId)
                 .orElseThrow(() -> {
                     log.warn("공휴일 조회 실패 - 존재하지 않는 공휴일: holidayId={}", holidayId);
-                    return new EntityNotFoundException(ErrorCode.HOLIDAY_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.HOLIDAY_NOT_FOUND);
                 });
     }
 
@@ -215,7 +215,7 @@ public class HolidayServiceImpl implements HolidayService {
                     data.getDate(), data.getName(), data.getCountryCode())) {
                 log.warn("중복 공휴일 발견: date={}, name={}, countryCode={}",
                         data.getDate(), data.getName(), data.getCountryCode());
-                throw new DuplicateException(ErrorCode.HOLIDAY_ALREADY_EXISTS);
+                throw new DuplicateException(HrErrorCode.HOLIDAY_ALREADY_EXISTS);
             }
         }
 

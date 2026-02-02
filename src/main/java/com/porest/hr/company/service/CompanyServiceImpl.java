@@ -1,10 +1,10 @@
 package com.porest.hr.company.service;
 
-import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
-import com.lshdainty.porest.common.exception.DuplicateException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.BusinessRuleViolationException;
+import com.porest.core.exception.DuplicateException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.type.YNType;
 import com.porest.hr.company.domain.Company;
 import com.porest.hr.company.repository.CompanyRepository;
 import com.porest.hr.company.service.dto.CompanyServiceDto;
@@ -62,7 +62,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         if (!company.getDepartments().isEmpty()) {
             log.warn("회사 삭제 실패 - 부서 존재: id={}", id);
-            throw new BusinessRuleViolationException(ErrorCode.DEPARTMENT_HAS_MEMBERS);
+            throw new BusinessRuleViolationException(HrErrorCode.DEPARTMENT_HAS_MEMBERS);
         }
 
         company.deleteCompany();
@@ -91,7 +91,7 @@ public class CompanyServiceImpl implements CompanyService {
         Optional<Company> OCompany = companyRepository.findByIdWithDepartments(id);
         if (OCompany.isEmpty()) {
             log.warn("회사 조회 실패 - 존재하지 않는 회사: id={}", id);
-            throw new EntityNotFoundException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new EntityNotFoundException(HrErrorCode.COMPANY_NOT_FOUND);
         }
 
         Company company = OCompany.get();
@@ -115,7 +115,7 @@ public class CompanyServiceImpl implements CompanyService {
         Optional<Company> company = companyRepository.findById(id);
         if (company.isPresent()) {
             log.warn("회사 ID 중복: id={}", id);
-            throw new DuplicateException(ErrorCode.COMPANY_ALREADY_EXISTS);
+            throw new DuplicateException(HrErrorCode.COMPANY_ALREADY_EXISTS);
         }
     }
 
@@ -124,7 +124,7 @@ public class CompanyServiceImpl implements CompanyService {
         Optional<Company> company = companyRepository.findById(companyId);
         if ((company.isEmpty()) || YNType.isY(company.get().getIsDeleted())) {
             log.warn("회사 조회 실패 - 존재하지 않거나 삭제된 회사: id={}", companyId);
-            throw new EntityNotFoundException(ErrorCode.COMPANY_NOT_FOUND);
+            throw new EntityNotFoundException(HrErrorCode.COMPANY_NOT_FOUND);
         }
         return company.get();
     }

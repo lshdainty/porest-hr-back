@@ -1,6 +1,6 @@
 package com.porest.hr.schedule.repository;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.schedule.domain.Schedule;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

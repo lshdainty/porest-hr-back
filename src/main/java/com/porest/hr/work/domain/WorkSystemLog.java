@@ -2,7 +2,7 @@ package com.porest.hr.work.domain;
 
 import com.porest.hr.common.converter.SystemTypeConverter;
 import com.porest.hr.common.domain.AuditingFields;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

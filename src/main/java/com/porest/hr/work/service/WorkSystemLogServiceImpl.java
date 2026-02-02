@@ -2,7 +2,7 @@ package com.porest.hr.work.service;
 
 import com.porest.hr.work.domain.WorkSystemLog;
 import com.porest.hr.work.repository.WorkSystemLogRepository;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package com.porest.hr.work.repository;
 
 import com.porest.hr.work.domain.QWorkSystemLog;
 import com.porest.hr.work.domain.WorkSystemLog;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

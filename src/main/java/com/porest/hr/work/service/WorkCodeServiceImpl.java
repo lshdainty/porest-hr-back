@@ -1,9 +1,9 @@
 package com.porest.hr.work.service;
 
-import com.lshdainty.porest.common.exception.DuplicateException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.InvalidValueException;
+import com.porest.core.exception.DuplicateException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.exception.InvalidValueException;
 import com.porest.hr.work.domain.WorkCode;
 import com.porest.hr.work.repository.WorkCodeRepository;
 import com.porest.hr.work.service.dto.WorkCodeServiceDto;
@@ -45,12 +45,12 @@ public class WorkCodeServiceImpl implements WorkCodeService {
         WorkCode parent = null;
         if (parentId != null) {
             parent = workCodeRepository.findById(parentId)
-                    .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WORK_CODE_NOT_FOUND));
+                    .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
         }
 
         // 코드 중복 체크
         workCodeRepository.findByCode(code).ifPresent(wc -> {
-            throw new DuplicateException(ErrorCode.WORK_CODE_DUPLICATE);
+            throw new DuplicateException(HrErrorCode.WORK_CODE_DUPLICATE);
         });
 
         // 업무 코드 생성
@@ -68,17 +68,17 @@ public class WorkCodeServiceImpl implements WorkCodeService {
     public void updateWorkCode(Long id, String code, String name, Long parentId, Integer orderSeq) {
         // 업무 코드 조회
         WorkCode workCode = workCodeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WORK_CODE_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
 
         // 부모 코드 조회 (parentId가 있는 경우)
         WorkCode parent = null;
         if (parentId != null) {
             parent = workCodeRepository.findById(parentId)
-                    .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WORK_CODE_NOT_FOUND));
+                    .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
 
             // 자기 자신을 부모로 설정하는 것 방지
             if (id.equals(parentId)) {
-                throw new InvalidValueException(ErrorCode.WORK_CODE_INVALID_PARENT);
+                throw new InvalidValueException(HrErrorCode.WORK_CODE_INVALID_PARENT);
             }
         }
 
@@ -86,7 +86,7 @@ public class WorkCodeServiceImpl implements WorkCodeService {
         if (code != null) {
             workCodeRepository.findByCode(code).ifPresent(wc -> {
                 if (!wc.getId().equals(id)) {
-                    throw new DuplicateException(ErrorCode.WORK_CODE_DUPLICATE);
+                    throw new DuplicateException(HrErrorCode.WORK_CODE_DUPLICATE);
                 }
             });
         }
@@ -103,7 +103,7 @@ public class WorkCodeServiceImpl implements WorkCodeService {
     public void deleteWorkCode(Long id) {
         // 업무 코드 조회
         WorkCode workCode = workCodeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WORK_CODE_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
 
         // 업무 코드 삭제 (Soft Delete)
         workCode.deleteWorkCode();

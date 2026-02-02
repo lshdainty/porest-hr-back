@@ -1,7 +1,7 @@
 package com.porest.hr.dues.controller;
 
 import com.porest.hr.dues.controller.dto.DuesApiDto;
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.dues.service.DuesService;
 import com.porest.hr.dues.service.dto.DuesServiceDto;
 import lombok.RequiredArgsConstructor;

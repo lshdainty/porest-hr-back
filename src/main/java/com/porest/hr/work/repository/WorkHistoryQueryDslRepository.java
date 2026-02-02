@@ -1,7 +1,7 @@
 package com.porest.hr.work.repository;
 
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.work.domain.WorkHistory;
 import com.porest.hr.work.repository.dto.WorkHistorySearchCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;

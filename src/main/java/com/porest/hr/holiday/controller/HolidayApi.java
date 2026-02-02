@@ -1,7 +1,7 @@
 package com.porest.hr.holiday.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.common.type.CountryCode;
+import com.porest.core.controller.ApiResponse;
+import com.porest.core.type.CountryCode;
 import com.porest.hr.holiday.controller.dto.HolidayApiDto;
 import com.porest.hr.holiday.type.HolidayType;
 import com.porest.hr.security.annotation.LoginUser;

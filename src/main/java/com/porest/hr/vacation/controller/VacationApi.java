@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.vacation.controller.dto.VacationApiDto;

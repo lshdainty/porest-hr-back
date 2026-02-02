@@ -1,7 +1,7 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.exception.DuplicateException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
+import com.porest.core.exception.DuplicateException;
+import com.porest.core.exception.EntityNotFoundException;
 import com.porest.hr.permission.domain.Permission;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.repository.PermissionRepository;
@@ -402,7 +402,7 @@ class RoleServiceTest {
             roleService.deleteRole(roleCode);
 
             // then
-            assertThat(role.getIsDeleted()).isEqualTo(com.lshdainty.porest.common.type.YNType.Y);
+            assertThat(role.getIsDeleted()).isEqualTo(com.porest.core.type.YNType.Y);
         }
 
         @Test
@@ -625,7 +625,7 @@ class RoleServiceTest {
             roleService.deletePermission(permissionCode);
 
             // then
-            assertThat(permission.getIsDeleted()).isEqualTo(com.lshdainty.porest.common.type.YNType.Y);
+            assertThat(permission.getIsDeleted()).isEqualTo(com.porest.core.type.YNType.Y);
         }
 
         @Test

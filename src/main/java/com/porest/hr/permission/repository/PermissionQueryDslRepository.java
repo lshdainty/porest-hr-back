@@ -1,6 +1,6 @@
 package com.porest.hr.permission.repository;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.permission.domain.Permission;
 import com.porest.hr.permission.domain.QPermission;
 import com.porest.hr.permission.type.ActionType;

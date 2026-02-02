@@ -1,8 +1,8 @@
 package com.porest.hr.vacation.service.policy;
 
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.ErrorCode;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.type.YNType;
 import com.porest.hr.vacation.domain.VacationPolicy;
 import com.porest.hr.vacation.repository.VacationPolicyRepository;
 import com.porest.hr.vacation.service.dto.VacationPolicyServiceDto;

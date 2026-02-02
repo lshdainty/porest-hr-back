@@ -1,6 +1,6 @@
 package com.porest.hr.notice.service.dto;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.notice.type.NoticeType;
 import lombok.Builder;
 import lombok.Getter;

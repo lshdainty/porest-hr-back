@@ -1,9 +1,9 @@
 package com.porest.hr.schedule.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.ForbiddenException;
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.controller.ApiResponse;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.exception.ForbiddenException;
+import com.porest.core.type.DisplayType;
 import com.porest.hr.schedule.controller.dto.ScheduleApiDto;
 import com.porest.hr.schedule.domain.Schedule;
 import com.porest.hr.schedule.service.ScheduleService;
@@ -128,7 +128,7 @@ public class ScheduleApiController implements ScheduleApi {
     private void validateScheduleOwnership(String loginUserId, String targetUserId) {
         if (!loginUserId.equals(targetUserId) && !hasScheduleManageAuthority()) {
             log.warn("일정 접근 거부 - 로그인 유저: {}, 대상 유저: {}", loginUserId, targetUserId);
-            throw new ForbiddenException(ErrorCode.SCHEDULE_ACCESS_DENIED);
+            throw new ForbiddenException(HrErrorCode.SCHEDULE_ACCESS_DENIED);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.porest.hr.work.type;
 
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 
 /**
  * 테스트 전용 SystemType 구현체

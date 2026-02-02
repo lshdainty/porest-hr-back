@@ -1,8 +1,8 @@
 package com.porest.hr.common.converter;
 
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.DefaultSystemType;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.hr.common.type.DefaultSystemType;
+import com.porest.hr.common.type.SystemType;
 import com.porest.hr.work.type.TestSystemType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

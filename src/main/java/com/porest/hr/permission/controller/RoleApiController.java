@@ -1,6 +1,6 @@
 package com.porest.hr.permission.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.permission.controller.dto.RoleApiDto;
 import com.porest.hr.permission.domain.Permission;
 import com.porest.hr.permission.domain.Role;

@@ -1,8 +1,8 @@
 package com.porest.hr.holiday.service.dto;
 
-import com.lshdainty.porest.common.type.CountryCode;
+import com.porest.core.type.CountryCode;
 import com.porest.hr.holiday.type.HolidayType;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

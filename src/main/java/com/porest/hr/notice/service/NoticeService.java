@@ -97,7 +97,7 @@ public interface NoticeService {
      *
      * @param noticeId 공지사항 ID
      * @return 공지사항 엔티티
-     * @throws com.lshdainty.porest.common.exception.EntityNotFoundException 공지사항이 존재하지 않거나 삭제된 경우
+     * @throws com.porest.core.exception.EntityNotFoundException 공지사항이 존재하지 않거나 삭제된 경우
      */
     Notice checkNoticeExist(Long noticeId);
 }

@@ -1,6 +1,6 @@
 package com.porest.hr.dues.repository;
 
-import com.lshdainty.porest.common.type.DefaultCompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.repository.dto.UsersMonthBirthDuesDto;
 import com.porest.hr.dues.type.DuesCalcType;

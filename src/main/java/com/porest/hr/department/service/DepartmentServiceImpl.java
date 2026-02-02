@@ -1,10 +1,10 @@
 package com.porest.hr.department.service;
 
-import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.BusinessRuleViolationException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.type.YNType;
 import com.porest.hr.company.domain.Company;
 import com.porest.hr.company.service.CompanyService;
 import com.porest.hr.department.domain.Department;
@@ -47,7 +47,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             // 부모 부서와 같은 회사인지 검증
             if (!parent.getCompany().getId().equals(data.getCompanyId())) {
                 log.warn("부서 생성 실패 - 부모 부서와 다른 회사: parentCompanyId={}, companyId={}", parent.getCompany().getId(), data.getCompanyId());
-                throw new InvalidValueException(ErrorCode.DEPARTMENT_COMPANY_MISMATCH);
+                throw new InvalidValueException(HrErrorCode.DEPARTMENT_COMPANY_MISMATCH);
             }
         }
 
@@ -86,19 +86,19 @@ public class DepartmentServiceImpl implements DepartmentService {
             // 자기 자신을 부모로 설정하는 것 방지
             if (newParent.getId().equals(data.getId())) {
                 log.warn("부서 수정 실패 - 자기 자신을 부모로 설정: id={}", data.getId());
-                throw new InvalidValueException(ErrorCode.DEPARTMENT_SELF_REFERENCE);
+                throw new InvalidValueException(HrErrorCode.DEPARTMENT_SELF_REFERENCE);
             }
 
             // 순환 참조 방지 (자신의 하위 부서를 부모로 설정하는 것 방지)
             if (isDescendant(department, newParent)) {
                 log.warn("부서 수정 실패 - 순환 참조: id={}, parentId={}", data.getId(), data.getParentId());
-                throw new InvalidValueException(ErrorCode.DEPARTMENT_CIRCULAR_REFERENCE);
+                throw new InvalidValueException(HrErrorCode.DEPARTMENT_CIRCULAR_REFERENCE);
             }
 
             // 같은 회사인지 검증
             if (!newParent.getCompany().getId().equals(department.getCompany().getId())) {
                 log.warn("부서 수정 실패 - 다른 회사 부서: id={}, parentCompanyId={}", data.getId(), newParent.getCompany().getId());
-                throw new InvalidValueException(ErrorCode.DEPARTMENT_COMPANY_MISMATCH);
+                throw new InvalidValueException(HrErrorCode.DEPARTMENT_COMPANY_MISMATCH);
             }
         }
 
@@ -132,7 +132,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         if (hasChildren) {
             log.warn("부서 삭제 실패 - 하위 부서 존재: departmentId={}", departmentId);
-            throw new BusinessRuleViolationException(ErrorCode.DEPARTMENT_HAS_MEMBERS);
+            throw new BusinessRuleViolationException(HrErrorCode.DEPARTMENT_HAS_MEMBERS);
         }
 
         // 논리 삭제 실행
@@ -184,7 +184,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
                 if (existingMainDepartment.isPresent()) {
                     log.warn("부서 사용자 등록 실패 - 메인 부서 이미 존재: userId={}", data.getUserId());
-                    throw new BusinessRuleViolationException(ErrorCode.DEPARTMENT_HAS_MEMBERS);
+                    throw new BusinessRuleViolationException(HrErrorCode.DEPARTMENT_HAS_MEMBERS);
                 }
             }
 
@@ -213,7 +213,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
             if (userDepartmentOpt.isEmpty()) {
                 log.warn("부서 사용자 삭제 실패 - 사용자 부서 관계 없음: userId={}, departmentId={}", userId, departmentId);
-                throw new EntityNotFoundException(ErrorCode.DEPARTMENT_NOT_FOUND);
+                throw new EntityNotFoundException(HrErrorCode.DEPARTMENT_NOT_FOUND);
             }
 
             // 논리 삭제 실행
@@ -273,7 +273,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         Optional<Department> department = departmentRepository.findById(departmentId);
         if ((department.isEmpty()) || YNType.isY(department.get().getIsDeleted())) {
             log.warn("부서 조회 실패 - 존재하지 않거나 삭제된 부서: departmentId={}", departmentId);
-            throw new EntityNotFoundException(ErrorCode.DEPARTMENT_NOT_FOUND);
+            throw new EntityNotFoundException(HrErrorCode.DEPARTMENT_NOT_FOUND);
         }
         return department.get();
     }

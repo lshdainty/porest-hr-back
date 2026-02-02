@@ -1,7 +1,7 @@
 package com.porest.hr.user.repository;
 
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.user.domain.User;
 import jakarta.persistence.EntityManager;

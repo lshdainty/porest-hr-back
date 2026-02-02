@@ -1,15 +1,15 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.CompanyType;
-import com.lshdainty.porest.common.type.CountryCode;
+import com.porest.hr.common.type.CompanyType;
+import com.porest.core.type.CountryCode;
 import com.porest.hr.company.domain.Company;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.domain.Department;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.department.repository.DepartmentQueryDslRepository;
 import com.porest.hr.user.domain.User;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class DepartmentQueryDslRepositoryTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
@@ -51,7 +51,7 @@ class DepartmentQueryDslRepositoryTest {
     private User createTestUser(String id, String name, String email, LocalDate birth) {
         return User.createUser(
                 null, id, name, email,
-                birth, OriginCompanyType.DTOL, "9 ~ 18",
+                birth, DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

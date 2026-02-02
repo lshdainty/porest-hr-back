@@ -1,7 +1,7 @@
 package com.porest.hr.work.repository;
 
 import com.porest.hr.work.domain.WorkSystemLog;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 
 import java.time.LocalDateTime;
 import java.util.List;

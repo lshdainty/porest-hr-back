@@ -1,8 +1,8 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.vacation.domain.VacationGrant;
 import com.porest.hr.vacation.domain.VacationPolicy;
@@ -49,7 +49,7 @@ class VacationUsageDeductionQueryDslRepositoryTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

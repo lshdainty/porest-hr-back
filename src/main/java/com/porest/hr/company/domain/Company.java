@@ -2,7 +2,7 @@ package com.porest.hr.company.domain;
 
 import com.porest.hr.common.domain.AuditingFields;
 import com.porest.hr.department.domain.Department;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

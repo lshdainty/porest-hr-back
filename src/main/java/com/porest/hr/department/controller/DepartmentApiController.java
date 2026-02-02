@@ -1,6 +1,6 @@
 package com.porest.hr.department.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.department.controller.dto.DepartmentApiDto;
 import com.porest.hr.department.service.DepartmentService;
 import com.porest.hr.department.service.dto.DepartmentServiceDto;

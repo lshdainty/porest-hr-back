@@ -2,7 +2,7 @@ package com.porest.hr.repository;
 
 import com.porest.hr.work.domain.WorkSystemLog;
 import com.porest.hr.work.repository.WorkSystemLogQueryDslRepository;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 import com.porest.hr.work.type.TestSystemType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

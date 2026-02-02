@@ -1,10 +1,10 @@
 package com.porest.hr.user.service;
 
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.util.MessageResolver;
-import com.lshdainty.porest.common.util.PorestFile;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.type.YNType;
+import com.porest.core.util.MessageResolver;
+import com.porest.core.util.PorestFile;
 import com.porest.hr.department.repository.DepartmentRepository;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.repository.RoleRepository;
@@ -246,7 +246,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> findUser = userRepository.findById(userId);
         if ((findUser.isEmpty()) || YNType.isY(findUser.get().getIsDeleted())) {
             log.warn("사용자 조회 실패 - 존재하지 않거나 삭제된 사용자: userId={}", userId);
-            throw new EntityNotFoundException(ErrorCode.USER_NOT_FOUND);
+            throw new EntityNotFoundException(HrErrorCode.USER_NOT_FOUND);
         }
         return findUser.get();
     }
@@ -256,7 +256,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> findUser = userRepository.findByIdWithRolesAndPermissions(userId);
         if ((findUser.isEmpty()) || YNType.isY(findUser.get().getIsDeleted())) {
             log.warn("사용자 조회 실패 - 존재하지 않거나 삭제된 사용자: userId={}", userId);
-            throw new EntityNotFoundException(ErrorCode.USER_NOT_FOUND);
+            throw new EntityNotFoundException(HrErrorCode.USER_NOT_FOUND);
         }
         return findUser.get();
     }

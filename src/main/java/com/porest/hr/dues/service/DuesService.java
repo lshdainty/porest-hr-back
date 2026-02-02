@@ -78,7 +78,7 @@ public interface DuesService {
      *
      * @param duesId 조회할 회비 ID
      * @return 조회된 회비 엔티티
-     * @throws com.lshdainty.porest.common.exception.EntityNotFoundException 회비가 존재하지 않을 경우
+     * @throws com.porest.core.exception.EntityNotFoundException 회비가 존재하지 않을 경우
      */
     Dues checkDuesExist(Long duesId);
 }

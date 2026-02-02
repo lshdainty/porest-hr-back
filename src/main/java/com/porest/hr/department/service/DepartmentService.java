@@ -79,7 +79,7 @@ public interface DepartmentService {
      *
      * @param departmentId 부서 ID
      * @return 부서 엔티티
-     * @throws com.lshdainty.porest.common.exception.EntityNotFoundException 부서가 존재하지 않거나 삭제된 경우
+     * @throws com.porest.core.exception.EntityNotFoundException 부서가 존재하지 않거나 삭제된 경우
      */
     Department checkDepartmentExists(Long departmentId);
 }

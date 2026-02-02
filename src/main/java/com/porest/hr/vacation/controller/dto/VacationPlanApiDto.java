@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.controller.dto;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.vacation.service.dto.VacationPlanServiceDto;
 import com.porest.hr.vacation.service.dto.VacationPolicyServiceDto;
 import com.porest.hr.vacation.type.EffectiveType;

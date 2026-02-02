@@ -1,14 +1,14 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.CountryCode;
+import com.porest.core.type.CountryCode;
 import com.porest.hr.company.domain.Company;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.domain.Department;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.department.repository.DepartmentJpaRepository;
 import com.porest.hr.user.domain.User;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class DepartmentJpaRepositoryTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

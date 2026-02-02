@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.service.dto;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.vacation.type.EffectiveType;
 import com.porest.hr.vacation.type.ExpirationType;
 import com.porest.hr.vacation.type.GrantMethod;

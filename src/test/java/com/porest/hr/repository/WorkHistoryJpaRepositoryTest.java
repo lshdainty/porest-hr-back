@@ -1,8 +1,8 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.work.domain.WorkCode;
 import com.porest.hr.work.domain.WorkHistory;
@@ -46,7 +46,7 @@ class WorkHistoryJpaRepositoryTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
@@ -55,7 +55,7 @@ class WorkHistoryJpaRepositoryTest {
     private User createTestUser(String id, String name, String email, LocalDate birth) {
         return User.createUser(
                 null, id, name, email,
-                birth, OriginCompanyType.DTOL, "9 ~ 18",
+                birth, DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

@@ -1,9 +1,9 @@
 package com.porest.hr.holiday.domain;
 
 import com.porest.hr.common.domain.AuditingFields;
-import com.lshdainty.porest.common.type.CountryCode;
+import com.porest.core.type.CountryCode;
 import com.porest.hr.holiday.type.HolidayType;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;

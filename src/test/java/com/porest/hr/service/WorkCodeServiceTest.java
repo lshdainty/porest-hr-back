@@ -1,9 +1,9 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.exception.DuplicateException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.DuplicateException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.type.YNType;
 import com.porest.hr.work.domain.WorkCode;
 import com.porest.hr.work.repository.WorkCodeRepository;
 import com.porest.hr.work.service.WorkCodeServiceImpl;

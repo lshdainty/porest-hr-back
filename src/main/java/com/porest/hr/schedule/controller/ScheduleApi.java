@@ -1,6 +1,6 @@
 package com.porest.hr.schedule.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.schedule.controller.dto.ScheduleApiDto;
 import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.user.domain.User;

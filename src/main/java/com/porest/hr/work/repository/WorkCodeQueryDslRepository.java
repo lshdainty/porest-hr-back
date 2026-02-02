@@ -1,6 +1,6 @@
 package com.porest.hr.work.repository;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.work.domain.WorkCode;
 import com.porest.hr.work.type.CodeType;
 import com.querydsl.core.BooleanBuilder;

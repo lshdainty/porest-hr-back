@@ -1,9 +1,9 @@
 package com.porest.hr.user.controller;
 
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.type.CompanyType;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.CompanyType;
 import com.porest.hr.user.controller.dto.UserApiDto;
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.user.service.UserService;
 import com.porest.hr.user.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;

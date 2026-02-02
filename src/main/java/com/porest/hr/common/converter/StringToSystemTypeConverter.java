@@ -1,9 +1,9 @@
 package com.porest.hr.common.converter;
 
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.DefaultSystemType;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.core.exception.ErrorCode;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.hr.common.type.DefaultSystemType;
+import com.porest.hr.common.type.SystemType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

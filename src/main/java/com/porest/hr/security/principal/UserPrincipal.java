@@ -1,6 +1,6 @@
 package com.porest.hr.security.principal;
 
-import com.lshdainty.porest.common.security.AuditorPrincipal;
+import com.porest.core.security.AuditorPrincipal;
 import com.porest.hr.user.domain.User;
 
 /**

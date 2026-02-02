@@ -1,6 +1,6 @@
 package com.porest.hr.common.domain;
 
-import com.lshdainty.porest.common.config.database.IpAuditingEntityListener;
+import com.porest.hr.common.config.database.IpAuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

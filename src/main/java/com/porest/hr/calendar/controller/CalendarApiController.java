@@ -1,8 +1,8 @@
 package com.porest.hr.calendar.controller;
 
 import com.porest.hr.calendar.controller.dto.CalendarApiDto;
-import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.controller.ApiResponse;
+import com.porest.core.type.DisplayType;
 import com.porest.hr.schedule.domain.Schedule;
 import com.porest.hr.schedule.service.ScheduleService;
 import com.porest.hr.vacation.service.VacationService;

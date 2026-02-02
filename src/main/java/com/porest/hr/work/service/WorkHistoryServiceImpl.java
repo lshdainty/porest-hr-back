@@ -1,9 +1,9 @@
 package com.porest.hr.work.service;
 
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.CountryCode;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.type.CountryCode;
 import com.porest.hr.holiday.domain.Holiday;
 import com.porest.hr.holiday.service.HolidayService;
 import com.porest.hr.holiday.type.HolidayType;
@@ -187,7 +187,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
         Optional<WorkHistory> workHistory = workHistoryRepository.findById(id);
         workHistory.orElseThrow(() -> {
             log.warn("업무 이력 조회 실패 - 존재하지 않는 이력: id={}", id);
-            return new EntityNotFoundException(ErrorCode.WORK_NOT_FOUND);
+            return new EntityNotFoundException(HrErrorCode.WORK_NOT_FOUND);
         });
         return workHistory.get();
     }
@@ -195,12 +195,12 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
     private WorkCode checkWorkCodeExist(String code) {
         if (code == null) {
             log.warn("업무 코드 검증 실패 - 코드 미입력");
-            throw new InvalidValueException(ErrorCode.WORK_CODE_REQUIRED);
+            throw new InvalidValueException(HrErrorCode.WORK_CODE_REQUIRED);
         }
         Optional<WorkCode> workCode = workCodeRepository.findByCode(code);
         workCode.orElseThrow(() -> {
             log.warn("업무 코드 조회 실패 - 존재하지 않는 코드: code={}", code);
-            return new EntityNotFoundException(ErrorCode.WORK_CODE_NOT_FOUND);
+            return new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND);
         });
         return workCode.get();
     }
@@ -293,7 +293,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
         // 년월 유효성 검증
         if (year == null || month == null) {
             log.warn("업무 미등록 리스트 다운로드 실패 - 년월 미입력");
-            throw new InvalidValueException(ErrorCode.WORK_YEAR_MONTH_REQUIRED);
+            throw new InvalidValueException(HrErrorCode.WORK_YEAR_MONTH_REQUIRED);
         }
 
         // 해당 년월의 시작일과 마지막일 계산
@@ -488,7 +488,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
         // 년월 유효성 검증
         if (year == null || month == null) {
             log.warn("업무 미등록 날짜 조회 실패 - 년월 미입력");
-            throw new InvalidValueException(ErrorCode.WORK_YEAR_MONTH_REQUIRED);
+            throw new InvalidValueException(HrErrorCode.WORK_YEAR_MONTH_REQUIRED);
         }
 
         // 사용자 존재 확인

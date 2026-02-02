@@ -1,10 +1,10 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.holiday.domain.Holiday;
 import com.porest.hr.holiday.service.HolidayService;
 import com.porest.hr.holiday.type.HolidayType;
@@ -75,7 +75,7 @@ class WorkHistoryServiceTest {
     private User createTestUser(String userId) {
         return User.createUser(
                 null, userId, "테스트유저", "test@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

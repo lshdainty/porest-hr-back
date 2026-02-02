@@ -1,6 +1,6 @@
 package com.porest.hr.department.service.dto;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.company.domain.Company;
 import com.porest.hr.department.domain.Department;
 import lombok.Builder;

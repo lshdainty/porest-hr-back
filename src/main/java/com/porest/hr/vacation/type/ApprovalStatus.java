@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.type;
 
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.type.DisplayType;
 
 public enum ApprovalStatus implements DisplayType {
     PENDING(1L),

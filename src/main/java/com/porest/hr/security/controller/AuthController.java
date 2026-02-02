@@ -1,9 +1,9 @@
 package com.porest.hr.security.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.UnauthorizedException;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.controller.ApiResponse;
+import com.porest.core.exception.ErrorCode;
+import com.porest.core.exception.UnauthorizedException;
+import com.porest.core.type.YNType;
 import com.porest.hr.security.controller.dto.AuthApiDto;
 import com.porest.hr.security.principal.UserPrincipal;
 import com.porest.hr.security.service.IpBlacklistService;

@@ -1,9 +1,9 @@
 package com.porest.hr.vacation.service;
 
-import com.lshdainty.porest.common.exception.DuplicateException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.DuplicateException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.user.service.UserService;
 import com.porest.hr.vacation.domain.UserVacationPlan;
@@ -49,7 +49,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         // 코드 중복 체크
         if (vacationPlanRepository.existsByCode(code)) {
             log.warn("휴가 플랜 생성 실패 - 코드 중복: code={}", code);
-            throw new DuplicateException(ErrorCode.VACATION_PLAN_ALREADY_EXISTS);
+            throw new DuplicateException(HrErrorCode.VACATION_PLAN_ALREADY_EXISTS);
         }
 
         VacationPlan plan = VacationPlan.createPlan(code, name, desc);
@@ -67,7 +67,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         // 코드 중복 체크
         if (vacationPlanRepository.existsByCode(code)) {
             log.warn("휴가 플랜 생성 실패 - 코드 중복: code={}", code);
-            throw new DuplicateException(ErrorCode.VACATION_PLAN_ALREADY_EXISTS);
+            throw new DuplicateException(HrErrorCode.VACATION_PLAN_ALREADY_EXISTS);
         }
 
         // 정책 조회 및 검증
@@ -76,7 +76,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
             VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
                     .orElseThrow(() -> {
                         log.warn("휴가 플랜 생성 실패 - 정책 없음: policyId={}", policyId);
-                        return new EntityNotFoundException(ErrorCode.VACATION_POLICY_NOT_FOUND);
+                        return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
                     });
             policies.add(policy);
         }
@@ -95,7 +95,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCodeWithPolicies(code)
                 .orElseThrow(() -> {
                     log.warn("휴가 플랜 조회 실패 - 존재하지 않음: code={}", code);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         return VacationPlanServiceDto.fromWithPolicies(plan);
@@ -108,7 +108,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByIdWithPolicies(planId)
                 .orElseThrow(() -> {
                     log.warn("휴가 플랜 조회 실패 - 존재하지 않음: planId={}", planId);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         return VacationPlanServiceDto.fromWithPolicies(plan);
@@ -132,7 +132,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCode(code)
                 .orElseThrow(() -> {
                     log.warn("휴가 플랜 수정 실패 - 존재하지 않음: code={}", code);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         plan.updatePlan(name, desc);
@@ -149,7 +149,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCode(code)
                 .orElseThrow(() -> {
                     log.warn("휴가 플랜 삭제 실패 - 존재하지 않음: code={}", code);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         plan.deletePlan();
@@ -169,19 +169,19 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCodeWithPolicies(planCode)
                 .orElseThrow(() -> {
                     log.warn("정책 추가 실패 - 플랜 없음: planCode={}", planCode);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
                 .orElseThrow(() -> {
                     log.warn("정책 추가 실패 - 정책 없음: policyId={}", policyId);
-                    return new EntityNotFoundException(ErrorCode.VACATION_POLICY_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
                 });
 
         // 이미 존재하는지 확인
         if (plan.hasPolicy(policyId)) {
             log.warn("정책 추가 실패 - 이미 존재: planCode={}, policyId={}", planCode, policyId);
-            throw new DuplicateException(ErrorCode.VACATION_PLAN_POLICY_ALREADY_EXISTS);
+            throw new DuplicateException(HrErrorCode.VACATION_PLAN_POLICY_ALREADY_EXISTS);
         }
 
         plan.addPolicy(policy);
@@ -197,13 +197,13 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCodeWithPolicies(planCode)
                 .orElseThrow(() -> {
                     log.warn("정책 제거 실패 - 플랜 없음: planCode={}", planCode);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
                 .orElseThrow(() -> {
                     log.warn("정책 제거 실패 - 정책 없음: policyId={}", policyId);
-                    return new EntityNotFoundException(ErrorCode.VACATION_POLICY_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
                 });
 
         plan.removePolicy(policy);
@@ -219,7 +219,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCodeWithPolicies(planCode)
                 .orElseThrow(() -> {
                     log.warn("정책 업데이트 실패 - 플랜 없음: planCode={}", planCode);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         // 기존 정책 모두 제거
@@ -230,7 +230,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
             VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
                     .orElseThrow(() -> {
                         log.warn("정책 업데이트 실패 - 정책 없음: policyId={}", policyId);
-                        return new EntityNotFoundException(ErrorCode.VACATION_POLICY_NOT_FOUND);
+                        return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
                     });
             plan.addPolicy(policy);
         }
@@ -252,13 +252,13 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCodeWithPolicies(planCode)
                 .orElseThrow(() -> {
                     log.warn("플랜 할당 실패 - 플랜 없음: planCode={}", planCode);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         // 이미 할당되어 있는지 확인
         if (userVacationPlanRepository.existsByUserIdAndPlanCode(userId, planCode)) {
             log.warn("플랜 할당 실패 - 이미 할당됨: userId={}, planCode={}", userId, planCode);
-            throw new DuplicateException(ErrorCode.USER_VACATION_PLAN_ALREADY_EXISTS);
+            throw new DuplicateException(HrErrorCode.USER_VACATION_PLAN_ALREADY_EXISTS);
         }
 
         // UserVacationPlan 생성
@@ -282,7 +282,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
             VacationPlan plan = vacationPlanRepository.findByCodeWithPolicies(planCode)
                     .orElseThrow(() -> {
                         log.warn("플랜 할당 실패 - 플랜 없음: planCode={}", planCode);
-                        return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                        return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                     });
 
             // 이미 할당되어 있으면 스킵
@@ -312,13 +312,13 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = vacationPlanRepository.findByCodeWithPolicies(planCode)
                 .orElseThrow(() -> {
                     log.warn("플랜 회수 실패 - 플랜 없음: planCode={}", planCode);
-                    return new EntityNotFoundException(ErrorCode.VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
         UserVacationPlan userVacationPlan = userVacationPlanRepository.findByUserIdAndPlanCode(userId, planCode)
                 .orElseThrow(() -> {
                     log.warn("플랜 회수 실패 - 사용자에게 할당되지 않음: userId={}, planCode={}", userId, planCode);
-                    return new EntityNotFoundException(ErrorCode.USER_VACATION_PLAN_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.USER_VACATION_PLAN_NOT_FOUND);
                 });
 
         // UserVacationPlan 소프트 삭제

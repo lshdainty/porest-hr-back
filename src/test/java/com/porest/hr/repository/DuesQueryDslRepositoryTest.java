@@ -1,10 +1,10 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.CompanyType;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.hr.common.type.CompanyType;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.repository.DuesQueryDslRepository;
 import com.porest.hr.dues.repository.dto.UsersMonthBirthDuesDto;
@@ -46,7 +46,7 @@ class DuesQueryDslRepositoryTest {
     }
 
     private User createTestUser(String id, String name, String email) {
-        return createTestUser(id, name, email, OriginCompanyType.DTOL);
+        return createTestUser(id, name, email, DefaultCompanyType.NONE);
     }
 
     @Test

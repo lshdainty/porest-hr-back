@@ -1,6 +1,6 @@
 package com.porest.hr.notice.repository;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.notice.domain.Notice;
 import com.porest.hr.notice.type.NoticeType;
 import com.querydsl.core.types.dsl.BooleanExpression;

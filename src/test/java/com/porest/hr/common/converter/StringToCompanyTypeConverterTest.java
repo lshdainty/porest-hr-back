@@ -1,9 +1,8 @@
 package com.porest.hr.common.converter;
 
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.CompanyType;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.hr.common.type.CompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,19 +51,9 @@ class StringToCompanyTypeConverterTest {
     }
 
     @Test
-    @DisplayName("OriginCompanyType 변환 성공")
-    void convert_originCompanyType_success() {
-        // when
-        CompanyType result = converter.convert("SKAX");
-
-        // then
-        assertThat(result).isEqualTo(OriginCompanyType.SKAX);
-    }
-
-    @Test
-    @DisplayName("OriginCompanyType의 모든 값 변환 성공")
-    void convert_allOriginCompanyTypes_success() {
-        for (OriginCompanyType type : OriginCompanyType.values()) {
+    @DisplayName("DefaultCompanyType의 모든 값 변환 성공")
+    void convert_allDefaultCompanyTypes_success() {
+        for (DefaultCompanyType type : DefaultCompanyType.values()) {
             // when
             CompanyType result = converter.convert(type.name());
 

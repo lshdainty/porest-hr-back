@@ -1,6 +1,6 @@
 package com.porest.hr.security.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.security.controller.dto.TokenExchangeDto;
 import com.porest.hr.security.service.TokenExchangeService;
 import io.swagger.v3.oas.annotations.Operation;

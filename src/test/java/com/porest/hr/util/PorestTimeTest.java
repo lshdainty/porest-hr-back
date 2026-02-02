@@ -1,7 +1,7 @@
 package com.porest.hr.util;
 
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.util.PorestTime;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.util.PorestTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

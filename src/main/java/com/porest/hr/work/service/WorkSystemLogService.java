@@ -1,6 +1,6 @@
 package com.porest.hr.work.service;
 
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 
 import java.util.List;
 import java.util.Map;

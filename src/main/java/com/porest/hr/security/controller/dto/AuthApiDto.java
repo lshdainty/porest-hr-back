@@ -2,7 +2,7 @@ package com.porest.hr.security.controller.dto;
 
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.user.type.StatusType;
 
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.porest.hr.vacation.type;
 
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.exception.ErrorCode;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.type.DisplayType;
 
 import java.time.LocalDateTime;
 

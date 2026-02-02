@@ -1,6 +1,6 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.config.properties.SecurityProperties;
+import com.porest.core.config.properties.SecurityProperties;
 import com.porest.hr.security.service.IpBlacklistServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,10 +1,10 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.exception.BusinessRuleViolationException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.exception.BusinessRuleViolationException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.repository.DepartmentRepository;
 import com.porest.hr.holiday.repository.HolidayRepository;
 import com.porest.hr.vacation.domain.UserVacationPlan;
@@ -1144,7 +1144,7 @@ class VacationServiceTest {
 
             // when & then
             assertThatThrownBy(() -> vacationService.manualGrantVacation(userId, data))
-                    .isInstanceOf(com.lshdainty.porest.common.exception.InvalidValueException.class);
+                    .isInstanceOf(com.porest.core.exception.InvalidValueException.class);
         }
     }
 
@@ -1305,7 +1305,7 @@ class VacationServiceTest {
         void getAllUsersVacationSummaryFailNullYear() {
             // when & then
             assertThatThrownBy(() -> vacationService.getAllUsersVacationSummary(null))
-                    .isInstanceOf(com.lshdainty.porest.common.exception.InvalidValueException.class);
+                    .isInstanceOf(com.porest.core.exception.InvalidValueException.class);
         }
     }
 
@@ -1581,7 +1581,7 @@ class VacationServiceTest {
     private User createTestUser(String userId) {
         return User.createUser(
                 null, userId, "테스트유저", "test@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.SKAX, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

@@ -1,6 +1,6 @@
 package com.porest.hr.user.service;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.user.service.dto.UserServiceDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,7 +63,7 @@ public interface UserService {
      *
      * @param userId 사용자 ID
      * @return User 엔티티
-     * @throws com.lshdainty.porest.common.exception.EntityNotFoundException 사용자가 존재하지 않는 경우
+     * @throws com.porest.core.exception.EntityNotFoundException 사용자가 존재하지 않는 경우
      */
     User checkUserExist(String userId);
 
@@ -73,7 +73,7 @@ public interface UserService {
      *
      * @param userId 사용자 ID
      * @return User 엔티티 (역할 및 권한 정보 포함)
-     * @throws com.lshdainty.porest.common.exception.EntityNotFoundException 사용자가 존재하지 않는 경우
+     * @throws com.porest.core.exception.EntityNotFoundException 사용자가 존재하지 않는 경우
      */
     User findUserById(String userId);
 

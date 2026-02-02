@@ -1,6 +1,6 @@
 package com.porest.hr.notice.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.notice.controller.dto.NoticeApiDto;
 import com.porest.hr.notice.type.NoticeType;
 import io.swagger.v3.oas.annotations.Operation;

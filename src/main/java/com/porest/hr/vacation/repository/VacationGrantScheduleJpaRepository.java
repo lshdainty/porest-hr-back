@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.repository;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.vacation.domain.VacationGrantSchedule;
 import com.porest.hr.vacation.type.GrantMethod;
 import jakarta.persistence.EntityManager;

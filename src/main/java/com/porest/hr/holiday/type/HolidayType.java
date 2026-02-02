@@ -1,6 +1,6 @@
 package com.porest.hr.holiday.type;
 
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.type.DisplayType;
 
 public enum HolidayType implements DisplayType {
     PUBLIC(1L),

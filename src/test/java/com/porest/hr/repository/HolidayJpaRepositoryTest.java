@@ -1,7 +1,7 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
 import com.porest.hr.holiday.domain.Holiday;
 import com.porest.hr.holiday.repository.HolidayJpaRepository;
 import com.porest.hr.holiday.type.HolidayType;

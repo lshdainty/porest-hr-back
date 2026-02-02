@@ -1,10 +1,10 @@
 package com.porest.hr.repository;
 
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
-import com.lshdainty.porest.common.type.CompanyType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
+import com.porest.hr.common.type.CompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.permission.domain.Permission;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.type.ActionType;
@@ -47,7 +47,7 @@ class UserJpaRepositoryTest {
     }
 
     private User createTestUser(String id, String name, String email) {
-        return createTestUser(id, name, email, OriginCompanyType.DTOL);
+        return createTestUser(id, name, email, DefaultCompanyType.NONE);
     }
 
     @Test
@@ -155,7 +155,7 @@ class UserJpaRepositoryTest {
         // when
         User foundUser = userRepository.findById("testUser").orElseThrow();
         foundUser.updateUser("수정이름", "updated@test.com", null,
-                LocalDate.of(1991, 1, 1), OriginCompanyType.DTOL, "8 ~ 17",
+                LocalDate.of(1991, 1, 1), DefaultCompanyType.NONE, "8 ~ 17",
                 YNType.Y, null, null, null, null);
         em.flush();
         em.clear();
@@ -376,7 +376,7 @@ class UserJpaRepositoryTest {
     @DisplayName("전체 유저 조회 시 SYSTEM 계정 제외")
     void findUsersExcludesSystemAccount() {
         // given
-        User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com", OriginCompanyType.DTOL);
+        User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com", DefaultCompanyType.NONE);
         User systemUser = createTestUser("systemUser", "시스템유저", "system@test.com", DefaultCompanyType.SYSTEM);
         userRepository.save(normalUser);
         userRepository.save(systemUser);
@@ -406,7 +406,7 @@ class UserJpaRepositoryTest {
         role.addPermission(permission);
         em.persist(role);
 
-        User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com", OriginCompanyType.DTOL);
+        User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com", DefaultCompanyType.NONE);
         normalUser.addRole(role);
         userRepository.save(normalUser);
 
@@ -431,7 +431,7 @@ class UserJpaRepositoryTest {
         // given
         User user = User.createUser(
                 100L, "testUser", "홍길동", "hong@test.com",
-                LocalDate.of(1990, 1, 1), OriginCompanyType.DTOL, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         userRepository.save(user);

@@ -1,9 +1,8 @@
 package com.porest.hr.common.converter;
 
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.CompanyType;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
-import com.lshdainty.porest.company.type.OriginCompanyType;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.hr.common.type.CompanyType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,22 +73,9 @@ class CompanyTypeJsonDeserializerTest {
     }
 
     @Test
-    @DisplayName("OriginCompanyType 역직렬화 성공")
-    void deserialize_originCompanyType_success() throws Exception {
-        // given
-        when(jsonParser.getText()).thenReturn("SKAX");
-
-        // when
-        CompanyType result = deserializer.deserialize(jsonParser, context);
-
-        // then
-        assertThat(result).isEqualTo(OriginCompanyType.SKAX);
-    }
-
-    @Test
-    @DisplayName("OriginCompanyType의 모든 값 역직렬화 성공")
-    void deserialize_allOriginCompanyTypes_success() throws Exception {
-        for (OriginCompanyType type : OriginCompanyType.values()) {
+    @DisplayName("DefaultCompanyType의 모든 값 역직렬화 성공")
+    void deserialize_allDefaultCompanyTypes_success() throws Exception {
+        for (DefaultCompanyType type : DefaultCompanyType.values()) {
             // given
             when(jsonParser.getText()).thenReturn(type.name());
 

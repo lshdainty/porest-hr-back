@@ -1,9 +1,9 @@
 package com.porest.hr.notice.service;
 
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.InvalidValueException;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.exception.InvalidValueException;
+import com.porest.core.type.YNType;
 import com.porest.hr.notice.domain.Notice;
 import com.porest.hr.notice.repository.NoticeRepository;
 import com.porest.hr.notice.service.dto.NoticeServiceDto;
@@ -142,7 +142,7 @@ public class NoticeServiceImpl implements NoticeService {
         Optional<Notice> notice = noticeRepository.findById(noticeId);
         if (notice.isEmpty() || YNType.isY(notice.get().getIsDeleted())) {
             log.warn("공지사항 조회 실패 - 존재하지 않는 공지사항: noticeId={}", noticeId);
-            throw new EntityNotFoundException(ErrorCode.NOTICE_NOT_FOUND);
+            throw new EntityNotFoundException(HrErrorCode.NOTICE_NOT_FOUND);
         }
         return notice.get();
     }
@@ -150,7 +150,7 @@ public class NoticeServiceImpl implements NoticeService {
     private void validateNoticeDate(LocalDate startDate, LocalDate endDate) {
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             log.warn("공지사항 등록/수정 실패 - 시작일이 종료일보다 이후: startDate={}, endDate={}", startDate, endDate);
-            throw new InvalidValueException(ErrorCode.NOTICE_INVALID_DATE);
+            throw new InvalidValueException(HrErrorCode.NOTICE_INVALID_DATE);
         }
     }
 

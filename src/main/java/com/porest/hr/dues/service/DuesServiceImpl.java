@@ -1,7 +1,7 @@
 package com.porest.hr.dues.service;
 
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.exception.ErrorCode;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.repository.DuesRepository;
 import com.porest.hr.dues.repository.dto.UsersMonthBirthDuesDto;
@@ -160,7 +160,7 @@ public class DuesServiceImpl implements DuesService {
         return duesRepository.findById(duesId)
                 .orElseThrow(() -> {
                     log.warn("회비 조회 실패 - 존재하지 않는 회비: duesId={}", duesId);
-                    return new EntityNotFoundException(ErrorCode.DUES_NOT_FOUND);
+                    return new EntityNotFoundException(HrErrorCode.DUES_NOT_FOUND);
                 });
     }
 }

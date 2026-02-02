@@ -1,6 +1,6 @@
 package com.porest.hr.work.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.work.controller.dto.WorkApiDto;
@@ -11,7 +11,7 @@ import com.porest.hr.work.service.WorkSystemLogService;
 import com.porest.hr.work.service.dto.WorkCodeServiceDto;
 import com.porest.hr.work.service.dto.WorkHistoryServiceDto;
 import com.porest.hr.work.type.CodeType;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

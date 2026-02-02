@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.type;
 
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.type.DisplayType;
 
 public enum RepeatUnit implements DisplayType {
     YEARLY(1L),

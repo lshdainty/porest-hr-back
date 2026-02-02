@@ -1,7 +1,7 @@
 package com.porest.hr.security.resolver;
 
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.UnauthorizedException;
+import com.porest.core.exception.ErrorCode;
+import com.porest.core.exception.UnauthorizedException;
 import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.security.principal.UserPrincipal;
 import com.porest.hr.user.domain.User;

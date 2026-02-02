@@ -2,12 +2,12 @@ package com.porest.hr.user.domain;
 
 import com.porest.hr.common.converter.CompanyTypeConverter;
 import com.porest.hr.common.domain.AuditingFields;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.CompanyType;
+import com.porest.core.type.CountryCode;
+import com.porest.hr.common.type.CompanyType;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.domain.UserRole;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.vacation.domain.UserVacationPlan;
 import com.porest.hr.vacation.domain.VacationApproval;
 import com.porest.hr.vacation.domain.VacationGrant;

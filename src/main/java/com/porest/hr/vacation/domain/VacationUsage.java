@@ -1,7 +1,7 @@
 package com.porest.hr.vacation.domain;
 
 import com.porest.hr.common.domain.AuditingFields;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.vacation.type.VacationTimeType;
 import jakarta.persistence.*;

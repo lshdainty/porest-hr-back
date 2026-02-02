@@ -1,8 +1,9 @@
 package com.porest.hr.security.service;
 
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.ForbiddenException;
-import com.lshdainty.porest.common.exception.UnauthorizedException;
+import com.porest.core.exception.ErrorCode;
+import com.porest.core.exception.ForbiddenException;
+import com.porest.core.exception.UnauthorizedException;
+import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.security.controller.dto.TokenExchangeDto;
 import com.porest.hr.security.jwt.JwtTokenProvider;
@@ -53,7 +54,7 @@ public class TokenExchangeService {
         // 3. HR 서비스 접근 권한 확인
         if (!services.contains(HR_SERVICE_CODE)) {
             log.warn("User does not have access to HR service");
-            throw new ForbiddenException(ErrorCode.PERMISSION_DENIED, "HR service access denied");
+            throw new ForbiddenException(HrErrorCode.PERMISSION_DENIED, "HR service access denied");
         }
 
         // 4. 사용자 정보 추출

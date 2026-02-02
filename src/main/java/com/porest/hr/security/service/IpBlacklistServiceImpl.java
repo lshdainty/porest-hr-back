@@ -1,6 +1,6 @@
 package com.porest.hr.security.service;
 
-import com.lshdainty.porest.common.config.properties.SecurityProperties;
+import com.porest.core.config.properties.SecurityProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

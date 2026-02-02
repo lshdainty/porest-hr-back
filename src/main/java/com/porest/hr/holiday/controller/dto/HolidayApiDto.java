@@ -2,8 +2,8 @@ package com.porest.hr.holiday.controller.dto;
 
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
 import com.porest.hr.holiday.type.HolidayType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

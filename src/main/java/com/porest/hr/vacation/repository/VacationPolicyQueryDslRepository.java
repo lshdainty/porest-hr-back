@@ -2,7 +2,7 @@ package com.porest.hr.vacation.repository;
 
 import com.porest.hr.vacation.domain.VacationPolicy;
 import com.porest.hr.vacation.type.VacationType;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

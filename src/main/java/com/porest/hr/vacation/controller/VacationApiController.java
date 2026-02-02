@@ -1,9 +1,9 @@
 package com.porest.hr.vacation.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.common.exception.ErrorCode;
-import com.lshdainty.porest.common.exception.ForbiddenException;
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.controller.ApiResponse;
+import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.core.exception.ForbiddenException;
+import com.porest.core.type.DisplayType;
 import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.vacation.controller.dto.VacationApiDto;
@@ -770,7 +770,7 @@ public class VacationApiController implements VacationApi {
     private void validateVacationOwnership(String loginUserId, String targetUserId) {
         if (!loginUserId.equals(targetUserId) && !hasVacationManageAuthority()) {
             log.warn("휴가 접근 거부 - 로그인 유저: {}, 대상 유저: {}", loginUserId, targetUserId);
-            throw new ForbiddenException(ErrorCode.VACATION_ACCESS_DENIED);
+            throw new ForbiddenException(HrErrorCode.VACATION_ACCESS_DENIED);
         }
     }
 
@@ -793,7 +793,7 @@ public class VacationApiController implements VacationApi {
     private void validateUserIdentity(String loginUserId, String requestUserId, String action) {
         if (!loginUserId.equals(requestUserId)) {
             log.warn("{} 접근 거부 - 로그인 유저: {}, 요청 유저: {}", action, loginUserId, requestUserId);
-            throw new ForbiddenException(ErrorCode.VACATION_ACCESS_DENIED);
+            throw new ForbiddenException(HrErrorCode.VACATION_ACCESS_DENIED);
         }
     }
 

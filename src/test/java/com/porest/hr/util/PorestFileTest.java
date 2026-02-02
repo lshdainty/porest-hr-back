@@ -1,9 +1,9 @@
 package com.porest.hr.util;
 
-import com.lshdainty.porest.common.exception.ResourceNotFoundException;
-import com.lshdainty.porest.common.message.MessageKey;
-import com.lshdainty.porest.common.util.MessageResolver;
-import com.lshdainty.porest.common.util.PorestFile;
+import com.porest.core.exception.ResourceNotFoundException;
+import com.porest.core.message.MessageKey;
+import com.porest.core.util.MessageResolver;
+import com.porest.core.util.PorestFile;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -137,13 +137,13 @@ class PorestFileTest {
         doThrow(new IOException("Transfer failed")).when(mockFile).transferTo(any(File.class));
 
         given(messageResolver.getMessage(any(MessageKey.class), anyString()))
-                .willReturn("File registHoliday failed");
+                .willReturn("File save failed");
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> PorestFile.save(mockFile, tempDir.toString(), "test.txt", messageResolver));
 
-        assertThat(exception.getMessage()).isEqualTo("File registHoliday failed");
+        assertThat(exception.getMessage()).isEqualTo("File save failed");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);
     }
 

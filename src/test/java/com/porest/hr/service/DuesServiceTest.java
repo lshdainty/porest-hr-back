@@ -1,6 +1,6 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
+import com.porest.core.exception.EntityNotFoundException;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.service.DuesService;
 import com.porest.hr.dues.service.DuesServiceImpl;

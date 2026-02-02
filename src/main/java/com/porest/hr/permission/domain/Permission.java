@@ -1,7 +1,7 @@
 package com.porest.hr.permission.domain;
 
 import com.porest.hr.common.domain.AuditingFields;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.permission.type.ActionType;
 import com.porest.hr.permission.type.ResourceType;
 import jakarta.persistence.*;

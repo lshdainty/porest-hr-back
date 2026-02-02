@@ -1,6 +1,6 @@
 package com.porest.hr.common.config.security;
 
-import com.lshdainty.porest.common.util.PorestIP;
+import com.porest.core.util.PorestIP;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -3,7 +3,7 @@ package com.porest.hr.service;
 import com.porest.hr.work.domain.WorkSystemLog;
 import com.porest.hr.work.repository.WorkSystemLogRepository;
 import com.porest.hr.work.service.WorkSystemLogServiceImpl;
-import com.lshdainty.porest.common.type.SystemType;
+import com.porest.hr.common.type.SystemType;
 import com.porest.hr.work.type.TestSystemType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;

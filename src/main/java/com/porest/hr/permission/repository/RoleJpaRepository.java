@@ -1,6 +1,6 @@
 package com.porest.hr.permission.repository;
 
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.type.YNType;
 import com.porest.hr.permission.domain.Role;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

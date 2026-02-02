@@ -1,6 +1,6 @@
 package com.porest.hr.notice.type;
 
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.type.DisplayType;
 
 public enum NoticeType implements DisplayType {
     GENERAL(1L),

@@ -1,6 +1,6 @@
 package com.porest.hr.user.type;
 
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.type.DisplayType;
 
 public enum StatusType implements DisplayType {
     PENDING(1L), // 초대 후 아직 회원가입하지 않은 상태

@@ -1,7 +1,7 @@
 package com.porest.hr.department.repository;
 
-import com.lshdainty.porest.common.type.YNType;
-import com.lshdainty.porest.common.type.DefaultCompanyType;
+import com.porest.core.type.YNType;
+import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.domain.Department;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.user.domain.User;

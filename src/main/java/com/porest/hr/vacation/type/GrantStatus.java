@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.type;
 
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.type.DisplayType;
 
 public enum GrantStatus implements DisplayType {
     // 아래 4개의 경우 사용자가 부여받은 휴가의 상태 타입

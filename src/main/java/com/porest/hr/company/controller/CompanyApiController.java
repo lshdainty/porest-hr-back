@@ -1,6 +1,6 @@
 package com.porest.hr.company.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
+import com.porest.core.controller.ApiResponse;
 import com.porest.hr.company.controller.dto.CompanyApiDto;
 import com.porest.hr.company.service.CompanyService;
 import com.porest.hr.company.service.dto.CompanyServiceDto;

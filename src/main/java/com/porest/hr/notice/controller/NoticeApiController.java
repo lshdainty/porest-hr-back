@@ -1,7 +1,7 @@
 package com.porest.hr.notice.controller;
 
-import com.lshdainty.porest.common.controller.ApiResponse;
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.controller.ApiResponse;
+import com.porest.core.type.DisplayType;
 import com.porest.hr.notice.controller.dto.NoticeApiDto;
 import com.porest.hr.notice.service.NoticeService;
 import com.porest.hr.notice.service.dto.NoticeServiceDto;

@@ -1,9 +1,9 @@
 package com.porest.hr.service;
 
-import com.lshdainty.porest.common.exception.DuplicateException;
-import com.lshdainty.porest.common.exception.EntityNotFoundException;
-import com.lshdainty.porest.common.type.CountryCode;
-import com.lshdainty.porest.common.type.YNType;
+import com.porest.core.exception.DuplicateException;
+import com.porest.core.exception.EntityNotFoundException;
+import com.porest.core.type.CountryCode;
+import com.porest.core.type.YNType;
 import com.porest.hr.holiday.domain.Holiday;
 import com.porest.hr.holiday.repository.HolidayRepository;
 import com.porest.hr.holiday.service.HolidayServiceImpl;

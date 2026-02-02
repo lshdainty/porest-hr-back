@@ -1,6 +1,6 @@
 package com.porest.hr.schedule.type;
 
-import com.lshdainty.porest.common.type.DisplayType;
+import com.porest.core.type.DisplayType;
 
 public enum ScheduleType implements DisplayType {
     EDUCATION(1L),
