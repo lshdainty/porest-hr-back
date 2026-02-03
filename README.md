@@ -2,18 +2,18 @@
   <img src="https://img.shields.io/badge/POREST-6DB33F?style=for-the-badge&logo=spring&logoColor=white" alt="POREST" />
 </p>
 
-<h1 align="center">POREST Backend</h1>
+<h1 align="center">POREST HR Backend</h1>
 
 <p align="center">
   <strong>사업장 근로자를 위한 일정관리 및 휴가관리 서비스</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/lshdainty/porest-back/actions/workflows/ci-main.yml">
-    <img src="https://github.com/lshdainty/porest-back/actions/workflows/ci-main.yml/badge.svg" alt="CI/CD" />
+  <a href="https://github.com/lshdainty/porest-hr-back/actions/workflows/ci-main.yml">
+    <img src="https://github.com/lshdainty/porest-hr-back/actions/workflows/ci-main.yml/badge.svg" alt="CI/CD" />
   </a>
-  <a href="https://codecov.io/gh/lshdainty/porest-back">
-    <img src="https://codecov.io/gh/lshdainty/porest-back/branch/main/graph/badge.svg" alt="codecov" />
+  <a href="https://codecov.io/gh/lshdainty/porest-hr-back">
+    <img src="https://codecov.io/gh/lshdainty/porest-hr-back/branch/main/graph/badge.svg" alt="codecov" />
   </a>
   <img src="https://img.shields.io/badge/Java-25-007396?logo=openjdk&logoColor=white" alt="Java" />
   <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot" />
@@ -23,7 +23,7 @@
 
 ## 소개
 
-**POREST Backend**는 [POREST](https://github.com/lshdainty/POREST) 서비스의 백엔드입니다.
+**POREST HR Backend**는 [POREST](https://github.com/lshdainty/POREST) 서비스의 HR(인사관리) 백엔드입니다.
 
 Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며, 기존 사용하던 Legacy 프로그램을 **JPA**, **QueryDSL** 등 실무에서 많이 사용중인 라이브러리를 사용하여 개선하고자 합니다.
 
@@ -55,12 +55,12 @@ Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며, 기존 
 ### 모듈 구조
 
 ```
-porest-back
-├── porest-back-common    # 공통 라이브러리 (Exception, i18n, Utility 등)
+porest-hr-back
+├── porest-core           # 공통 라이브러리 (Exception, i18n, Utility 등)
 └── porest-back-{company} # 회사별 커스텀 모듈 (선택적 확장)
 ```
 
-- **porest-back-common**: 예외 처리, 국제화(i18n), API 응답 포맷, 공통 유틸리티 등 프로젝트 전반에서 사용되는 컴포넌트 제공
+- **porest-core**: 예외 처리, 국제화(i18n), API 응답 포맷, 공통 유틸리티 등 프로젝트 전반에서 사용되는 컴포넌트 제공
 - **회사별 커스텀 모듈**: 각 회사별로 필요한 타입(회사 타입, 시스템 타입 등)을 정의하여 플러그인 방식으로 확장 가능
 
 ---
@@ -68,7 +68,7 @@ porest-back
 ## 도메인 모듈
 
 ```
-src/main/java/com/lshdainty/porest/
+src/main/java/com/porest/hr/
 ├── user/                  # 사용자 관리
 ├── vacation/              # 휴가 관리 (핵심 도메인)
 ├── work/                  # 근무 이력 관리
@@ -153,8 +153,10 @@ src/main/resources/message/
 | Repository | Description |
 |------------|-------------|
 | [POREST](https://github.com/lshdainty/POREST) | 통합 레포지토리 (서비스 소개) |
-| [porest-front](https://github.com/lshdainty/porest-front) | React 기반 프론트엔드 |
-| [porest-back-common](https://github.com/lshdainty/porest-back-common) | 공통 라이브러리 |
+| [porest-hr-front](https://github.com/lshdainty/porest-hr-front) | HR 프론트엔드 |
+| [porest-core](https://github.com/lshdainty/porest-core) | 공통 라이브러리 |
+| [porest-sso-back](https://github.com/lshdainty/porest-sso-back) | SSO 백엔드 |
+| [porest-sso-front](https://github.com/lshdainty/porest-sso-front) | SSO 프론트엔드 |
 
 ---
 
