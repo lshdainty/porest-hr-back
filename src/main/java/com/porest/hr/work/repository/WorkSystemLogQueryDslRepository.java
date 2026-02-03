@@ -36,8 +36,8 @@ public class WorkSystemLogQueryDslRepository implements WorkSystemLogRepository 
         WorkSystemLog result = query
                 .selectFrom(workSystemLog)
                 .where(
-                        workSystemLog.createDate.goe(startDateTime),
-                        workSystemLog.createDate.lt(endDateTime),
+                        workSystemLog.createAt.goe(startDateTime),
+                        workSystemLog.createAt.lt(endDateTime),
                         workSystemLog.code.eq(code)
                 )
                 .fetchOne();
@@ -53,8 +53,8 @@ public class WorkSystemLogQueryDslRepository implements WorkSystemLogRepository 
                 .select(workSystemLog.code)
                 .from(workSystemLog)
                 .where(
-                        workSystemLog.createDate.goe(startDateTime),
-                        workSystemLog.createDate.lt(endDateTime),
+                        workSystemLog.createAt.goe(startDateTime),
+                        workSystemLog.createAt.lt(endDateTime),
                         workSystemLog.code.in(codes)
                 )
                 .fetch();

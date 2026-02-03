@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "vacation_plan_policy")
-public class VacationPlanPolicy extends AuditingFields {
+public class VacationPlanPolicy extends AuditingFieldsWithIp {
     /**
      * 플랜-정책 매핑 아이디<br>
      * 테이블 관리용 seq

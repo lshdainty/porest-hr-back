@@ -1,6 +1,6 @@
 package com.porest.hr.holiday.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.CountryCode;
 import com.porest.hr.holiday.type.HolidayType;
 import com.porest.core.type.YNType;
@@ -17,7 +17,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "holiday")
-public class Holiday extends AuditingFields {
+public class Holiday extends AuditingFieldsWithIp {
     /**
      * 공휴일 아이디<br>
      * 테이블 관리용 seq

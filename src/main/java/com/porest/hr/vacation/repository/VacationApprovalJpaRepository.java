@@ -39,7 +39,7 @@ public class VacationApprovalJpaRepository implements VacationApprovalRepository
                         "select distinct va.vacationGrant.id from VacationApproval va " +
                                 "where va.approver.id = :approverId " +
                                 "and va.isDeleted = :isDeleted " +
-                                "and function('year', va.vacationGrant.createDate) = :year", Long.class)
+                                "and function('year', va.vacationGrant.createAt) = :year", Long.class)
                 .setParameter("approverId", approverId)
                 .setParameter("isDeleted", YNType.N)
                 .setParameter("year", year)

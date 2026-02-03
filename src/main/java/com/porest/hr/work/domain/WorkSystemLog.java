@@ -1,7 +1,7 @@
 package com.porest.hr.work.domain;
 
 import com.porest.hr.common.converter.SystemTypeConverter;
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.hr.common.type.SystemType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "work_system_logs")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WorkSystemLog extends AuditingFields {
+public class WorkSystemLog extends AuditingFieldsWithIp {
     /**
      * 시스템 로그 아이디<br>
      */

@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
 import jakarta.persistence.*;
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
                 name = "uk_vacation_grant_schedule_user_policy",
                 columnNames = {"user_no", "vacation_policy_id"}
         ))
-public class VacationGrantSchedule extends AuditingFields {
+public class VacationGrantSchedule extends AuditingFieldsWithIp {
     /**
      * 스케줄 아이디<br>
      * 자동 생성되는 고유 식별자

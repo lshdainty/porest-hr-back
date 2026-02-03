@@ -1,6 +1,6 @@
 package com.porest.hr.permission.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.permission.type.ActionType;
 import com.porest.hr.permission.type.ResourceType;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "permissions")
-public class Permission extends AuditingFields {
+public class Permission extends AuditingFieldsWithIp {
     /**
      * 권한 아이디<br>
      * 자동 생성되는 고유 식별자

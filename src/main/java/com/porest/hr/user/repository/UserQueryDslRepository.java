@@ -130,8 +130,8 @@ public class UserQueryDslRepository implements UserRepository {
                 .selectFrom(user)
                 .where(user.isDeleted.eq(YNType.Y)
                         .and(user.company.ne(DefaultCompanyType.SYSTEM))
-                        .and(user.modifyDate.goe(startDate))
-                        .and(user.modifyDate.lt(endDate)))
+                        .and(user.modifyAt.goe(startDate))
+                        .and(user.modifyAt.lt(endDate)))
                 .fetch();
     }
 }

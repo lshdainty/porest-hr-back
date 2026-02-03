@@ -1,6 +1,6 @@
 package com.porest.hr.work.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.work.type.CodeType;
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "work_code")
-public class WorkCode extends AuditingFields {
+public class WorkCode extends AuditingFieldsWithIp {
     /**
      * 업무 코드 아이디<br>
      * 코드 관리용 ID

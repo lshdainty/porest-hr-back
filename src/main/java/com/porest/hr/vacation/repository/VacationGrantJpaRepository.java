@@ -179,7 +179,7 @@ public class VacationGrantJpaRepository implements VacationGrantRepository {
                                 "where vg.user.id = :userId " +
                                 "and vg.isDeleted = :isDeleted " +
                                 "and vg.policy.grantMethod = :grantMethod " +
-                                "and function('year', vg.createDate) = :year " +
+                                "and function('year', vg.createAt) = :year " +
                                 "order by vg.requestStartTime desc", VacationGrant.class)
                 .setParameter("userId", userId)
                 .setParameter("isDeleted", YNType.N)
@@ -199,7 +199,7 @@ public class VacationGrantJpaRepository implements VacationGrantRepository {
                                 "join fetch vg.user " +
                                 "join fetch vg.policy " +
                                 "where vg.id in :ids and vg.isDeleted = :isDeleted " +
-                                "order by vg.createDate desc", VacationGrant.class)
+                                "order by vg.createAt desc", VacationGrant.class)
                 .setParameter("ids", vacationGrantIds)
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();

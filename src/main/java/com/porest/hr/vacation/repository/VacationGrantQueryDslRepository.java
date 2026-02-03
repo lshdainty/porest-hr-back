@@ -158,7 +158,7 @@ public class VacationGrantQueryDslRepository implements VacationGrantRepository 
                 .where(vacationGrant.user.id.eq(userId)
                         .and(vacationGrant.isDeleted.eq(YNType.N))
                         .and(vacationGrant.policy.grantMethod.eq(com.porest.hr.vacation.type.GrantMethod.ON_REQUEST))
-                        .and(vacationGrant.createDate.year().eq(year)))
+                        .and(vacationGrant.createAt.year().eq(year)))
                 .orderBy(vacationGrant.requestStartTime.desc())
                 .fetch();
     }
@@ -175,7 +175,7 @@ public class VacationGrantQueryDslRepository implements VacationGrantRepository 
                 .join(vacationGrant.policy).fetchJoin()
                 .where(vacationGrant.id.in(vacationGrantIds)
                         .and(vacationGrant.isDeleted.eq(YNType.N)))
-                .orderBy(vacationGrant.createDate.desc())
+                .orderBy(vacationGrant.createAt.desc())
                 .fetch();
     }
 

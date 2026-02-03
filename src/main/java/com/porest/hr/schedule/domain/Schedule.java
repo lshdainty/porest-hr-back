@@ -1,6 +1,6 @@
 package com.porest.hr.schedule.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.schedule.type.ScheduleType;
 import com.porest.hr.user.domain.User;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "schedule")
-public class Schedule extends AuditingFields {
+public class Schedule extends AuditingFieldsWithIp {
     /**
      * 스케줄 아이디<br>
      * 테이블 관리용 seq

@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.vacation.type.GrantMethod;
 import jakarta.persistence.*;
@@ -23,7 +23,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "vacation_plan")
-public class VacationPlan extends AuditingFields {
+public class VacationPlan extends AuditingFieldsWithIp {
     /**
      * 휴가 플랜 아이디<br>
      * 자동 생성되는 고유 식별자

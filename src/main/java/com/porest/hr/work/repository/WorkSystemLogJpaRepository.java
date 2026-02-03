@@ -24,8 +24,8 @@ public class WorkSystemLogJpaRepository implements WorkSystemLogRepository {
     public Optional<WorkSystemLog> findByPeriodAndCode(LocalDateTime startDateTime, LocalDateTime endDateTime, SystemType code) {
         List<WorkSystemLog> result = em.createQuery(
                         "select wsl from WorkSystemLog wsl " +
-                                "where wsl.createDate >= :startDateTime " +
-                                "and wsl.createDate < :endDateTime " +
+                                "where wsl.createAt >= :startDateTime " +
+                                "and wsl.createAt < :endDateTime " +
                                 "and wsl.code = :code", WorkSystemLog.class)
                 .setParameter("startDateTime", startDateTime)
                 .setParameter("endDateTime", endDateTime)
@@ -38,8 +38,8 @@ public class WorkSystemLogJpaRepository implements WorkSystemLogRepository {
     public List<SystemType> findCodesByPeriodAndCodes(LocalDateTime startDateTime, LocalDateTime endDateTime, List<SystemType> codes) {
         return em.createQuery(
                         "select wsl.code from WorkSystemLog wsl " +
-                                "where wsl.createDate >= :startDateTime " +
-                                "and wsl.createDate < :endDateTime " +
+                                "where wsl.createAt >= :startDateTime " +
+                                "and wsl.createAt < :endDateTime " +
                                 "and wsl.code in :codes", SystemType.class)
                 .setParameter("startDateTime", startDateTime)
                 .setParameter("endDateTime", endDateTime)

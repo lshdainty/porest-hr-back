@@ -45,7 +45,7 @@ public class VacationApprovalQueryDslRepository implements VacationApprovalRepos
                 .from(vacationApproval)
                 .where(vacationApproval.approver.id.eq(approverId)
                         .and(vacationApproval.isDeleted.eq(YNType.N))
-                        .and(vacationApproval.vacationGrant.createDate.year().eq(year)))
+                        .and(vacationApproval.vacationGrant.createAt.year().eq(year)))
                 .distinct()
                 .fetch();
     }

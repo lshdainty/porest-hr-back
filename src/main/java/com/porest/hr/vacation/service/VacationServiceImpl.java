@@ -1233,7 +1233,7 @@ public class VacationServiceImpl implements VacationService {
                             .requestEndTime(grant.getRequestEndTime())
                             .requestDesc(grant.getRequestDesc())
                             .grantStatus(grant.getStatus())
-                            .createDate(grant.getCreateDate())
+                            .createDate(grant.getCreateAt())
                             .currentApproverId(currentApprover != null ? currentApprover.getId() : null)
                             .currentApproverName(currentApprover != null ? currentApprover.getName() : null)
                             .approvers(approvalMap.getOrDefault(grant.getId(), List.of()))
@@ -1305,7 +1305,7 @@ public class VacationServiceImpl implements VacationService {
                             .requestEndTime(grant.getRequestEndTime())
                             .requestDesc(grant.getRequestDesc())
                             .grantStatus(grant.getStatus())
-                            .createDate(grant.getCreateDate())
+                            .createDate(grant.getCreateAt())
                             .currentApproverId(currentApprover != null ? currentApprover.getId() : null)
                             .currentApproverName(currentApprover != null ? currentApprover.getName() : null)
                             .approvers(approvalMap.getOrDefault(grant.getId(), List.of()))
@@ -1359,7 +1359,7 @@ public class VacationServiceImpl implements VacationService {
         // 5. 평균 처리 기간 (일수) - ACTIVE 또는 REJECTED 상태만 계산
         List<VacationGrant> processedGrants = allGrants.stream()
                 .filter(grant -> grant.getStatus() == GrantStatus.ACTIVE || grant.getStatus() == GrantStatus.REJECTED)
-                .filter(grant -> grant.getRequestStartTime() != null && grant.getModifyDate() != null)
+                .filter(grant -> grant.getRequestStartTime() != null && grant.getModifyAt() != null)
                 .toList();
 
         Double averageProcessingDays = 0.0;
@@ -1368,7 +1368,7 @@ public class VacationServiceImpl implements VacationService {
                     .mapToLong(grant -> {
                         Duration duration = Duration.between(
                                 grant.getRequestStartTime(),
-                                grant.getModifyDate()
+                                grant.getModifyAt()
                         );
                         return duration.toDays();
                     })

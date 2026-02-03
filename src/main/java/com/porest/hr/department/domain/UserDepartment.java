@@ -1,6 +1,6 @@
 package com.porest.hr.department.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "user_department")
-public class UserDepartment extends AuditingFields {
+public class UserDepartment extends AuditingFieldsWithIp {
     /**
      * 사용자-부서 매핑 아이디<br>
      * 테이블 관리용 seq

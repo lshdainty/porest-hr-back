@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.vacation.type.ApprovalStatus;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "vacation_approval")
-public class VacationApproval extends AuditingFields {
+public class VacationApproval extends AuditingFieldsWithIp {
     /**
      * 휴가 승인 아이디<br>
      * 테이블 관리용 seq

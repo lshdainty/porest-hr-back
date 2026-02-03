@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.vacation.type.EffectiveType;
 import com.porest.hr.vacation.type.ExpirationType;
@@ -31,7 +31,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "vacation_policy")
-public class VacationPolicy extends AuditingFields {
+public class VacationPolicy extends AuditingFieldsWithIp {
     /**
      * 휴가 정책 아이디<br>
      * 테이블 관리용 seq

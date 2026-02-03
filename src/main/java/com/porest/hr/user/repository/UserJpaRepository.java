@@ -124,8 +124,8 @@ public class UserJpaRepository implements UserRepository {
                 "select u from User u " +
                 "where u.isDeleted = :isDeleted " +
                 "and u.company != :systemCompany " +
-                "and u.modifyDate >= :startDate " +
-                "and u.modifyDate < :endDate", User.class)
+                "and u.modifyAt >= :startDate " +
+                "and u.modifyAt < :endDate", User.class)
                 .setParameter("isDeleted", YNType.Y)
                 .setParameter("systemCompany", DefaultCompanyType.SYSTEM)
                 .setParameter("startDate", startDate)

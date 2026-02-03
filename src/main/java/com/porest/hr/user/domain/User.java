@@ -1,7 +1,7 @@
 package com.porest.hr.user.domain;
 
 import com.porest.hr.common.converter.CompanyTypeConverter;
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.CountryCode;
 import com.porest.hr.common.type.CompanyType;
 import com.porest.hr.department.domain.UserDepartment;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "users")
-public class User extends AuditingFields {
+public class User extends AuditingFieldsWithIp {
     /**
      * 유저 순번<br>
      * HR 내부 관리용 PK (auto increment)

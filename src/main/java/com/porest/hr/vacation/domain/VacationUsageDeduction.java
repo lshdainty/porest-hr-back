@@ -1,6 +1,6 @@
 package com.porest.hr.vacation.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "vacation_usage_deduction")
-public class VacationUsageDeduction extends AuditingFields {
+public class VacationUsageDeduction extends AuditingFieldsWithIp {
     /**
      * 휴가 사용 차감 내역 아이디<br>
      * 테이블 관리용 seq

@@ -48,7 +48,7 @@ repositories {
 
 dependencies {
     // ==================== Private Codes (GitHub Packages) ====================
-    implementation 'com.porest:porest-core:2.0.0'
+    implementation 'com.porest:porest-core:2.0.1'
     implementation 'com.lshdainty:porest-back-skc:1.0.0' // optional: 회사별 타입 사용 시 필요
 
     // ==================== Spring Boot Starters ====================

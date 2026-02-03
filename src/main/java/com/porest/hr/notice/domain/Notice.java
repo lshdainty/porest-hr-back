@@ -1,6 +1,6 @@
 package com.porest.hr.notice.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.notice.type.NoticeType;
 import com.porest.hr.user.domain.User;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "notice")
-public class Notice extends AuditingFields {
+public class Notice extends AuditingFieldsWithIp {
     /**
      * 공지사항 아이디<br>
      * 테이블 관리용 seq

@@ -50,7 +50,7 @@ public class NoticeQueryDslRepository implements NoticeRepository {
                 .selectFrom(notice)
                 .leftJoin(notice.writer).fetchJoin()
                 .where(isNotDeleted())
-                .orderBy(notice.isPinned.desc(), notice.createDate.desc())
+                .orderBy(notice.isPinned.desc(), notice.createAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -70,7 +70,7 @@ public class NoticeQueryDslRepository implements NoticeRepository {
                 .leftJoin(notice.writer).fetchJoin()
                 .where(notice.type.eq(type)
                         .and(isNotDeleted()))
-                .orderBy(notice.isPinned.desc(), notice.createDate.desc())
+                .orderBy(notice.isPinned.desc(), notice.createAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -91,7 +91,7 @@ public class NoticeQueryDslRepository implements NoticeRepository {
                 .leftJoin(notice.writer).fetchJoin()
                 .where(notice.title.containsIgnoreCase(keyword)
                         .and(isNotDeleted()))
-                .orderBy(notice.isPinned.desc(), notice.createDate.desc())
+                .orderBy(notice.isPinned.desc(), notice.createAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -112,7 +112,7 @@ public class NoticeQueryDslRepository implements NoticeRepository {
                 .leftJoin(notice.writer).fetchJoin()
                 .where(isActiveNotice(now)
                         .and(isNotDeleted()))
-                .orderBy(notice.isPinned.desc(), notice.createDate.desc())
+                .orderBy(notice.isPinned.desc(), notice.createAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -133,7 +133,7 @@ public class NoticeQueryDslRepository implements NoticeRepository {
                 .leftJoin(notice.writer).fetchJoin()
                 .where(notice.isPinned.eq(YNType.Y)
                         .and(isNotDeleted()))
-                .orderBy(notice.createDate.desc())
+                .orderBy(notice.createAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

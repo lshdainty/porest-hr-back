@@ -1,6 +1,6 @@
 package com.porest.hr.dues.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.hr.dues.type.DuesCalcType;
 import com.porest.hr.dues.type.DuesType;
 import jakarta.persistence.*;
@@ -15,7 +15,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "dues")
-public class Dues extends AuditingFields {
+public class Dues extends AuditingFieldsWithIp {
     /**
      * 회비 아이디<br>
      * 테이블 관리용 seq

@@ -42,7 +42,7 @@ public class NoticeJpaRepository implements NoticeRepository {
                         "select n from Notice n " +
                                 "left join fetch n.writer " +
                                 "where n.isDeleted = :isDeleted " +
-                                "order by n.isPinned desc, n.createDate desc", Notice.class)
+                                "order by n.isPinned desc, n.createAt desc", Notice.class)
                 .setParameter("isDeleted", YNType.N)
                 .setFirstResult((int) pageable.getOffset())
                 .setMaxResults(pageable.getPageSize())
@@ -62,7 +62,7 @@ public class NoticeJpaRepository implements NoticeRepository {
                         "select n from Notice n " +
                                 "left join fetch n.writer " +
                                 "where n.type = :type and n.isDeleted = :isDeleted " +
-                                "order by n.isPinned desc, n.createDate desc", Notice.class)
+                                "order by n.isPinned desc, n.createAt desc", Notice.class)
                 .setParameter("type", type)
                 .setParameter("isDeleted", YNType.N)
                 .setFirstResult((int) pageable.getOffset())
@@ -84,7 +84,7 @@ public class NoticeJpaRepository implements NoticeRepository {
                         "select n from Notice n " +
                                 "left join fetch n.writer " +
                                 "where lower(n.title) like lower(:keyword) and n.isDeleted = :isDeleted " +
-                                "order by n.isPinned desc, n.createDate desc", Notice.class)
+                                "order by n.isPinned desc, n.createAt desc", Notice.class)
                 .setParameter("keyword", "%" + keyword + "%")
                 .setParameter("isDeleted", YNType.N)
                 .setFirstResult((int) pageable.getOffset())
@@ -108,7 +108,7 @@ public class NoticeJpaRepository implements NoticeRepository {
                                 "where n.startDate <= :now " +
                                 "and (n.endDate >= :now or n.endDate is null) " +
                                 "and n.isDeleted = :isDeleted " +
-                                "order by n.isPinned desc, n.createDate desc", Notice.class)
+                                "order by n.isPinned desc, n.createAt desc", Notice.class)
                 .setParameter("now", now)
                 .setParameter("isDeleted", YNType.N)
                 .setFirstResult((int) pageable.getOffset())
@@ -133,7 +133,7 @@ public class NoticeJpaRepository implements NoticeRepository {
                         "select n from Notice n " +
                                 "left join fetch n.writer " +
                                 "where n.isPinned = :isPinned and n.isDeleted = :isDeleted " +
-                                "order by n.createDate desc", Notice.class)
+                                "order by n.createAt desc", Notice.class)
                 .setParameter("isPinned", YNType.Y)
                 .setParameter("isDeleted", YNType.N)
                 .setFirstResult((int) pageable.getOffset())

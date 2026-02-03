@@ -1,6 +1,6 @@
 package com.porest.hr.work.domain;
 
-import com.porest.hr.common.domain.AuditingFields;
+import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
 import jakarta.persistence.*;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // -> protected Order() {}와 동일한 의미 (롬복으로 생성자 막기)
 @Table(name = "work_history")
-public class WorkHistory extends AuditingFields {
+public class WorkHistory extends AuditingFieldsWithIp {
     /**
      * 이력 관리용 ID
      */

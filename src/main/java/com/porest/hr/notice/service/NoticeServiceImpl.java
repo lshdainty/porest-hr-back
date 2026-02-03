@@ -166,8 +166,8 @@ public class NoticeServiceImpl implements NoticeService {
                 .viewCount(notice.getViewCount())
                 .startDate(notice.getStartDate())
                 .endDate(notice.getEndDate())
-                .createDate(notice.getCreateDate())
-                .modifyDate(notice.getModifyDate())
+                .createDate(notice.getCreateAt())
+                .modifyDate(notice.getModifyAt())
                 .build();
     }
 }

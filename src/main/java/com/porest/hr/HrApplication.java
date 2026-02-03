@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.porest.hr", "com.porest.core"})
 public class HrApplication {
 
     public static void main(String[] args) {
