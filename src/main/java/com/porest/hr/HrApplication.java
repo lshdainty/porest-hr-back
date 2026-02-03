@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @EnableScheduling
 @SpringBootApplication
-public class PorestApplication {
+public class HrApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PorestApplication.class, args);
+        SpringApplication.run(HrApplication.class, args);
     }
 
 }
