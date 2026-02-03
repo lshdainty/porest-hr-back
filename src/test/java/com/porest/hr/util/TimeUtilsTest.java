@@ -1,7 +1,7 @@
 package com.porest.hr.util;
 
 import com.porest.core.exception.InvalidValueException;
-import com.porest.core.util.PorestTime;
+import com.porest.core.util.TimeUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,14 +13,14 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("porest Time Util 테스트")
-class PorestTimeTest {
+@DisplayName("TimeUtils 테스트")
+class TimeUtilsTest {
 
     @Test
     @DisplayName("시작 시간이 종료 시간 이후인지 확인 - 성공")
     void isAfterThanEndDateSuccessTest() {
         // Given & When & Then
-        assertThat(PorestTime.isAfterThanEndDate(
+        assertThat(TimeUtils.isAfter(
                 LocalDateTime.of(2025, 1, 2, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0))
         ).isTrue();
@@ -30,7 +30,7 @@ class PorestTimeTest {
     @DisplayName("시작 시간이 종료 시간 이후인지 확인 - 실패 (시작 시간이 종료 시간 이전임)")
     void isAfterThanEndDateFailTest() {
         // Given & When & Then
-        assertThat(PorestTime.isAfterThanEndDate(
+        assertThat(TimeUtils.isAfter(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 2, 0, 0, 0))
         ).isFalse();
@@ -40,7 +40,7 @@ class PorestTimeTest {
     @DisplayName("시작 시간이 종료 시간 이후인지 확인 - 실패 (시작 시간과 종료 시간 동일함)")
     void isAfterThanEndDateSuccessTestSameTime() {
         // Given & When & Then
-        assertThat(PorestTime.isAfterThanEndDate(
+        assertThat(TimeUtils.isAfter(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0))
         ).isFalse();
@@ -50,7 +50,7 @@ class PorestTimeTest {
     @DisplayName("시작 시간과 종료 시간 사이의 날짜 목록 구하기 - 성공")
     void getBetweenDatesSuccessTest() {
         // Given & When & Then
-        assertThat(PorestTime.getBetweenDates(
+        assertThat(TimeUtils.getDateRange(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 5, 0, 0, 0)
         )).containsExactly(
@@ -67,7 +67,7 @@ class PorestTimeTest {
     void getBetweenDatesSuccessTestReverseStartEndDate() {
         // Given & When & Then
         assertThrows(InvalidValueException.class, () -> {
-            PorestTime.getBetweenDates(
+            TimeUtils.getDateRange(
                     LocalDateTime.of(2025, 1, 10, 0, 0, 0),
                     LocalDateTime.of(2025, 1, 1, 0, 0, 0)
             );
@@ -78,7 +78,7 @@ class PorestTimeTest {
     @DisplayName("시작 시간과 종료 시간 사이의 요일에 해당하는 날짜 목록 구하기 - 성공")
     void getBetweenDatesByDayOfWeekSuccessTest() {
         // Given & When & Then
-        assertThat(PorestTime.getBetweenDatesByDayOfWeek(
+        assertThat(TimeUtils.filterByDayOfWeek(
                 LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2025, 1, 10, 0, 0, 0),
                 new int[]{6, 7}
@@ -93,7 +93,7 @@ class PorestTimeTest {
     void getBetweenDatesByDayOfWeekSuccessTestWrongDay() {
         // Given & When & Then
         assertThrows(InvalidValueException.class, () -> {
-            PorestTime.getBetweenDatesByDayOfWeek(
+            TimeUtils.filterByDayOfWeek(
                     LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     LocalDateTime.of(2025, 1, 10, 0, 0, 0),
                     new int[]{8}
@@ -110,7 +110,7 @@ class PorestTimeTest {
         int[] daysOfWeek = {1}; // 월요일만
 
         // When
-        List<LocalDate> result = PorestTime.getBetweenDatesByDayOfWeek(start, end, daysOfWeek);
+        List<LocalDate> result = TimeUtils.filterByDayOfWeek(start, end, daysOfWeek);
 
         // Then
         assertThat(result).hasSize(1);
@@ -126,7 +126,7 @@ class PorestTimeTest {
         int[] daysOfWeek = {7}; // 일요일
 
         // When
-        List<LocalDate> result = PorestTime.getBetweenDatesByDayOfWeek(start, end, daysOfWeek);
+        List<LocalDate> result = TimeUtils.filterByDayOfWeek(start, end, daysOfWeek);
 
         // Then
         assertThat(result).hasSize(1);
@@ -142,7 +142,7 @@ class PorestTimeTest {
         int[] daysOfWeek = {1}; // 월요일만
 
         // When
-        List<LocalDate> result = PorestTime.getBetweenDatesByDayOfWeek(start, end, daysOfWeek);
+        List<LocalDate> result = TimeUtils.filterByDayOfWeek(start, end, daysOfWeek);
 
         // Then
         assertThat(result).isEmpty();
@@ -164,7 +164,7 @@ class PorestTimeTest {
         );
 
         // When & Then
-        assertThat(PorestTime.addAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
+        assertThat(TimeUtils.mergeDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
                 LocalDate.of(2025, 1, 1),
                 LocalDate.of(2025, 1, 2),
                 LocalDate.of(2025, 1, 3),
@@ -181,7 +181,7 @@ class PorestTimeTest {
         List<LocalDate> targetDates = List.of(LocalDate.of(2025, 1, 1));
 
         // When & Then
-        assertThat(PorestTime.addAllDates(sourceDates, targetDates))
+        assertThat(TimeUtils.mergeDates(sourceDates, targetDates))
                 .containsExactly(LocalDate.of(2025, 1, 1));
     }
 
@@ -201,7 +201,7 @@ class PorestTimeTest {
         );
 
         // When & Then
-        assertThat(PorestTime.removeAllDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
+        assertThat(TimeUtils.excludeDates(sourceDates, targetDates)).containsExactlyInAnyOrder(
                 LocalDate.of(2025, 1, 1),
                 LocalDate.of(2025, 1, 2)
         );
@@ -215,7 +215,7 @@ class PorestTimeTest {
         List<LocalDate> targetDates = List.of(LocalDate.of(2025, 1, 1));
 
         // When & Then
-        assertThat(PorestTime.removeAllDates(sourceDates, targetDates)).isEmpty();
+        assertThat(TimeUtils.excludeDates(sourceDates, targetDates)).isEmpty();
     }
 
     @Test
@@ -229,7 +229,7 @@ class PorestTimeTest {
         );
 
         // When & Then
-        assertThat(PorestTime.findMaxDateTime(dateTimes)).isEqualTo(LocalDateTime.of(2025, 1, 5, 12, 0, 0));
+        assertThat(TimeUtils.latest(dateTimes)).isEqualTo(LocalDateTime.of(2025, 1, 5, 12, 0, 0));
     }
 
     @Test
@@ -237,7 +237,7 @@ class PorestTimeTest {
     void findMaxDateTimeFailTestNull() {
         // When & Then
         assertThrows(InvalidValueException.class,
-                () -> PorestTime.findMaxDateTime(null));
+                () -> TimeUtils.latest(null));
     }
 
     @Test
@@ -245,7 +245,7 @@ class PorestTimeTest {
     void findMaxDateTimeFailTestEmpty() {
         // When & Then
         assertThrows(InvalidValueException.class,
-                () -> PorestTime.findMaxDateTime(Collections.emptyList()));
+                () -> TimeUtils.latest(Collections.emptyList()));
     }
 
     @Test
@@ -255,7 +255,7 @@ class PorestTimeTest {
         List<LocalDateTime> dateTimes = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
 
         // When & Then
-        assertThat(PorestTime.findMaxDateTime(dateTimes))
+        assertThat(TimeUtils.latest(dateTimes))
                 .isEqualTo(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
     }
 
@@ -270,7 +270,7 @@ class PorestTimeTest {
         );
 
         // When & Then
-        assertThat(PorestTime.findMinDateTime(dateTimes)).isEqualTo(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
+        assertThat(TimeUtils.earliest(dateTimes)).isEqualTo(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
     }
 
     @Test
@@ -278,7 +278,7 @@ class PorestTimeTest {
     void findMinDateTimeFailTestNull() {
         // When & Then
         assertThrows(InvalidValueException.class,
-                () -> PorestTime.findMinDateTime(null));
+                () -> TimeUtils.earliest(null));
     }
 
     @Test
@@ -286,7 +286,7 @@ class PorestTimeTest {
     void findMinDateTimeFailTestEmpty() {
         // When & Then
         assertThrows(InvalidValueException.class,
-                () -> PorestTime.findMinDateTime(Collections.emptyList()));
+                () -> TimeUtils.earliest(Collections.emptyList()));
     }
 
     @Test
@@ -296,7 +296,7 @@ class PorestTimeTest {
         List<LocalDateTime> dateTimes = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
 
         // When & Then
-        assertThat(PorestTime.findMinDateTime(dateTimes))
+        assertThat(TimeUtils.earliest(dateTimes))
                 .isEqualTo(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
     }
 }

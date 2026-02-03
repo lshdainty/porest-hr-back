@@ -1,6 +1,6 @@
 package com.porest.hr.common.config.database;
 
-import com.porest.core.util.PorestIP;
+import com.porest.core.util.HttpUtils;
 import com.porest.hr.common.domain.AuditingFields;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -17,7 +17,7 @@ public class IpAuditingEntityListener {
     @PrePersist
     public void setCreatedIp(Object entity) {
         if (entity instanceof AuditingFields auditingFields) {
-            String currentIp = PorestIP.getClientIp();
+            String currentIp = HttpUtils.getClientIp();
             if (currentIp != null) {
                 auditingFields.setCreateIP(currentIp);
             }
@@ -30,7 +30,7 @@ public class IpAuditingEntityListener {
     @PreUpdate
     public void setModifiedIp(Object entity) {
         if (entity instanceof AuditingFields auditingFields) {
-            String currentIp = PorestIP.getClientIp();
+            String currentIp = HttpUtils.getClientIp();
             if (currentIp != null) {
                 auditingFields.setModifyIP(currentIp);
             }

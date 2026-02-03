@@ -3,7 +3,7 @@ package com.porest.hr.service;
 import com.porest.core.exception.EntityNotFoundException;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
-import com.porest.core.util.PorestFile;
+import com.porest.core.util.FileUtils;
 import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.repository.DepartmentRepository;
 import com.porest.hr.user.domain.User;
@@ -121,10 +121,10 @@ class UserServiceTest {
                     .build();
             willDoNothing().given(userRepository).save(any(User.class));
 
-            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-                mocked.when(() -> PorestFile.copy(anyString(), anyString(), any(MessageResolver.class)))
+            try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                mocked.when(() -> FileUtils.copy(anyString(), anyString(), any(MessageResolver.class)))
                         .thenReturn(true);
-                mocked.when(() -> PorestFile.extractOriginalFilename(anyString(), isNull()))
+                mocked.when(() -> FileUtils.extractOriginalFilename(anyString(), isNull()))
                         .thenReturn("test.jpg");
 
                 // when
@@ -234,8 +234,8 @@ class UserServiceTest {
             );
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
 
-            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-                mocked.when(() -> PorestFile.generatePhysicalFilename("test.jpg", "some-uuid"))
+            try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                mocked.when(() -> FileUtils.generatePhysicalFilename("test.jpg", "some-uuid"))
                         .thenReturn("test.jpg_some-uuid");
 
                 // when
@@ -533,10 +533,10 @@ class UserServiceTest {
             MockMultipartFile mockFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test".getBytes());
             String physicalFilename = "test.jpg_some-uuid";
 
-            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-                mocked.when(() -> PorestFile.generatePhysicalFilename(eq("test.jpg"), anyString()))
+            try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                mocked.when(() -> FileUtils.generatePhysicalFilename(eq("test.jpg"), anyString()))
                         .thenReturn(physicalFilename);
-                mocked.when(() -> PorestFile.save(eq(mockFile), anyString(), eq(physicalFilename), eq(messageResolver)))
+                mocked.when(() -> FileUtils.save(eq(mockFile), anyString(), eq(physicalFilename), eq(messageResolver)))
                         .thenReturn(true);
 
                 // when
@@ -709,8 +709,8 @@ class UserServiceTest {
             String originalFilename = "test.jpg";
             String uuid = "some-uuid";
 
-            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-                mocked.when(() -> PorestFile.generatePhysicalFilename(originalFilename, uuid))
+            try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                mocked.when(() -> FileUtils.generatePhysicalFilename(originalFilename, uuid))
                         .thenReturn("test.jpg_some-uuid");
 
                 // when
@@ -728,8 +728,8 @@ class UserServiceTest {
             String originalFilename = null;
             String uuid = "some-uuid";
 
-            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-                mocked.when(() -> PorestFile.generatePhysicalFilename(originalFilename, uuid))
+            try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                mocked.when(() -> FileUtils.generatePhysicalFilename(originalFilename, uuid))
                         .thenReturn(null);
 
                 // when
@@ -753,10 +753,10 @@ class UserServiceTest {
                     .profileUUID("some-uuid")
                     .build();
 
-            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-                mocked.when(() -> PorestFile.copy(anyString(), anyString(), eq(messageResolver)))
+            try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                mocked.when(() -> FileUtils.copy(anyString(), anyString(), eq(messageResolver)))
                         .thenReturn(true);
-                mocked.when(() -> PorestFile.extractOriginalFilename(anyString(), isNull()))
+                mocked.when(() -> FileUtils.extractOriginalFilename(anyString(), isNull()))
                         .thenReturn("test.jpg");
 
                 // when
@@ -793,8 +793,8 @@ class UserServiceTest {
                     .profileUUID("some-uuid")
                     .build();
 
-            try (MockedStatic<PorestFile> mocked = mockStatic(PorestFile.class)) {
-                mocked.when(() -> PorestFile.copy(anyString(), anyString(), eq(messageResolver)))
+            try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                mocked.when(() -> FileUtils.copy(anyString(), anyString(), eq(messageResolver)))
                         .thenReturn(false);
 
                 // when

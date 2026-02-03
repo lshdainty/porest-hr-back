@@ -1,6 +1,6 @@
 package com.porest.hr.common.config.security;
 
-import com.porest.core.util.PorestIP;
+import com.porest.core.util.HttpUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -107,7 +107,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
             String method = request.getMethod();
             String uri = request.getRequestURI();
             String queryString = request.getQueryString();
-            String clientIp = PorestIP.getClientIp();
+            String clientIp = HttpUtils.getClientIp();
             String userId = getCurrentUserId();
             String userAgent = getUserAgent(request);
             String requestBody = getRequestBody(request);

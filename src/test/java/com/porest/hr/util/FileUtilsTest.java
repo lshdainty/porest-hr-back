@@ -3,7 +3,7 @@ package com.porest.hr.util;
 import com.porest.core.exception.ResourceNotFoundException;
 import com.porest.core.message.MessageKey;
 import com.porest.core.util.MessageResolver;
-import com.porest.core.util.PorestFile;
+import com.porest.core.util.FileUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +27,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("porest File Util 테스트")
-class PorestFileTest {
+@DisplayName("FileUtils 테스트")
+class FileUtilsTest {
 
     @Mock
     private MessageResolver messageResolver;
@@ -47,7 +47,7 @@ class PorestFileTest {
         String customFileName = "custom.txt";
 
         // When
-        boolean result = PorestFile.save(multipartFile, tempDir.toString(), customFileName, messageResolver);
+        boolean result = FileUtils.save(multipartFile, tempDir.toString(), customFileName, messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -67,7 +67,7 @@ class PorestFileTest {
         );
 
         // When
-        boolean result = PorestFile.save(multipartFile, tempDir.toString(), null, messageResolver);
+        boolean result = FileUtils.save(multipartFile, tempDir.toString(), null, messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -88,7 +88,7 @@ class PorestFileTest {
         String fileName = "test.txt";
 
         // When
-        boolean result = PorestFile.save(multipartFile, subDir.toString(), fileName, messageResolver);
+        boolean result = FileUtils.save(multipartFile, subDir.toString(), fileName, messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -101,7 +101,7 @@ class PorestFileTest {
     @DisplayName("파일 저장 - 실패 (null 파일)")
     void saveFailNullFile() {
         // Given & When & Then
-        assertThat(PorestFile.save(null, tempDir.toString(), "test.txt", messageResolver)).isFalse();
+        assertThat(FileUtils.save(null, tempDir.toString(), "test.txt", messageResolver)).isFalse();
     }
 
     @Test
@@ -111,7 +111,7 @@ class PorestFileTest {
         MockMultipartFile emptyFile = new MockMultipartFile("file", "", "text/plain", new byte[0]);
 
         // When & Then
-        assertThat(PorestFile.save(emptyFile, tempDir.toString(), "test.txt", messageResolver)).isFalse();
+        assertThat(FileUtils.save(emptyFile, tempDir.toString(), "test.txt", messageResolver)).isFalse();
     }
 
     @Test
@@ -123,7 +123,7 @@ class PorestFileTest {
         );
 
         // When & Then
-        assertThat(PorestFile.save(multipartFile, tempDir.toString(), null, messageResolver)).isFalse();
+        assertThat(FileUtils.save(multipartFile, tempDir.toString(), null, messageResolver)).isFalse();
     }
 
     @Test
@@ -141,7 +141,7 @@ class PorestFileTest {
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> PorestFile.save(mockFile, tempDir.toString(), "test.txt", messageResolver));
+                () -> FileUtils.save(mockFile, tempDir.toString(), "test.txt", messageResolver));
 
         assertThat(exception.getMessage()).isEqualTo("File save failed");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);
@@ -156,7 +156,7 @@ class PorestFileTest {
         Files.writeString(testFile, content);
 
         // When
-        byte[] result = PorestFile.read(testFile.toString(), messageResolver);
+        byte[] result = FileUtils.read(testFile.toString(), messageResolver);
 
         // Then
         assertThat(new String(result)).isEqualTo(content);
@@ -170,7 +170,7 @@ class PorestFileTest {
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> PorestFile.read(nonExistentPath, messageResolver));
+                () -> FileUtils.read(nonExistentPath, messageResolver));
     }
 
     @Test
@@ -182,7 +182,7 @@ class PorestFileTest {
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> PorestFile.read(directory.toString(), messageResolver));
+                () -> FileUtils.read(directory.toString(), messageResolver));
     }
 
     @Test
@@ -198,7 +198,7 @@ class PorestFileTest {
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> PorestFile.read(testFile.toString(), messageResolver));
+                () -> FileUtils.read(testFile.toString(), messageResolver));
     }
 
     @Test
@@ -211,7 +211,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.copy(sourceFile.toString(), targetFile.toString(), messageResolver);
+        boolean result = FileUtils.copy(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -231,7 +231,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.copy(sourceFile.toString(), targetFile.toString(), messageResolver);
+        boolean result = FileUtils.copy(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -249,7 +249,7 @@ class PorestFileTest {
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> PorestFile.copy(nonExistentSource, targetPath, messageResolver));
+                () -> FileUtils.copy(nonExistentSource, targetPath, messageResolver));
     }
 
     @Test
@@ -267,7 +267,7 @@ class PorestFileTest {
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> PorestFile.copy(sourceFile.toString(), targetFile.toString(), messageResolver));
+                () -> FileUtils.copy(sourceFile.toString(), targetFile.toString(), messageResolver));
 
         assertThat(exception.getMessage()).isEqualTo("File copy failed");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);
@@ -283,7 +283,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.move(sourceFile.toString(), targetFile.toString(), messageResolver);
+        boolean result = FileUtils.move(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -303,7 +303,7 @@ class PorestFileTest {
         Files.writeString(sourceFile, content);
 
         // When
-        boolean result = PorestFile.move(sourceFile.toString(), targetFile.toString(), messageResolver);
+        boolean result = FileUtils.move(sourceFile.toString(), targetFile.toString(), messageResolver);
 
         // Then
         assertThat(result).isTrue();
@@ -322,7 +322,7 @@ class PorestFileTest {
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> PorestFile.move(nonExistentSource, targetPath, messageResolver));
+                () -> FileUtils.move(nonExistentSource, targetPath, messageResolver));
     }
 
     @Test
@@ -340,7 +340,7 @@ class PorestFileTest {
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> PorestFile.move(sourceFile.toString(), targetFile.toString(), messageResolver));
+                () -> FileUtils.move(sourceFile.toString(), targetFile.toString(), messageResolver));
 
         assertThat(exception.getMessage()).isEqualTo("File move failed");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);
@@ -354,7 +354,7 @@ class PorestFileTest {
         String uuid = "550e8400-e29b-41d4-a716-446655440000";
 
         // When
-        String result = PorestFile.generatePhysicalFilename(originalFilename, uuid);
+        String result = FileUtils.generatePhysicalFilename(originalFilename, uuid);
 
         // Then
         assertThat(result).isEqualTo("document_550e8400-e29b-41d4-a716-446655440000.txt");
@@ -368,7 +368,7 @@ class PorestFileTest {
         String uuid = "550e8400-e29b-41d4-a716-446655440000";
 
         // When
-        String result = PorestFile.generatePhysicalFilename(originalFilename, uuid);
+        String result = FileUtils.generatePhysicalFilename(originalFilename, uuid);
 
         // Then
         assertThat(result).isEqualTo("document_550e8400-e29b-41d4-a716-446655440000");
@@ -378,14 +378,14 @@ class PorestFileTest {
     @DisplayName("물리적 파일명 생성 - 실패 (null 파일명)")
     void generatePhysicalFilenameFailNullFilename() {
         // Given & When & Then
-        assertThat(PorestFile.generatePhysicalFilename(null, "uuid")).isNull();
+        assertThat(FileUtils.generatePhysicalFilename(null, "uuid")).isNull();
     }
 
     @Test
     @DisplayName("물리적 파일명 생성 - 실패 (빈 파일명)")
     void generatePhysicalFilenameFailEmptyFilename() {
         // Given & When & Then
-        assertThat(PorestFile.generatePhysicalFilename("", "uuid")).isEqualTo("");
+        assertThat(FileUtils.generatePhysicalFilename("", "uuid")).isEqualTo("");
     }
 
     @Test
@@ -395,7 +395,7 @@ class PorestFileTest {
         String originalFilename = "document.txt";
 
         // When & Then
-        assertThat(PorestFile.generatePhysicalFilename(originalFilename, null))
+        assertThat(FileUtils.generatePhysicalFilename(originalFilename, null))
                 .isEqualTo(originalFilename);
     }
 
@@ -406,7 +406,7 @@ class PorestFileTest {
         String originalFilename = "document.txt";
 
         // When & Then
-        assertThat(PorestFile.generatePhysicalFilename(originalFilename, ""))
+        assertThat(FileUtils.generatePhysicalFilename(originalFilename, ""))
                 .isEqualTo(originalFilename);
     }
 
@@ -418,7 +418,7 @@ class PorestFileTest {
         String uuid = "550e8400-e29b-41d4-a716-446655440000";
 
         // When
-        String result = PorestFile.extractOriginalFilename(physicalFilename, uuid);
+        String result = FileUtils.extractOriginalFilename(physicalFilename, uuid);
 
         // Then
         assertThat(result).isEqualTo("document.txt");
@@ -431,7 +431,7 @@ class PorestFileTest {
         String physicalFilename = "document_550e8400-e29b-41d4-a716-446655440000.txt";
 
         // When
-        String result = PorestFile.extractOriginalFilename(physicalFilename, null);
+        String result = FileUtils.extractOriginalFilename(physicalFilename, null);
 
         // Then
         assertThat(result).isEqualTo("document.txt");
@@ -444,7 +444,7 @@ class PorestFileTest {
         String physicalFilename = "document.txt";
 
         // When
-        String result = PorestFile.extractOriginalFilename(physicalFilename, null);
+        String result = FileUtils.extractOriginalFilename(physicalFilename, null);
 
         // Then
         assertThat(result).isEqualTo("document.txt");
@@ -454,14 +454,14 @@ class PorestFileTest {
     @DisplayName("원본 파일명 추출 - 실패 (null 파일명)")
     void extractOriginalFilenameFailNull() {
         // Given & When & Then
-        assertThat(PorestFile.extractOriginalFilename(null, "uuid")).isNull();
+        assertThat(FileUtils.extractOriginalFilename(null, "uuid")).isNull();
     }
 
     @Test
     @DisplayName("원본 파일명 추출 - 실패 (빈 파일명)")
     void extractOriginalFilenameFailEmpty() {
         // Given & When & Then
-        assertThat(PorestFile.extractOriginalFilename("", "uuid")).isNull();
+        assertThat(FileUtils.extractOriginalFilename("", "uuid")).isNull();
     }
 
     @Test
@@ -472,7 +472,7 @@ class PorestFileTest {
         String uuid = "550e8400-e29b-41d4-a716-446655440000";
 
         // When
-        String result = PorestFile.extractUuid(physicalFilename, uuid);
+        String result = FileUtils.extractUuid(physicalFilename, uuid);
 
         // Then
         assertThat(result).isEqualTo(uuid);
@@ -485,7 +485,7 @@ class PorestFileTest {
         String physicalFilename = "document_550e8400-e29b-41d4-a716-446655440000.txt";
 
         // When
-        String result = PorestFile.extractUuid(physicalFilename, null);
+        String result = FileUtils.extractUuid(physicalFilename, null);
 
         // Then
         assertThat(result).isEqualTo("550e8400-e29b-41d4-a716-446655440000");
@@ -498,7 +498,7 @@ class PorestFileTest {
         String physicalFilename = "document_550e8400-e29b-41d4-a716-446655440000";
 
         // When
-        String result = PorestFile.extractUuid(physicalFilename, null);
+        String result = FileUtils.extractUuid(physicalFilename, null);
 
         // Then
         assertThat(result).isEqualTo("550e8400-e29b-41d4-a716-446655440000");
@@ -511,7 +511,7 @@ class PorestFileTest {
         String physicalFilename = "document.txt";
 
         // When
-        String result = PorestFile.extractUuid(physicalFilename, null);
+        String result = FileUtils.extractUuid(physicalFilename, null);
 
         // Then
         assertThat(result).isNull();
@@ -521,14 +521,14 @@ class PorestFileTest {
     @DisplayName("UUID 추출 - 실패 (null 파일명)")
     void extractUuidFailNull() {
         // Given & When & Then
-        assertThat(PorestFile.extractUuid(null, null)).isNull();
+        assertThat(FileUtils.extractUuid(null, null)).isNull();
     }
 
     @Test
     @DisplayName("UUID 추출 - 실패 (빈 파일명)")
     void extractUuidFailEmpty() {
         // Given & When & Then
-        assertThat(PorestFile.extractUuid("", null)).isNull();
+        assertThat(FileUtils.extractUuid("", null)).isNull();
     }
 
     @Test
@@ -538,7 +538,7 @@ class PorestFileTest {
         String physicalFilename = "document.txt";
 
         // When
-        String result = PorestFile.extractUuid(physicalFilename, null);
+        String result = FileUtils.extractUuid(physicalFilename, null);
 
         // Then
         assertThat(result).isNull();
@@ -551,7 +551,7 @@ class PorestFileTest {
         String physicalFilename = "document_.txt";
 
         // When
-        String result = PorestFile.extractUuid(physicalFilename, null);
+        String result = FileUtils.extractUuid(physicalFilename, null);
 
         // Then
         assertThat(result).isNull();

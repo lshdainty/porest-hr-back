@@ -5,7 +5,7 @@ import com.porest.core.exception.EntityNotFoundException;
 import com.porest.core.exception.ErrorCode;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.hr.common.exception.HrErrorCode;
-import com.porest.core.util.PorestTime;
+import com.porest.core.util.TimeUtils;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
 import com.porest.hr.department.domain.Department;
@@ -86,7 +86,7 @@ public class VacationServiceImpl implements VacationService {
         User user = userService.checkUserExist(data.getUserId());
 
         // 2. 시작, 종료시간 비교
-        if (PorestTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) {
+        if (TimeUtils.isAfter(data.getStartDate(), data.getEndDate())) {
             log.warn("휴가 사용 실패 - 시작일이 종료일보다 이후: startDate={}, endDate={}", data.getStartDate(), data.getEndDate());
             throw new InvalidValueException(HrErrorCode.VACATION_INVALID_DATE);
         }
@@ -113,7 +113,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         // 5. 주말 리스트 조회
-        List<LocalDate> weekDays = PorestTime.getBetweenDatesByDayOfWeek(data.getStartDate(), data.getEndDate(), new int[]{6, 7});
+        List<LocalDate> weekDays = TimeUtils.filterByDayOfWeek(data.getStartDate(), data.getEndDate(), new int[]{6, 7});
 
         // 6. 공휴일 리스트 조회 (사용자의 국가 코드 기반)
         CountryCode countryCode = user.getCountryCode();
@@ -126,14 +126,14 @@ public class VacationServiceImpl implements VacationService {
                 .map(h -> h.getDate())
                 .toList();
 
-        weekDays = PorestTime.addAllDates(weekDays, holidays);
+        weekDays = TimeUtils.mergeDates(weekDays, holidays);
 
         // 7. 두 날짜 간 모든 날짜 가져오기
-        List<LocalDate> betweenDates = PorestTime.getBetweenDates(data.getStartDate(), data.getEndDate());
+        List<LocalDate> betweenDates = TimeUtils.getDateRange(data.getStartDate(), data.getEndDate());
         log.info("betweenDates : {}, weekDays : {}", betweenDates, weekDays);
 
         // 8. 사용자가 캘린더에서 선택한 날짜 중 휴일, 공휴일 제거
-        betweenDates = PorestTime.removeAllDates(betweenDates, weekDays);
+        betweenDates = TimeUtils.excludeDates(betweenDates, weekDays);
         log.info("remainDays : {}", betweenDates);
 
         // 9. 등록하려는 총 사용시간 계산
@@ -320,7 +320,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         // 3. 삭제 가능 시점 체크 (현재 시간이 사용 시작일 이전인지 확인)
-        if (PorestTime.isAfterThanEndDate(LocalDateTime.now(), usage.getStartDate())) {
+        if (TimeUtils.isAfter(LocalDateTime.now(), usage.getStartDate())) {
             log.warn("휴가 사용 취소 실패 - 시작일 이후 취소 불가: vacationUsageId={}, startDate={}", vacationUsageId, usage.getStartDate());
             throw new BusinessRuleViolationException(HrErrorCode.VACATION_CANNOT_CANCEL);
         }
@@ -784,7 +784,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         // 6. 부여일과 만료일 검증 (부여일 < 만료일)
-        if (PorestTime.isAfterThanEndDate(grantDate, expiryDate)) {
+        if (TimeUtils.isAfter(grantDate, expiryDate)) {
             log.warn("휴가 수동 부여 실패 - 부여일이 만료일보다 이후: grantDate={}, expiryDate={}", grantDate, expiryDate);
             throw new InvalidValueException(HrErrorCode.VACATION_INVALID_DATE);
         }

@@ -5,7 +5,7 @@ import com.porest.core.exception.EntityNotFoundException;
 import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.core.type.YNType;
-import com.porest.core.util.PorestTime;
+import com.porest.core.util.TimeUtils;
 import com.porest.hr.schedule.domain.Schedule;
 import com.porest.hr.schedule.repository.ScheduleRepository;
 import com.porest.hr.schedule.service.dto.ScheduleServiceDto;
@@ -35,7 +35,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         // 유저 조회
         User user = userService.checkUserExist(data.getUserId());
 
-        if (PorestTime.isAfterThanEndDate(data.getStartDate(), data.getEndDate())) {
+        if (TimeUtils.isAfter(data.getStartDate(), data.getEndDate())) {
             log.warn("일정 등록 실패 - 시작일이 종료일보다 이후: startDate={}, endDate={}", data.getStartDate(), data.getEndDate());
             throw new InvalidValueException(HrErrorCode.SCHEDULE_INVALID_DATE);
         }
@@ -64,7 +64,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public List<Schedule> searchSchedulesByPeriod(LocalDateTime start, LocalDateTime end) {
         log.debug("기간별 일정 조회: start={}, end={}", start, end);
-        if (PorestTime.isAfterThanEndDate(start, end)) {
+        if (TimeUtils.isAfter(start, end)) {
             log.warn("일정 조회 실패 - 시작일이 종료일보다 이후: start={}, end={}", start, end);
             throw new InvalidValueException(HrErrorCode.SCHEDULE_INVALID_DATE);
         }

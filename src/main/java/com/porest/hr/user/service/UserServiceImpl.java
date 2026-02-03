@@ -4,7 +4,7 @@ import com.porest.core.exception.EntityNotFoundException;
 import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.core.type.YNType;
 import com.porest.core.util.MessageResolver;
-import com.porest.core.util.PorestFile;
+import com.porest.core.util.FileUtils;
 import com.porest.hr.department.repository.DepartmentRepository;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.repository.RoleRepository;
@@ -228,9 +228,9 @@ public class UserServiceImpl implements UserService {
 
         String uuid = UUID.randomUUID().toString();
 
-        String physicalFilename = PorestFile.generatePhysicalFilename(originalFilename, uuid);
+        String physicalFilename = FileUtils.generatePhysicalFilename(originalFilename, uuid);
 
-        PorestFile.save(file, tempPath, physicalFilename, messageResolver);
+        FileUtils.save(file, tempPath, physicalFilename, messageResolver);
 
         String absolutePath = Paths.get(tempPath, physicalFilename).toString();
 
@@ -274,7 +274,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String generateProfileUrl(String originalFilename, String uuid) {
-        String physicalFilename = PorestFile.generatePhysicalFilename(originalFilename, uuid);
+        String physicalFilename = FileUtils.generatePhysicalFilename(originalFilename, uuid);
         if (physicalFilename == null) {
             return null;
         }
@@ -293,8 +293,8 @@ public class UserServiceImpl implements UserService {
             String tempFilePath = Paths.get(tempPath, physicalFileName).toString();
             String originFilePath = Paths.get(originPath, physicalFileName).toString();
 
-            if (PorestFile.copy(tempFilePath, originFilePath, messageResolver)) {
-                profileName = PorestFile.extractOriginalFilename(physicalFileName, null);
+            if (FileUtils.copy(tempFilePath, originFilePath, messageResolver)) {
+                profileName = FileUtils.extractOriginalFilename(physicalFileName, null);
                 profileUUID = data.getProfileUUID();
             }
         }
