@@ -62,7 +62,7 @@ public class VacationGrantQueryDslRepository implements VacationGrantRepository 
                 .selectFrom(vacationGrant)
                 .join(vacationGrant.user).fetchJoin()
                 .join(vacationGrant.policy).fetchJoin()
-                .where(vacationGrant.policy.id.eq(policyId)
+                .where(vacationGrant.policy.rowId.eq(policyId)
                         .and(vacationGrant.isDeleted.eq(YNType.N)))
                 .fetch();
     }
@@ -145,7 +145,7 @@ public class VacationGrantQueryDslRepository implements VacationGrantRepository 
                 .selectFrom(vacationGrant)
                 .join(vacationGrant.user).fetchJoin()
                 .join(vacationGrant.policy).fetchJoin()
-                .where(vacationGrant.id.eq(id))
+                .where(vacationGrant.rowId.eq(id))
                 .fetchOne());
     }
 
@@ -173,7 +173,7 @@ public class VacationGrantQueryDslRepository implements VacationGrantRepository 
                 .selectFrom(vacationGrant)
                 .join(vacationGrant.user).fetchJoin()
                 .join(vacationGrant.policy).fetchJoin()
-                .where(vacationGrant.id.in(vacationGrantIds)
+                .where(vacationGrant.rowId.in(vacationGrantIds)
                         .and(vacationGrant.isDeleted.eq(YNType.N)))
                 .orderBy(vacationGrant.createAt.desc())
                 .fetch();

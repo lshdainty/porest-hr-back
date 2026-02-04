@@ -80,7 +80,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private Authentication createAuthenticationFromHrToken(String token) {
         // JWT Claims에서 정보 추출
         String userId = jwtTokenProvider.getUserId(token);
-        Long ssoUserNo = jwtTokenProvider.getSsoUserNoFromHrToken(token);
+        Long ssoUserRowId = jwtTokenProvider.getSsoUserRowIdFromHrToken(token);
         String name = jwtTokenProvider.getNameFromHrToken(token);
         String email = jwtTokenProvider.getEmailFromHrToken(token);
         List<String> roles = jwtTokenProvider.getRolesFromHrToken(token);
@@ -95,7 +95,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // JwtClaimsPrincipal 생성 (User는 필요할 때 Lazy Loading)
         JwtClaimsPrincipal principal = new JwtClaimsPrincipal(
-                userId, ssoUserNo, name, email, roles, permissions,
+                userId, ssoUserRowId, name, email, roles, permissions,
                 () -> userService.findUserById(userId)  // Lazy Loading Supplier
         );
 

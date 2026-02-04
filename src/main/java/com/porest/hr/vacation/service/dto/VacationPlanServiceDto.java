@@ -26,7 +26,7 @@ public class VacationPlanServiceDto {
      */
     public static VacationPlanServiceDto from(VacationPlan plan) {
         return VacationPlanServiceDto.builder()
-                .id(plan.getId())
+                .id(plan.getRowId())
                 .code(plan.getCode())
                 .name(plan.getName())
                 .desc(plan.getDesc())
@@ -46,7 +46,7 @@ public class VacationPlanServiceDto {
                     return orderA.compareTo(orderB);
                 })
                 .map(vpp -> VacationPolicyServiceDto.builder()
-                        .id(vpp.getVacationPolicy().getId())
+                        .id(vpp.getVacationPolicy().getRowId())
                         .name(vpp.getVacationPolicy().getName())
                         .desc(vpp.getVacationPolicy().getDesc())
                         .vacationType(vpp.getVacationPolicy().getVacationType())
@@ -64,7 +64,7 @@ public class VacationPlanServiceDto {
                 .toList();
 
         return VacationPlanServiceDto.builder()
-                .id(plan.getId())
+                .id(plan.getRowId())
                 .code(plan.getCode())
                 .name(plan.getName())
                 .desc(plan.getDesc())

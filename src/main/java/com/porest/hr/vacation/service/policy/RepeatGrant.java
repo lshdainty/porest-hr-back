@@ -42,7 +42,7 @@ public class RepeatGrant implements VacationPolicyStrategy {
         );
 
         vacationPolicyRepository.save(vacationPolicy);
-        return vacationPolicy.getId();
+        return vacationPolicy.getRowId();
     }
 
     /**

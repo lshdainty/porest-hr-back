@@ -82,7 +82,7 @@ class WorkHistoryQueryDslRepositoryTest {
         em.clear();
 
         // then
-        Optional<WorkHistory> findHistory = workHistoryRepository.findById(workHistory.getId());
+        Optional<WorkHistory> findHistory = workHistoryRepository.findByRowId(workHistory.getRowId());
         assertThat(findHistory.isPresent()).isTrue();
         assertThat(findHistory.get().getContent()).isEqualTo("API 개발");
         assertThat(findHistory.get().getHours()).isEqualByComparingTo(new BigDecimal("8.0"));
@@ -92,7 +92,7 @@ class WorkHistoryQueryDslRepositoryTest {
     @DisplayName("단건 조회 시 업무이력이 없으면 빈 Optional 반환")
     void findByIdEmpty() {
         // when
-        Optional<WorkHistory> findHistory = workHistoryRepository.findById(999L);
+        Optional<WorkHistory> findHistory = workHistoryRepository.findByRowId(999L);
 
         // then
         assertThat(findHistory.isEmpty()).isTrue();
@@ -206,7 +206,7 @@ class WorkHistoryQueryDslRepositoryTest {
         em.clear();
 
         // when
-        WorkHistory foundHistory = workHistoryRepository.findById(workHistory.getId()).orElseThrow();
+        WorkHistory foundHistory = workHistoryRepository.findByRowId(workHistory.getRowId()).orElseThrow();
         workHistoryRepository.delete(foundHistory);
         em.flush();
         em.clear();
@@ -328,14 +328,14 @@ class WorkHistoryQueryDslRepositoryTest {
         em.clear();
 
         // when
-        WorkHistory foundHistory = workHistoryRepository.findById(workHistory.getId()).orElseThrow();
+        WorkHistory foundHistory = workHistoryRepository.findByRowId(workHistory.getRowId()).orElseThrow();
         foundHistory.updateWorkHistory(LocalDate.of(2025, 1, 2), null, null, null, null,
                 new BigDecimal("4.0"), "수정된 내용");
         em.flush();
         em.clear();
 
         // then
-        WorkHistory updatedHistory = workHistoryRepository.findById(workHistory.getId()).orElseThrow();
+        WorkHistory updatedHistory = workHistoryRepository.findByRowId(workHistory.getRowId()).orElseThrow();
         assertThat(updatedHistory.getDate()).isEqualTo(LocalDate.of(2025, 1, 2));
         assertThat(updatedHistory.getHours()).isEqualByComparingTo(new BigDecimal("4.0"));
         assertThat(updatedHistory.getContent()).isEqualTo("수정된 내용");
@@ -445,7 +445,7 @@ class WorkHistoryQueryDslRepositoryTest {
 
         // when
         WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
-        condition.setGroupSeq(group.getId());
+        condition.setGroupSeq(group.getRowId());
         List<WorkHistory> histories = workHistoryRepository.findAll(condition);
 
         // then
@@ -475,7 +475,7 @@ class WorkHistoryQueryDslRepositoryTest {
 
         // when
         WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
-        condition.setPartSeq(part.getId());
+        condition.setPartSeq(part.getRowId());
         List<WorkHistory> histories = workHistoryRepository.findAll(condition);
 
         // then
@@ -503,7 +503,7 @@ class WorkHistoryQueryDslRepositoryTest {
 
         // when
         WorkHistorySearchCondition condition = new WorkHistorySearchCondition();
-        condition.setDivisionSeq(division.getId());
+        condition.setDivisionSeq(division.getRowId());
         List<WorkHistory> histories = workHistoryRepository.findAll(condition);
 
         // then

@@ -35,7 +35,7 @@ public class NoticeServiceImpl implements NoticeService {
 
         User writer = userService.checkUserExist(data.getWriterId());
 
-        validateNoticeDate(data.getStartDate(), data.getEndDate());
+        // 날짜 범위 검증은 @DateRange 어노테이션으로 Controller 레벨에서 처리
 
         Notice notice = Notice.createNotice(
                 writer,
@@ -48,9 +48,9 @@ public class NoticeServiceImpl implements NoticeService {
         );
 
         noticeRepository.save(notice);
-        log.info("공지사항 등록 완료: noticeId={}, writerId={}", notice.getId(), data.getWriterId());
+        log.info("공지사항 등록 완료: noticeId={}, writerId={}", notice.getRowId(), data.getWriterId());
 
-        return notice.getId();
+        return notice.getRowId();
     }
 
     @Override
@@ -112,7 +112,7 @@ public class NoticeServiceImpl implements NoticeService {
 
         Notice notice = checkNoticeExist(noticeId);
 
-        validateNoticeDate(data.getStartDate(), data.getEndDate());
+        // 날짜 범위 검증은 @DateRange 어노테이션으로 Controller 레벨에서 처리
 
         notice.updateNotice(
                 data.getTitle(),
@@ -139,7 +139,7 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public Notice checkNoticeExist(Long noticeId) {
-        Optional<Notice> notice = noticeRepository.findById(noticeId);
+        Optional<Notice> notice = noticeRepository.findByRowId(noticeId);
         if (notice.isEmpty() || YNType.isY(notice.get().getIsDeleted())) {
             log.warn("공지사항 조회 실패 - 존재하지 않는 공지사항: noticeId={}", noticeId);
             throw new EntityNotFoundException(HrErrorCode.NOTICE_NOT_FOUND);
@@ -147,16 +147,9 @@ public class NoticeServiceImpl implements NoticeService {
         return notice.get();
     }
 
-    private void validateNoticeDate(LocalDate startDate, LocalDate endDate) {
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            log.warn("공지사항 등록/수정 실패 - 시작일이 종료일보다 이후: startDate={}, endDate={}", startDate, endDate);
-            throw new InvalidValueException(HrErrorCode.NOTICE_INVALID_DATE);
-        }
-    }
-
     private NoticeServiceDto convertToDto(Notice notice) {
         return NoticeServiceDto.builder()
-                .id(notice.getId())
+                .id(notice.getRowId())
                 .writerId(notice.getWriter() != null ? notice.getWriter().getId() : null)
                 .writerName(notice.getWriter() != null ? notice.getWriter().getName() : null)
                 .title(notice.getTitle())

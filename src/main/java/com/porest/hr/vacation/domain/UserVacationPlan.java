@@ -19,19 +19,19 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_vacation_plan")
 public class UserVacationPlan extends AuditingFieldsWithIp {
     /**
-     * 사용자-플랜 매핑 아이디<br>
+     * 사용자-플랜 매핑 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_vacation_plan_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 사용자<br>
      * 어떤 사용자에게 플랜이 부여되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "user_row_id", nullable = false)
     private User user;
 
     /**
@@ -39,7 +39,7 @@ public class UserVacationPlan extends AuditingFieldsWithIp {
      * 어떤 플랜이 부여되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_plan_id", nullable = false)
+    @JoinColumn(name = "vacation_plan_row_id", nullable = false)
     private VacationPlan vacationPlan;
 
     /**

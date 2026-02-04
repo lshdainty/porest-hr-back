@@ -75,7 +75,7 @@ public class TokenExchangeService {
 
         // 8. 응답 생성
         TokenExchangeDto.UserInfo userInfo = TokenExchangeDto.UserInfo.builder()
-                .userNo(user.getSsoUserNo())
+                .userNo(user.getSsoUserRowId())
                 .userId(user.getId())
                 .userName(user.getName())
                 .userEmail(user.getEmail())

@@ -73,13 +73,13 @@ class HolidayServiceTest {
             Long id = 1L;
             Holiday holiday = Holiday.createHoliday("설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 1), YNType.Y, "🎉");
             setHolidayId(holiday, id);
-            given(holidayRepository.findById(id)).willReturn(Optional.of(holiday));
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.of(holiday));
 
             // when
-            Holiday result = holidayService.findById(id);
+            Holiday result = holidayService.findByRowId(id);
 
             // then
-            then(holidayRepository).should().findById(id);
+            then(holidayRepository).should().findByRowId(id);
             assertThat(result.getName()).isEqualTo("설날");
         }
 
@@ -88,10 +88,10 @@ class HolidayServiceTest {
         void findByIdFailNotFound() {
             // given
             Long id = 999L;
-            given(holidayRepository.findById(id)).willReturn(Optional.empty());
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> holidayService.findById(id))
+            assertThatThrownBy(() -> holidayService.findByRowId(id))
                     .isInstanceOf(EntityNotFoundException.class);
         }
     }
@@ -190,7 +190,7 @@ class HolidayServiceTest {
             Long id = 1L;
             Holiday holiday = Holiday.createHoliday("설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 1), YNType.Y, "🎉");
             setHolidayId(holiday, id);
-            given(holidayRepository.findById(id)).willReturn(Optional.of(holiday));
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.of(holiday));
 
             HolidayServiceDto data = HolidayServiceDto.builder()
                     .id(id)
@@ -202,7 +202,7 @@ class HolidayServiceTest {
             holidayService.editHoliday(data);
 
             // then
-            then(holidayRepository).should().findById(id);
+            then(holidayRepository).should().findByRowId(id);
             assertThat(holiday.getName()).isEqualTo("설날 연휴");
             assertThat(holiday.getDate()).isEqualTo(LocalDate.of(2025, 1, 30));
         }
@@ -213,7 +213,7 @@ class HolidayServiceTest {
             // given
             Long id = 999L;
             HolidayServiceDto data = HolidayServiceDto.builder().id(id).build();
-            given(holidayRepository.findById(id)).willReturn(Optional.empty());
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> holidayService.editHoliday(data))
@@ -230,14 +230,14 @@ class HolidayServiceTest {
             // given
             Long id = 1L;
             Holiday holiday = Holiday.createHoliday("설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 1), YNType.Y, "🎉");
-            given(holidayRepository.findById(id)).willReturn(Optional.of(holiday));
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.of(holiday));
             willDoNothing().given(holidayRepository).delete(holiday);
 
             // when
             holidayService.deleteHoliday(id);
 
             // then
-            then(holidayRepository).should().findById(id);
+            then(holidayRepository).should().findByRowId(id);
             then(holidayRepository).should().delete(holiday);
         }
 
@@ -246,7 +246,7 @@ class HolidayServiceTest {
         void deleteHolidayFailNotFound() {
             // given
             Long id = 999L;
-            given(holidayRepository.findById(id)).willReturn(Optional.empty());
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> holidayService.deleteHoliday(id))
@@ -264,7 +264,7 @@ class HolidayServiceTest {
             // given
             Long id = 1L;
             Holiday holiday = Holiday.createHoliday("설날", LocalDate.of(2025, 1, 29), HolidayType.PUBLIC, CountryCode.KR, YNType.Y, LocalDate.of(2025, 1, 1), YNType.Y, "🎉");
-            given(holidayRepository.findById(id)).willReturn(Optional.of(holiday));
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.of(holiday));
 
             // when
             Holiday result = holidayService.checkHolidayExist(id);
@@ -278,7 +278,7 @@ class HolidayServiceTest {
         void checkHolidayExistFailNotFound() {
             // given
             Long id = 999L;
-            given(holidayRepository.findById(id)).willReturn(Optional.empty());
+            given(holidayRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> holidayService.checkHolidayExist(id))

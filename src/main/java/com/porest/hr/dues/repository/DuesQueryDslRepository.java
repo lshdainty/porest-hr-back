@@ -29,10 +29,10 @@ public class DuesQueryDslRepository implements DuesRepository {
     }
 
     @Override
-    public Optional<Dues> findById(Long id) {
+    public Optional<Dues> findByRowId(Long rowId) {
         return Optional.ofNullable(query
                 .selectFrom(dues)
-                .where(dues.id.eq(id))
+                .where(dues.rowId.eq(rowId))
                 .fetchOne());
     }
 

@@ -88,7 +88,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
             em.clear();
 
             // then
-            Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
             assertThat(findSchedule).isPresent();
             assertThat(findSchedule.get().getUser().getId()).isEqualTo("user1");
             assertThat(findSchedule.get().getVacationPolicy().getName()).isEqualTo("연차");
@@ -107,7 +107,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
             em.clear();
 
             // then
-            Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
             assertThat(findSchedule).isPresent();
             assertThat(findSchedule.get().getNextGrantDate()).isEqualTo(nextGrantDate);
         }
@@ -127,7 +127,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
 
             // when
             Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(
-                    user.getId(), repeatPolicy.getId());
+                    user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(findSchedule).isPresent();
@@ -144,7 +144,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
 
             // when
             Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(
-                    user.getId(), repeatPolicy.getId());
+                    user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(findSchedule).isEmpty();
@@ -162,7 +162,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
 
             // when
             Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(
-                    user.getId(), repeatPolicy.getId());
+                    user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(findSchedule).isEmpty();
@@ -182,7 +182,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
             em.clear();
 
             // when
-            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(exists).isTrue();
@@ -196,7 +196,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
             em.clear();
 
             // when
-            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(exists).isFalse();
@@ -213,7 +213,7 @@ class VacationGrantScheduleQueryDslRepositoryTest {
             em.clear();
 
             // when
-            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(exists).isFalse();

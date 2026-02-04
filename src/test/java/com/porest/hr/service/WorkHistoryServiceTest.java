@@ -108,7 +108,7 @@ class WorkHistoryServiceTest {
             WorkCode division = createTestWorkCode(3L, "DIVISION", "분류", CodeType.OPTION);
             WorkHistory workHistory = createTestWorkHistory(id, user, group, part, division);
 
-            given(workHistoryRepository.findById(id)).willReturn(Optional.of(workHistory));
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
 
             // when
             WorkHistoryServiceDto result = workHistoryService.findWorkHistory(id);
@@ -123,7 +123,7 @@ class WorkHistoryServiceTest {
         void findWorkHistoryFailNotFound() {
             // given
             Long id = 999L;
-            given(workHistoryRepository.findById(id)).willReturn(Optional.empty());
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> workHistoryService.findWorkHistory(id))
@@ -329,7 +329,7 @@ class WorkHistoryServiceTest {
                     .content("수정된 업무 내용")
                     .build();
 
-            given(workHistoryRepository.findById(id)).willReturn(Optional.of(workHistory));
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
             given(userService.checkUserExist("user1")).willReturn(user);
             given(workCodeRepository.findByCode("GROUP")).willReturn(Optional.of(group));
             given(workCodeRepository.findByCode("PART")).willReturn(Optional.of(part));
@@ -359,7 +359,7 @@ class WorkHistoryServiceTest {
                     .content("수정된 업무 내용")
                     .build();
 
-            given(workHistoryRepository.findById(id)).willReturn(Optional.empty());
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> workHistoryService.updateWorkHistory(dto))
@@ -381,7 +381,7 @@ class WorkHistoryServiceTest {
             WorkCode division = createTestWorkCode(3L, "DIVISION", "분류", CodeType.OPTION);
             WorkHistory workHistory = createTestWorkHistory(id, user, group, part, division);
 
-            given(workHistoryRepository.findById(id)).willReturn(Optional.of(workHistory));
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
             willDoNothing().given(workHistoryRepository).delete(workHistory);
 
             // when
@@ -396,7 +396,7 @@ class WorkHistoryServiceTest {
         void deleteWorkHistoryFailNotFound() {
             // given
             Long id = 999L;
-            given(workHistoryRepository.findById(id)).willReturn(Optional.empty());
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> workHistoryService.deleteWorkHistory(id))
@@ -596,7 +596,7 @@ class WorkHistoryServiceTest {
                     .content("수정된 업무 내용")
                     .build();
 
-            given(workHistoryRepository.findById(id)).willReturn(Optional.of(workHistory));
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
             given(userService.checkUserExist("user1")).willReturn(user);
             given(workCodeRepository.findByCode("GROUP")).willReturn(Optional.of(group));
             given(workCodeRepository.findByCode("NONEXISTENT_PART")).willReturn(Optional.empty());
@@ -628,7 +628,7 @@ class WorkHistoryServiceTest {
                     .content("수정된 업무 내용")
                     .build();
 
-            given(workHistoryRepository.findById(id)).willReturn(Optional.of(workHistory));
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
             given(userService.checkUserExist("user1")).willReturn(user);
             given(workCodeRepository.findByCode("GROUP")).willReturn(Optional.of(group));
             given(workCodeRepository.findByCode("PART")).willReturn(Optional.of(part));

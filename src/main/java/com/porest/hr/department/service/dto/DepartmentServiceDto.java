@@ -35,7 +35,7 @@ public class DepartmentServiceDto {
         if (department == null) return null;
 
         return DepartmentServiceDto.builder()
-                .id(department.getId())
+                .id(department.getRowId())
                 .name(department.getName())
                 .nameKR(department.getNameKR())
                 .parentId(department.getParentId())

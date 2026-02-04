@@ -19,19 +19,19 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_roles")
 public class UserRole extends AuditingFieldsWithIp {
     /**
-     * 사용자-역할 매핑 아이디<br>
+     * 사용자-역할 매핑 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_role_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 사용자<br>
      * 어떤 사용자에게 역할이 부여되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "user_row_id", nullable = false)
     private User user;
 
     /**
@@ -39,7 +39,7 @@ public class UserRole extends AuditingFieldsWithIp {
      * 어떤 역할이 부여되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_row_id", nullable = false)
     private Role role;
 
     /**

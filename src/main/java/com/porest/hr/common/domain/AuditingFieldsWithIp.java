@@ -21,14 +21,14 @@ public abstract class AuditingFieldsWithIp extends AuditingFields {
      * 생성 IP
      */
     @Setter
-    @Column(name = "create_ip", length = 49, updatable = false)
+    @Column(name = "create_ip", length = 45, updatable = false)
     private String createIp;
 
     /**
      * 최종 수정 IP
      */
     @Setter
-    @Column(name = "modify_ip", length = 49)
+    @Column(name = "modify_ip", length = 45)
     private String modifyIp;
 
     /**

@@ -25,12 +25,12 @@ public class NoticeJpaRepository implements NoticeRepository {
     }
 
     @Override
-    public Optional<Notice> findById(Long noticeId) {
+    public Optional<Notice> findByRowId(Long rowId) {
         List<Notice> result = em.createQuery(
                         "select n from Notice n " +
                                 "left join fetch n.writer " +
-                                "where n.id = :noticeId and n.isDeleted = :isDeleted", Notice.class)
-                .setParameter("noticeId", noticeId)
+                                "where n.rowId = :rowId and n.isDeleted = :isDeleted", Notice.class)
+                .setParameter("rowId", rowId)
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));

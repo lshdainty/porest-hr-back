@@ -85,11 +85,7 @@ public class VacationServiceImpl implements VacationService {
         // 1. 사용자 검증
         User user = userService.checkUserExist(data.getUserId());
 
-        // 2. 시작, 종료시간 비교
-        if (TimeUtils.isAfter(data.getStartDate(), data.getEndDate())) {
-            log.warn("휴가 사용 실패 - 시작일이 종료일보다 이후: startDate={}, endDate={}", data.getStartDate(), data.getEndDate());
-            throw new InvalidValueException(HrErrorCode.VACATION_INVALID_DATE);
-        }
+        // 2. 날짜 범위 검증은 @DateRange 어노테이션으로 Controller 레벨에서 처리
 
         // 3. 연차가 아닌 시간단위 휴가인 경우 유연근무제 시간 체크
         if (!(data.getTimeType().equals(VacationTimeType.DAYOFF) || data.getTimeType().equals(VacationTimeType.DEFENSE))) {
@@ -207,7 +203,7 @@ public class VacationServiceImpl implements VacationService {
         log.info("휴가 사용 완료 - User: {}, Period: {} ~ {}, WorkingDays: {}, TotalUseTime: {}",
                 user.getId(), data.getStartDate(), data.getEndDate(), betweenDates.size(), totalUseTime);
 
-        return usage.getId();
+        return usage.getRowId();
     }
 
     @Override
@@ -332,7 +328,7 @@ public class VacationServiceImpl implements VacationService {
         for (VacationUsageDeduction deduction : deductions) {
             VacationGrant grant = deduction.getGrant();
             grant.restore(deduction.getDeductedTime());
-            log.info("VacationGrant {} 복구: {} 추가", grant.getId(), deduction.getDeductedTime());
+            log.info("VacationGrant {} 복구: {} 추가", grant.getRowId(), deduction.getDeductedTime());
         }
 
         // 6. VacationUsage 소프트 삭제
@@ -366,7 +362,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 2. 모든 usage ID 추출
         List<Long> usageIds = usages.stream()
-                .map(VacationUsage::getId)
+                .map(VacationUsage::getRowId)
                 .toList();
 
         // 3. IN 쿼리로 한번에 모든 deduction 조회
@@ -375,7 +371,7 @@ public class VacationServiceImpl implements VacationService {
         // 4. usageId -> VacationType 매핑 (첫 번째 grant의 type)
         Map<Long, VacationType> vacationTypeMap = allDeductions.stream()
                 .collect(Collectors.toMap(
-                        d -> d.getUsage().getId(),
+                        d -> d.getUsage().getRowId(),
                         d -> d.getGrant().getType(),
                         (existing, replacement) -> existing
                 ));
@@ -383,14 +379,14 @@ public class VacationServiceImpl implements VacationService {
         // 5. VacationServiceDto로 변환
         return usages.stream()
                 .map(usage -> VacationServiceDto.builder()
-                        .id(usage.getId())
+                        .id(usage.getRowId())
                         .user(usage.getUser())
                         .desc(usage.getDesc())
                         .timeType(usage.getType())
                         .startDate(usage.getStartDate())
                         .endDate(usage.getEndDate())
                         .usedTime(usage.getUsedTime())
-                        .type(vacationTypeMap.get(usage.getId()))
+                        .type(vacationTypeMap.get(usage.getRowId()))
                         .build())
                 .toList();
     }
@@ -406,7 +402,7 @@ public class VacationServiceImpl implements VacationService {
         // VacationServiceDto로 변환
         return usages.stream()
                 .map(usage -> VacationServiceDto.builder()
-                        .id(usage.getId())
+                        .id(usage.getRowId())
                         .desc(usage.getDesc())
                         .timeType(usage.getType())
                         .startDate(usage.getStartDate())
@@ -455,7 +451,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 1. baseTime 기준 유효한 부여 휴가 조회
         List<VacationGrant> validGrants = vacationGrantRepository.findValidGrantsByUserIdAndBaseTime(userId, baseTime);
-        List<Long> grantIds = validGrants.stream().map(VacationGrant::getId).toList();
+        List<Long> grantIds = validGrants.stream().map(VacationGrant::getRowId).toList();
 
         // 2. 해당 부여 휴가에 연결된 사용 내역 조회 (VacationUsageDeduction 통해)
         List<VacationUsageDeduction> deductions = vacationUsageDeductionRepository.findByGrantIds(grantIds);
@@ -476,7 +472,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 이전 달 기준 유효한 부여 휴가 조회
         List<VacationGrant> prevValidGrants = vacationGrantRepository.findValidGrantsByUserIdAndBaseTime(userId, prevMonthLastDay);
-        List<Long> prevGrantIds = prevValidGrants.stream().map(VacationGrant::getId).toList();
+        List<Long> prevGrantIds = prevValidGrants.stream().map(VacationGrant::getRowId).toList();
 
         // 이전 달 부여 휴가에 연결된 사용 내역 조회
         List<VacationUsageDeduction> prevDeductions = vacationUsageDeductionRepository.findByGrantIds(prevGrantIds);
@@ -580,7 +576,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         return VacationPolicyServiceDto.builder()
-                .id(policy.getId())
+                .id(policy.getRowId())
                 .name(policy.getName())
                 .desc(policy.getDesc())
                 .vacationType(policy.getVacationType())
@@ -611,7 +607,7 @@ public class VacationServiceImpl implements VacationService {
                     }
 
                     return VacationPolicyServiceDto.builder()
-                            .id(p.getId())
+                            .id(p.getRowId())
                             .name(p.getName())
                             .desc(p.getDesc())
                             .vacationType(p.getVacationType())
@@ -633,7 +629,7 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     public VacationPolicy validateAndGetVacationPolicy(Long vacationPolicyId) {
-        Optional<VacationPolicy> policy = vacationPolicyRepository.findVacationPolicyById(vacationPolicyId);
+        Optional<VacationPolicy> policy = vacationPolicyRepository.findByRowId(vacationPolicyId);
         policy.orElseThrow(() -> {
             log.warn("휴가 정책 조회 실패 - 존재하지 않는 정책: vacationPolicyId={}", vacationPolicyId);
             return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
@@ -675,7 +671,7 @@ public class VacationServiceImpl implements VacationService {
                 revokedGrantCount++;
 
                 log.info("Revoked vacation grant {} from user {} (remainTime: {})",
-                        grant.getId(), grant.getUser().getId(), grant.getRemainTime());
+                        grant.getRowId(), grant.getUser().getId(), grant.getRemainTime());
             }
         }
 
@@ -709,7 +705,7 @@ public class VacationServiceImpl implements VacationService {
                     }
 
                     return VacationPolicyServiceDto.builder()
-                            .id(policy.getId())
+                            .id(policy.getRowId())
                             .name(policy.getName())
                             .desc(policy.getDesc())
                             .vacationType(policy.getVacationType())
@@ -804,7 +800,7 @@ public class VacationServiceImpl implements VacationService {
         vacationGrantRepository.save(vacationGrant);
 
         log.info("Manually granted vacation: grantId={}, userId={}, policyId={}, grantTime={}, grantDate={}, expiryDate={}",
-                vacationGrant.getId(), userId, policy.getId(), grantTime, grantDate, expiryDate);
+                vacationGrant.getRowId(), userId, policy.getRowId(), grantTime, grantDate, expiryDate);
 
         return vacationGrant;
     }
@@ -842,7 +838,7 @@ public class VacationServiceImpl implements VacationService {
         grant.revoke();
 
         log.info("Revoked vacation grant: grantId={}, userId={}, policyId={}, grantTime={}",
-                grant.getId(), grant.getUser().getId(), grant.getPolicy().getId(), grant.getGrantTime());
+                grant.getRowId(), grant.getUser().getId(), grant.getPolicy().getRowId(), grant.getGrantTime());
 
         return grant;
     }
@@ -989,7 +985,7 @@ public class VacationServiceImpl implements VacationService {
             vacationApprovalRepository.saveAll(approvals);
 
             log.info("휴가 신청 완료 - User: {}, Policy: {}, GrantId: {}, Approvers: {} (순서대로)",
-                    userId, policy.getId(), vacationGrant.getId(), approverIds);
+                    userId, policy.getRowId(), vacationGrant.getRowId(), approverIds);
         } else {
             // 승인이 필요 없는 경우 즉시 ACTIVE 상태로 전환
             // - 정책의 approvalRequiredCount가 0 또는 null인 경우
@@ -1001,14 +997,14 @@ public class VacationServiceImpl implements VacationService {
 
             if (requiredCount != null && requiredCount > 0 && availableApproverCount == 0) {
                 log.info("휴가 신청 완료 (자동 승인 - 최상위 조직장) - User: {}, Policy: {}, GrantId: {}",
-                        userId, policy.getId(), vacationGrant.getId());
+                        userId, policy.getRowId(), vacationGrant.getRowId());
             } else {
                 log.info("휴가 신청 완료 (즉시 승인) - User: {}, Policy: {}, GrantId: {}",
-                        userId, policy.getId(), vacationGrant.getId());
+                        userId, policy.getRowId(), vacationGrant.getRowId());
             }
         }
 
-        return vacationGrant.getId();
+        return vacationGrant.getRowId();
     }
 
     @Transactional
@@ -1035,7 +1031,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 4. 순차 승인 검증: 이전 순서의 승인자들이 모두 승인했는지 확인
         VacationGrant vacationGrant = approval.getVacationGrant();
-        List<VacationApproval> allApprovals = vacationApprovalRepository.findByVacationGrantId(vacationGrant.getId());
+        List<VacationApproval> allApprovals = vacationApprovalRepository.findByVacationGrantId(vacationGrant.getRowId());
 
         Integer currentOrder = approval.getApprovalOrder();
 
@@ -1066,21 +1062,21 @@ public class VacationServiceImpl implements VacationService {
             vacationGrant.approve(grantDate, expiryDate);
 
             log.info("휴가 전체 승인 완료 - VacationGrant ID: {}, Final Approver: {}, Status: ACTIVE",
-                    vacationGrant.getId(), approverId);
+                    vacationGrant.getRowId(), approverId);
         } else {
             // 승인자가 2명 이상이고 1명 이상이 승인한 경우 PROGRESS 상태로 전환
             if (totalApprovalCount >= 2) {
                 vacationGrant.updateToProgress();
                 log.info("휴가 승인 진행 중 - VacationGrant ID: {}, Approver: {} (순서: {}), Status: PROGRESS",
-                        vacationGrant.getId(), approverId, currentOrder);
+                        vacationGrant.getRowId(), approverId, currentOrder);
             }
 
             long pendingCount = allApprovals.stream().filter(VacationApproval::isPending).count();
             log.info("휴가 부분 승인 완료 - VacationGrant ID: {}, Approver: {} (순서: {}), 남은 승인: {}",
-                    vacationGrant.getId(), approverId, currentOrder, pendingCount);
+                    vacationGrant.getRowId(), approverId, currentOrder, pendingCount);
         }
 
-        return approval.getId();
+        return approval.getRowId();
     }
 
     @Transactional
@@ -1119,9 +1115,9 @@ public class VacationServiceImpl implements VacationService {
         vacationGrant.reject();
 
         log.info("휴가 거부 완료 - VacationGrant ID: {}, Approver: {}, Reason: {}",
-                vacationGrant.getId(), approverId, data.getRejectionReason());
+                vacationGrant.getRowId(), approverId, data.getRejectionReason());
 
-        return approval.getId();
+        return approval.getRowId();
     }
 
     @Transactional
@@ -1152,7 +1148,7 @@ public class VacationServiceImpl implements VacationService {
         log.info("휴가 신청 취소 완료 - VacationGrant ID: {}, User: {}",
                 vacationGrantId, userId);
 
-        return vacationGrant.getId();
+        return vacationGrant.getRowId();
     }
 
     @Override
@@ -1183,7 +1179,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 모든 grant ID 추출
         List<Long> grantIds = grants.stream()
-                .map(VacationGrant::getId)
+                .map(VacationGrant::getRowId)
                 .toList();
 
         // IN 쿼리로 한번에 모든 approval 조회
@@ -1192,13 +1188,13 @@ public class VacationServiceImpl implements VacationService {
         // grantId -> List<VacationApprovalServiceDto> 매핑
         Map<Long, List<VacationApprovalServiceDto>> approvalMap = allApprovals.stream()
                 .collect(Collectors.groupingBy(
-                        approval -> approval.getVacationGrant().getId(),
+                        approval -> approval.getVacationGrant().getRowId(),
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 list -> list.stream()
                                         .sorted((a1, a2) -> Integer.compare(a1.getApprovalOrder(), a2.getApprovalOrder()))
                                         .map(approval -> VacationApprovalServiceDto.builder()
-                                                .id(approval.getId())
+                                                .id(approval.getRowId())
                                                 .approverId(approval.getApprover().getId())
                                                 .approverName(approval.getApprover().getName())
                                                 .approvalOrder(approval.getApprovalOrder())
@@ -1217,10 +1213,10 @@ public class VacationServiceImpl implements VacationService {
                     User currentApprover = grant.getCurrentPendingApprover();
 
                     return VacationServiceDto.builder()
-                            .id(grant.getId())
+                            .id(grant.getRowId())
                             .userId(grant.getUser().getId())
                             .user(grant.getUser())
-                            .policyId(grant.getPolicy().getId())
+                            .policyId(grant.getPolicy().getRowId())
                             .policyName(grant.getPolicy().getName())
                             .type(grant.getType())
                             .desc(grant.getDesc())
@@ -1236,7 +1232,7 @@ public class VacationServiceImpl implements VacationService {
                             .createDate(grant.getCreateAt())
                             .currentApproverId(currentApprover != null ? currentApprover.getId() : null)
                             .currentApproverName(currentApprover != null ? currentApprover.getName() : null)
-                            .approvers(approvalMap.getOrDefault(grant.getId(), List.of()))
+                            .approvers(approvalMap.getOrDefault(grant.getRowId(), List.of()))
                             .build();
                 })
                 .toList();
@@ -1256,7 +1252,7 @@ public class VacationServiceImpl implements VacationService {
 
         // 모든 grant ID 추출
         List<Long> grantIds = grants.stream()
-                .map(VacationGrant::getId)
+                .map(VacationGrant::getRowId)
                 .toList();
 
         // IN 쿼리로 한번에 모든 approval 조회
@@ -1265,13 +1261,13 @@ public class VacationServiceImpl implements VacationService {
         // grantId -> List<VacationApprovalServiceDto> 매핑
         Map<Long, List<VacationApprovalServiceDto>> approvalMap = allApprovals.stream()
                 .collect(Collectors.groupingBy(
-                        approval -> approval.getVacationGrant().getId(),
+                        approval -> approval.getVacationGrant().getRowId(),
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 list -> list.stream()
                                         .sorted((a1, a2) -> Integer.compare(a1.getApprovalOrder(), a2.getApprovalOrder()))
                                         .map(approval -> VacationApprovalServiceDto.builder()
-                                                .id(approval.getId())
+                                                .id(approval.getRowId())
                                                 .approverId(approval.getApprover().getId())
                                                 .approverName(approval.getApprover().getName())
                                                 .approvalOrder(approval.getApprovalOrder())
@@ -1289,10 +1285,10 @@ public class VacationServiceImpl implements VacationService {
                     User currentApprover = grant.getCurrentPendingApprover();
 
                     return VacationServiceDto.builder()
-                            .id(grant.getId())
+                            .id(grant.getRowId())
                             .userId(grant.getUser().getId())
                             .user(grant.getUser())
-                            .policyId(grant.getPolicy().getId())
+                            .policyId(grant.getPolicy().getRowId())
                             .policyName(grant.getPolicy().getName())
                             .type(grant.getType())
                             .desc(grant.getDesc())
@@ -1308,7 +1304,7 @@ public class VacationServiceImpl implements VacationService {
                             .createDate(grant.getCreateAt())
                             .currentApproverId(currentApprover != null ? currentApprover.getId() : null)
                             .currentApproverName(currentApprover != null ? currentApprover.getName() : null)
-                            .approvers(approvalMap.getOrDefault(grant.getId(), List.of()))
+                            .approvers(approvalMap.getOrDefault(grant.getRowId(), List.of()))
                             .build();
                 })
                 .toList();
@@ -1443,17 +1439,17 @@ public class VacationServiceImpl implements VacationService {
         Set<Long> assignedPolicyIds = userVacationPlans.stream()
                 .filter(uvp -> YNType.isN(uvp.getIsDeleted()))
                 .flatMap(uvp -> uvp.getVacationPlan().getPolicies().stream())
-                .map(VacationPolicy::getId)
+                .map(VacationPolicy::getRowId)
                 .collect(Collectors.toSet());
 
         // 5. 할당된 정책과 할당되지 않은 정책 분리
         List<VacationPolicyServiceDto> assignedPolicies = allPolicies.stream()
-                .filter(p -> assignedPolicyIds.contains(p.getId()))
+                .filter(p -> assignedPolicyIds.contains(p.getRowId()))
                 .map(this::convertToPolicyServiceDto)
                 .toList();
 
         List<VacationPolicyServiceDto> unassignedPolicies = allPolicies.stream()
-                .filter(p -> !assignedPolicyIds.contains(p.getId()))
+                .filter(p -> !assignedPolicyIds.contains(p.getRowId()))
                 .map(this::convertToPolicyServiceDto)
                 .toList();
 
@@ -1474,7 +1470,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         return VacationPolicyServiceDto.builder()
-                .id(policy.getId())
+                .id(policy.getRowId())
                 .name(policy.getName())
                 .desc(policy.getDesc())
                 .vacationType(policy.getVacationType())
@@ -1517,7 +1513,7 @@ public class VacationServiceImpl implements VacationService {
                     }
 
                     return VacationPolicyServiceDto.builder()
-                            .id(policy.getId())
+                            .id(policy.getRowId())
                             .name(policy.getName())
                             .desc(policy.getDesc())
                             .vacationType(policy.getVacationType())

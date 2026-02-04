@@ -22,12 +22,12 @@ import java.util.Objects;
 @Table(name = "permissions")
 public class Permission extends AuditingFieldsWithIp {
     /**
-     * 권한 아이디<br>
+     * 행 아이디<br>
      * 자동 생성되는 고유 식별자
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "permission_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 권한 코드<br>

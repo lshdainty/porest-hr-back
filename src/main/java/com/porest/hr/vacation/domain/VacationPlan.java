@@ -25,12 +25,12 @@ import java.util.Objects;
 @Table(name = "vacation_plan")
 public class VacationPlan extends AuditingFieldsWithIp {
     /**
-     * 휴가 플랜 아이디<br>
+     * 휴가 플랜 행 아이디<br>
      * 자동 생성되는 고유 식별자
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_plan_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 플랜 코드<br>
@@ -177,7 +177,7 @@ public class VacationPlan extends AuditingFieldsWithIp {
      */
     public void addPolicy(VacationPolicy policy) {
         boolean exists = this.vacationPlanPolicies.stream()
-                .anyMatch(pp -> pp.getVacationPolicy().getId().equals(policy.getId())
+                .anyMatch(pp -> pp.getVacationPolicy().getRowId().equals(policy.getRowId())
                         && YNType.isN(pp.getIsDeleted()));
 
         if (!exists) {
@@ -199,7 +199,7 @@ public class VacationPlan extends AuditingFieldsWithIp {
      */
     public void removePolicy(VacationPolicy policy) {
         this.vacationPlanPolicies.stream()
-                .filter(pp -> pp.getVacationPolicy().getId().equals(policy.getId())
+                .filter(pp -> pp.getVacationPolicy().getRowId().equals(policy.getRowId())
                         && YNType.isN(pp.getIsDeleted()))
                 .forEach(VacationPlanPolicy::deletePlanPolicy);
     }
@@ -222,6 +222,6 @@ public class VacationPlan extends AuditingFieldsWithIp {
     public boolean hasPolicy(Long policyId) {
         return this.vacationPlanPolicies.stream()
                 .filter(pp -> YNType.isN(pp.getIsDeleted()))
-                .anyMatch(pp -> pp.getVacationPolicy().getId().equals(policyId));
+                .anyMatch(pp -> pp.getVacationPolicy().getRowId().equals(policyId));
     }
 }

@@ -17,20 +17,20 @@ import java.time.LocalDate;
 @Table(name = "notice")
 public class Notice extends AuditingFieldsWithIp {
     /**
-     * 공지사항 아이디<br>
+     * 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notice_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 작성자 객체<br>
-     * 테이블 컬럼은 user_no<br>
+     * 테이블 컬럼은 writer_row_id<br>
      * 공지사항을 작성한 유저 정보
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "writer_row_id", nullable = false)
     private User writer;
 
     /**

@@ -18,19 +18,19 @@ import lombok.NoArgsConstructor;
 @Table(name = "vacation_plan_policy")
 public class VacationPlanPolicy extends AuditingFieldsWithIp {
     /**
-     * 플랜-정책 매핑 아이디<br>
+     * 플랜-정책 매핑 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_plan_policy_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 휴가 플랜<br>
      * 어떤 플랜에 정책이 추가되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_plan_id", nullable = false)
+    @JoinColumn(name = "vacation_plan_row_id", nullable = false)
     private VacationPlan vacationPlan;
 
     /**
@@ -38,7 +38,7 @@ public class VacationPlanPolicy extends AuditingFieldsWithIp {
      * 어떤 정책이 추가되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_policy_id", nullable = false)
+    @JoinColumn(name = "vacation_policy_row_id", nullable = false)
     private VacationPolicy vacationPolicy;
 
     /**

@@ -141,7 +141,7 @@ public class JwtTokenProvider {
                 .issuedAt(now)
                 .expiration(expiration)
                 .claim(TOKEN_TYPE_CLAIM, TOKEN_TYPE_HR_ACCESS)
-                .claim("ssoUserNo", user.getSsoUserNo())
+                .claim("ssoUserRowId", user.getSsoUserRowId())
                 .claim("name", user.getName())
                 .claim("email", user.getEmail())
                 .claim("roles", roles)
@@ -277,14 +277,14 @@ public class JwtTokenProvider {
     // ==================== HR JWT Claims 추출 메서드 ====================
 
     /**
-     * HR JWT 토큰에서 SSO 사용자 번호 추출
+     * HR JWT 토큰에서 SSO 사용자 행 아이디 추출
      *
      * @param token JWT 토큰
-     * @return SSO 사용자 번호
+     * @return SSO 사용자 행 아이디
      */
-    public Long getSsoUserNoFromHrToken(String token) {
+    public Long getSsoUserRowIdFromHrToken(String token) {
         Claims claims = getHrClaims(token);
-        return claims.get("ssoUserNo", Long.class);
+        return claims.get("ssoUserRowId", Long.class);
     }
 
     /**

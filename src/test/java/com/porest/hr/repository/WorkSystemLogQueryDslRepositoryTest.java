@@ -41,7 +41,7 @@ class WorkSystemLogQueryDslRepositoryTest {
         em.clear();
 
         // then
-        assertThat(log.getId()).isNotNull();
+        assertThat(log.getRowId()).isNotNull();
         assertThat(log.getCode()).isEqualTo(TestSystemType.ERP);
     }
 

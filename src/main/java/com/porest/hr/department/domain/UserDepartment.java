@@ -14,29 +14,29 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_department")
 public class UserDepartment extends AuditingFieldsWithIp {
     /**
-     * 사용자-부서 매핑 아이디<br>
+     * 사용자-부서 매핑 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_department_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 사용자 객체<br>
-     * 테이블 컬럼은 user_no<br>
+     * 테이블 컬럼은 user_row_id<br>
      * 어떤 유저가 부서에 속해 있는지 알기 위해 사용
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "user_row_id", nullable = false)
     private User user;
 
     /**
      * 부서 객체<br>
-     * 테이블 컬럼은 department_id<br>
+     * 테이블 컬럼은 department_row_id<br>
      * 유저가 속한 부서 정보
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", nullable = false)
+    @JoinColumn(name = "department_row_id", nullable = false)
     private Department department;
 
     /**

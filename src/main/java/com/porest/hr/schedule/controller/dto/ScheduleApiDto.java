@@ -1,11 +1,12 @@
 package com.porest.hr.schedule.controller.dto;
 
-import tools.jackson.databind.PropertyNamingStrategies;
-import tools.jackson.databind.annotation.JsonNaming;
+import com.porest.core.validation.annotation.DateRange;
 import com.porest.hr.schedule.type.ScheduleType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ public class ScheduleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "일정 등록 요청")
+    @DateRange(startField = "startDate", endField = "endDate", message = "{error.schedule.invalid.date}")
     public static class RegistScheduleReq {
         @Schema(description = "사용자 ID", example = "admin", required = true)
         private String userId;
@@ -44,6 +46,7 @@ public class ScheduleApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "일정 수정 요청")
+    @DateRange(startField = "startDate", endField = "endDate", message = "{error.schedule.invalid.date}")
     public static class UpdateScheduleReq {
         @Schema(description = "사용자 ID", example = "admin")
         private String userId;

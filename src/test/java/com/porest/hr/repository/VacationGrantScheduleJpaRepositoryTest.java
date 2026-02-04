@@ -88,7 +88,7 @@ class VacationGrantScheduleJpaRepositoryTest {
             em.clear();
 
             // then
-            Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
             assertThat(findSchedule).isPresent();
             assertThat(findSchedule.get().getVacationPolicy().getName()).isEqualTo("연차");
         }
@@ -108,7 +108,7 @@ class VacationGrantScheduleJpaRepositoryTest {
 
             // when
             Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(
-                    user.getId(), repeatPolicy.getId());
+                    user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(findSchedule).isPresent();
@@ -124,7 +124,7 @@ class VacationGrantScheduleJpaRepositoryTest {
 
             // when
             Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(
-                    user.getId(), repeatPolicy.getId());
+                    user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(findSchedule).isEmpty();
@@ -142,7 +142,7 @@ class VacationGrantScheduleJpaRepositoryTest {
 
             // when
             Optional<VacationGrantSchedule> findSchedule = vacationGrantScheduleRepository.findByUserIdAndPolicyId(
-                    user.getId(), repeatPolicy.getId());
+                    user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(findSchedule).isEmpty();
@@ -162,7 +162,7 @@ class VacationGrantScheduleJpaRepositoryTest {
             em.clear();
 
             // when
-            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(exists).isTrue();
@@ -176,7 +176,7 @@ class VacationGrantScheduleJpaRepositoryTest {
             em.clear();
 
             // when
-            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(exists).isFalse();
@@ -193,7 +193,7 @@ class VacationGrantScheduleJpaRepositoryTest {
             em.clear();
 
             // when
-            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getId());
+            boolean exists = vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), repeatPolicy.getRowId());
 
             // then
             assertThat(exists).isFalse();

@@ -41,14 +41,14 @@ public class HolidayServiceImpl implements HolidayService {
                 data.getIcon()
         );
         holidayRepository.save(holiday);
-        log.info("공휴일 등록 완료: holidayId={}, name={}", holiday.getId(), data.getName());
-        return holiday.getId();
+        log.info("공휴일 등록 완료: holidayId={}, name={}", holiday.getRowId(), data.getName());
+        return holiday.getRowId();
     }
 
     @Override
-    public Holiday findById(Long id) {
-        log.debug("공휴일 조회: id={}", id);
-        return checkHolidayExist(id);
+    public Holiday findByRowId(Long rowId) {
+        log.debug("공휴일 조회: rowId={}", rowId);
+        return checkHolidayExist(rowId);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class HolidayServiceImpl implements HolidayService {
 
     @Override
     public Holiday checkHolidayExist(Long holidayId) {
-        return holidayRepository.findById(holidayId)
+        return holidayRepository.findByRowId(holidayId)
                 .orElseThrow(() -> {
                     log.warn("공휴일 조회 실패 - 존재하지 않는 공휴일: holidayId={}", holidayId);
                     return new EntityNotFoundException(HrErrorCode.HOLIDAY_NOT_FOUND);

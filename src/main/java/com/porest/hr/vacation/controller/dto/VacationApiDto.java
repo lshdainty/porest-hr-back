@@ -1,6 +1,7 @@
 package com.porest.hr.vacation.controller.dto;
 
 import com.porest.core.type.YNType;
+import com.porest.core.validation.annotation.DateRange;
 import com.porest.hr.vacation.type.ApprovalStatus;
 import com.porest.hr.vacation.type.EffectiveType;
 import com.porest.hr.vacation.type.ExpirationType;
@@ -25,6 +26,7 @@ public class VacationApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "휴가 사용 요청")
+    @DateRange(startField = "startDate", endField = "endDate", message = "{error.vacation.invalid.date}")
     public static class UseVacationReq {
         @Schema(description = "사용자 ID", example = "user123")
         private String userId;
@@ -58,6 +60,7 @@ public class VacationApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "휴가 사용 수정 요청")
+    @DateRange(startField = "startDate", endField = "endDate", message = "{error.vacation.invalid.date}")
     public static class UpdateVacationUsageReq {
         @Schema(description = "사용자 ID", example = "user123")
         private String userId;
@@ -368,6 +371,7 @@ public class VacationApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "휴가 수동 부여 요청")
+    @DateRange(startField = "grantDate", endField = "expiryDate", message = "{error.vacation.grant.invalid.date}")
     public static class ManualGrantVacationReq {
         @Schema(description = "휴가 정책 ID", example = "1")
         private Long vacationPolicyId;
@@ -423,6 +427,7 @@ public class VacationApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "휴가 신청 요청")
+    @DateRange(startField = "requestStartTime", endField = "requestEndTime", message = "{error.vacation.request.invalid.date}")
     public static class RequestVacationReq {
         @Schema(description = "휴가 정책 ID", example = "1")
         private Long policyId;

@@ -35,7 +35,7 @@ public class OnRequest implements VacationPolicyStrategy {
         );
 
         vacationPolicyRepository.save(vacationPolicy);
-        return vacationPolicy.getId();
+        return vacationPolicy.getRowId();
     }
 
     /**

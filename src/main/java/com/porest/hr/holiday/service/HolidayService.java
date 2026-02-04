@@ -23,12 +23,12 @@ public interface HolidayService {
     Long registHoliday(HolidayServiceDto data);
 
     /**
-     * ID로 공휴일을 조회합니다.
+     * rowId로 공휴일을 조회합니다.
      *
-     * @param id 공휴일 ID
+     * @param rowId 공휴일 rowId
      * @return 공휴일 엔티티
      */
-    Holiday findById(Long id);
+    Holiday findByRowId(Long rowId);
 
     /**
      * 국가 코드로 공휴일 목록을 조회합니다.

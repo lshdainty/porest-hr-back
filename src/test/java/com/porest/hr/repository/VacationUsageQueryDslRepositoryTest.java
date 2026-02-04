@@ -68,7 +68,7 @@ class VacationUsageQueryDslRepositoryTest {
         em.clear();
 
         // then
-        Optional<VacationUsage> findUsage = vacationUsageRepository.findById(usage.getId());
+        Optional<VacationUsage> findUsage = vacationUsageRepository.findById(usage.getRowId());
         assertThat(findUsage.isPresent()).isTrue();
         assertThat(findUsage.get().getDesc()).isEqualTo("연차");
     }

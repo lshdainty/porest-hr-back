@@ -20,11 +20,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WorkSystemLog extends AuditingFieldsWithIp {
     /**
-     * 시스템 로그 아이디<br>
+     * 행 아이디<br>
+     * 테이블 관리용 PK (auto increment)
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "system_log_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 시스템 코드

@@ -21,8 +21,8 @@ public class VacationPolicyJpaRepository implements VacationPolicyRepository {
     }
 
     @Override
-    public Optional<VacationPolicy> findVacationPolicyById(Long vacationPolicyId) {
-        return Optional.ofNullable(em.find(VacationPolicy.class, vacationPolicyId));
+    public Optional<VacationPolicy> findByRowId(Long rowId) {
+        return Optional.ofNullable(em.find(VacationPolicy.class, rowId));
     }
 
     @Override

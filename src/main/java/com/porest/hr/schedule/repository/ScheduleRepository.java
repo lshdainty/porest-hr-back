@@ -20,10 +20,10 @@ public interface ScheduleRepository {
     /**
      * 스케줄 단건 조회
      *
-     * @param scheduleId 스케줄 ID
+     * @param rowId 스케줄 rowId
      * @return Optional&lt;Schedule&gt;
      */
-    Optional<Schedule> findById(Long scheduleId);
+    Optional<Schedule> findByRowId(Long rowId);
 
     /**
      * 유저 스케줄 조회

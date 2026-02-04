@@ -18,19 +18,19 @@ import lombok.NoArgsConstructor;
 @Table(name = "role_permissions")
 public class RolePermission extends AuditingFieldsWithIp {
     /**
-     * 역할-권한 매핑 아이디<br>
+     * 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_permission_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 역할<br>
      * 어떤 역할에 권한이 부여되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_row_id", nullable = false)
     private Role role;
 
     /**
@@ -38,7 +38,7 @@ public class RolePermission extends AuditingFieldsWithIp {
      * 어떤 권한이 부여되었는지
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "permission_id", nullable = false)
+    @JoinColumn(name = "permission_row_id", nullable = false)
     private Permission permission;
 
     /**

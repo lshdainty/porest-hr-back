@@ -41,7 +41,7 @@ public class VacationPlanQueryDslRepository implements VacationPlanRepository {
                 .leftJoin(plan.vacationPlanPolicies, planPolicy).fetchJoin()
                 .leftJoin(planPolicy.vacationPolicy, policy).fetchJoin()
                 .where(
-                        plan.id.eq(id),
+                        plan.rowId.eq(id),
                         plan.isDeleted.eq(YNType.N),
                         planPolicy.isDeleted.eq(YNType.N).or(planPolicy.isNull())
                 )

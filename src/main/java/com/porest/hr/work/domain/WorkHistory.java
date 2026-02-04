@@ -17,11 +17,12 @@ import java.time.LocalDate;
 @Table(name = "work_history")
 public class WorkHistory extends AuditingFieldsWithIp {
     /**
-     * 이력 관리용 ID
+     * 행 아이디<br>
+     * 테이블 관리용 PK (auto increment)
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "work_history_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 업무 날짜
@@ -33,7 +34,7 @@ public class WorkHistory extends AuditingFieldsWithIp {
      * 근무자
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "user_row_id", nullable = false)
     private User user;
 
     /**

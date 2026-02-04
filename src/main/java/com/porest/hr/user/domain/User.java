@@ -34,20 +34,20 @@ import java.util.stream.Collectors;
 @Table(name = "users")
 public class User extends AuditingFieldsWithIp {
     /**
-     * 유저 순번<br>
+     * 유저 행 아이디<br>
      * HR 내부 관리용 PK (auto increment)
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_no")
-    private Long no;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
-     * SSO 사용자 순번<br>
+     * SSO 사용자 행 아이디<br>
      * SSO에서 발급한 row_id<br>
      * SSO와 HR 간 사용자 연결 키 (nullable - SSO 연동 전 사용자 존재 가능)
      */
-    @Column(name = "sso_user_no", unique = true)
-    private Long ssoUserNo;
+    @Column(name = "sso_user_row_id", unique = true)
+    private Long ssoUserRowId;
 
     /**
      * 사용자 아이디<br>
@@ -198,14 +198,14 @@ public class User extends AuditingFieldsWithIp {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 유저 생성할 것
      *
-     * @param ssoUserNo SSO에서 발급한 row_id (nullable - SSO 연동 전 사용자)
+     * @param ssoUserRowId SSO에서 발급한 row_id (nullable - SSO 연동 전 사용자)
      * @return User
      */
-    public static User createUser(Long ssoUserNo, String id, String name, String email, LocalDate birth,
+    public static User createUser(Long ssoUserRowId, String id, String name, String email, LocalDate birth,
                                   CompanyType company, String workTime, LocalDate joinDate,
                                   YNType lunarYN, String profileName, String profileUUID, CountryCode countryCode) {
         User user = new User();
-        user.ssoUserNo = ssoUserNo;
+        user.ssoUserRowId = ssoUserRowId;
         user.id = id;
         user.name = name;
         user.email = email;
@@ -225,15 +225,15 @@ public class User extends AuditingFieldsWithIp {
      * SSO 이벤트 기반 유저 생성 (최소 정보)<br>
      * SSO에서 사용자 생성 이벤트 수신 시 사용
      *
-     * @param ssoUserNo SSO에서 발급한 row_id
+     * @param ssoUserRowId SSO에서 발급한 row_id
      * @param id 사용자 아이디
      * @param name 사용자명
      * @param email 이메일
      * @return User
      */
-    public static User createUserFromSso(Long ssoUserNo, String id, String name, String email) {
+    public static User createUserFromSso(Long ssoUserRowId, String id, String name, String email) {
         User user = new User();
-        user.ssoUserNo = ssoUserNo;
+        user.ssoUserRowId = ssoUserRowId;
         user.id = id;
         user.name = name;
         user.email = email;
@@ -242,13 +242,13 @@ public class User extends AuditingFieldsWithIp {
     }
 
     /**
-     * SSO 연동 - ssoUserNo 설정<br>
+     * SSO 연동 - ssoUserRowId 설정<br>
      * 기존 사용자에 SSO 연결
      *
-     * @param ssoUserNo SSO에서 발급한 row_id
+     * @param ssoUserRowId SSO에서 발급한 row_id
      */
-    public void linkToSso(Long ssoUserNo) {
-        this.ssoUserNo = ssoUserNo;
+    public void linkToSso(Long ssoUserRowId) {
+        this.ssoUserRowId = ssoUserRowId;
     }
 
     /**

@@ -26,12 +26,12 @@ public interface WorkCodeRepository {
     Optional<WorkCode> findByCode(String code);
 
     /**
-     * Id로 업무 코드 조회
+     * rowId로 업무 코드 조회
      *
-     * @param id 업무 코드 Id
+     * @param rowId 업무 코드 rowId
      * @return Optional&lt;WorkCode&gt;
      */
-    Optional<WorkCode> findById(Long id);
+    Optional<WorkCode> findByRowId(Long rowId);
 
     /**
      * 동적 조건으로 업무 코드 목록 조회

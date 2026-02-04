@@ -28,12 +28,12 @@ public class WorkCodeServiceImpl implements WorkCodeService {
         List<WorkCode> workCodes = workCodeRepository.findAllByConditions(parentWorkCode, parentWorkCodeId, parentIsNull, type);
         return workCodes.stream()
                 .map(wc -> WorkCodeServiceDto.builder()
-                        .id(wc.getId())
+                        .id(wc.getRowId())
                         .code(wc.getCode())
                         .name(wc.getName())
                         .type(wc.getType())
                         .orderSeq(wc.getOrderSeq())
-                        .parentId(wc.getParent() != null ? wc.getParent().getId() : null)
+                        .parentId(wc.getParent() != null ? wc.getParent().getRowId() : null)
                         .build())
                 .collect(Collectors.toList());
     }
@@ -44,7 +44,7 @@ public class WorkCodeServiceImpl implements WorkCodeService {
         // 부모 코드 조회 (parentId가 있는 경우)
         WorkCode parent = null;
         if (parentId != null) {
-            parent = workCodeRepository.findById(parentId)
+            parent = workCodeRepository.findByRowId(parentId)
                     .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
         }
 
@@ -60,20 +60,20 @@ public class WorkCodeServiceImpl implements WorkCodeService {
         log.info("업무 코드 생성 완료: code={}, name={}, type={}, parentId={}, orderSeq={}",
                 code, name, type, parentId, orderSeq);
 
-        return workCode.getId();
+        return workCode.getRowId();
     }
 
     @Override
     @Transactional
     public void updateWorkCode(Long id, String code, String name, Long parentId, Integer orderSeq) {
         // 업무 코드 조회
-        WorkCode workCode = workCodeRepository.findById(id)
+        WorkCode workCode = workCodeRepository.findByRowId(id)
                 .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
 
         // 부모 코드 조회 (parentId가 있는 경우)
         WorkCode parent = null;
         if (parentId != null) {
-            parent = workCodeRepository.findById(parentId)
+            parent = workCodeRepository.findByRowId(parentId)
                     .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
 
             // 자기 자신을 부모로 설정하는 것 방지
@@ -85,7 +85,7 @@ public class WorkCodeServiceImpl implements WorkCodeService {
         // 코드 중복 체크 (자신 제외)
         if (code != null) {
             workCodeRepository.findByCode(code).ifPresent(wc -> {
-                if (!wc.getId().equals(id)) {
+                if (!wc.getRowId().equals(id)) {
                     throw new DuplicateException(HrErrorCode.WORK_CODE_DUPLICATE);
                 }
             });
@@ -102,7 +102,7 @@ public class WorkCodeServiceImpl implements WorkCodeService {
     @Transactional
     public void deleteWorkCode(Long id) {
         // 업무 코드 조회
-        WorkCode workCode = workCodeRepository.findById(id)
+        WorkCode workCode = workCodeRepository.findByRowId(id)
                 .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.WORK_CODE_NOT_FOUND));
 
         // 업무 코드 삭제 (Soft Delete)

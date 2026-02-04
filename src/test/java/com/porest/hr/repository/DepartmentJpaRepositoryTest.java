@@ -64,7 +64,7 @@ class DepartmentJpaRepositoryTest {
         em.clear();
 
         // then
-        Optional<Department> findDepartment = departmentRepository.findById(department.getId());
+        Optional<Department> findDepartment = departmentRepository.findById(department.getRowId());
         assertThat(findDepartment.isPresent()).isTrue();
         assertThat(findDepartment.get().getName()).isEqualTo("개발팀");
         assertThat(findDepartment.get().getLevel()).isEqualTo(1L);
@@ -96,7 +96,7 @@ class DepartmentJpaRepositoryTest {
         em.clear();
 
         // then
-        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getId());
+        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getRowId());
         assertThat(userDepartments).hasSize(1);
         assertThat(userDepartments.get(0).getUser().getId()).isEqualTo("user1");
     }
@@ -138,7 +138,7 @@ class DepartmentJpaRepositoryTest {
         em.clear();
 
         // when
-        Optional<UserDepartment> found = departmentRepository.findUserDepartment("user1", department.getId());
+        Optional<UserDepartment> found = departmentRepository.findUserDepartment("user1", department.getRowId());
 
         // then
         assertThat(found.isPresent()).isTrue();
@@ -163,7 +163,7 @@ class DepartmentJpaRepositoryTest {
         em.clear();
 
         // when
-        List<User> usersNotIn = departmentRepository.findUsersNotInDepartment(department.getId());
+        List<User> usersNotIn = departmentRepository.findUsersNotInDepartment(department.getRowId());
 
         // then
         assertThat(usersNotIn).hasSize(2);
@@ -198,7 +198,7 @@ class DepartmentJpaRepositoryTest {
         // given
         Department department = Department.createDepartment("개발팀", "개발팀", null, null, 1L, "개발 부서", "#FF0000", company);
         departmentRepository.save(department);
-        Long departmentId = department.getId();
+        Long departmentId = department.getRowId();
 
         department.deleteDepartment();
         em.flush();
@@ -229,7 +229,7 @@ class DepartmentJpaRepositoryTest {
         em.clear();
 
         // when
-        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getId());
+        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getRowId());
 
         // then
         assertThat(userDepartments).hasSize(2);
@@ -351,7 +351,7 @@ class DepartmentJpaRepositoryTest {
         em.clear();
 
         // when
-        List<User> users = departmentRepository.findUsersNotInDepartment(department.getId());
+        List<User> users = departmentRepository.findUsersNotInDepartment(department.getRowId());
 
         // then
         assertThat(users).hasSize(1);
@@ -381,7 +381,7 @@ class DepartmentJpaRepositoryTest {
         em.clear();
 
         // when
-        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getId());
+        List<UserDepartment> userDepartments = departmentRepository.findUserDepartmentsInDepartment(department.getRowId());
 
         // then
         assertThat(userDepartments).hasSize(1);

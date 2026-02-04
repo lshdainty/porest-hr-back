@@ -223,7 +223,7 @@ class ScheduleServiceTest {
                     .endDate(futureEnd.plusDays(5))
                     .build();
 
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.of(existingSchedule));
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.of(existingSchedule));
             given(userService.checkUserExist(userId)).willReturn(user);
             willDoNothing().given(scheduleRepository).save(any(Schedule.class));
 
@@ -231,7 +231,7 @@ class ScheduleServiceTest {
             Long newScheduleId = scheduleService.updateSchedule(scheduleId, data);
 
             // then
-            then(scheduleRepository).should().findById(scheduleId);
+            then(scheduleRepository).should().findByRowId(scheduleId);
             then(userService).should().checkUserExist(userId);
             then(scheduleRepository).should().save(any(Schedule.class));
             assertThat(existingSchedule.getIsDeleted()).isEqualTo(YNType.Y);
@@ -254,13 +254,13 @@ class ScheduleServiceTest {
                     futureStart, futureEnd);
             setScheduleId(schedule, scheduleId);
 
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.of(schedule));
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.of(schedule));
 
             // when
             scheduleService.deleteSchedule(scheduleId);
 
             // then
-            then(scheduleRepository).should().findById(scheduleId);
+            then(scheduleRepository).should().findByRowId(scheduleId);
             assertThat(schedule.getIsDeleted()).isEqualTo(YNType.Y);
         }
 
@@ -269,7 +269,7 @@ class ScheduleServiceTest {
         void deleteScheduleFailNotFound() {
             // given
             Long scheduleId = 999L;
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.empty());
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> scheduleService.deleteSchedule(scheduleId))
@@ -289,7 +289,7 @@ class ScheduleServiceTest {
                     futureStart, futureEnd);
             schedule.deleteSchedule();
 
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.of(schedule));
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.of(schedule));
 
             // when & then
             assertThatThrownBy(() -> scheduleService.deleteSchedule(scheduleId))
@@ -309,7 +309,7 @@ class ScheduleServiceTest {
                     pastStart, pastEnd);
             setScheduleId(schedule, scheduleId);
 
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.of(schedule));
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.of(schedule));
 
             // when & then
             assertThatThrownBy(() -> scheduleService.deleteSchedule(scheduleId))
@@ -330,7 +330,7 @@ class ScheduleServiceTest {
                     LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
             setScheduleId(schedule, scheduleId);
 
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.of(schedule));
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.of(schedule));
 
             // when
             Schedule result = scheduleService.checkScheduleExist(scheduleId);
@@ -344,7 +344,7 @@ class ScheduleServiceTest {
         void checkScheduleExistFailNotFound() {
             // given
             Long scheduleId = 999L;
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.empty());
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> scheduleService.checkScheduleExist(scheduleId))
@@ -361,7 +361,7 @@ class ScheduleServiceTest {
                     LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
             schedule.deleteSchedule();
 
-            given(scheduleRepository.findById(scheduleId)).willReturn(Optional.of(schedule));
+            given(scheduleRepository.findByRowId(scheduleId)).willReturn(Optional.of(schedule));
 
             // when & then
             assertThatThrownBy(() -> scheduleService.checkScheduleExist(scheduleId))

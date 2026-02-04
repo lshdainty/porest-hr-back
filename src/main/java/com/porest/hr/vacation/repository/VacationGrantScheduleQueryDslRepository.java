@@ -44,7 +44,7 @@ public class VacationGrantScheduleQueryDslRepository implements VacationGrantSch
                 .leftJoin(schedule.vacationPolicy, policy).fetchJoin()
                 .where(
                         schedule.user.id.eq(userId),
-                        schedule.vacationPolicy.id.eq(policyId),
+                        schedule.vacationPolicy.rowId.eq(policyId),
                         schedule.isDeleted.eq(YNType.N)
                 )
                 .fetchOne();
@@ -61,7 +61,7 @@ public class VacationGrantScheduleQueryDslRepository implements VacationGrantSch
                 .from(schedule)
                 .where(
                         schedule.user.id.eq(userId),
-                        schedule.vacationPolicy.id.eq(policyId),
+                        schedule.vacationPolicy.rowId.eq(policyId),
                         schedule.isDeleted.eq(YNType.N)
                 )
                 .fetchFirst();

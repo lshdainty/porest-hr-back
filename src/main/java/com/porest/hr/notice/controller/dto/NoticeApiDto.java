@@ -1,12 +1,13 @@
 package com.porest.hr.notice.controller.dto;
 
-import tools.jackson.databind.PropertyNamingStrategies;
-import tools.jackson.databind.annotation.JsonNaming;
 import com.porest.core.type.YNType;
+import com.porest.core.validation.annotation.DateRange;
 import com.porest.hr.notice.type.NoticeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.annotation.JsonNaming;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class NoticeApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "공지사항 등록 요청")
+    @DateRange(startField = "startDate", endField = "endDate", message = "{error.notice.invalid.date}")
     public static class CreateNoticeReq {
         @Schema(description = "작성자 ID", example = "admin", required = true)
         private String writerId;
@@ -53,6 +55,7 @@ public class NoticeApiDto {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Schema(description = "공지사항 수정 요청")
+    @DateRange(startField = "startDate", endField = "endDate", message = "{error.notice.invalid.date}")
     public static class UpdateNoticeReq {
         @Schema(description = "공지사항 제목", example = "시스템 점검 안내 (수정)")
         private String title;

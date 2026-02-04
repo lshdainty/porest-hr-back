@@ -18,30 +18,30 @@ import java.time.LocalDateTime;
 @Table(name = "vacation_approval")
 public class VacationApproval extends AuditingFieldsWithIp {
     /**
-     * 휴가 승인 아이디<br>
+     * 휴가 승인 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_approval_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 휴가 부여 객체<br>
-     * 테이블 컬럼은 vacation_grant_id<br>
+     * 테이블 컬럼은 vacation_grant_row_id<br>
      * 어떤 휴가 부여에 대한 승인인지 알기 위해 사용
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_grant_id", nullable = false)
+    @JoinColumn(name = "vacation_grant_row_id", nullable = false)
     @Setter
     private VacationGrant vacationGrant;
 
     /**
      * 승인자 유저 객체<br>
-     * 테이블 컬럼은 user_no<br>
+     * 테이블 컬럼은 approver_row_id<br>
      * 누가 승인하는지 알기 위해 사용
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "approver_row_id", nullable = false)
     @Setter
     private User approver;
 

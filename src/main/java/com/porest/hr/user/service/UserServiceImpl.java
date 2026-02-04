@@ -53,11 +53,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String joinUser(UserServiceDto data) {
-        log.debug("사용자 생성 시작: ssoUserNo={}, id={}, name={}, email={}",
-                data.getSsoUserNo(), data.getId(), data.getName(), data.getEmail());
+        log.debug("사용자 생성 시작: ssoUserRowId={}, id={}, name={}, email={}",
+                data.getSsoUserRowId(), data.getId(), data.getName(), data.getEmail());
 
-        if (data.getSsoUserNo() == null) {
-            throw new IllegalArgumentException("ssoUserNo는 필수입니다. SSO에서 사용자 생성 후 진행해주세요.");
+        if (data.getSsoUserRowId() == null) {
+            throw new IllegalArgumentException("ssoUserRowId는 필수입니다. SSO에서 사용자 생성 후 진행해주세요.");
         }
 
         UserServiceDto profileDto = UserServiceDto.builder().build();
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = User.createUser(
-                data.getSsoUserNo(),
+                data.getSsoUserRowId(),
                 data.getId(),
                 data.getName(),
                 data.getEmail(),
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
         );
 
         userRepository.save(user);
-        log.info("사용자 생성 완료: ssoUserNo={}, id={}", user.getSsoUserNo(), user.getId());
+        log.info("사용자 생성 완료: ssoUserRowId={}, id={}", user.getSsoUserRowId(), user.getId());
         return user.getId();
     }
 
@@ -375,7 +375,7 @@ public class UserServiceImpl implements UserService {
                             .roles(roleDetails)
                             .roleNames(approver.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                             .allPermissions(approver.getAllAuthorities())
-                            .departmentId(dept.getId())
+                            .departmentId(dept.getRowId())
                             .departmentName(dept.getName())
                             .departmentNameKR(dept.getNameKR())
                             .departmentLevel(dept.getLevel())

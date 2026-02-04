@@ -55,7 +55,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = VacationPlan.createPlan(code, name, desc);
         vacationPlanRepository.save(plan);
 
-        log.info("휴가 플랜 생성 완료: planId={}, code={}", plan.getId(), code);
+        log.info("휴가 플랜 생성 완료: planId={}, code={}", plan.getRowId(), code);
         return VacationPlanServiceDto.from(plan);
     }
 
@@ -73,7 +73,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         // 정책 조회 및 검증
         List<VacationPolicy> policies = new ArrayList<>();
         for (Long policyId : policyIds) {
-            VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
+            VacationPolicy policy = vacationPolicyRepository.findByRowId(policyId)
                     .orElseThrow(() -> {
                         log.warn("휴가 플랜 생성 실패 - 정책 없음: policyId={}", policyId);
                         return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
@@ -84,7 +84,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
         VacationPlan plan = VacationPlan.createPlanWithPolicies(code, name, desc, policies);
         vacationPlanRepository.save(plan);
 
-        log.info("휴가 플랜 생성 완료: planId={}, code={}, policyCount={}", plan.getId(), code, policies.size());
+        log.info("휴가 플랜 생성 완료: planId={}, code={}, policyCount={}", plan.getRowId(), code, policies.size());
         return VacationPlanServiceDto.fromWithPolicies(plan);
     }
 
@@ -137,7 +137,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
 
         plan.updatePlan(name, desc);
 
-        log.info("휴가 플랜 수정 완료: planId={}, code={}", plan.getId(), code);
+        log.info("휴가 플랜 수정 완료: planId={}, code={}", plan.getRowId(), code);
         return VacationPlanServiceDto.from(plan);
     }
 
@@ -154,7 +154,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
 
         plan.deletePlan();
 
-        log.info("휴가 플랜 삭제 완료: planId={}, code={}", plan.getId(), code);
+        log.info("휴가 플랜 삭제 완료: planId={}, code={}", plan.getRowId(), code);
     }
 
     // ========================================
@@ -172,7 +172,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
                     return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
-        VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
+        VacationPolicy policy = vacationPolicyRepository.findByRowId(policyId)
                 .orElseThrow(() -> {
                     log.warn("정책 추가 실패 - 정책 없음: policyId={}", policyId);
                     return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
@@ -200,7 +200,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
                     return new EntityNotFoundException(HrErrorCode.VACATION_PLAN_NOT_FOUND);
                 });
 
-        VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
+        VacationPolicy policy = vacationPolicyRepository.findByRowId(policyId)
                 .orElseThrow(() -> {
                     log.warn("정책 제거 실패 - 정책 없음: policyId={}", policyId);
                     return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
@@ -227,7 +227,7 @@ public class VacationPlanServiceImpl implements VacationPlanService {
 
         // 새 정책 추가
         for (Long policyId : policyIds) {
-            VacationPolicy policy = vacationPolicyRepository.findVacationPolicyById(policyId)
+            VacationPolicy policy = vacationPolicyRepository.findByRowId(policyId)
                     .orElseThrow(() -> {
                         log.warn("정책 업데이트 실패 - 정책 없음: policyId={}", policyId);
                         return new EntityNotFoundException(HrErrorCode.VACATION_POLICY_NOT_FOUND);
@@ -357,13 +357,13 @@ public class VacationPlanServiceImpl implements VacationPlanService {
 
         for (VacationPolicy policy : repeatPolicies) {
             // 이미 존재하면 스킵 (다른 Plan에서 이미 생성됨)
-            if (!vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), policy.getId())) {
+            if (!vacationGrantScheduleRepository.existsByUserIdAndPolicyId(user.getId(), policy.getRowId())) {
                 VacationGrantSchedule schedule = VacationGrantSchedule.createSchedule(user, policy);
                 vacationGrantScheduleRepository.save(schedule);
 
-                log.debug("VacationGrantSchedule 생성: userId={}, policyId={}", user.getId(), policy.getId());
+                log.debug("VacationGrantSchedule 생성: userId={}, policyId={}", user.getId(), policy.getRowId());
             } else {
-                log.debug("VacationGrantSchedule 이미 존재, 스킵: userId={}, policyId={}", user.getId(), policy.getId());
+                log.debug("VacationGrantSchedule 이미 존재, 스킵: userId={}, policyId={}", user.getId(), policy.getRowId());
             }
         }
     }
@@ -385,21 +385,21 @@ public class VacationPlanServiceImpl implements VacationPlanService {
 
         Set<Long> otherPlanPolicyIds = userPlans.stream()
                 .filter(uvp -> YNType.isN(uvp.getIsDeleted()))
-                .filter(uvp -> !uvp.getVacationPlan().getId().equals(plan.getId())) // 회수할 Plan 제외
+                .filter(uvp -> !uvp.getVacationPlan().getRowId().equals(plan.getRowId())) // 회수할 Plan 제외
                 .flatMap(uvp -> uvp.getVacationPlan().getRepeatGrantPolicies().stream())
-                .map(VacationPolicy::getId)
+                .map(VacationPolicy::getRowId)
                 .collect(Collectors.toSet());
 
         for (VacationPolicy policy : policiesToCheck) {
             // 다른 Plan에 없는 Policy만 Schedule 삭제
-            if (!otherPlanPolicyIds.contains(policy.getId())) {
-                vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), policy.getId())
+            if (!otherPlanPolicyIds.contains(policy.getRowId())) {
+                vacationGrantScheduleRepository.findByUserIdAndPolicyId(user.getId(), policy.getRowId())
                         .ifPresent(schedule -> {
                             schedule.deleteSchedule();
-                            log.debug("VacationGrantSchedule 삭제: userId={}, policyId={}", user.getId(), policy.getId());
+                            log.debug("VacationGrantSchedule 삭제: userId={}, policyId={}", user.getId(), policy.getRowId());
                         });
             } else {
-                log.debug("VacationGrantSchedule 삭제 스킵 (다른 Plan에 존재): userId={}, policyId={}", user.getId(), policy.getId());
+                log.debug("VacationGrantSchedule 삭제 스킵 (다른 Plan에 존재): userId={}, policyId={}", user.getId(), policy.getRowId());
             }
         }
     }

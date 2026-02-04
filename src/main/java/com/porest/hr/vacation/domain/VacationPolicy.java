@@ -33,12 +33,12 @@ import java.util.List;
 @Table(name = "vacation_policy")
 public class VacationPolicy extends AuditingFieldsWithIp {
     /**
-     * 휴가 정책 아이디<br>
+     * 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_policy_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 휴가 정책 이름<br>

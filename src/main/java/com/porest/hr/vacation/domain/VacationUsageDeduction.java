@@ -14,19 +14,19 @@ import java.math.BigDecimal;
 @Table(name = "vacation_usage_deduction")
 public class VacationUsageDeduction extends AuditingFieldsWithIp {
     /**
-     * 휴가 사용 차감 내역 아이디<br>
+     * 휴가 사용 차감 내역 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_usage_deduction_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 휴가 사용 객체<br>
      * 사용자가 사용한 휴가 내역을 알기위해 사용 (어디서 사용했는지)
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_usage_id", nullable = false)
+    @JoinColumn(name = "vacation_usage_row_id", nullable = false)
     private VacationUsage usage;
 
     /**
@@ -34,7 +34,7 @@ public class VacationUsageDeduction extends AuditingFieldsWithIp {
      * 사용자가 부여받은 휴가를 알기위해 사용 (어디서 차감했는지)
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_grant_id", nullable = false)
+    @JoinColumn(name = "vacation_grant_row_id", nullable = false)
     private VacationGrant grant;
 
     /**

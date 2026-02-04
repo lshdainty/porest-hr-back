@@ -71,7 +71,7 @@ class NoticeJpaRepositoryTest {
             em.clear();
 
             // then
-            Optional<Notice> findNotice = noticeRepository.findById(notice.getId());
+            Optional<Notice> findNotice = noticeRepository.findByRowId(notice.getRowId());
             assertThat(findNotice.isPresent()).isTrue();
             assertThat(findNotice.get().getTitle()).isEqualTo("테스트 공지");
             assertThat(findNotice.get().getContent()).isEqualTo("테스트 내용");
@@ -82,7 +82,7 @@ class NoticeJpaRepositoryTest {
         @DisplayName("존재하지 않는 공지사항 조회시 빈 Optional 반환")
         void findByIdEmpty() {
             // when
-            Optional<Notice> findNotice = noticeRepository.findById(999L);
+            Optional<Notice> findNotice = noticeRepository.findByRowId(999L);
 
             // then
             assertThat(findNotice.isEmpty()).isTrue();
@@ -102,7 +102,7 @@ class NoticeJpaRepositoryTest {
             em.clear();
 
             // when
-            Optional<Notice> findNotice = noticeRepository.findById(notice.getId());
+            Optional<Notice> findNotice = noticeRepository.findByRowId(notice.getRowId());
 
             // then
             assertThat(findNotice.isEmpty()).isTrue();
@@ -328,13 +328,13 @@ class NoticeJpaRepositoryTest {
             em.clear();
 
             // when
-            Notice foundNotice = noticeRepository.findById(notice.getId()).orElseThrow();
+            Notice foundNotice = noticeRepository.findByRowId(notice.getRowId()).orElseThrow();
             foundNotice.updateNotice("수정 제목", "수정 내용", NoticeType.URGENT, YNType.Y, null, null);
             em.flush();
             em.clear();
 
             // then
-            Notice updatedNotice = noticeRepository.findById(notice.getId()).orElseThrow();
+            Notice updatedNotice = noticeRepository.findByRowId(notice.getRowId()).orElseThrow();
             assertThat(updatedNotice.getTitle()).isEqualTo("수정 제목");
             assertThat(updatedNotice.getContent()).isEqualTo("수정 내용");
             assertThat(updatedNotice.getType()).isEqualTo(NoticeType.URGENT);
@@ -354,13 +354,13 @@ class NoticeJpaRepositoryTest {
             em.clear();
 
             // when
-            Notice foundNotice = noticeRepository.findById(notice.getId()).orElseThrow();
+            Notice foundNotice = noticeRepository.findByRowId(notice.getRowId()).orElseThrow();
             foundNotice.deleteNotice();
             em.flush();
             em.clear();
 
             // then
-            Optional<Notice> deletedNotice = noticeRepository.findById(notice.getId());
+            Optional<Notice> deletedNotice = noticeRepository.findByRowId(notice.getRowId());
             assertThat(deletedNotice.isEmpty()).isTrue();
         }
 
@@ -377,14 +377,14 @@ class NoticeJpaRepositoryTest {
             em.clear();
 
             // when
-            Notice foundNotice = noticeRepository.findById(notice.getId()).orElseThrow();
+            Notice foundNotice = noticeRepository.findByRowId(notice.getRowId()).orElseThrow();
             foundNotice.increaseViewCount();
             foundNotice.increaseViewCount();
             em.flush();
             em.clear();
 
             // then
-            Notice updatedNotice = noticeRepository.findById(notice.getId()).orElseThrow();
+            Notice updatedNotice = noticeRepository.findByRowId(notice.getRowId()).orElseThrow();
             assertThat(updatedNotice.getViewCount()).isEqualTo(2L);
         }
     }

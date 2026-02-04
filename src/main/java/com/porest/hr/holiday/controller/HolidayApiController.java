@@ -50,7 +50,7 @@ public class HolidayApiController implements HolidayApi {
 
         List<HolidayApiDto.SearchHolidaysResp> resp = holidays.stream()
                 .map(h -> new HolidayApiDto.SearchHolidaysResp(
-                        h.getId(),
+                        h.getRowId(),
                         h.getName(),
                         h.getDate(),
                         h.getType(),
@@ -72,7 +72,7 @@ public class HolidayApiController implements HolidayApi {
 
         List<HolidayApiDto.SearchHolidaysResp> resp = holidays.stream()
                 .map(h -> new HolidayApiDto.SearchHolidaysResp(
-                        h.getId(),
+                        h.getRowId(),
                         h.getName(),
                         h.getDate(),
                         h.getType(),
@@ -103,9 +103,9 @@ public class HolidayApiController implements HolidayApi {
                 .build()
         );
 
-        Holiday findHoliday = holidayService.findById(id);
+        Holiday findHoliday = holidayService.findByRowId(id);
         return ApiResponse.success(new HolidayApiDto.EditHolidayResp(
-                findHoliday.getId(),
+                findHoliday.getRowId(),
                 findHoliday.getName(),
                 findHoliday.getDate(),
                 findHoliday.getType(),

@@ -92,7 +92,7 @@ class VacationApprovalQueryDslRepositoryTest {
         em.clear();
 
         // then
-        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getId());
+        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getRowId());
         assertThat(result).hasSize(2);
     }
 
@@ -105,7 +105,7 @@ class VacationApprovalQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getId());
+        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getRowId());
 
         // then
         assertThat(result).hasSize(1);
@@ -131,7 +131,7 @@ class VacationApprovalQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getId());
+        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getRowId());
 
         // then
         assertThat(result).hasSize(2);
@@ -158,7 +158,7 @@ class VacationApprovalQueryDslRepositoryTest {
 
         // when
         Optional<VacationApproval> result = vacationApprovalRepository
-                .findByIdWithVacationGrantAndUser(approval.getId());
+                .findByIdWithVacationGrantAndUser(approval.getRowId());
 
         // then
         assertThat(result.isPresent()).isTrue();
@@ -197,7 +197,7 @@ class VacationApprovalQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getId());
+        List<VacationApproval> result = vacationApprovalRepository.findByVacationGrantId(grant.getRowId());
 
         // then
         assertThat(result).hasSize(3);
@@ -216,7 +216,7 @@ class VacationApprovalQueryDslRepositoryTest {
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result).contains(grant.getId());
+        assertThat(result).contains(grant.getRowId());
     }
 
     @Test

@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 public class JwtClaimsPrincipal implements UserPrincipal {
 
     private final String userId;
-    private final Long ssoUserNo;
+    private final Long ssoUserRowId;
     private final String name;
     private final String email;
     private final List<String> roles;
@@ -31,18 +31,18 @@ public class JwtClaimsPrincipal implements UserPrincipal {
      * JWT Claims 기반 Principal 생성
      *
      * @param userId 사용자 ID (JWT subject)
-     * @param ssoUserNo SSO 사용자 번호
+     * @param ssoUserRowId SSO 사용자 번호
      * @param name 사용자 이름
      * @param email 사용자 이메일
      * @param roles 역할 목록
      * @param permissions 권한 목록
      * @param userSupplier User 엔티티 조회 함수 (Lazy Loading용)
      */
-    public JwtClaimsPrincipal(String userId, Long ssoUserNo, String name, String email,
+    public JwtClaimsPrincipal(String userId, Long ssoUserRowId, String name, String email,
                                List<String> roles, List<String> permissions,
                                Supplier<User> userSupplier) {
         this.userId = userId;
-        this.ssoUserNo = ssoUserNo;
+        this.ssoUserRowId = ssoUserRowId;
         this.name = name;
         this.email = email;
         this.roles = roles != null ? roles : Collections.emptyList();

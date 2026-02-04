@@ -27,8 +27,8 @@ public class ScheduleQueryDslRepository implements ScheduleRepository {
     }
 
     @Override
-    public Optional<Schedule> findById(Long scheduleId) {
-        return Optional.ofNullable(em.find(Schedule.class, scheduleId));
+    public Optional<Schedule> findByRowId(Long rowId) {
+        return Optional.ofNullable(em.find(Schedule.class, rowId));
     }
 
     @Override

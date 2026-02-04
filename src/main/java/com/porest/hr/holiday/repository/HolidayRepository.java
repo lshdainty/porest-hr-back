@@ -23,10 +23,10 @@ public interface HolidayRepository {
     /**
      * 단건 휴일 조회
      *
-     * @param id 휴일 ID
+     * @param rowId 휴일 rowId
      * @return Optional&lt;Holiday&gt;
      */
-    Optional<Holiday> findById(Long id);
+    Optional<Holiday> findByRowId(Long rowId);
 
     /**
      * 전체 휴일 조회

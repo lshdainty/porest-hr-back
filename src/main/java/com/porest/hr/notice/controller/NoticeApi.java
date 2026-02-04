@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +43,7 @@ public interface NoticeApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = NoticeApiDto.CreateNoticeReq.class))
             )
-            @RequestBody NoticeApiDto.CreateNoticeReq data
+            @Valid @RequestBody NoticeApiDto.CreateNoticeReq data
     );
 
     @Operation(
@@ -211,7 +212,7 @@ public interface NoticeApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = NoticeApiDto.UpdateNoticeReq.class))
             )
-            @RequestBody NoticeApiDto.UpdateNoticeReq data
+            @Valid @RequestBody NoticeApiDto.UpdateNoticeReq data
     );
 
     @Operation(

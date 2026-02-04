@@ -100,7 +100,7 @@ class VacationUsageDeductionQueryDslRepositoryTest {
         em.clear();
 
         // then
-        List<VacationUsageDeduction> result = deductionRepository.findByUsageId(usage.getId());
+        List<VacationUsageDeduction> result = deductionRepository.findByUsageId(usage.getRowId());
         assertThat(result).hasSize(2);
     }
 
@@ -115,7 +115,7 @@ class VacationUsageDeductionQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationUsageDeduction> result = deductionRepository.findByUsageId(usage.getId());
+        List<VacationUsageDeduction> result = deductionRepository.findByUsageId(usage.getRowId());
 
         // then
         assertThat(result).hasSize(1);
@@ -160,12 +160,12 @@ class VacationUsageDeductionQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationUsageDeduction> result = deductionRepository.findByGrantIds(List.of(grant.getId(), grant2.getId()));
+        List<VacationUsageDeduction> result = deductionRepository.findByGrantIds(List.of(grant.getRowId(), grant2.getRowId()));
 
         // then
         assertThat(result).hasSize(2);
-        assertThat(result).extracting(d -> d.getUsage().getId())
-                .containsExactlyInAnyOrder(usage.getId(), usage2.getId());
+        assertThat(result).extracting(d -> d.getUsage().getRowId())
+                .containsExactlyInAnyOrder(usage.getRowId(), usage2.getRowId());
     }
 
     @Test
@@ -210,11 +210,11 @@ class VacationUsageDeductionQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationUsageDeduction> result = deductionRepository.findByGrantIds(List.of(grant.getId()));
+        List<VacationUsageDeduction> result = deductionRepository.findByGrantIds(List.of(grant.getRowId()));
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUsage().getId()).isEqualTo(usage.getId());
+        assertThat(result.get(0).getUsage().getRowId()).isEqualTo(usage.getRowId());
     }
 
     @Test
@@ -228,11 +228,11 @@ class VacationUsageDeductionQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationUsageDeduction> result = deductionRepository.findByGrantIds(List.of(grant.getId(), 999L));
+        List<VacationUsageDeduction> result = deductionRepository.findByGrantIds(List.of(grant.getRowId(), 999L));
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getGrant().getId()).isEqualTo(grant.getId());
+        assertThat(result.get(0).getGrant().getRowId()).isEqualTo(grant.getRowId());
     }
 
     @Test
@@ -256,12 +256,12 @@ class VacationUsageDeductionQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationUsageDeduction> result = deductionRepository.findByUsageIds(List.of(usage.getId(), usage2.getId()));
+        List<VacationUsageDeduction> result = deductionRepository.findByUsageIds(List.of(usage.getRowId(), usage2.getRowId()));
 
         // then
         assertThat(result).hasSize(2);
-        assertThat(result).extracting(d -> d.getUsage().getId())
-                .containsExactlyInAnyOrder(usage.getId(), usage2.getId());
+        assertThat(result).extracting(d -> d.getUsage().getRowId())
+                .containsExactlyInAnyOrder(usage.getRowId(), usage2.getRowId());
     }
 
     @Test
@@ -295,10 +295,10 @@ class VacationUsageDeductionQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<VacationUsageDeduction> result = deductionRepository.findByUsageIds(List.of(usage.getId(), 999L));
+        List<VacationUsageDeduction> result = deductionRepository.findByUsageIds(List.of(usage.getRowId(), 999L));
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUsage().getId()).isEqualTo(usage.getId());
+        assertThat(result.get(0).getUsage().getRowId()).isEqualTo(usage.getRowId());
     }
 }

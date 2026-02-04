@@ -69,7 +69,7 @@ public class VacationApiController implements VacationApi {
         // VacationGrant 정보 변환
         List<VacationApiDto.GetUserVacationHistoryResp.VacationGrantInfo> grantInfos = vacationInfo.getGrants().stream()
                 .map(g -> new VacationApiDto.GetUserVacationHistoryResp.VacationGrantInfo(
-                        g.getId(),
+                        g.getRowId(),
                         g.getType(),
                         getTranslatedName(g.getType()),
                         g.getDesc(),
@@ -85,7 +85,7 @@ public class VacationApiController implements VacationApi {
         // VacationUsage 정보 변환
         List<VacationApiDto.GetUserVacationHistoryResp.VacationUsageInfo> usageInfos = vacationInfo.getUsages().stream()
                 .map(u -> new VacationApiDto.GetUserVacationHistoryResp.VacationUsageInfo(
-                        u.getId(),
+                        u.getRowId(),
                         u.getDesc(),
                         u.getType(),
                         getTranslatedName(u.getType()),
@@ -110,7 +110,7 @@ public class VacationApiController implements VacationApi {
                     List<VacationApiDto.GetAllUsersVacationHistoryResp.VacationGrantInfo> grantInfos =
                             dto.getGrants().stream()
                                     .map(g -> new VacationApiDto.GetAllUsersVacationHistoryResp.VacationGrantInfo(
-                                            g.getId(),
+                                            g.getRowId(),
                                             g.getType(),
                                             getTranslatedName(g.getType()),
                                             g.getDesc(),
@@ -127,7 +127,7 @@ public class VacationApiController implements VacationApi {
                     List<VacationApiDto.GetAllUsersVacationHistoryResp.VacationUsageInfo> usageInfos =
                             dto.getUsages().stream()
                                     .map(u -> new VacationApiDto.GetAllUsersVacationHistoryResp.VacationUsageInfo(
-                                            u.getId(),
+                                            u.getRowId(),
                                             u.getDesc(),
                                             u.getType(),
                                             getTranslatedName(u.getType()),
@@ -462,9 +462,9 @@ public class VacationApiController implements VacationApi {
         VacationGrant grant = vacationService.manualGrantVacation(userId, serviceDto);
 
         return ApiResponse.success(new VacationApiDto.ManualGrantVacationResp(
-                grant.getId(),
+                grant.getRowId(),
                 userId,
-                grant.getPolicy().getId(),
+                grant.getPolicy().getRowId(),
                 grant.getGrantTime(),
                 grant.getGrantDate(),
                 grant.getExpiryDate()
@@ -477,7 +477,7 @@ public class VacationApiController implements VacationApi {
         VacationGrant grant = vacationService.revokeVacationGrant(vacationGrantId);
 
         return ApiResponse.success(new VacationApiDto.RevokeVacationGrantResp(
-                grant.getId(),
+                grant.getRowId(),
                 grant.getUser().getId()
         ));
     }

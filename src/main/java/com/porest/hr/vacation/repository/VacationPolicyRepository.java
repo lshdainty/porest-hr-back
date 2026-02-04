@@ -20,10 +20,10 @@ public interface VacationPolicyRepository {
     /**
      * 단일 휴가 정책 조회
      *
-     * @param vacationPolicyId 휴가 정책 ID
+     * @param rowId 휴가 정책 rowId
      * @return Optional&lt;VacationPolicy&gt;
      */
-    Optional<VacationPolicy> findVacationPolicyById(Long vacationPolicyId);
+    Optional<VacationPolicy> findByRowId(Long rowId);
 
     /**
      * 전체 휴가 정책 조회

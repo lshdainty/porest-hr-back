@@ -22,30 +22,30 @@ import java.util.List;
 @Table(name = "vacation_grant")
 public class VacationGrant extends AuditingFieldsWithIp {
     /**
-     * 휴가 부여 아이디<br>
+     * 휴가 부여 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_grant_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 사용자 객체<br>
-     * 테이블 컬럼은 user_no<br>
+     * 테이블 컬럼은 user_row_id<br>
      * 어떤 유저에게 부여했는지 알기 위해 사용
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "user_row_id", nullable = false)
     @Setter
     private User user;
 
     /**
      * 휴가 정책 객체<br>
-     * 테이블 컬럼은 vacation_policy_id
+     * 테이블 컬럼은 vacation_policy_row_id
      * 어떤 휴가 정책에 의해 부여 받았는지 알기 위해 사용
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_policy_id", nullable = false)
+    @JoinColumn(name = "vacation_policy_row_id", nullable = false)
     private VacationPolicy policy;
 
     /**

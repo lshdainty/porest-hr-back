@@ -27,12 +27,12 @@ import java.time.LocalDateTime;
         ))
 public class VacationGrantSchedule extends AuditingFieldsWithIp {
     /**
-     * 스케줄 아이디<br>
+     * 스케줄 행 아이디<br>
      * 자동 생성되는 고유 식별자
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "vacation_grant_schedule_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 사용자<br>
@@ -47,7 +47,7 @@ public class VacationGrantSchedule extends AuditingFieldsWithIp {
      * 자동 부여될 휴가 정책
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vacation_policy_id", nullable = false)
+    @JoinColumn(name = "vacation_policy_row_id", nullable = false)
     private VacationPolicy vacationPolicy;
 
     /**

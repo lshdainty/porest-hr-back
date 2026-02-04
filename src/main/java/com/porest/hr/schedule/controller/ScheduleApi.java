@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +42,7 @@ public interface ScheduleApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = ScheduleApiDto.RegistScheduleReq.class))
             )
-            @RequestBody ScheduleApiDto.RegistScheduleReq data,
+            @Valid @RequestBody ScheduleApiDto.RegistScheduleReq data,
             @Parameter(hidden = true) @LoginUser User loginUser,
             HttpServletRequest req
     );
@@ -74,7 +75,7 @@ public interface ScheduleApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = ScheduleApiDto.UpdateScheduleReq.class))
             )
-            @RequestBody ScheduleApiDto.UpdateScheduleReq data,
+            @Valid @RequestBody ScheduleApiDto.UpdateScheduleReq data,
             @Parameter(hidden = true) @LoginUser User loginUser
     );
 

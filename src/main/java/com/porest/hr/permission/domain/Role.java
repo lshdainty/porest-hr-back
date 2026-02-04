@@ -24,12 +24,12 @@ import java.util.Objects;
 @Table(name = "roles")
 public class Role extends AuditingFieldsWithIp {
     /**
-     * 역할 아이디<br>
+     * 행 아이디<br>
      * 자동 생성되는 고유 식별자
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 역할 코드<br>

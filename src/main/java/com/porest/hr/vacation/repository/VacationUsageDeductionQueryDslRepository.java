@@ -32,7 +32,7 @@ public class VacationUsageDeductionQueryDslRepository implements VacationUsageDe
                 .selectFrom(vacationUsageDeduction)
                 .join(vacationUsageDeduction.usage).fetchJoin()
                 .join(vacationUsageDeduction.grant).fetchJoin()
-                .where(vacationUsageDeduction.usage.id.eq(usageId))
+                .where(vacationUsageDeduction.usage.rowId.eq(usageId))
                 .fetch();
     }
 
@@ -45,7 +45,7 @@ public class VacationUsageDeductionQueryDslRepository implements VacationUsageDe
                 .selectFrom(vacationUsageDeduction)
                 .join(vacationUsageDeduction.usage).fetchJoin()
                 .join(vacationUsageDeduction.grant).fetchJoin()
-                .where(vacationUsageDeduction.grant.id.in(grantIds)
+                .where(vacationUsageDeduction.grant.rowId.in(grantIds)
                         .and(vacationUsageDeduction.usage.isDeleted.eq(YNType.N)))
                 .fetch();
     }
@@ -59,7 +59,7 @@ public class VacationUsageDeductionQueryDslRepository implements VacationUsageDe
                 .selectFrom(vacationUsageDeduction)
                 .join(vacationUsageDeduction.usage).fetchJoin()
                 .join(vacationUsageDeduction.grant).fetchJoin()
-                .where(vacationUsageDeduction.usage.id.in(usageIds))
+                .where(vacationUsageDeduction.usage.rowId.in(usageIds))
                 .fetch();
     }
 }

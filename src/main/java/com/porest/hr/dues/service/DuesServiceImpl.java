@@ -35,8 +35,8 @@ public class DuesServiceImpl implements DuesService {
                 data.getDetail()
         );
         duesRepository.save(dues);
-        log.info("회비 등록 완료: duesId={}", dues.getId());
-        return dues.getId();
+        log.info("회비 등록 완료: duesId={}", dues.getRowId());
+        return dues.getRowId();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class DuesServiceImpl implements DuesService {
 
         List<DuesServiceDto> dtos = dues.stream()
                 .map(d -> DuesServiceDto.builder()
-                        .id(d.getId())
+                        .id(d.getRowId())
                         .userName(d.getUserName())
                         .amount(d.getAmount())
                         .type(d.getType())
@@ -71,7 +71,7 @@ public class DuesServiceImpl implements DuesService {
 
         List<DuesServiceDto> dtos = dues.stream()
                 .map(d -> DuesServiceDto.builder()
-                        .id(d.getId())
+                        .id(d.getRowId())
                         .userName(d.getUserName())
                         .amount(d.getAmount())
                         .type(d.getType())
@@ -157,7 +157,7 @@ public class DuesServiceImpl implements DuesService {
 
     @Override
     public Dues checkDuesExist(Long duesId) {
-        return duesRepository.findById(duesId)
+        return duesRepository.findByRowId(duesId)
                 .orElseThrow(() -> {
                     log.warn("회비 조회 실패 - 존재하지 않는 회비: duesId={}", duesId);
                     return new EntityNotFoundException(HrErrorCode.DUES_NOT_FOUND);

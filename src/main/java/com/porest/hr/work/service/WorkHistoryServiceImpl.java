@@ -77,8 +77,8 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
                 data.getHours(),
                 data.getContent());
         workHistoryRepository.save(workHistory);
-        log.info("업무 이력 생성 완료: id={}, userId={}, hours={}", workHistory.getId(), data.getUserId(), data.getHours());
-        return workHistory.getId();
+        log.info("업무 이력 생성 완료: rowId={}, userId={}, hours={}", workHistory.getRowId(), data.getUserId(), data.getHours());
+        return workHistory.getRowId();
     }
 
     @Override
@@ -105,7 +105,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
         log.info("업무 이력 일괄 생성 완료: count={}", workHistories.size());
 
         return workHistories.stream()
-                .map(WorkHistory::getId)
+                .map(WorkHistory::getRowId)
                 .collect(Collectors.toList());
     }
 
@@ -116,7 +116,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
 
         return workHistories.stream()
                 .map(w -> WorkHistoryServiceDto.builder()
-                        .id(w.getId())
+                        .id(w.getRowId())
                         .date(w.getDate())
                         .userId(w.getUser().getId())
                         .userName(w.getUser().getName())
@@ -138,7 +138,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
         WorkHistory w = checkWorkHistoryExist(id);
 
         return WorkHistoryServiceDto.builder()
-                .id(w.getId())
+                .id(w.getRowId())
                 .date(w.getDate())
                 .userId(w.getUser().getId())
                 .userName(w.getUser().getName())
@@ -183,10 +183,10 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
         log.info("업무 이력 삭제 완료: id={}", id);
     }
 
-    private WorkHistory checkWorkHistoryExist(Long id) {
-        Optional<WorkHistory> workHistory = workHistoryRepository.findById(id);
+    private WorkHistory checkWorkHistoryExist(Long rowId) {
+        Optional<WorkHistory> workHistory = workHistoryRepository.findByRowId(rowId);
         workHistory.orElseThrow(() -> {
-            log.warn("업무 이력 조회 실패 - 존재하지 않는 이력: id={}", id);
+            log.warn("업무 이력 조회 실패 - 존재하지 않는 이력: rowId={}", rowId);
             return new EntityNotFoundException(HrErrorCode.WORK_NOT_FOUND);
         });
         return workHistory.get();
@@ -210,7 +210,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
             return null;
         }
         return WorkCodeServiceDto.builder()
-                .id(workCode.getId())
+                .id(workCode.getRowId())
                 .code(workCode.getCode())
                 .name(workCode.getName())
                 .type(workCode.getType())

@@ -37,7 +37,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
         return Optional.ofNullable(query
                 .selectFrom(department)
                 .where(
-                        department.id.eq(id),
+                        department.rowId.eq(id),
                         department.isDeleted.eq(YNType.N)
                 )
                 .fetchOne()
@@ -68,7 +68,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                 .selectFrom(userDepartment)
                 .where(
                         userDepartment.user.id.eq(userId),
-                        userDepartment.department.id.eq(departmentId),
+                        userDepartment.department.rowId.eq(departmentId),
                         userDepartment.isDeleted.eq(YNType.N)
                 )
                 .fetchOne()
@@ -87,7 +87,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                                 .join(userDepartment.department, department)
                                 .where(
                                         userDepartment.user.id.eq(user.id),
-                                        userDepartment.department.id.eq(departmentId),
+                                        userDepartment.department.rowId.eq(departmentId),
                                         userDepartment.isDeleted.eq(YNType.N),
                                         department.isDeleted.eq(YNType.N)
                                 )
@@ -103,7 +103,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                 .join(userDepartment.user, user).fetchJoin()
                 .join(userDepartment.department, department)
                 .where(
-                        userDepartment.department.id.eq(departmentId),
+                        userDepartment.department.rowId.eq(departmentId),
                         userDepartment.isDeleted.eq(YNType.N),
                         department.isDeleted.eq(YNType.N),
                         user.isDeleted.eq(YNType.N),
@@ -166,7 +166,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
             Department parentDept = query
                     .selectFrom(department)
                     .where(
-                            department.id.eq(currentDept.getParentId()),
+                            department.rowId.eq(currentDept.getParentId()),
                             department.isDeleted.eq(YNType.N)
                     )
                     .fetchOne();

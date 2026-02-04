@@ -168,7 +168,7 @@ class WorkCodeServiceTest {
             CodeType type = CodeType.OPTION;
             Integer orderSeq = 1;
 
-            given(workCodeRepository.findById(parentId)).willReturn(Optional.of(parentCode));
+            given(workCodeRepository.findByRowId(parentId)).willReturn(Optional.of(parentCode));
             given(workCodeRepository.findByCode(code)).willReturn(Optional.empty());
             willDoNothing().given(workCodeRepository).save(any(WorkCode.class));
 
@@ -198,7 +198,7 @@ class WorkCodeServiceTest {
         void createWorkCodeFailParentNotFound() {
             // given
             Long parentId = 999L;
-            given(workCodeRepository.findById(parentId)).willReturn(Optional.empty());
+            given(workCodeRepository.findByRowId(parentId)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> workCodeService.createWorkCode("WC001", "업무코드1", CodeType.OPTION, parentId, 1))
@@ -220,7 +220,7 @@ class WorkCodeServiceTest {
             String newName = "수정된 업무코드";
             Integer newOrderSeq = 2;
 
-            given(workCodeRepository.findById(id)).willReturn(Optional.of(workCode));
+            given(workCodeRepository.findByRowId(id)).willReturn(Optional.of(workCode));
             given(workCodeRepository.findByCode(newCode)).willReturn(Optional.empty());
 
             // when
@@ -241,8 +241,8 @@ class WorkCodeServiceTest {
             WorkCode workCode = createTestWorkCode(id, "WC001", "업무코드1", CodeType.OPTION);
             WorkCode parentCode = createTestWorkCode(parentId, "PARENT", "상위코드", CodeType.LABEL);
 
-            given(workCodeRepository.findById(id)).willReturn(Optional.of(workCode));
-            given(workCodeRepository.findById(parentId)).willReturn(Optional.of(parentCode));
+            given(workCodeRepository.findByRowId(id)).willReturn(Optional.of(workCode));
+            given(workCodeRepository.findByRowId(parentId)).willReturn(Optional.of(parentCode));
 
             // when
             workCodeService.updateWorkCode(id, null, null, parentId, null);
@@ -256,7 +256,7 @@ class WorkCodeServiceTest {
         void updateWorkCodeFailNotFound() {
             // given
             Long id = 999L;
-            given(workCodeRepository.findById(id)).willReturn(Optional.empty());
+            given(workCodeRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> workCodeService.updateWorkCode(id, "WC001", "업무코드1", null, 1))
@@ -270,7 +270,7 @@ class WorkCodeServiceTest {
             Long id = 1L;
             WorkCode workCode = createTestWorkCode(id, "WC001", "업무코드1", CodeType.LABEL);
 
-            given(workCodeRepository.findById(id)).willReturn(Optional.of(workCode));
+            given(workCodeRepository.findByRowId(id)).willReturn(Optional.of(workCode));
 
             // when & then
             assertThatThrownBy(() -> workCodeService.updateWorkCode(id, null, null, id, null))
@@ -286,7 +286,7 @@ class WorkCodeServiceTest {
             WorkCode workCode = createTestWorkCode(id, "WC001", "업무코드1", CodeType.LABEL);
             WorkCode otherCode = createTestWorkCode(otherId, "WC002", "업무코드2", CodeType.LABEL);
 
-            given(workCodeRepository.findById(id)).willReturn(Optional.of(workCode));
+            given(workCodeRepository.findByRowId(id)).willReturn(Optional.of(workCode));
             given(workCodeRepository.findByCode("WC002")).willReturn(Optional.of(otherCode));
 
             // when & then
@@ -305,7 +305,7 @@ class WorkCodeServiceTest {
             Long id = 1L;
             WorkCode workCode = createTestWorkCode(id, "WC001", "업무코드1", CodeType.LABEL);
 
-            given(workCodeRepository.findById(id)).willReturn(Optional.of(workCode));
+            given(workCodeRepository.findByRowId(id)).willReturn(Optional.of(workCode));
 
             // when
             workCodeService.deleteWorkCode(id);
@@ -319,7 +319,7 @@ class WorkCodeServiceTest {
         void deleteWorkCodeFailNotFound() {
             // given
             Long id = 999L;
-            given(workCodeRepository.findById(id)).willReturn(Optional.empty());
+            given(workCodeRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> workCodeService.deleteWorkCode(id))

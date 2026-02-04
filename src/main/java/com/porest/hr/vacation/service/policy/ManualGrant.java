@@ -36,7 +36,7 @@ public class ManualGrant implements VacationPolicyStrategy {
         );
 
         vacationPolicyRepository.save(vacationPolicy);
-        return vacationPolicy.getId();
+        return vacationPolicy.getRowId();
     }
 
     /**

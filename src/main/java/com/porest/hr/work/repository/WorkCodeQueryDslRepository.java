@@ -41,12 +41,12 @@ public class WorkCodeQueryDslRepository implements WorkCodeRepository {
     }
 
     @Override
-    public Optional<WorkCode> findById(Long id) {
+    public Optional<WorkCode> findByRowId(Long rowId) {
         return Optional.ofNullable(
                 query
                         .selectFrom(workCode)
                         .where(
-                                workCode.id.eq(id),
+                                workCode.rowId.eq(rowId),
                                 workCode.isDeleted.eq(YNType.N)
                         )
                         .fetchFirst()
@@ -65,9 +65,9 @@ public class WorkCodeQueryDslRepository implements WorkCodeRepository {
             // 최상위 코드 조회 (parent가 null)
             builder.and(workCode.parent.isNull());
         } else if (parentWorkCodeId != null) {
-            // Id로 특정 부모 코드의 하위 코드 조회 (우선순위 높음)
-            WorkCode parent = findById(parentWorkCodeId)
-                    .orElseThrow(() -> new IllegalArgumentException("부모 코드를 찾을 수 없습니다 (id: " + parentWorkCodeId + ")"));
+            // rowId로 특정 부모 코드의 하위 코드 조회 (우선순위 높음)
+            WorkCode parent = findByRowId(parentWorkCodeId)
+                    .orElseThrow(() -> new IllegalArgumentException("부모 코드를 찾을 수 없습니다 (rowId: " + parentWorkCodeId + ")"));
             builder.and(workCode.parent.eq(parent));
         } else if (parentWorkCode != null && !parentWorkCode.isEmpty()) {
             // 코드 문자열로 특정 부모 코드의 하위 코드 조회

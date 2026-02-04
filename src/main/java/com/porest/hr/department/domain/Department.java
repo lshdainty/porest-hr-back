@@ -20,12 +20,12 @@ import java.util.Objects;
 @Table(name = "department")
 public class Department extends AuditingFieldsWithIp {
     /**
-     * 부서 아이디<br>
+     * 부서 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "department_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 부서명<br>
@@ -42,19 +42,19 @@ public class Department extends AuditingFieldsWithIp {
     private String nameKR;
 
     /**
-     * 상위 부서 아이디 (읽기 전용)<br>
+     * 상위 부서 행 아이디 (읽기 전용)<br>
      * 부모에 대한 수정은 parent 객체를 통해 진행할 것
      */
-    @Column(name = "parent_department_id", insertable = false, updatable = false)
+    @Column(name = "parent_row_id", insertable = false, updatable = false)
     private Long parentId;
 
     /**
      * 상위 부서 객체<br>
-     * 테이블 컬럼은 parent_department_id<br>
+     * 테이블 컬럼은 parent_row_id<br>
      * 부서의 계층 구조를 표현하기 위한 자기 참조 관계
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_department_id")
+    @JoinColumn(name = "parent_row_id")
     private Department parent;
 
     /**
@@ -62,7 +62,7 @@ public class Department extends AuditingFieldsWithIp {
      * 부서를 관리하는 사용자
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "head_user_no")
+    @JoinColumn(name = "head_user_row_id")
     private User headUser;
 
     /**
@@ -88,11 +88,11 @@ public class Department extends AuditingFieldsWithIp {
 
     /**
      * 회사 객체<br>
-     * 테이블 컬럼은 company_no<br>
+     * 테이블 컬럼은 company_row_id<br>
      * 부서가 속한 회사 정보
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_no")
+    @JoinColumn(name = "company_row_id")
     private Company company;
 
     /**

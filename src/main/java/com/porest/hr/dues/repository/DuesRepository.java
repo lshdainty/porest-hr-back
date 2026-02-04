@@ -20,10 +20,10 @@ public interface DuesRepository {
     /**
      * 단건 회비 조회
      *
-     * @param id 회비 ID
+     * @param rowId 회비 rowId
      * @return Optional&lt;Dues&gt;
      */
-    Optional<Dues> findById(Long id);
+    Optional<Dues> findByRowId(Long rowId);
 
     /**
      * 전체 회비 조회

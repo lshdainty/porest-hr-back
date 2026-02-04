@@ -29,10 +29,10 @@ public class VacationPolicyQueryDslRepository implements VacationPolicyRepositor
     }
 
     @Override
-    public Optional<VacationPolicy> findVacationPolicyById(Long vacationPolicyId) {
+    public Optional<VacationPolicy> findByRowId(Long rowId) {
         return Optional.ofNullable(query
                 .selectFrom(vacationPolicy)
-                .where(vacationPolicy.id.eq(vacationPolicyId))
+                .where(vacationPolicy.rowId.eq(rowId))
                 .fetchOne()
         );
     }

@@ -68,8 +68,8 @@ public class DepartmentServiceImpl implements DepartmentService {
                 company
         );
         departmentRepository.save(department);
-        log.info("부서 생성 완료: id={}, name={}", department.getId(), department.getName());
-        return department.getId();
+        log.info("부서 생성 완료: id={}, name={}", department.getRowId(), department.getName());
+        return department.getRowId();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             newParent = checkDepartmentExists(data.getParentId());
 
             // 자기 자신을 부모로 설정하는 것 방지
-            if (newParent.getId().equals(data.getId())) {
+            if (newParent.getRowId().equals(data.getId())) {
                 log.warn("부서 수정 실패 - 자기 자신을 부모로 설정: id={}", data.getId());
                 throw new InvalidValueException(HrErrorCode.DEPARTMENT_SELF_REFERENCE);
             }
@@ -96,7 +96,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             }
 
             // 같은 회사인지 검증
-            if (!newParent.getCompany().getId().equals(department.getCompany().getId())) {
+            if (!newParent.getCompany().getRowId().equals(department.getCompany().getRowId())) {
                 log.warn("부서 수정 실패 - 다른 회사 부서: id={}, parentCompanyId={}", data.getId(), newParent.getCompany().getId());
                 throw new InvalidValueException(HrErrorCode.DEPARTMENT_COMPANY_MISMATCH);
             }
@@ -145,7 +145,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         log.debug("부서 조회: departmentId={}", id);
         Department department = checkDepartmentExists(id);
         return DepartmentServiceDto.builder()
-                .id(department.getId())
+                .id(department.getRowId())
                 .name(department.getName())
                 .nameKR(department.getNameKR())
                 .parentId(department.getParentId())
@@ -195,7 +195,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                     data.getMainYN()
             );
             departmentRepository.saveUserDepartment(userDepartment);
-            userDepartmentIds.add(userDepartment.getId());
+            userDepartmentIds.add(userDepartment.getRowId());
         }
 
         log.info("부서 사용자 등록 완료: departmentId={}, count={}", departmentId, userDepartmentIds.size());
@@ -253,7 +253,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         // Department 정보 포함하여 반환
         return DepartmentServiceDto.builder()
-                .id(department.getId())
+                .id(department.getRowId())
                 .name(department.getName())
                 .nameKR(department.getNameKR())
                 .parentId(department.getParentId())
@@ -288,7 +288,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         for (Department child : currentDepartment.getChildren()) {
             if (YNType.isN(child.getIsDeleted())) {
-                if (child.getId().equals(targetDepartment.getId())) {
+                if (child.getRowId().equals(targetDepartment.getRowId())) {
                     return true;
                 }
                 if (isDescendant(child, targetDepartment)) {

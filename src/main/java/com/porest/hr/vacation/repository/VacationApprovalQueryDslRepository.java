@@ -33,7 +33,7 @@ public class VacationApprovalQueryDslRepository implements VacationApprovalRepos
                 .selectFrom(vacationApproval)
                 .join(vacationApproval.vacationGrant).fetchJoin()
                 .join(vacationApproval.approver).fetchJoin()
-                .where(vacationApproval.vacationGrant.id.eq(vacationGrantId)
+                .where(vacationApproval.vacationGrant.rowId.eq(vacationGrantId)
                         .and(vacationApproval.isDeleted.eq(YNType.N)))
                 .fetch();
     }
@@ -41,7 +41,7 @@ public class VacationApprovalQueryDslRepository implements VacationApprovalRepos
     @Override
     public List<Long> findAllVacationGrantIdsByApproverIdAndYear(String approverId, Integer year) {
         return query
-                .select(vacationApproval.vacationGrant.id)
+                .select(vacationApproval.vacationGrant.rowId)
                 .from(vacationApproval)
                 .where(vacationApproval.approver.id.eq(approverId)
                         .and(vacationApproval.isDeleted.eq(YNType.N))
@@ -58,7 +58,7 @@ public class VacationApprovalQueryDslRepository implements VacationApprovalRepos
                 .join(vacationApproval.vacationGrant.user).fetchJoin()
                 .join(vacationApproval.vacationGrant.policy).fetchJoin()
                 .join(vacationApproval.approver).fetchJoin()
-                .where(vacationApproval.id.eq(id)
+                .where(vacationApproval.rowId.eq(id)
                         .and(vacationApproval.isDeleted.eq(YNType.N)))
                 .fetchOne();
         return Optional.ofNullable(result);
@@ -73,7 +73,7 @@ public class VacationApprovalQueryDslRepository implements VacationApprovalRepos
                 .selectFrom(vacationApproval)
                 .join(vacationApproval.vacationGrant).fetchJoin()
                 .join(vacationApproval.approver).fetchJoin()
-                .where(vacationApproval.vacationGrant.id.in(vacationGrantIds)
+                .where(vacationApproval.vacationGrant.rowId.in(vacationGrantIds)
                         .and(vacationApproval.isDeleted.eq(YNType.N)))
                 .fetch();
     }

@@ -46,7 +46,7 @@ class VacationPolicyQueryDslRepositoryTest {
         em.clear();
 
         // then
-        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findVacationPolicyById(policy.getId());
+        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findByRowId(policy.getRowId());
         assertThat(findPolicy.isPresent()).isTrue();
         assertThat(findPolicy.get().getName()).isEqualTo("연차 휴가");
         assertThat(findPolicy.get().getVacationType()).isEqualTo(VacationType.ANNUAL);
@@ -56,7 +56,7 @@ class VacationPolicyQueryDslRepositoryTest {
     @DisplayName("단건 조회 시 정책이 없어도 Null이 반환되면 안된다.")
     void findByIdEmpty() {
         // given & when
-        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findVacationPolicyById(999L);
+        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findByRowId(999L);
 
         // then
         assertThat(findPolicy.isEmpty()).isTrue();
@@ -182,7 +182,7 @@ class VacationPolicyQueryDslRepositoryTest {
         em.clear();
 
         // when
-        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findVacationPolicyById(policy.getId());
+        Optional<VacationPolicy> findPolicy = vacationPolicyRepository.findByRowId(policy.getRowId());
 
         // then
         assertThat(findPolicy.isPresent()).isTrue();

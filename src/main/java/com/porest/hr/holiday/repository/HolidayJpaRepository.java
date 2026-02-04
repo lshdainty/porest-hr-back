@@ -23,8 +23,8 @@ public class HolidayJpaRepository implements HolidayRepository {
     }
 
     @Override
-    public Optional<Holiday> findById(Long id) {
-        return Optional.ofNullable(em.find(Holiday.class, id));
+    public Optional<Holiday> findByRowId(Long rowId) {
+        return Optional.ofNullable(em.find(Holiday.class, rowId));
     }
 
     @Override

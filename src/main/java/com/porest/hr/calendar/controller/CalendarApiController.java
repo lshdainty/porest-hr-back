@@ -41,7 +41,7 @@ public class CalendarApiController implements CalendarApi {
                         s.getEndDate(),
                         "schedule",
                         null,
-                        s.getId()
+                        s.getRowId()
                 ))
                 .toList());
 

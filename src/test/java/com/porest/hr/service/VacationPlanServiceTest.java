@@ -146,7 +146,7 @@ class VacationPlanServiceTest {
         void createPlanWithPoliciesSuccess() {
             // given
             given(vacationPlanRepository.existsByCode("NEW_PLAN")).willReturn(false);
-            given(vacationPolicyRepository.findVacationPolicyById(1L)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(1L)).willReturn(Optional.of(policy));
             willDoNothing().given(vacationPlanRepository).save(any(VacationPlan.class));
 
             // when
@@ -163,7 +163,7 @@ class VacationPlanServiceTest {
         void createPlanWithPoliciesNotFoundPolicy() {
             // given
             given(vacationPlanRepository.existsByCode("NEW_PLAN")).willReturn(false);
-            given(vacationPolicyRepository.findVacationPolicyById(999L)).willReturn(Optional.empty());
+            given(vacationPolicyRepository.findByRowId(999L)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> vacationPlanService.createPlanWithPolicies(
@@ -346,7 +346,7 @@ class VacationPlanServiceTest {
             // given
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
-            given(vacationPolicyRepository.findVacationPolicyById(1L)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(1L)).willReturn(Optional.of(policy));
 
             // when
             vacationPlanService.addPolicyToPlan("DEFAULT", 1L);
@@ -372,7 +372,7 @@ class VacationPlanServiceTest {
             // given
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
-            given(vacationPolicyRepository.findVacationPolicyById(999L)).willReturn(Optional.empty());
+            given(vacationPolicyRepository.findByRowId(999L)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> vacationPlanService.addPolicyToPlan("DEFAULT", 999L))
@@ -387,7 +387,7 @@ class VacationPlanServiceTest {
             ReflectionTestUtils.setField(planPolicy, "id", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(planPolicy)));
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
-            given(vacationPolicyRepository.findVacationPolicyById(1L)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(1L)).willReturn(Optional.of(policy));
 
             // when & then
             assertThatThrownBy(() -> vacationPlanService.addPolicyToPlan("DEFAULT", 1L))
@@ -406,7 +406,7 @@ class VacationPlanServiceTest {
             ReflectionTestUtils.setField(planPolicy, "id", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(planPolicy)));
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
-            given(vacationPolicyRepository.findVacationPolicyById(1L)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(1L)).willReturn(Optional.of(policy));
 
             // when
             vacationPlanService.removePolicyFromPlan("DEFAULT", 1L);
@@ -432,7 +432,7 @@ class VacationPlanServiceTest {
             // given
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
-            given(vacationPolicyRepository.findVacationPolicyById(999L)).willReturn(Optional.empty());
+            given(vacationPolicyRepository.findByRowId(999L)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> vacationPlanService.removePolicyFromPlan("DEFAULT", 999L))
@@ -458,7 +458,7 @@ class VacationPlanServiceTest {
             ReflectionTestUtils.setField(newPolicy, "id", 3L);
 
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
-            given(vacationPolicyRepository.findVacationPolicyById(3L)).willReturn(Optional.of(newPolicy));
+            given(vacationPolicyRepository.findByRowId(3L)).willReturn(Optional.of(newPolicy));
 
             // when
             vacationPlanService.updatePlanPolicies("DEFAULT", List.of(3L));
@@ -485,7 +485,7 @@ class VacationPlanServiceTest {
             // given
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
-            given(vacationPolicyRepository.findVacationPolicyById(999L)).willReturn(Optional.empty());
+            given(vacationPolicyRepository.findByRowId(999L)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> vacationPlanService.updatePlanPolicies("DEFAULT", List.of(999L)))

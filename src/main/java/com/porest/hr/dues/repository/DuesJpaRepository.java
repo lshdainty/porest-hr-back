@@ -23,8 +23,8 @@ public class DuesJpaRepository implements DuesRepository {
     }
 
     @Override
-    public Optional<Dues> findById(Long id) {
-        return Optional.ofNullable(em.find(Dues.class, id));
+    public Optional<Dues> findByRowId(Long rowId) {
+        return Optional.ofNullable(em.find(Dues.class, rowId));
     }
 
     @Override

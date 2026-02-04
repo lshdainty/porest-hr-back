@@ -33,12 +33,12 @@ public class NoticeQueryDslRepository implements NoticeRepository {
     }
 
     @Override
-    public Optional<Notice> findById(Long noticeId) {
+    public Optional<Notice> findByRowId(Long rowId) {
         return Optional.ofNullable(
                 query
                         .selectFrom(notice)
                         .leftJoin(notice.writer).fetchJoin()
-                        .where(notice.id.eq(noticeId)
+                        .where(notice.rowId.eq(rowId)
                                 .and(isNotDeleted()))
                         .fetchOne()
         );

@@ -83,7 +83,7 @@ public class ScheduleApiController implements ScheduleApi {
 
         List<ScheduleApiDto.SearchSchedulesByUserResp> resp = schedules.stream()
                 .map(s -> new ScheduleApiDto.SearchSchedulesByUserResp(
-                        s.getId(),
+                        s.getRowId(),
                         s.getType(),
                         getTranslatedName(s.getType()),
                         s.getDesc(),
@@ -102,7 +102,7 @@ public class ScheduleApiController implements ScheduleApi {
 
         List<ScheduleApiDto.SearchSchedulesByPeriodResp> resp = schedules.stream()
                 .map(s -> new ScheduleApiDto.SearchSchedulesByPeriodResp(
-                        s.getId(),
+                        s.getRowId(),
                         s.getUser().getId(),
                         s.getUser().getName(),
                         s.getType(),

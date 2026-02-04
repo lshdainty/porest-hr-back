@@ -36,15 +36,15 @@ public class WorkHistoryJpaRepository implements WorkHistoryRepository {
     }
 
     @Override
-    public Optional<WorkHistory> findById(Long id) {
+    public Optional<WorkHistory> findByRowId(Long rowId) {
         List<WorkHistory> result = em.createQuery(
                         "select wh from WorkHistory wh " +
                                 "join fetch wh.user " +
                                 "left join fetch wh.group " +
                                 "left join fetch wh.part " +
                                 "left join fetch wh.division " +
-                                "where wh.id = :id", WorkHistory.class)
-                .setParameter("id", id)
+                                "where wh.rowId = :rowId", WorkHistory.class)
+                .setParameter("rowId", rowId)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }

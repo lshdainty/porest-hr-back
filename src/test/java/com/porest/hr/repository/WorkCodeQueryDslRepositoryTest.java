@@ -83,7 +83,7 @@ class WorkCodeQueryDslRepositoryTest {
         em.clear();
 
         // when
-        Optional<WorkCode> findCode = workCodeRepository.findById(workCode.getId());
+        Optional<WorkCode> findCode = workCodeRepository.findByRowId(workCode.getRowId());
 
         // then
         assertThat(findCode.isPresent()).isTrue();
@@ -94,7 +94,7 @@ class WorkCodeQueryDslRepositoryTest {
     @DisplayName("Id로 조회 시 업무코드가 없으면 빈 Optional 반환")
     void findByIdEmpty() {
         // when
-        Optional<WorkCode> findCode = workCodeRepository.findById(999L);
+        Optional<WorkCode> findCode = workCodeRepository.findByRowId(999L);
 
         // then
         assertThat(findCode.isEmpty()).isTrue();
@@ -151,7 +151,7 @@ class WorkCodeQueryDslRepositoryTest {
         em.clear();
 
         // when
-        List<WorkCode> codes = workCodeRepository.findAllByConditions(null, parent.getId(), null, null);
+        List<WorkCode> codes = workCodeRepository.findAllByConditions(null, parent.getRowId(), null, null);
 
         // then
         assertThat(codes).hasSize(1);

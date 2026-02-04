@@ -64,7 +64,7 @@ public class VacationGrantScheduler {
                     successCount++;
 
                     log.info("휴가 만료 처리 완료 - Grant ID: {}, User: {}, VacationType: {}, RemainTime: {}, ExpiryDate: {}",
-                            grant.getId(),
+                            grant.getRowId(),
                             grant.getUser().getId(),
                             grant.getType().name(),
                             grant.getRemainTime(),
@@ -72,7 +72,7 @@ public class VacationGrantScheduler {
 
                 } catch (Exception e) {
                     log.error("휴가 만료 처리 실패 - VacationGrant ID: {}, Error: {}",
-                            grant.getId(), e.getMessage(), e);
+                            grant.getRowId(), e.getMessage(), e);
                     failCount++;
                 }
             }
@@ -175,7 +175,7 @@ public class VacationGrantScheduler {
 
                 } catch (Exception e) {
                     log.error("휴가 부여 실패 - VacationGrantSchedule ID: {}, Error: {}",
-                            schedule.getId(), e.getMessage(), e);
+                            schedule.getRowId(), e.getMessage(), e);
                     failCount++;
                     // 개별 실패는 스킵하고 계속 진행
                 }

@@ -32,10 +32,10 @@ public class WorkCodeJpaRepository implements WorkCodeRepository {
     }
 
     @Override
-    public Optional<WorkCode> findById(Long id) {
+    public Optional<WorkCode> findByRowId(Long rowId) {
         List<WorkCode> result = em.createQuery(
-                        "select wc from WorkCode wc where wc.id = :id and wc.isDeleted = :isDeleted", WorkCode.class)
-                .setParameter("id", id)
+                        "select wc from WorkCode wc where wc.rowId = :rowId and wc.isDeleted = :isDeleted", WorkCode.class)
+                .setParameter("rowId", rowId)
                 .setParameter("isDeleted", YNType.N)
                 .getResultList();
         return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
@@ -49,7 +49,7 @@ public class WorkCodeJpaRepository implements WorkCodeRepository {
         if (parentIsNull != null && parentIsNull) {
             jpql.append(" and wc.parent is null");
         } else if (parentWorkCodeId != null) {
-            jpql.append(" and wc.parent.id = :parentId");
+            jpql.append(" and wc.parent.rowId = :parentId");
         } else if (parentWorkCode != null && !parentWorkCode.isEmpty()) {
             jpql.append(" and wc.parent.code = :parentCode");
         }

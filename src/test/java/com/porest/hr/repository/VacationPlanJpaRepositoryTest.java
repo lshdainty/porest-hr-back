@@ -75,7 +75,7 @@ class VacationPlanJpaRepositoryTest {
             em.clear();
 
             // when
-            Optional<VacationPlan> findPlan = vacationPlanRepository.findByIdWithPolicies(plan.getId());
+            Optional<VacationPlan> findPlan = vacationPlanRepository.findByIdWithPolicies(plan.getRowId());
 
             // then
             assertThat(findPlan).isPresent();

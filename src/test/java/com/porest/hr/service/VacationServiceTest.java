@@ -308,7 +308,7 @@ class VacationServiceTest {
             VacationPolicy policy = createTestPolicy();
             ReflectionTestUtils.setField(policy, "id", policyId);
 
-            given(vacationPolicyRepository.findVacationPolicyById(policyId))
+            given(vacationPolicyRepository.findByRowId(policyId))
                     .willReturn(Optional.of(policy));
 
             // when
@@ -324,7 +324,7 @@ class VacationServiceTest {
         void getVacationPolicyFailNotFound() {
             // given
             Long policyId = 999L;
-            given(vacationPolicyRepository.findVacationPolicyById(policyId))
+            given(vacationPolicyRepository.findByRowId(policyId))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -380,7 +380,7 @@ class VacationServiceTest {
             VacationPolicy policy = createTestPolicy();
             ReflectionTestUtils.setField(policy, "id", policyId);
 
-            given(vacationPolicyRepository.findVacationPolicyById(policyId))
+            given(vacationPolicyRepository.findByRowId(policyId))
                     .willReturn(Optional.of(policy));
             given(vacationGrantRepository.findByPolicyId(policyId))
                     .willReturn(List.of());
@@ -402,7 +402,7 @@ class VacationServiceTest {
             ReflectionTestUtils.setField(policy, "id", policyId);
             policy.deleteVacationPolicy();
 
-            given(vacationPolicyRepository.findVacationPolicyById(policyId))
+            given(vacationPolicyRepository.findByRowId(policyId))
                     .willReturn(Optional.of(policy));
 
             // when & then
@@ -419,7 +419,7 @@ class VacationServiceTest {
             ReflectionTestUtils.setField(policy, "id", policyId);
             ReflectionTestUtils.setField(policy, "canDeleted", YNType.N);
 
-            given(vacationPolicyRepository.findVacationPolicyById(policyId))
+            given(vacationPolicyRepository.findByRowId(policyId))
                     .willReturn(Optional.of(policy));
 
             // when & then
@@ -1046,7 +1046,7 @@ class VacationServiceTest {
                     .build();
 
             given(userService.checkUserExist(userId)).willReturn(user);
-            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(policyId)).willReturn(Optional.of(policy));
             willDoNothing().given(vacationGrantRepository).save(any(VacationGrant.class));
 
             // when
@@ -1081,7 +1081,7 @@ class VacationServiceTest {
                     .build();
 
             given(userService.checkUserExist(userId)).willReturn(user);
-            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(policyId)).willReturn(Optional.of(policy));
             willDoNothing().given(vacationGrantRepository).save(any(VacationGrant.class));
 
             // when
@@ -1111,7 +1111,7 @@ class VacationServiceTest {
                     .build();
 
             given(userService.checkUserExist(userId)).willReturn(user);
-            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(policyId)).willReturn(Optional.of(policy));
 
             // when & then
             assertThatThrownBy(() -> vacationService.manualGrantVacation(userId, data))
@@ -1140,7 +1140,7 @@ class VacationServiceTest {
                     .build();
 
             given(userService.checkUserExist(userId)).willReturn(user);
-            given(vacationPolicyRepository.findVacationPolicyById(policyId)).willReturn(Optional.of(policy));
+            given(vacationPolicyRepository.findByRowId(policyId)).willReturn(Optional.of(policy));
 
             // when & then
             assertThatThrownBy(() -> vacationService.manualGrantVacation(userId, data))
@@ -1204,7 +1204,7 @@ class VacationServiceTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(usageId);
+            assertThat(result.getRowId()).isEqualTo(usageId);
         }
 
         @Test

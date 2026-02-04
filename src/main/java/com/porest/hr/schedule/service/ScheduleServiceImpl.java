@@ -35,10 +35,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         // 유저 조회
         User user = userService.checkUserExist(data.getUserId());
 
-        if (TimeUtils.isAfter(data.getStartDate(), data.getEndDate())) {
-            log.warn("일정 등록 실패 - 시작일이 종료일보다 이후: startDate={}, endDate={}", data.getStartDate(), data.getEndDate());
-            throw new InvalidValueException(HrErrorCode.SCHEDULE_INVALID_DATE);
-        }
+        // 날짜 범위 검증은 @DateRange 어노테이션으로 Controller 레벨에서 처리
 
         Schedule schedule = Schedule.createSchedule(
                 user,
@@ -50,9 +47,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         // 휴가 등록
         scheduleRepository.save(schedule);
-        log.info("일정 등록 완료: scheduleId={}, userId={}", schedule.getId(), data.getUserId());
+        log.info("일정 등록 완료: scheduleId={}, userId={}", schedule.getRowId(), data.getUserId());
 
-        return schedule.getId();
+        return schedule.getRowId();
     }
 
     @Override
@@ -103,7 +100,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public Schedule checkScheduleExist(Long scheduleId) {
-        Optional<Schedule> schedule = scheduleRepository.findById(scheduleId);
+        Optional<Schedule> schedule = scheduleRepository.findByRowId(scheduleId);
         if (schedule.isEmpty() || YNType.isY(schedule.get().getIsDeleted())) {
             log.warn("일정 조회 실패 - 존재하지 않는 일정: scheduleId={}", scheduleId);
             throw new EntityNotFoundException(HrErrorCode.SCHEDULE_NOT_FOUND);

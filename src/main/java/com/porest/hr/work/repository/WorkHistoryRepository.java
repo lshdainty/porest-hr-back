@@ -31,10 +31,10 @@ public interface WorkHistoryRepository {
     /**
      * 단건 업무 이력 조회
      *
-     * @param id 업무 이력 ID
+     * @param rowId 업무 이력 rowId
      * @return Optional&lt;WorkHistory&gt;
      */
-    Optional<WorkHistory> findById(Long id);
+    Optional<WorkHistory> findByRowId(Long rowId);
 
     /**
      * 전체 업무 이력 조회

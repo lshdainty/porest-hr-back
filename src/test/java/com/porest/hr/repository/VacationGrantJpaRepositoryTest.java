@@ -78,7 +78,7 @@ class VacationGrantJpaRepositoryTest {
         em.clear();
 
         // then
-        Optional<VacationGrant> findGrant = vacationGrantRepository.findById(grant.getId());
+        Optional<VacationGrant> findGrant = vacationGrantRepository.findById(grant.getRowId());
         assertThat(findGrant.isPresent()).isTrue();
         assertThat(findGrant.get().getDesc()).isEqualTo("2025년 연차");
         assertThat(findGrant.get().getGrantTime()).isEqualByComparingTo(new BigDecimal("8.0"));
@@ -106,7 +106,7 @@ class VacationGrantJpaRepositoryTest {
         em.clear();
 
         // when
-        List<VacationGrant> grants = vacationGrantRepository.findByPolicyId(policy.getId());
+        List<VacationGrant> grants = vacationGrantRepository.findByPolicyId(policy.getRowId());
 
         // then
         assertThat(grants).hasSize(1);
@@ -195,13 +195,13 @@ class VacationGrantJpaRepositoryTest {
         em.clear();
 
         // when - 차감
-        VacationGrant foundGrant = vacationGrantRepository.findById(grant.getId()).orElseThrow();
+        VacationGrant foundGrant = vacationGrantRepository.findById(grant.getRowId()).orElseThrow();
         foundGrant.deduct(new BigDecimal("4.0"));
         em.flush();
         em.clear();
 
         // then - 차감 확인
-        VacationGrant deductedGrant = vacationGrantRepository.findById(grant.getId()).orElseThrow();
+        VacationGrant deductedGrant = vacationGrantRepository.findById(grant.getRowId()).orElseThrow();
         assertThat(deductedGrant.getRemainTime()).isEqualByComparingTo(new BigDecimal("4.0"));
     }
 
@@ -339,7 +339,7 @@ class VacationGrantJpaRepositoryTest {
 
         // when
         List<VacationGrant> grants = vacationGrantRepository.findByIdsWithUserAndPolicy(
-                List.of(grant1.getId(), grant2.getId())
+                List.of(grant1.getRowId(), grant2.getRowId())
         );
 
         // then

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +45,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.UseVacationReq.class))
             )
-            @RequestBody VacationApiDto.UseVacationReq data,
+            @Valid @RequestBody VacationApiDto.UseVacationReq data,
             @Parameter(hidden = true) @LoginUser User loginUser
     );
 
@@ -138,7 +139,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.UpdateVacationUsageReq.class))
             )
-            @RequestBody VacationApiDto.UpdateVacationUsageReq data,
+            @Valid @RequestBody VacationApiDto.UpdateVacationUsageReq data,
             @Parameter(hidden = true) @LoginUser User loginUser
     );
 
@@ -420,7 +421,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.ManualGrantVacationReq.class))
             )
-            @RequestBody VacationApiDto.ManualGrantVacationReq data
+            @Valid @RequestBody VacationApiDto.ManualGrantVacationReq data
     );
 
     @Operation(
@@ -472,7 +473,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.RequestVacationReq.class))
             )
-            @RequestBody VacationApiDto.RequestVacationReq data,
+            @Valid @RequestBody VacationApiDto.RequestVacationReq data,
             @Parameter(hidden = true) @LoginUser User loginUser
     );
 

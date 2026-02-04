@@ -426,8 +426,8 @@ class UserQueryDslRepositoryTest {
     }
 
     @Test
-    @DisplayName("SSO User No로 유저 조회")
-    void findBySsoUserNo() {
+    @DisplayName("SSO User Row Id로 유저 조회")
+    void findBySsoUserRowId() {
         // given
         User user = User.createUser(
                 100L, "testUser", "홍길동", "hong@test.com",
@@ -439,19 +439,19 @@ class UserQueryDslRepositoryTest {
         em.clear();
 
         // when
-        Optional<User> findUser = userRepository.findBySsoUserNo(100L);
+        Optional<User> findUser = userRepository.findBySsoUserRowId(100L);
 
         // then
         assertThat(findUser.isPresent()).isTrue();
         assertThat(findUser.get().getId()).isEqualTo("testUser");
-        assertThat(findUser.get().getSsoUserNo()).isEqualTo(100L);
+        assertThat(findUser.get().getSsoUserRowId()).isEqualTo(100L);
     }
 
     @Test
-    @DisplayName("SSO User No로 유저 조회 - 없으면 빈 Optional")
-    void findBySsoUserNoEmpty() {
+    @DisplayName("SSO User Row Id로 유저 조회 - 없으면 빈 Optional")
+    void findBySsoUserRowIdEmpty() {
         // when
-        Optional<User> findUser = userRepository.findBySsoUserNo(999L);
+        Optional<User> findUser = userRepository.findBySsoUserRowId(999L);
 
         // then
         assertThat(findUser.isEmpty()).isTrue();

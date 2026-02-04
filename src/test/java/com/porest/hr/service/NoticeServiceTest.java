@@ -152,13 +152,13 @@ class NoticeServiceTest {
             );
             setNoticeId(notice, noticeId);
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when
             NoticeServiceDto result = noticeService.searchNotice(noticeId);
 
             // then
-            then(noticeRepository).should().findById(noticeId);
+            then(noticeRepository).should().findByRowId(noticeId);
             assertThat(result.getTitle()).isEqualTo("테스트 공지");
             assertThat(result.getType()).isEqualTo(NoticeType.GENERAL);
         }
@@ -175,7 +175,7 @@ class NoticeServiceTest {
             );
             setNoticeId(notice, noticeId);
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when
             NoticeServiceDto result = noticeService.searchNoticeAndIncreaseViewCount(noticeId);
@@ -189,7 +189,7 @@ class NoticeServiceTest {
         void searchNoticeFailNotFound() {
             // given
             Long noticeId = 999L;
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.empty());
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> noticeService.searchNotice(noticeId))
@@ -208,7 +208,7 @@ class NoticeServiceTest {
             );
             notice.deleteNotice();
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when & then
             assertThatThrownBy(() -> noticeService.searchNotice(noticeId))
@@ -366,7 +366,7 @@ class NoticeServiceTest {
                     .endDate(LocalDate.now().plusDays(60))
                     .build();
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when
             noticeService.updateNotice(noticeId, updateData);
@@ -387,7 +387,7 @@ class NoticeServiceTest {
                     .title("수정 제목")
                     .build();
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.empty());
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> noticeService.updateNotice(noticeId, updateData))
@@ -412,7 +412,7 @@ class NoticeServiceTest {
                     .endDate(LocalDate.now())
                     .build();
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when & then
             assertThatThrownBy(() -> noticeService.updateNotice(noticeId, updateData))
@@ -435,7 +435,7 @@ class NoticeServiceTest {
             );
             setNoticeId(notice, noticeId);
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when
             noticeService.deleteNotice(noticeId);
@@ -449,7 +449,7 @@ class NoticeServiceTest {
         void deleteNoticeFailNotFound() {
             // given
             Long noticeId = 999L;
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.empty());
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> noticeService.deleteNotice(noticeId))
@@ -468,7 +468,7 @@ class NoticeServiceTest {
             );
             notice.deleteNotice();
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when & then
             assertThatThrownBy(() -> noticeService.deleteNotice(noticeId))
@@ -491,7 +491,7 @@ class NoticeServiceTest {
             );
             setNoticeId(notice, noticeId);
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when
             Notice result = noticeService.checkNoticeExist(noticeId);
@@ -505,7 +505,7 @@ class NoticeServiceTest {
         void checkNoticeExistFailNotFound() {
             // given
             Long noticeId = 999L;
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.empty());
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> noticeService.checkNoticeExist(noticeId))
@@ -524,7 +524,7 @@ class NoticeServiceTest {
             );
             notice.deleteNotice();
 
-            given(noticeRepository.findById(noticeId)).willReturn(Optional.of(notice));
+            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
 
             // when & then
             assertThatThrownBy(() -> noticeService.checkNoticeExist(noticeId))

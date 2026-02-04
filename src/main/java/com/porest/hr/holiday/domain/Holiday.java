@@ -19,12 +19,12 @@ import java.util.Objects;
 @Table(name = "holiday")
 public class Holiday extends AuditingFieldsWithIp {
     /**
-     * 공휴일 아이디<br>
-     * 테이블 관리용 seq
+     * 행 아이디<br>
+     * 테이블 관리용 PK (auto increment)
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "holiday_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 공휴일 일자<br>

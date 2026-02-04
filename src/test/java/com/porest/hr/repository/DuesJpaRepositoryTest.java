@@ -50,7 +50,7 @@ class DuesJpaRepositoryTest {
         em.clear();
 
         // then
-        Optional<Dues> findDues = duesRepository.findById(dues.getId());
+        Optional<Dues> findDues = duesRepository.findByRowId(dues.getRowId());
         assertThat(findDues.isPresent()).isTrue();
         assertThat(findDues.get().getUserName()).isEqualTo("홍길동");
         assertThat(findDues.get().getAmount()).isEqualTo(50000L);
@@ -60,7 +60,7 @@ class DuesJpaRepositoryTest {
     @DisplayName("단건 조회 시 회비가 없으면 빈 Optional 반환")
     void findByIdEmpty() {
         // when
-        Optional<Dues> findDues = duesRepository.findById(999L);
+        Optional<Dues> findDues = duesRepository.findByRowId(999L);
 
         // then
         assertThat(findDues.isEmpty()).isTrue();
@@ -251,13 +251,13 @@ class DuesJpaRepositoryTest {
         em.clear();
 
         // when
-        Dues foundDues = duesRepository.findById(dues.getId()).orElseThrow();
+        Dues foundDues = duesRepository.findByRowId(dues.getRowId()).orElseThrow();
         duesRepository.delete(foundDues);
         em.flush();
         em.clear();
 
         // then
-        Optional<Dues> deletedDues = duesRepository.findById(dues.getId());
+        Optional<Dues> deletedDues = duesRepository.findByRowId(dues.getRowId());
         assertThat(deletedDues.isEmpty()).isTrue();
     }
 
@@ -274,14 +274,14 @@ class DuesJpaRepositoryTest {
         em.clear();
 
         // when
-        Dues foundDues = duesRepository.findById(dues.getId()).orElseThrow();
+        Dues foundDues = duesRepository.findByRowId(dues.getRowId()).orElseThrow();
         foundDues.updateDues("김철수", 60000L, DuesType.BIRTH, DuesCalcType.PLUS,
                 LocalDate.of(2025, 2, 1), "수정된 내용");
         em.flush();
         em.clear();
 
         // then
-        Dues updatedDues = duesRepository.findById(dues.getId()).orElseThrow();
+        Dues updatedDues = duesRepository.findByRowId(dues.getRowId()).orElseThrow();
         assertThat(updatedDues.getUserName()).isEqualTo("김철수");
         assertThat(updatedDues.getAmount()).isEqualTo(60000L);
         assertThat(updatedDues.getType()).isEqualTo(DuesType.BIRTH);

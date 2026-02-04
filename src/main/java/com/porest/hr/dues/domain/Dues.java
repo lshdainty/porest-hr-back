@@ -17,12 +17,12 @@ import java.util.Objects;
 @Table(name = "dues")
 public class Dues extends AuditingFieldsWithIp {
     /**
-     * 회비 아이디<br>
+     * 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "dues_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 회원 이름<br>

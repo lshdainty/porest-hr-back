@@ -32,7 +32,7 @@ public class VacationUsageQueryDslRepository implements VacationUsageRepository 
         return Optional.ofNullable(query
                 .selectFrom(vacationUsage)
                 .join(vacationUsage.user).fetchJoin()
-                .where(vacationUsage.id.eq(vacationUsageId))
+                .where(vacationUsage.rowId.eq(vacationUsageId))
                 .fetchOne()
         );
     }

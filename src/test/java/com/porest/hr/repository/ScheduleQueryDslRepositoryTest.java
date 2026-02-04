@@ -67,7 +67,7 @@ class ScheduleQueryDslRepositoryTest {
         em.clear();
 
         // then
-        Optional<Schedule> findSchedule = scheduleRepository.findById(schedule.getId());
+        Optional<Schedule> findSchedule = scheduleRepository.findByRowId(schedule.getRowId());
         assertThat(findSchedule.isPresent()).isTrue();
         assertThat(findSchedule.get().getDesc()).isEqualTo("테스트 교육");
         assertThat(findSchedule.get().getType()).isEqualTo(ScheduleType.EDUCATION);
@@ -77,7 +77,7 @@ class ScheduleQueryDslRepositoryTest {
     @DisplayName("단건 조회 시 스케줄이 없으면 빈 Optional 반환")
     void findByIdEmpty() {
         // when
-        Optional<Schedule> findSchedule = scheduleRepository.findById(999L);
+        Optional<Schedule> findSchedule = scheduleRepository.findByRowId(999L);
 
         // then
         assertThat(findSchedule.isEmpty()).isTrue();
@@ -219,7 +219,7 @@ class ScheduleQueryDslRepositoryTest {
         em.clear();
 
         // when
-        Schedule foundSchedule = scheduleRepository.findById(schedule.getId()).orElseThrow();
+        Schedule foundSchedule = scheduleRepository.findByRowId(schedule.getRowId()).orElseThrow();
         foundSchedule.deleteSchedule();
         em.flush();
         em.clear();

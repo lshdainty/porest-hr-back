@@ -13,7 +13,7 @@ import java.util.List;
 @Getter @Setter
 @Builder
 public class UserServiceDto {
-    private Long ssoUserNo; // SSO에서 발급한 사용자 순번 (HR PK로 사용)
+    private Long ssoUserRowId; // SSO에서 발급한 사용자 순번 (HR PK로 사용)
     private String id;
     private String name;
     private String email;

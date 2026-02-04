@@ -19,20 +19,20 @@ import java.time.LocalDateTime;
 @Table(name = "schedule")
 public class Schedule extends AuditingFieldsWithIp {
     /**
-     * 스케줄 아이디<br>
+     * 행 아이디<br>
      * 테이블 관리용 seq
      */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_id")
-    private Long id;
+    @Column(name = "row_id")
+    private Long rowId;
 
     /**
      * 사용자 객체<br>
-     * 테이블 컬럼은 user_no<br>
+     * 테이블 컬럼은 user_row_id<br>
      * 어떤 유저의 스케줄인지 알기 위해 사용
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no", nullable = false)
+    @JoinColumn(name = "user_row_id", nullable = false)
     private User user;
 
     /**

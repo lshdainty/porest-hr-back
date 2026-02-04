@@ -42,14 +42,14 @@ public class WorkHistoryQueryDslRepository implements WorkHistoryRepository {
     }
 
     @Override
-    public Optional<WorkHistory> findById(Long id) {
+    public Optional<WorkHistory> findByRowId(Long rowId) {
         return Optional.ofNullable(query
                 .selectFrom(workHistory)
                 .join(workHistory.user).fetchJoin()
                 .leftJoin(workHistory.group).fetchJoin()
                 .leftJoin(workHistory.part).fetchJoin()
                 .leftJoin(workHistory.division).fetchJoin()
-                .where(workHistory.id.eq(id))
+                .where(workHistory.rowId.eq(rowId))
                 .fetchOne());
     }
 
@@ -73,7 +73,7 @@ public class WorkHistoryQueryDslRepository implements WorkHistoryRepository {
                 .orderBy(
                         "OLDEST".equalsIgnoreCase(condition.getSortType()) ? workHistory.date.asc()
                                 : workHistory.date.desc(),
-                        workHistory.id.desc())
+                        workHistory.rowId.desc())
                 .fetch();
     }
 
@@ -102,7 +102,7 @@ public class WorkHistoryQueryDslRepository implements WorkHistoryRepository {
                 .orderBy(
                         "OLDEST".equalsIgnoreCase(condition.getSortType()) ? workHistory.date.asc()
                                 : workHistory.date.desc(),
-                        workHistory.id.desc())
+                        workHistory.rowId.desc())
                 .stream();
     }
 
@@ -128,15 +128,15 @@ public class WorkHistoryQueryDslRepository implements WorkHistoryRepository {
     }
 
     private BooleanExpression groupEq(Long groupSeq) {
-        return groupSeq != null ? workHistory.group.id.eq(groupSeq) : null;
+        return groupSeq != null ? workHistory.group.rowId.eq(groupSeq) : null;
     }
 
     private BooleanExpression partEq(Long partSeq) {
-        return partSeq != null ? workHistory.part.id.eq(partSeq) : null;
+        return partSeq != null ? workHistory.part.rowId.eq(partSeq) : null;
     }
 
     private BooleanExpression divisionEq(Long divisionSeq) {
-        return divisionSeq != null ? workHistory.division.id.eq(divisionSeq) : null;
+        return divisionSeq != null ? workHistory.division.rowId.eq(divisionSeq) : null;
     }
 
     @Override

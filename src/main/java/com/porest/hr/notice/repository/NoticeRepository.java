@@ -22,10 +22,10 @@ public interface NoticeRepository {
     /**
      * 단건 공지사항 조회
      *
-     * @param noticeId 공지사항 ID
+     * @param rowId 공지사항 rowId
      * @return Optional&lt;Notice&gt;
      */
-    Optional<Notice> findById(Long noticeId);
+    Optional<Notice> findByRowId(Long rowId);
 
     /**
      * 전체 공지사항 페이징 조회
