@@ -340,10 +340,8 @@ public class UserApiController implements UserApi {
                 result.getUserId(),
                 result.getName(),
                 result.getEmail(),
-                result.getInvitationSentAt(),
-                result.getInvitationExpiresAt(),
-                result.getInvitationStatus() != null ? result.getInvitationStatus().name() : null,
-                result.isAlreadyExists() ? "기존 SSO 계정과 연결되었습니다." : "초대가 발송되었습니다."
+                result.getMessage() != null ? result.getMessage() :
+                        (result.isAlreadyExists() ? "기존 SSO 계정과 연결되었습니다." : "초대가 발송되었습니다.")
         ));
     }
 

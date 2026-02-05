@@ -13,7 +13,6 @@ import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserApiDto {
@@ -412,15 +411,6 @@ public class UserApiDto {
 
         @Schema(description = "사용자 이메일", example = "hong@example.com")
         private String userEmail;
-
-        @Schema(description = "초대 발송 일시")
-        private LocalDateTime invitationSentAt;
-
-        @Schema(description = "초대 만료 일시")
-        private LocalDateTime invitationExpiresAt;
-
-        @Schema(description = "초대 상태", example = "PENDING")
-        private String invitationStatus;
 
         @Schema(description = "메시지", example = "초대가 발송되었습니다.")
         private String message;

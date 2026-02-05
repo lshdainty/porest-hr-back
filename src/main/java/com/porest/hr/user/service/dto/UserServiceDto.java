@@ -7,11 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.porest.hr.user.type.StatusType;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter @Setter
@@ -80,10 +78,6 @@ public class UserServiceDto {
         private String userId;
         private String name;
         private String email;
-        private String invitationToken;
-        private LocalDateTime invitationSentAt;
-        private LocalDateTime invitationExpiresAt;
-        private StatusType invitationStatus;
         private String message;
     }
 }

@@ -10,7 +10,6 @@ import com.porest.core.type.YNType;
 import com.porest.core.util.MessageResolver;
 import com.porest.core.util.FileUtils;
 import com.porest.hr.department.repository.DepartmentRepository;
-import com.porest.hr.user.type.StatusType;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.repository.RoleRepository;
 import com.porest.hr.user.domain.User;
@@ -464,12 +463,11 @@ public class UserServiceImpl implements UserService {
                         .userId(user.getId())
                         .name(user.getName())
                         .email(user.getEmail())
-                        .invitationStatus(user.getInvitationStatus())
                         .message(ssoResponse.getMessage())
                         .build();
             }
 
-            // HR에 없으면 새로 생성 (ACTIVE 상태)
+            // HR에 없으면 새로 생성
             User user = User.createUser(
                     ssoResponse.getUserNo(),
                     ssoResponse.getUserId(),
@@ -484,7 +482,6 @@ public class UserServiceImpl implements UserService {
                     data.getProfileUUID(),
                     data.getCountryCode()
             );
-            user.linkExistingSsoUser(ssoResponse.getUserNo());
             userRepository.save(user);
 
             return UserServiceDto.InviteResult.builder()
@@ -493,22 +490,24 @@ public class UserServiceImpl implements UserService {
                     .userId(user.getId())
                     .name(user.getName())
                     .email(user.getEmail())
-                    .invitationStatus(StatusType.ACTIVE)
                     .message(ssoResponse.getMessage())
                     .build();
         }
 
         // 3. 신규 사용자 - HR DB에 저장
-        User user = User.createInvitedUser(
+        User user = User.createUser(
                 ssoResponse.getUserNo(),
                 data.getId(),
                 data.getName(),
                 data.getEmail(),
+                data.getBirth(),
                 data.getCompany(),
                 data.getWorkTime(),
                 data.getJoinDate(),
-                data.getCountryCode(),
-                ssoResponse.getInvitationToken()
+                data.getLunarYN() != null ? data.getLunarYN() : YNType.N,
+                data.getProfileName(),
+                data.getProfileUUID(),
+                data.getCountryCode()
         );
         userRepository.save(user);
 
@@ -520,25 +519,17 @@ public class UserServiceImpl implements UserService {
                 .userId(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
-                .invitationToken(ssoResponse.getInvitationToken())
-                .invitationSentAt(user.getInvitationSentAt())
-                .invitationExpiresAt(user.getInvitationExpiresAt())
-                .invitationStatus(StatusType.PENDING)
+                .message(ssoResponse.getMessage())
                 .build();
     }
 
     @Override
     @Transactional
     public UserServiceDto editInvitation(String userId, UserServiceDto data) {
-        log.debug("초대 대기 사용자 정보 수정: userId={}", userId);
+        log.debug("사용자 정보 수정: userId={}", userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.USER_NOT_FOUND));
-
-        // PENDING 상태인지 확인
-        if (!user.isPendingInvitation()) {
-            throw new InvalidValueException(HrErrorCode.INVITATION_EXPIRED);
-        }
 
         // 정보 수정 (비밀번호 제외 필드만)
         user.updateUser(
@@ -555,7 +546,7 @@ public class UserServiceImpl implements UserService {
                 data.getCountryCode()
         );
 
-        log.info("초대 대기 사용자 정보 수정 완료: userId={}", userId);
+        log.info("사용자 정보 수정 완료: userId={}", userId);
 
         return UserServiceDto.builder()
                 .ssoUserRowId(user.getSsoUserRowId())
@@ -577,12 +568,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(HrErrorCode.USER_NOT_FOUND));
 
-        // PENDING 상태인지 확인
-        if (!user.isPendingInvitation()) {
-            throw new InvalidValueException(HrErrorCode.INVITATION_EXPIRED);
-        }
-
-        // SSO API 호출
+        // SSO API 호출 (초대 상태 확인은 SSO에서 처리)
         ssoApiClient.resendInvitation(userId);
 
         log.info("초대 재전송 완료: userId={}", userId);

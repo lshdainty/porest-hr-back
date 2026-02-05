@@ -86,8 +86,7 @@ public class AuthController implements AuthApi {
                 YNType.Y,
                 StringUtils.hasText(user.getProfileName()) && StringUtils.hasText(user.getProfileUUID()) ?
                         userService.generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null,
-                YNType.N,  // 비밀번호 변경 필요 여부 (SSO에서 관리)
-                null  // 초대 상태 (SSO에서 관리)
+                YNType.N  // 비밀번호 변경 필요 여부 (SSO에서 관리)
         );
 
         log.info("user info : {}, {}, {}, roles: {}, permissions: {}, {}",

@@ -3,7 +3,6 @@ package com.porest.hr.security.controller.dto;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.annotation.JsonNaming;
 import com.porest.core.type.YNType;
-import com.porest.hr.user.type.StatusType;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -23,8 +22,7 @@ public class AuthApiDto {
         private List<String> permissions;      // 모든 권한 코드 목록
         private YNType isLogin;
         private String profileUrl;
-        private YNType passwordChangeRequired; // 비밀번호 변경 필요 여부
-        private StatusType invitationStatus;   // 초대 상태 (PENDING, ACTIVE 등)
+        private YNType passwordChangeRequired; // 비밀번호 변경 필요 여부 (SSO에서 관리)
     }
 
     @Getter
