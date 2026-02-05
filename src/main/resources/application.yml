@@ -117,3 +117,11 @@ security:
     enabled: true  # IP 블랙리스트 기능 활성화 여부
     log-level: WARN  # 차단 로그 레벨 (WARN 또는 ERROR)
     file-path: ${IP_BLACKLIST_FILE_PATH:config/ip-blacklist.txt}  # IP 블랙리스트 파일 경로
+
+# SSO 연동 설정
+sso:
+  api-url: ${SSO_API_URL:http://localhost:8080}
+  client-code: ${SSO_CLIENT_CODE:hr}
+  timeout:
+    connect: ${SSO_CONNECT_TIMEOUT:5000}
+    read: ${SSO_READ_TIMEOUT:10000}

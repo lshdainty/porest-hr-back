@@ -315,4 +315,70 @@ public class UserApiController implements UserApi {
         if (type == null) return null;
         return messageSource.getMessage(type.getMessageKey(), null, LocaleContextHolder.getLocale());
     }
+
+    // ==================== 초대 관련 API ====================
+
+    @Override
+    public ApiResponse inviteUser(UserApiDto.InviteUserReq data) {
+        log.debug("REST request to invite user: {}", data.getUserId());
+
+        UserServiceDto.InviteResult result = userService.inviteUser(
+                UserServiceDto.builder()
+                        .id(data.getUserId())
+                        .name(data.getUserName())
+                        .email(data.getUserEmail())
+                        .joinDate(data.getJoinDate())
+                        .company(data.getUserCompanyType())
+                        .workTime(data.getUserWorkTime())
+                        .countryCode(data.getCountryCode())
+                        .build()
+        );
+
+        return ApiResponse.success(new UserApiDto.InviteUserResp(
+                result.isAlreadyExists(),
+                result.getSsoUserRowId(),
+                result.getUserId(),
+                result.getName(),
+                result.getEmail(),
+                result.getInvitationSentAt(),
+                result.getInvitationExpiresAt(),
+                result.getInvitationStatus() != null ? result.getInvitationStatus().name() : null,
+                result.isAlreadyExists() ? "기존 SSO 계정과 연결되었습니다." : "초대가 발송되었습니다."
+        ));
+    }
+
+    @Override
+    public ApiResponse editInvitation(String userId, UserApiDto.EditInvitationReq data) {
+        log.debug("REST request to edit invitation: {}", userId);
+
+        UserServiceDto result = userService.editInvitation(
+                userId,
+                UserServiceDto.builder()
+                        .name(data.getUserName())
+                        .email(data.getUserEmail())
+                        .company(data.getUserCompanyType())
+                        .workTime(data.getUserWorkTime())
+                        .countryCode(data.getCountryCode())
+                        .build()
+        );
+
+        return ApiResponse.success(new UserApiDto.EditInvitationResp(
+                result.getSsoUserRowId(),
+                result.getId(),
+                result.getName(),
+                result.getEmail(),
+                result.getCompany(),
+                result.getWorkTime(),
+                result.getCountryCode()
+        ));
+    }
+
+    @Override
+    public ApiResponse resendInvitation(String userId) {
+        log.debug("REST request to resend invitation: {}", userId);
+
+        userService.resendInvitation(userId);
+
+        return ApiResponse.success();
+    }
 }

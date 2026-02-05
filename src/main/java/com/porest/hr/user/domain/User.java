@@ -8,6 +8,7 @@ import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.domain.UserRole;
 import com.porest.core.type.YNType;
+import com.porest.hr.user.type.StatusType;
 import com.porest.hr.vacation.domain.UserVacationPlan;
 import com.porest.hr.vacation.domain.VacationApproval;
 import com.porest.hr.vacation.domain.VacationGrant;
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,6 +138,44 @@ public class User extends AuditingFieldsWithIp {
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deleted", nullable = false, length = 1)
     private YNType isDeleted;
+
+    /**
+     * 초대 상태<br>
+     * PENDING: 초대 후 아직 회원가입하지 않은 상태<br>
+     * ACTIVE: 회원가입 완료한 상태<br>
+     * EXPIRED: 초대 링크가 만료된 상태
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "invitation_status", length = 10)
+    private StatusType invitationStatus;
+
+    /**
+     * 초대 토큰<br>
+     * SSO에서 발급한 초대 토큰 (회원가입 완료 후 null)
+     */
+    @Column(name = "invitation_token", length = 36)
+    private String invitationToken;
+
+    /**
+     * 초대 발송 일시<br>
+     * 초대 이메일 발송 시간
+     */
+    @Column(name = "invitation_sent_at")
+    private LocalDateTime invitationSentAt;
+
+    /**
+     * 초대 만료 일시<br>
+     * 초대 토큰 만료 시간 (기본 48시간)
+     */
+    @Column(name = "invitation_expires_at")
+    private LocalDateTime invitationExpiresAt;
+
+    /**
+     * 회원가입 완료 일시<br>
+     * 사용자가 회원가입을 완료한 시간
+     */
+    @Column(name = "registered_at")
+    private LocalDateTime registeredAt;
 
     /**
      * 대시보드 레이아웃 정보<br>
@@ -498,5 +538,112 @@ public class User extends AuditingFieldsWithIp {
                 .map(UserVacationPlan::getVacationPlan)
                 .filter(plan -> YNType.isN(plan.getIsDeleted()))
                 .anyMatch(plan -> plan.getCode().equals(planCode));
+    }
+
+    /* 초대 관련 메서드 */
+
+    /**
+     * 초대된 사용자 생성 팩토리 메서드<br>
+     * SSO에서 초대 결과를 받아 HR에 사용자 생성
+     *
+     * @param ssoUserRowId SSO에서 발급한 row_id
+     * @param id 사용자 ID
+     * @param name 사용자명
+     * @param email 이메일
+     * @param company 회사
+     * @param workTime 근무시간
+     * @param joinDate 입사일
+     * @param countryCode 국가코드
+     * @param invitationToken 초대 토큰
+     * @return 초대된 User 엔티티
+     */
+    public static User createInvitedUser(Long ssoUserRowId, String id, String name, String email,
+                                         CompanyType company, String workTime, LocalDate joinDate,
+                                         CountryCode countryCode, String invitationToken) {
+        User user = new User();
+        user.ssoUserRowId = ssoUserRowId;
+        user.id = id;
+        user.name = name;
+        user.email = email;
+        user.company = company;
+        user.workTime = workTime;
+        user.joinDate = joinDate;
+        user.countryCode = countryCode;
+        user.lunarYN = YNType.N;
+        user.isDeleted = YNType.N;
+        user.invitationStatus = StatusType.PENDING;
+        user.invitationToken = invitationToken;
+        user.invitationSentAt = LocalDateTime.now();
+        user.invitationExpiresAt = LocalDateTime.now().plusHours(48);
+        return user;
+    }
+
+    /**
+     * 초대 정보 설정<br>
+     * SSO 초대 결과를 바탕으로 초대 정보 설정
+     *
+     * @param token 초대 토큰
+     * @param sentAt 발송 시간
+     * @param expiresAt 만료 시간
+     * @param status 초대 상태
+     */
+    public void setInvitationInfo(String token, LocalDateTime sentAt, LocalDateTime expiresAt, StatusType status) {
+        this.invitationToken = token;
+        this.invitationSentAt = sentAt;
+        this.invitationExpiresAt = expiresAt;
+        this.invitationStatus = status;
+    }
+
+    /**
+     * 회원가입 완료 처리<br>
+     * SSO에서 USER_UPDATED 이벤트 수신 시 호출
+     *
+     * @param newId 변경된 사용자 ID (null이면 유지)
+     * @param newEmail 변경된 이메일 (null이면 유지)
+     */
+    public void completeRegistration(String newId, String newEmail) {
+        if (newId != null && !newId.equals(this.id)) {
+            this.id = newId;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+        }
+        this.invitationStatus = StatusType.ACTIVE;
+        this.registeredAt = LocalDateTime.now();
+        this.invitationToken = null;
+    }
+
+    /**
+     * 초대 토큰 갱신<br>
+     * 초대 재전송 시 토큰 및 만료 시간 갱신
+     *
+     * @param newToken 새 초대 토큰
+     */
+    public void renewInvitationToken(String newToken) {
+        this.invitationToken = newToken;
+        this.invitationSentAt = LocalDateTime.now();
+        this.invitationExpiresAt = LocalDateTime.now().plusHours(48);
+        this.invitationStatus = StatusType.PENDING;
+    }
+
+    /**
+     * 초대 대기 상태 여부 확인
+     *
+     * @return PENDING 상태면 true
+     */
+    public boolean isPendingInvitation() {
+        return this.invitationStatus == StatusType.PENDING;
+    }
+
+    /**
+     * SSO 연동된 기존 사용자 연결 처리<br>
+     * 이미 SSO에 등록된 사용자가 HR에 연결되는 경우
+     *
+     * @param ssoUserRowId SSO에서 발급한 row_id
+     */
+    public void linkExistingSsoUser(Long ssoUserRowId) {
+        this.ssoUserRowId = ssoUserRowId;
+        this.invitationStatus = StatusType.ACTIVE;
+        this.registeredAt = LocalDateTime.now();
     }
 }

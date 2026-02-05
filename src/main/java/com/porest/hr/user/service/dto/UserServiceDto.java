@@ -7,7 +7,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.porest.hr.user.type.StatusType;
+import lombok.AllArgsConstructor;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter @Setter
@@ -62,5 +66,24 @@ public class UserServiceDto {
     public static class PermissionDetailDto {
         private String permissionCode;
         private String permissionName;
+    }
+
+    /**
+     * 사용자 초대 결과 DTO
+     */
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class InviteResult {
+        private boolean alreadyExists;
+        private Long ssoUserRowId;
+        private String userId;
+        private String name;
+        private String email;
+        private String invitationToken;
+        private LocalDateTime invitationSentAt;
+        private LocalDateTime invitationExpiresAt;
+        private StatusType invitationStatus;
+        private String message;
     }
 }

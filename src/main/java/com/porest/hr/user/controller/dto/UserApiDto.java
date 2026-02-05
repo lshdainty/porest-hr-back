@@ -13,6 +13,7 @@ import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserApiDto {
@@ -360,6 +361,118 @@ public class UserApiDto {
 
         @Schema(description = "권한 이름", example = "사용자 조회")
         private String permissionName;
+    }
+
+    // ==================== 초대 관련 DTO ====================
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "사용자 초대 요청")
+    public static class InviteUserReq {
+        @Schema(description = "사용자 ID", example = "hong")
+        private String userId;
+
+        @Schema(description = "사용자 이름", example = "홍길동")
+        private String userName;
+
+        @Schema(description = "사용자 이메일", example = "hong@example.com")
+        private String userEmail;
+
+        @Schema(description = "입사일", example = "2024-01-01")
+        private LocalDate joinDate;
+
+        @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
+        private CompanyType userCompanyType;
+
+        @Schema(description = "근무시간", example = "9 ~ 18")
+        private String userWorkTime;
+
+        @Schema(description = "국가코드", example = "KR")
+        private CountryCode countryCode;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "사용자 초대 응답")
+    public static class InviteUserResp {
+        @Schema(description = "기존 SSO 사용자 여부", example = "false")
+        private boolean alreadyExists;
+
+        @Schema(description = "SSO 사용자 번호", example = "1")
+        private Long ssoUserRowId;
+
+        @Schema(description = "사용자 ID", example = "hong")
+        private String userId;
+
+        @Schema(description = "사용자 이름", example = "홍길동")
+        private String userName;
+
+        @Schema(description = "사용자 이메일", example = "hong@example.com")
+        private String userEmail;
+
+        @Schema(description = "초대 발송 일시")
+        private LocalDateTime invitationSentAt;
+
+        @Schema(description = "초대 만료 일시")
+        private LocalDateTime invitationExpiresAt;
+
+        @Schema(description = "초대 상태", example = "PENDING")
+        private String invitationStatus;
+
+        @Schema(description = "메시지", example = "초대가 발송되었습니다.")
+        private String message;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "초대 정보 수정 요청")
+    public static class EditInvitationReq {
+        @Schema(description = "사용자 이름", example = "홍길동")
+        private String userName;
+
+        @Schema(description = "사용자 이메일", example = "hong@example.com")
+        private String userEmail;
+
+        @Schema(description = "소속 회사", example = "KAKAO")
+        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
+        private CompanyType userCompanyType;
+
+        @Schema(description = "근무시간", example = "9 ~ 18")
+        private String userWorkTime;
+
+        @Schema(description = "국가코드", example = "KR")
+        private CountryCode countryCode;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "초대 정보 수정 응답")
+    public static class EditInvitationResp {
+        @Schema(description = "SSO 사용자 번호", example = "1")
+        private Long ssoUserRowId;
+
+        @Schema(description = "사용자 ID", example = "hong")
+        private String userId;
+
+        @Schema(description = "사용자 이름", example = "홍길동")
+        private String userName;
+
+        @Schema(description = "사용자 이메일", example = "hong@example.com")
+        private String userEmail;
+
+        @Schema(description = "소속 회사", example = "KAKAO")
+        private CompanyType userCompanyType;
+
+        @Schema(description = "근무시간", example = "9 ~ 18")
+        private String userWorkTime;
+
+        @Schema(description = "국가코드", example = "KR")
+        private CountryCode countryCode;
     }
 
 }

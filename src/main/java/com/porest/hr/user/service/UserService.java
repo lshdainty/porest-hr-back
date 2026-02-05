@@ -152,4 +152,37 @@ public interface UserService {
      * @return 모든 User 엔티티 리스트
      */
     List<User> findAllUsers();
+
+    /**
+     * 사용자 초대<br>
+     * SSO에 사용자 초대 요청 후 HR에 사용자 정보 저장
+     *
+     * @param data 초대할 사용자 정보
+     * @return 초대 결과 (SSO 응답 + HR 저장 정보)
+     * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
+     */
+    UserServiceDto.InviteResult inviteUser(UserServiceDto data);
+
+    /**
+     * 초대 대기 사용자 정보 수정<br>
+     * PENDING 상태의 사용자 정보만 수정 가능
+     *
+     * @param userId 사용자 ID
+     * @param data 수정할 정보
+     * @return 수정된 사용자 정보
+     * @throws com.porest.core.exception.EntityNotFoundException 사용자를 찾을 수 없는 경우
+     * @throws com.porest.core.exception.InvalidValueException PENDING 상태가 아닌 경우
+     */
+    UserServiceDto editInvitation(String userId, UserServiceDto data);
+
+    /**
+     * 초대 재전송<br>
+     * SSO에 초대 재전송 요청
+     *
+     * @param userId 사용자 ID
+     * @throws com.porest.core.exception.EntityNotFoundException 사용자를 찾을 수 없는 경우
+     * @throws com.porest.core.exception.InvalidValueException PENDING 상태가 아닌 경우
+     * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
+     */
+    void resendInvitation(String userId);
 }

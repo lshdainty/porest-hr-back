@@ -130,6 +130,13 @@ public enum HrErrorCode implements ErrorCodeProvider {
     NOTICE_NOT_FOUND("NOTICE_001", "error.notfound.notice", HttpStatus.NOT_FOUND),
     NOTICE_INVALID_DATE("NOTICE_002", "error.notice.invalid.date", HttpStatus.BAD_REQUEST),
 
+    // ========================================
+    // SSO (SSO 연동)
+    // ========================================
+    SSO_SERVICE_ERROR("SSO_001", "error.sso.service.error", HttpStatus.BAD_GATEWAY),
+    SSO_USER_NOT_FOUND("SSO_002", "error.sso.user.not.found", HttpStatus.NOT_FOUND),
+    SSO_INVITATION_FAILED("SSO_003", "error.sso.invitation.failed", HttpStatus.BAD_GATEWAY),
+
     ;
 
     /**

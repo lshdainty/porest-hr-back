@@ -240,4 +240,95 @@ public interface UserApi {
             @Parameter(description = "사용자 ID", example = "user123", required = true)
             @PathVariable("userId") String userId
     );
+
+    // ==================== 초대 관련 API ====================
+
+    @Operation(
+            summary = "사용자 초대",
+            description = "SSO에 사용자를 초대하고 HR 정보를 저장합니다. " +
+                    "이미 SSO에 등록된 사용자면 UserClientAccess만 생성됩니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "초대 성공",
+                    content = @Content(schema = @Schema(implementation = UserApiDto.InviteUserResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청 데이터"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "502",
+                    description = "SSO 서비스 연동 실패"
+            )
+    })
+    @PostMapping("/api/v1/users/invitations")
+    ApiResponse inviteUser(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "초대 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.InviteUserReq.class))
+            )
+            @RequestBody UserApiDto.InviteUserReq data
+    );
+
+    @Operation(
+            summary = "초대 정보 수정",
+            description = "초대 대기 중인 사용자의 정보를 수정합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "수정 성공",
+                    content = @Content(schema = @Schema(implementation = UserApiDto.EditInvitationResp.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "초대 대기 상태가 아닌 사용자"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음"
+            )
+    })
+    @PutMapping("/api/v1/users/{userId}/invitations")
+    ApiResponse editInvitation(
+            @Parameter(description = "사용자 ID", example = "user123", required = true)
+            @PathVariable("userId") String userId,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "수정 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.EditInvitationReq.class))
+            )
+            @RequestBody UserApiDto.EditInvitationReq data
+    );
+
+    @Operation(
+            summary = "초대 재전송",
+            description = "초대 이메일을 재발송합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "재전송 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "초대 대기 상태가 아닌 사용자"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "502",
+                    description = "SSO 서비스 연동 실패"
+            )
+    })
+    @PostMapping("/api/v1/users/{userId}/invitations/resend")
+    ApiResponse resendInvitation(
+            @Parameter(description = "사용자 ID", example = "user123", required = true)
+            @PathVariable("userId") String userId
+    );
 }
