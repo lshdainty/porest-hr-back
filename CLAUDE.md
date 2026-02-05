@@ -1,9 +1,42 @@
 # Project Overview
-- Language: Java 17 [LTS 사용] [web:26]
-- Framework: Spring Boot 3.4.x (Spring Framework 6.x) [web:26]
-- Build: Gradle [web:26]
-- Packaging: Jar 배포 [web:26]
-- API 문서: springdoc-openapi (Swagger UI) [web:26]
+- Language: Java 17 [LTS 사용]
+- Framework: Spring Boot 3.4.x (Spring Framework 6.x)
+- Build: Gradle
+- Packaging: Jar 배포
+- API 문서: springdoc-openapi (Swagger UI)
+
+## SSO 연동 아키텍처
+
+### 역할 분리
+| 구분 | SSO | HR |
+|------|-----|-----|
+| 인증 정보 | ID, Password, Email | X (SSO 참조) |
+| 초대/회원가입 | 초대 토큰, 상태, 만료일시 | X (SSO에서 관리) |
+| 비즈니스 정보 | X | 회사, 근무시간, 입사일, 부서, 휴가 등 |
+
+### HR User 엔티티
+- `ssoUserRowId`: SSO와 HR 간 사용자 연결 키 (FK 역할)
+- 인증 관련 필드 없음 (password, invitationStatus 등은 SSO에서 관리)
+- 비즈니스 데이터만 관리: company, workTime, joinDate, birth, department, vacation 등
+
+### SSO API 연동
+```java
+// SSO API 클라이언트 (client/sso/)
+@Component
+public class SsoApiClientImpl implements SsoApiClient {
+    // 사용자 초대: POST /api/v1/users/invite
+    SsoInviteResponse inviteUser(SsoInviteRequest request);
+
+    // 초대 재발송: POST /api/v1/users/{userId}/invitations/resend
+    void resendInvitation(String userId);
+}
+```
+
+### 초대 프로세스
+1. HR 관리자가 사용자 초대 → HR Backend가 SSO API 호출
+2. SSO에서 User 생성 + UserClientAccess 생성 + 초대 이메일 발송
+3. SSO 응답으로 받은 `ssoUserRowId`를 HR User에 저장
+4. 사용자가 SSO에서 회원가입 완료 → Redis 이벤트로 HR에 알림
 
 ## Modules & Structure
 - modules: core(domain), api(web), infra(persistence, external-clients) [web:27]
