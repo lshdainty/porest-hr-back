@@ -87,7 +87,11 @@ public class UserApiController implements UserApi {
                 user.getProfileUrl(),
                 user.getMainDepartmentNameKR(),
                 user.getDashboard(),
-                user.getCountryCode()
+                user.getCountryCode(),
+                user.getInvitationSentAt(),
+                user.getInvitationExpiresAt(),
+                user.getInvitationStatus(),
+                user.getRegisteredAt()
         ));
     }
 
@@ -143,7 +147,11 @@ public class UserApiController implements UserApi {
                             u.getProfileUrl(),
                             u.getMainDepartmentNameKR(),
                             u.getDashboard(),
-                            u.getCountryCode()
+                            u.getCountryCode(),
+                            u.getInvitationSentAt(),
+                            u.getInvitationExpiresAt(),
+                            u.getInvitationStatus(),
+                            u.getRegisteredAt()
                     );
                 })
                 .collect(Collectors.toList());
@@ -341,7 +349,10 @@ public class UserApiController implements UserApi {
                 result.getName(),
                 result.getEmail(),
                 result.getMessage() != null ? result.getMessage() :
-                        (result.isAlreadyExists() ? "기존 SSO 계정과 연결되었습니다." : "초대가 발송되었습니다.")
+                        (result.isAlreadyExists() ? "기존 SSO 계정과 연결되었습니다." : "초대가 발송되었습니다."),
+                result.getInvitationSentAt(),
+                result.getInvitationExpiresAt(),
+                result.getInvitationStatus()
         ));
     }
 

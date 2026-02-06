@@ -3,6 +3,7 @@ package com.porest.hr.user.service;
 import com.porest.core.exception.EntityNotFoundException;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.hr.client.sso.SsoApiClient;
+import com.porest.hr.client.sso.dto.SsoInvitationStatusResponse;
 import com.porest.hr.client.sso.dto.SsoInviteRequest;
 import com.porest.hr.client.sso.dto.SsoInviteResponse;
 import com.porest.hr.common.exception.HrErrorCode;
@@ -27,8 +28,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,7 +122,19 @@ public class UserServiceImpl implements UserService {
                         .build())
                 .collect(Collectors.toList());
 
+        // SSO에서 초대 상태 조회
+        SsoInvitationStatusResponse status = null;
+        if (user.getSsoUserRowId() != null) {
+            try {
+                List<SsoInvitationStatusResponse> statusList = ssoApiClient.getInvitationStatus(List.of(user.getSsoUserRowId()));
+                status = statusList.isEmpty() ? null : statusList.get(0);
+            } catch (Exception e) {
+                log.warn("SSO 초대 상태 조회 실패, 초대 상태 없이 진행: {}", e.getMessage());
+            }
+        }
+
         return UserServiceDto.builder()
+                .ssoUserRowId(user.getSsoUserRowId())
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
@@ -136,6 +152,10 @@ public class UserServiceImpl implements UserService {
                         generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
                 .mainDepartmentNameKR(mainDepartmentNameKR)
                 .dashboard(user.getDashboard())
+                .invitationSentAt(status != null ? status.getInvitationSentAt() : null)
+                .invitationExpiresAt(status != null ? status.getInvitationExpiresAt() : null)
+                .invitationStatus(status != null ? status.getInvitationStatus() : null)
+                .registeredAt(status != null ? status.getRegisteredAt() : null)
                 .build();
     }
 
@@ -145,6 +165,28 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findUsersWithRolesAndPermissions();
         log.debug("전체 사용자 목록 조회 완료: count={}", users.size());
 
+        // SSO에서 초대 상태 조회
+        List<Long> ssoUserRowIds = users.stream()
+                .map(User::getSsoUserRowId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        Map<Long, SsoInvitationStatusResponse> invitationStatusMap = Map.of();
+        if (!ssoUserRowIds.isEmpty()) {
+            try {
+                invitationStatusMap = ssoApiClient.getInvitationStatus(ssoUserRowIds).stream()
+                        .collect(Collectors.toMap(
+                                SsoInvitationStatusResponse::getUserNo,
+                                Function.identity(),
+                                (existing, replacement) -> existing
+                        ));
+                log.debug("SSO 초대 상태 조회 완료: count={}", invitationStatusMap.size());
+            } catch (Exception e) {
+                log.warn("SSO 초대 상태 조회 실패, 초대 상태 없이 진행: {}", e.getMessage());
+            }
+        }
+
+        Map<Long, SsoInvitationStatusResponse> finalInvitationStatusMap = invitationStatusMap;
         return users.stream()
                 .map(user -> {
                     String mainDepartmentNameKR = user.getUserDepartments().stream()
@@ -166,7 +208,13 @@ public class UserServiceImpl implements UserService {
                                     .build())
                             .collect(Collectors.toList());
 
+                    // SSO 초대 상태 매핑
+                    SsoInvitationStatusResponse status = user.getSsoUserRowId() != null
+                            ? finalInvitationStatusMap.get(user.getSsoUserRowId())
+                            : null;
+
                     return UserServiceDto.builder()
+                            .ssoUserRowId(user.getSsoUserRowId())
                             .id(user.getId())
                             .name(user.getName())
                             .email(user.getEmail())
@@ -184,6 +232,10 @@ public class UserServiceImpl implements UserService {
                                     generateProfileUrl(user.getProfileName(), user.getProfileUUID()) : null)
                             .mainDepartmentNameKR(mainDepartmentNameKR)
                             .dashboard(user.getDashboard())
+                            .invitationSentAt(status != null ? status.getInvitationSentAt() : null)
+                            .invitationExpiresAt(status != null ? status.getInvitationExpiresAt() : null)
+                            .invitationStatus(status != null ? status.getInvitationStatus() : null)
+                            .registeredAt(status != null ? status.getRegisteredAt() : null)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -464,6 +516,9 @@ public class UserServiceImpl implements UserService {
                         .name(user.getName())
                         .email(user.getEmail())
                         .message(ssoResponse.getMessage())
+                        .invitationSentAt(ssoResponse.getInvitationSentAt())
+                        .invitationExpiresAt(ssoResponse.getInvitationExpiresAt())
+                        .invitationStatus(ssoResponse.getInvitationStatus())
                         .build();
             }
 
@@ -491,6 +546,9 @@ public class UserServiceImpl implements UserService {
                     .name(user.getName())
                     .email(user.getEmail())
                     .message(ssoResponse.getMessage())
+                    .invitationSentAt(ssoResponse.getInvitationSentAt())
+                    .invitationExpiresAt(ssoResponse.getInvitationExpiresAt())
+                    .invitationStatus(ssoResponse.getInvitationStatus())
                     .build();
         }
 
@@ -520,6 +578,9 @@ public class UserServiceImpl implements UserService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .message(ssoResponse.getMessage())
+                .invitationSentAt(ssoResponse.getInvitationSentAt())
+                .invitationExpiresAt(ssoResponse.getInvitationExpiresAt())
+                .invitationStatus(ssoResponse.getInvitationStatus())
                 .build();
     }
 

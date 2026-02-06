@@ -121,6 +121,18 @@ public class UserApiDto {
 
         @Schema(description = "국가 코드", example = "KR")
         private CountryCode countryCode;
+
+        @Schema(description = "초대 발송 시간")
+        private java.time.LocalDateTime invitationSentAt;
+
+        @Schema(description = "초대 만료 시간")
+        private java.time.LocalDateTime invitationExpiresAt;
+
+        @Schema(description = "초대 상태", example = "PENDING")
+        private String invitationStatus;
+
+        @Schema(description = "회원가입 완료 시간")
+        private java.time.LocalDateTime registeredAt;
     }
 
     @Getter
@@ -414,6 +426,15 @@ public class UserApiDto {
 
         @Schema(description = "메시지", example = "초대가 발송되었습니다.")
         private String message;
+
+        @Schema(description = "초대 발송 시간")
+        private java.time.LocalDateTime invitationSentAt;
+
+        @Schema(description = "초대 만료 시간")
+        private java.time.LocalDateTime invitationExpiresAt;
+
+        @Schema(description = "초대 상태", example = "PENDING")
+        private String invitationStatus;
     }
 
     @Getter

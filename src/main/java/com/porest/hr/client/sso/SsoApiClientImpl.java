@@ -2,6 +2,8 @@ package com.porest.hr.client.sso;
 
 import com.porest.core.controller.ApiResponse;
 import com.porest.core.exception.ExternalServiceException;
+import com.porest.hr.client.sso.dto.SsoInvitationStatusRequest;
+import com.porest.hr.client.sso.dto.SsoInvitationStatusResponse;
 import com.porest.hr.client.sso.dto.SsoInviteRequest;
 import com.porest.hr.client.sso.dto.SsoInviteResponse;
 import com.porest.hr.common.exception.HrErrorCode;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +38,7 @@ public class SsoApiClientImpl implements SsoApiClient {
 
     private static final String INVITE_USER_PATH = "/api/v1/users/invite";
     private static final String RESEND_INVITATION_PATH = "/api/v1/users/resend";
+    private static final String INVITATION_STATUS_PATH = "/api/v1/users/invitation-status";
 
     @Override
     public SsoInviteResponse inviteUser(SsoInviteRequest request) {
@@ -91,6 +96,47 @@ public class SsoApiClientImpl implements SsoApiClient {
         } catch (RestClientException e) {
             log.error("SSO resendInvitation API failed: {}", e.getMessage(), e);
             throw new ExternalServiceException(HrErrorCode.SSO_SERVICE_ERROR, "SSO 초대 재전송 API 호출 실패", e);
+        }
+    }
+
+    @Override
+    public List<SsoInvitationStatusResponse> getInvitationStatus(List<Long> userNos) {
+        if (userNos == null || userNos.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        log.debug("Calling SSO getInvitationStatus API: userNos count={}", userNos.size());
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            SsoInvitationStatusRequest request = SsoInvitationStatusRequest.builder()
+                    .userNos(userNos)
+                    .build();
+
+            HttpEntity<SsoInvitationStatusRequest> entity = new HttpEntity<>(request, headers);
+
+            ResponseEntity<ApiResponse<List<SsoInvitationStatusResponse>>> response = ssoRestTemplate.exchange(
+                    INVITATION_STATUS_PATH,
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<>() {}
+            );
+
+            ApiResponse<List<SsoInvitationStatusResponse>> body = response.getBody();
+            if (body == null || body.getData() == null) {
+                log.warn("SSO getInvitationStatus API returned empty response");
+                return Collections.emptyList();
+            }
+
+            log.info("SSO getInvitationStatus API success: count={}", body.getData().size());
+
+            return body.getData();
+
+        } catch (RestClientException e) {
+            log.error("SSO getInvitationStatus API failed: {}", e.getMessage(), e);
+            throw new ExternalServiceException(HrErrorCode.SSO_SERVICE_ERROR, "SSO 초대 상태 조회 API 호출 실패", e);
         }
     }
 }

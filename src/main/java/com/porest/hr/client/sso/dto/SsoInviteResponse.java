@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * SSO 사용자 초대 응답 DTO
  */
@@ -45,4 +47,19 @@ public class SsoInviteResponse {
      * 메시지
      */
     private String message;
+
+    /**
+     * 초대 발송 시간
+     */
+    private LocalDateTime invitationSentAt;
+
+    /**
+     * 초대 만료 시간
+     */
+    private LocalDateTime invitationExpiresAt;
+
+    /**
+     * 초대 상태 (PENDING, ACTIVE, EXPIRED 등)
+     */
+    private String invitationStatus;
 }

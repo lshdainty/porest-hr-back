@@ -1,7 +1,10 @@
 package com.porest.hr.client.sso;
 
+import com.porest.hr.client.sso.dto.SsoInvitationStatusResponse;
 import com.porest.hr.client.sso.dto.SsoInviteRequest;
 import com.porest.hr.client.sso.dto.SsoInviteResponse;
+
+import java.util.List;
 
 /**
  * SSO API 클라이언트 인터페이스<br>
@@ -28,4 +31,14 @@ public interface SsoApiClient {
      * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
      */
     void resendInvitation(String userId);
+
+    /**
+     * SSO에서 여러 사용자의 초대 상태 조회<br>
+     * 사용자 목록 조회 시 초대 상태를 표시하기 위해 사용
+     *
+     * @param userNos SSO 사용자 번호 목록
+     * @return 각 사용자의 초대 상태 목록
+     * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
+     */
+    List<SsoInvitationStatusResponse> getInvitationStatus(List<Long> userNos);
 }

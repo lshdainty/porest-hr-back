@@ -32,6 +32,12 @@ public class UserServiceDto {
     private String profileUUID;
     private String dashboard;
 
+    // 초대 상태 정보 (SSO에서 조회)
+    private java.time.LocalDateTime invitationSentAt;
+    private java.time.LocalDateTime invitationExpiresAt;
+    private String invitationStatus;
+    private java.time.LocalDateTime registeredAt;
+
     // 메인 부서 정보
     private String mainDepartmentNameKR; // 메인 부서의 한글명
 
@@ -79,5 +85,8 @@ public class UserServiceDto {
         private String name;
         private String email;
         private String message;
+        private java.time.LocalDateTime invitationSentAt;
+        private java.time.LocalDateTime invitationExpiresAt;
+        private String invitationStatus;
     }
 }
