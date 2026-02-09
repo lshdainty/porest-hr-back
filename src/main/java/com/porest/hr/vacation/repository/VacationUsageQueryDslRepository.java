@@ -1,7 +1,6 @@
 package com.porest.hr.vacation.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.vacation.domain.VacationUsage;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -58,7 +57,7 @@ public class VacationUsageQueryDslRepository implements VacationUsageRepository 
                 .selectFrom(vacationUsage)
                 .join(vacationUsage.user).fetchJoin()
                 .where(vacationUsage.isDeleted.eq(YNType.N)
-                        .and(vacationUsage.user.company.ne(DefaultCompanyType.SYSTEM)))
+                        .and(vacationUsage.user.company.ne("SYSTEM")))
                 .orderBy(vacationUsage.user.id.asc(), vacationUsage.startDate.desc())
                 .fetch();
     }
@@ -69,7 +68,7 @@ public class VacationUsageQueryDslRepository implements VacationUsageRepository 
                 .selectFrom(vacationUsage)
                 .join(vacationUsage.user).fetchJoin()
                 .where(vacationUsage.isDeleted.eq(YNType.N)
-                        .and(vacationUsage.user.company.ne(DefaultCompanyType.SYSTEM))
+                        .and(vacationUsage.user.company.ne("SYSTEM"))
                         .and(vacationUsage.startDate.goe(startDate))
                         .and(vacationUsage.startDate.loe(endDate)))
                 .orderBy(vacationUsage.startDate.asc())

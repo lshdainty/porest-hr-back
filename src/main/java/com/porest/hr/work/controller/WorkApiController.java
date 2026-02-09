@@ -11,7 +11,6 @@ import com.porest.hr.work.service.WorkSystemLogService;
 import com.porest.hr.work.service.dto.WorkCodeServiceDto;
 import com.porest.hr.work.service.dto.WorkHistoryServiceDto;
 import com.porest.hr.work.type.CodeType;
-import com.porest.hr.common.type.SystemType;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -191,8 +190,8 @@ public class WorkApiController implements WorkApi {
     }
 
     @Override
-    public ApiResponse checkSystemStatus(List<SystemType> systemCodes) {
-        Map<SystemType, Boolean> statusMap = workSystemLogService.checkSystemStatusBatch(systemCodes);
+    public ApiResponse checkSystemStatus(List<String> systemCodes) {
+        Map<String, Boolean> statusMap = workSystemLogService.checkSystemStatusBatch(systemCodes);
 
         List<WorkApiDto.CheckSystemStatusResp> statuses = statusMap.entrySet().stream()
                 .map(entry -> new WorkApiDto.CheckSystemStatusResp(entry.getKey(), entry.getValue()))

@@ -1,7 +1,6 @@
 package com.porest.hr.work.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.work.domain.WorkHistory;
 import com.porest.hr.work.repository.dto.WorkHistorySearchCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -63,7 +62,7 @@ public class WorkHistoryQueryDslRepository implements WorkHistoryRepository {
                 .leftJoin(workHistory.division).fetchJoin()
                 .where(
                         workHistory.isDeleted.eq(YNType.N),
-                        workHistory.user.company.ne(DefaultCompanyType.SYSTEM),
+                        workHistory.user.company.ne("SYSTEM"),
                         dateBetween(condition.getStartDate(), condition.getEndDate()),
                         userNameLike(condition.getUserName()),
                         userIdEq(condition.getUserId()),
@@ -92,7 +91,7 @@ public class WorkHistoryQueryDslRepository implements WorkHistoryRepository {
                 .leftJoin(workHistory.division).fetchJoin()
                 .where(
                         workHistory.isDeleted.eq(YNType.N),
-                        workHistory.user.company.ne(DefaultCompanyType.SYSTEM),
+                        workHistory.user.company.ne("SYSTEM"),
                         dateBetween(condition.getStartDate(), condition.getEndDate()),
                         userNameLike(condition.getUserName()),
                         userIdEq(condition.getUserId()),

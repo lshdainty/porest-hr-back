@@ -1,9 +1,7 @@
 package com.porest.hr.user.domain;
 
-import com.porest.hr.common.converter.CompanyTypeConverter;
 import com.porest.hr.common.domain.AuditingFieldsWithIp;
 import com.porest.core.type.CountryCode;
-import com.porest.hr.common.type.CompanyType;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.permission.domain.UserRole;
@@ -95,9 +93,8 @@ public class User extends AuditingFieldsWithIp {
      * 사용자 원소속 회사<br>
      * 사용자가 원래 속한 회사 정보
      */
-    @Convert(converter = CompanyTypeConverter.class)
     @Column(name = "user_origin_company", nullable = false, length = 20)
-    private CompanyType company;
+    private String company;
 
     /**
      * 프로필 파일명<br>
@@ -202,7 +199,7 @@ public class User extends AuditingFieldsWithIp {
      * @return User
      */
     public static User createUser(Long ssoUserRowId, String id, String name, String email, LocalDate birth,
-                                  CompanyType company, String workTime, LocalDate joinDate,
+                                  String company, String workTime, LocalDate joinDate,
                                   YNType lunarYN, String profileName, String profileUUID, CountryCode countryCode) {
         User user = new User();
         user.ssoUserRowId = ssoUserRowId;
@@ -257,7 +254,7 @@ public class User extends AuditingFieldsWithIp {
      * 해당 메소드를 통해 유저 수정할 것
      */
     public void updateUser(String name, String email, List<Role> roles, LocalDate birth,
-                           CompanyType company, String workTime,
+                           String company, String workTime,
                            YNType lunarYN, String profileName, String profileUUID, String dashboard, CountryCode countryCode) {
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(email)) { this.email = email; }

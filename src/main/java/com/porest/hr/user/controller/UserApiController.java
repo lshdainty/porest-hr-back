@@ -1,7 +1,6 @@
 package com.porest.hr.user.controller;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.CompanyType;
 import com.porest.hr.user.controller.dto.UserApiDto;
 import com.porest.core.controller.ApiResponse;
 import com.porest.hr.user.service.UserService;
@@ -319,9 +318,9 @@ public class UserApiController implements UserApi {
         ));
     }
 
-    private String getTranslatedName(CompanyType type) {
-        if (type == null) return null;
-        return messageSource.getMessage(type.getMessageKey(), null, LocaleContextHolder.getLocale());
+    private String getTranslatedName(String companyCode) {
+        if (companyCode == null) return null;
+        return companyCode;
     }
 
     // ==================== 초대 관련 API ====================

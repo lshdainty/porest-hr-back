@@ -1,6 +1,5 @@
 package com.porest.hr.dues.repository;
 
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.repository.dto.UsersMonthBirthDuesDto;
 import com.porest.hr.dues.type.DuesCalcType;
@@ -67,7 +66,7 @@ public class DuesJpaRepository implements DuesRepository {
                                 "where d.userName = u.name and u.company != :systemCompany " +
                                 "and year(d.date) = :year and d.type = :type and d.calc = :calc " +
                                 "group by d.userName, month(d.date), d.detail", UsersMonthBirthDuesDto.class)
-                .setParameter("systemCompany", DefaultCompanyType.SYSTEM)
+                .setParameter("systemCompany", "SYSTEM")
                 .setParameter("year", year)
                 .setParameter("type", DuesType.BIRTH)
                 .setParameter("calc", DuesCalcType.PLUS)

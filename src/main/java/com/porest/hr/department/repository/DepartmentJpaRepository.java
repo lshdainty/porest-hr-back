@@ -1,7 +1,6 @@
 package com.porest.hr.department.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.domain.Department;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.user.domain.User;
@@ -68,7 +67,7 @@ public class DepartmentJpaRepository implements DepartmentRepository {
                 "where ud.user.id = u.id and ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted)", User.class)
                 .setParameter("departmentId", departmentId)
                 .setParameter("isDeleted", YNType.N)
-                .setParameter("systemCompany", DefaultCompanyType.SYSTEM)
+                .setParameter("systemCompany", "SYSTEM")
                 .getResultList();
     }
 
@@ -80,7 +79,7 @@ public class DepartmentJpaRepository implements DepartmentRepository {
                 "where ud.department.id = :departmentId and ud.isDeleted = :isDeleted and d.isDeleted = :isDeleted and u.isDeleted = :isDeleted and u.company != :systemCompany", UserDepartment.class)
                 .setParameter("departmentId", departmentId)
                 .setParameter("isDeleted", YNType.N)
-                .setParameter("systemCompany", DefaultCompanyType.SYSTEM)
+                .setParameter("systemCompany", "SYSTEM")
                 .getResultList();
     }
 

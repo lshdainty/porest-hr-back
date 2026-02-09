@@ -2,8 +2,6 @@ package com.porest.hr.repository;
 
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.repository.DuesJpaRepository;
 import com.porest.hr.dues.repository.dto.UsersMonthBirthDuesDto;
@@ -173,12 +171,12 @@ class DuesJpaRepositoryTest {
         // User 테이블과 JOIN하므로 해당 userName과 동일한 name을 가진 User가 필요
         User user1 = User.createUser(
                 null, "user1", "홍길동", "user1@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         User user2 = User.createUser(
                 null, "user2", "김철수", "user2@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         em.persist(user1);
@@ -208,12 +206,12 @@ class DuesJpaRepositoryTest {
         // given
         User normalUser = User.createUser(
                 null, "normalUser", "일반유저", "normal@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         User systemUser = User.createUser(
                 null, "systemUser", "시스템유저", "system@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "SYSTEM", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         em.persist(normalUser);

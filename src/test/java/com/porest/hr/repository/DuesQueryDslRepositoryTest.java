@@ -1,10 +1,7 @@
 package com.porest.hr.repository;
 
-import com.porest.hr.common.type.CompanyType;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.repository.DuesQueryDslRepository;
 import com.porest.hr.dues.repository.dto.UsersMonthBirthDuesDto;
@@ -37,7 +34,7 @@ class DuesQueryDslRepositoryTest {
     private TestEntityManager em;
 
     // 테스트용 User 생성 헬퍼 메소드
-    private User createTestUser(String id, String name, String email, CompanyType company) {
+    private User createTestUser(String id, String name, String email, String company) {
         return User.createUser(
                 null, id, name, email,
                 LocalDate.of(1990, 1, 1), company, "9 ~ 18",
@@ -46,7 +43,7 @@ class DuesQueryDslRepositoryTest {
     }
 
     private User createTestUser(String id, String name, String email) {
-        return createTestUser(id, name, email, DefaultCompanyType.NONE);
+        return createTestUser(id, name, email, "NONE");
     }
 
     @Test
@@ -213,7 +210,7 @@ class DuesQueryDslRepositoryTest {
     void findUsersMonthBirthDuesExcludesSystemAccount() {
         // given
         User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com");
-        User systemUser = createTestUser("systemUser", "시스템유저", "system@test.com", DefaultCompanyType.SYSTEM);
+        User systemUser = createTestUser("systemUser", "시스템유저", "system@test.com", "SYSTEM");
         em.persist(normalUser);
         em.persist(systemUser);
 

@@ -1,7 +1,6 @@
 package com.porest.hr.department.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.domain.Department;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.user.domain.User;
@@ -81,7 +80,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                 .selectFrom(user)
                 .where(
                         user.isDeleted.eq(YNType.N),
-                        user.company.ne(DefaultCompanyType.SYSTEM),
+                        user.company.ne("SYSTEM"),
                         JPAExpressions
                                 .selectFrom(userDepartment)
                                 .join(userDepartment.department, department)
@@ -107,7 +106,7 @@ public class DepartmentQueryDslRepository implements DepartmentRepository {
                         userDepartment.isDeleted.eq(YNType.N),
                         department.isDeleted.eq(YNType.N),
                         user.isDeleted.eq(YNType.N),
-                        user.company.ne(DefaultCompanyType.SYSTEM)
+                        user.company.ne("SYSTEM")
                 )
                 .fetch();
     }

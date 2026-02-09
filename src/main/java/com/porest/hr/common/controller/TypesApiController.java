@@ -6,8 +6,8 @@ import com.porest.core.exception.ErrorCode;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.DisplayType;
 import com.porest.hr.common.controller.dto.TypesDto;
-import com.porest.hr.common.type.DefaultCompanyType;
-import com.porest.hr.common.type.DefaultSystemType;
+import com.porest.hr.common.repository.CompanyCodeRepository;
+import com.porest.hr.common.repository.SystemCodeRepository;
 import com.porest.hr.holiday.type.HolidayType;
 import com.porest.hr.schedule.type.ScheduleType;
 import com.porest.hr.vacation.type.ApprovalStatus;
@@ -24,7 +24,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -36,11 +35,11 @@ import java.util.Map;
 @Slf4j
 public class TypesApiController implements TypesApi {
     private final MessageSource messageSource;
+    private final CompanyCodeRepository companyCodeRepository;
+    private final SystemCodeRepository systemCodeRepository;
 
     // 단일 타입 매핑
     private static final Map<String, Class<? extends DisplayType>> enumMap;
-    // 복합 타입 매핑 (Default + Origin 합침)
-    private static final Map<String, List<Class<? extends DisplayType>>> compositeEnumMap;
 
     static {
         enumMap = new HashMap<>();
@@ -55,31 +54,6 @@ public class TypesApiController implements TypesApi {
         enumMap.put("schedule-type", ScheduleType.class);
         enumMap.put("holiday-type", HolidayType.class);
         enumMap.put("country-code", CountryCode.class);
-
-        // company-type, system-type은 복합 타입으로 관리 (Default + Origin 합침)
-        compositeEnumMap = new HashMap<>();
-
-        // company-type: DefaultCompanyType + OriginCompanyType (있으면)
-        List<Class<? extends DisplayType>> companyTypes = new ArrayList<>();
-        companyTypes.add(DefaultCompanyType.class);
-        tryAddOriginType(companyTypes, "com.lshdainty.porest.company.type.OriginCompanyType");
-        compositeEnumMap.put("company-type", companyTypes);
-
-        // system-type: DefaultSystemType + OriginSystemType (있으면)
-        List<Class<? extends DisplayType>> systemTypes = new ArrayList<>();
-        systemTypes.add(DefaultSystemType.class);
-        tryAddOriginType(systemTypes, "com.porest.hr.work.type.OriginSystemType");
-        compositeEnumMap.put("system-type", systemTypes);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void tryAddOriginType(List<Class<? extends DisplayType>> list, String className) {
-        try {
-            Class<?> clazz = Class.forName(className);
-            list.add((Class<? extends DisplayType>) clazz);
-        } catch (ClassNotFoundException e) {
-            // 해당 모듈이 classpath에 없으면 무시
-        }
     }
 
     @Override
@@ -87,32 +61,30 @@ public class TypesApiController implements TypesApi {
         String key = enumName.toLowerCase();
         Locale locale = LocaleContextHolder.getLocale();
 
-        // 복합 타입인지 확인 (company-type, system-type)
-        if (compositeEnumMap.containsKey(key)) {
-            List<TypesDto> enumValues = new ArrayList<>();
-
-            for (Class<? extends DisplayType> enumClass : compositeEnumMap.get(key)) {
-                Arrays.stream(enumClass.getEnumConstants())
-                        .map(enumConstant -> TypesDto.builder()
-                                .code(((Enum<?>) enumConstant).name())
-                                .name(messageSource.getMessage(
-                                        ((DisplayType) enumConstant).getMessageKey(),
-                                        null,
-                                        locale
-                                ))
-                                .orderSeq(((DisplayType) enumConstant).getOrderSeq())
-                                .build()
-                        )
-                        .forEach(enumValues::add);
-            }
-
-            // orderSeq로 정렬
-            enumValues.sort((a, b) -> Long.compare(a.getOrderSeq(), b.getOrderSeq()));
-
-            return ApiResponse.success(enumValues);
+        // DB 기반 타입 조회 (company-type, system-type)
+        if ("company-type".equals(key)) {
+            List<TypesDto> companyTypes = companyCodeRepository.findAllActive().stream()
+                    .map(c -> TypesDto.builder()
+                            .code(c.getCode())
+                            .name(c.getName(locale))
+                            .orderSeq((long) c.getSortOrder())
+                            .build())
+                    .toList();
+            return ApiResponse.success(companyTypes);
         }
 
-        // 단일 타입
+        if ("system-type".equals(key)) {
+            List<TypesDto> systemTypes = systemCodeRepository.findAllActive().stream()
+                    .map(s -> TypesDto.builder()
+                            .code(s.getCode())
+                            .name(s.getName(locale))
+                            .orderSeq((long) s.getSortOrder())
+                            .build())
+                    .toList();
+            return ApiResponse.success(systemTypes);
+        }
+
+        // 단일 enum 타입
         Class<? extends DisplayType> enumClass = enumMap.get(key);
 
         if (enumClass == null) {

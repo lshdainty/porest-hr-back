@@ -1,7 +1,6 @@
 package com.porest.hr.work.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.work.domain.WorkHistory;
 import com.porest.hr.work.repository.dto.WorkHistorySearchCondition;
 import jakarta.persistence.EntityManager;
@@ -61,7 +60,7 @@ public class WorkHistoryJpaRepository implements WorkHistoryRepository {
 
         Map<String, Object> params = new HashMap<>();
         params.put("isDeleted", YNType.N);
-        params.put("systemCompany", DefaultCompanyType.SYSTEM);
+        params.put("systemCompany", "SYSTEM");
 
         appendConditions(jpql, params, condition);
 

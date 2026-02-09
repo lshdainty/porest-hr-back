@@ -1,12 +1,9 @@
 package com.porest.hr.user.controller.dto;
 
 import tools.jackson.databind.PropertyNamingStrategies;
-import tools.jackson.databind.annotation.JsonDeserialize;
 import tools.jackson.databind.annotation.JsonNaming;
-import com.porest.hr.common.converter.CompanyTypeJsonDeserializer;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.CompanyType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,8 +31,7 @@ public class UserApiDto {
         private LocalDate userBirth;
 
         @Schema(description = "소속 회사", example = "KAKAO")
-        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
-        private CompanyType userCompanyType;
+        private String userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
         private String userWorkTime;
@@ -101,8 +97,7 @@ public class UserApiDto {
         private List<String> permissions;
 
         @Schema(description = "소속 회사", example = "KAKAO")
-        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
-        private CompanyType userCompanyType;
+        private String userCompanyType;
 
         @Schema(description = "소속 회사명", example = "카카오")
         private String userOriginCompanyName;
@@ -153,8 +148,7 @@ public class UserApiDto {
         private List<String> userRoles;
 
         @Schema(description = "소속 회사", example = "KAKAO")
-        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
-        private CompanyType userCompanyType;
+        private String userCompanyType;
 
         @Schema(description = "근무 시간", example = "09:00-18:00")
         private String userWorkTime;
@@ -208,8 +202,7 @@ public class UserApiDto {
         private List<String> permissions;
 
         @Schema(description = "소속 회사", example = "KAKAO")
-        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
-        private CompanyType userCompanyType;
+        private String userCompanyType;
 
         @Schema(description = "소속 회사명", example = "카카오")
         private String userOriginCompanyName;
@@ -394,8 +387,7 @@ public class UserApiDto {
         private LocalDate joinDate;
 
         @Schema(description = "소속 회사", example = "KAKAO")
-        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
-        private CompanyType userCompanyType;
+        private String userCompanyType;
 
         @Schema(description = "근무시간", example = "9 ~ 18")
         private String userWorkTime;
@@ -449,8 +441,7 @@ public class UserApiDto {
         private String userEmail;
 
         @Schema(description = "소속 회사", example = "KAKAO")
-        @JsonDeserialize(using = CompanyTypeJsonDeserializer.class)
-        private CompanyType userCompanyType;
+        private String userCompanyType;
 
         @Schema(description = "근무시간", example = "9 ~ 18")
         private String userWorkTime;
@@ -477,7 +468,7 @@ public class UserApiDto {
         private String userEmail;
 
         @Schema(description = "소속 회사", example = "KAKAO")
-        private CompanyType userCompanyType;
+        private String userCompanyType;
 
         @Schema(description = "근무시간", example = "9 ~ 18")
         private String userWorkTime;

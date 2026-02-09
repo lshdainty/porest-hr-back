@@ -1,7 +1,6 @@
 package com.porest.hr.work.repository;
 
 import com.porest.hr.work.domain.WorkSystemLog;
-import com.porest.hr.common.type.SystemType;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,7 +20,7 @@ public class WorkSystemLogJpaRepository implements WorkSystemLogRepository {
     }
 
     @Override
-    public Optional<WorkSystemLog> findByPeriodAndCode(LocalDateTime startDateTime, LocalDateTime endDateTime, SystemType code) {
+    public Optional<WorkSystemLog> findByPeriodAndCode(LocalDateTime startDateTime, LocalDateTime endDateTime, String code) {
         List<WorkSystemLog> result = em.createQuery(
                         "select wsl from WorkSystemLog wsl " +
                                 "where wsl.createAt >= :startDateTime " +
@@ -35,12 +34,12 @@ public class WorkSystemLogJpaRepository implements WorkSystemLogRepository {
     }
 
     @Override
-    public List<SystemType> findCodesByPeriodAndCodes(LocalDateTime startDateTime, LocalDateTime endDateTime, List<SystemType> codes) {
+    public List<String> findCodesByPeriodAndCodes(LocalDateTime startDateTime, LocalDateTime endDateTime, List<String> codes) {
         return em.createQuery(
                         "select wsl.code from WorkSystemLog wsl " +
                                 "where wsl.createAt >= :startDateTime " +
                                 "and wsl.createAt < :endDateTime " +
-                                "and wsl.code in :codes", SystemType.class)
+                                "and wsl.code in :codes", String.class)
                 .setParameter("startDateTime", startDateTime)
                 .setParameter("endDateTime", endDateTime)
                 .setParameter("codes", codes)

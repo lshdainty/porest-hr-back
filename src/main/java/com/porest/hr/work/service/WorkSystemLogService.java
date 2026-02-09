@@ -1,7 +1,5 @@
 package com.porest.hr.work.service;
 
-import com.porest.hr.common.type.SystemType;
-
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +20,7 @@ public interface WorkSystemLogService {
      * @param code 시스템 코드
      * @return true: 생성됨, false: 삭제됨
      */
-    boolean toggleSystemCheck(SystemType code);
+    boolean toggleSystemCheck(String code);
 
     /**
      * 오늘 날짜 특정 시스템 체크 여부 확인<br>
@@ -31,14 +29,14 @@ public interface WorkSystemLogService {
      * @param code 시스템 코드
      * @return true: 체크됨, false: 체크 안됨
      */
-    boolean isCheckedToday(SystemType code);
+    boolean isCheckedToday(String code);
 
     /**
      * 오늘 날짜 여러 시스템의 체크 여부를 배치 확인<br>
      * 누가 체크했는지는 무관
      *
      * @param codes 시스템 코드 목록
-     * @return Map<SystemType, Boolean> - 시스템 코드별 체크 여부
+     * @return Map<String, Boolean> - 시스템 코드별 체크 여부
      */
-    Map<SystemType, Boolean> checkSystemStatusBatch(List<SystemType> codes);
+    Map<String, Boolean> checkSystemStatusBatch(List<String> codes);
 }

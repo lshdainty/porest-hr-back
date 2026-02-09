@@ -2,7 +2,6 @@ package com.porest.hr.work.service;
 
 import com.porest.hr.work.domain.WorkSystemLog;
 import com.porest.hr.work.repository.WorkSystemLogRepository;
-import com.porest.hr.common.type.SystemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ public class WorkSystemLogServiceImpl implements WorkSystemLogService {
 
     @Override
     @Transactional
-    public boolean toggleSystemCheck(SystemType code) {
+    public boolean toggleSystemCheck(String code) {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
@@ -47,7 +46,7 @@ public class WorkSystemLogServiceImpl implements WorkSystemLogService {
     }
 
     @Override
-    public boolean isCheckedToday(SystemType code) {
+    public boolean isCheckedToday(String code) {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
@@ -58,15 +57,15 @@ public class WorkSystemLogServiceImpl implements WorkSystemLogService {
     }
 
     @Override
-    public Map<SystemType, Boolean> checkSystemStatusBatch(List<SystemType> codes) {
+    public Map<String, Boolean> checkSystemStatusBatch(List<String> codes) {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
 
-        List<SystemType> checkedCodes = workSystemLogRepository
+        List<String> checkedCodes = workSystemLogRepository
                 .findCodesByPeriodAndCodes(startOfDay, endOfDay, codes);
 
-        Map<SystemType, Boolean> result = codes.stream()
+        Map<String, Boolean> result = codes.stream()
                 .collect(Collectors.toMap(
                         code -> code,
                         checkedCodes::contains

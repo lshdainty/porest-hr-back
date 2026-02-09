@@ -1,7 +1,6 @@
 package com.porest.hr.user.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.user.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -55,7 +54,7 @@ public class UserQueryDslRepository implements UserRepository {
         return query
                 .selectFrom(user)
                 .where(user.isDeleted.eq(YNType.N)
-                        .and(user.company.ne(DefaultCompanyType.SYSTEM)))
+                        .and(user.company.ne("SYSTEM")))
                 .fetch();
     }
 
@@ -98,7 +97,7 @@ public class UserQueryDslRepository implements UserRepository {
                 .leftJoin(user.userRoles, userRole).fetchJoin()
                 .leftJoin(userRole.role, role).fetchJoin()
                 .where(user.isDeleted.eq(YNType.N)
-                        .and(user.company.ne(DefaultCompanyType.SYSTEM)))
+                        .and(user.company.ne("SYSTEM")))
                 .fetch();
 
         if (users.isEmpty()) {
@@ -129,7 +128,7 @@ public class UserQueryDslRepository implements UserRepository {
         return query
                 .selectFrom(user)
                 .where(user.isDeleted.eq(YNType.Y)
-                        .and(user.company.ne(DefaultCompanyType.SYSTEM))
+                        .and(user.company.ne("SYSTEM"))
                         .and(user.modifyAt.goe(startDate))
                         .and(user.modifyAt.lt(endDate)))
                 .fetch();

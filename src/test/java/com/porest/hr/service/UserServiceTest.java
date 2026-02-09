@@ -4,7 +4,6 @@ import com.porest.core.exception.EntityNotFoundException;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
 import com.porest.core.util.FileUtils;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.repository.DepartmentRepository;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.user.repository.UserRepository;
@@ -72,7 +71,7 @@ class UserServiceTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
@@ -229,7 +228,7 @@ class UserServiceTest {
             String userId = "user1";
             User user = User.createUser(
                     null, userId, "이서준", "test@test.com",
-                    LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                    LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                     LocalDate.now(), YNType.N, "test.jpg", "some-uuid", CountryCode.KR
             );
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));
@@ -255,7 +254,7 @@ class UserServiceTest {
             String userId = "user1";
             User user = User.createUser(
                     null, userId, "이서준", "test@test.com",
-                    LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                    LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                     LocalDate.now(), YNType.N, "test.jpg", null, CountryCode.KR
             );
             given(userRepository.findByIdWithRolesAndPermissions(userId)).willReturn(Optional.of(user));

@@ -5,7 +5,6 @@ import com.porest.core.exception.EntityNotFoundException;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.company.domain.Company;
 import com.porest.hr.company.service.CompanyService;
 import com.porest.hr.department.domain.Department;
@@ -53,7 +52,7 @@ class DepartmentServiceTest {
     private User createTestUser(String id) {
         return User.createUser(
                 null, id, "테스트유저", "test@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

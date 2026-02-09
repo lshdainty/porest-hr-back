@@ -5,7 +5,6 @@ import com.porest.core.exception.InvalidValueException;
 import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.notice.domain.Notice;
 import com.porest.hr.notice.repository.NoticeRepository;
 import com.porest.hr.notice.service.NoticeService;
@@ -54,7 +53,7 @@ class NoticeServiceTest {
     private User createTestUser(String id) {
         return User.createUser(
                 null, id, "테스트유저", "test@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

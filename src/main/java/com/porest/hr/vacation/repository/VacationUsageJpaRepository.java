@@ -1,7 +1,6 @@
 package com.porest.hr.vacation.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.vacation.domain.VacationUsage;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +58,7 @@ public class VacationUsageJpaRepository implements VacationUsageRepository {
                                 "where vu.isDeleted = :isDeleted and u.company != :systemCompany " +
                                 "order by vu.user.id asc, vu.startDate desc", VacationUsage.class)
                 .setParameter("isDeleted", YNType.N)
-                .setParameter("systemCompany", DefaultCompanyType.SYSTEM)
+                .setParameter("systemCompany", "SYSTEM")
                 .getResultList();
     }
 
@@ -74,7 +73,7 @@ public class VacationUsageJpaRepository implements VacationUsageRepository {
                                 "and vu.startDate <= :endDate " +
                                 "order by vu.startDate asc", VacationUsage.class)
                 .setParameter("isDeleted", YNType.N)
-                .setParameter("systemCompany", DefaultCompanyType.SYSTEM)
+                .setParameter("systemCompany", "SYSTEM")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .getResultList();

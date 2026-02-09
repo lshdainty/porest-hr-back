@@ -1,8 +1,6 @@
 package com.porest.hr.work.domain;
 
-import com.porest.hr.common.converter.SystemTypeConverter;
 import com.porest.hr.common.domain.AuditingFieldsWithIp;
-import com.porest.hr.common.type.SystemType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,9 +28,8 @@ public class WorkSystemLog extends AuditingFieldsWithIp {
     /**
      * 시스템 코드
      */
-    @Convert(converter = SystemTypeConverter.class)
     @Column(name = "system_code", nullable = false, length = 20)
-    private SystemType code;
+    private String code;
 
     /**
      * 시스템 로그 생성 정적 팩토리 메서드<br>
@@ -41,7 +38,7 @@ public class WorkSystemLog extends AuditingFieldsWithIp {
      * @param code 시스템 코드
      * @return WorkSystemLog
      */
-    public static WorkSystemLog of(SystemType code) {
+    public static WorkSystemLog of(String code) {
         WorkSystemLog log = new WorkSystemLog();
         log.code = code;
         return log;

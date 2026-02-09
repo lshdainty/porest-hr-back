@@ -6,7 +6,6 @@ import com.porest.hr.user.domain.User;
 import com.porest.hr.work.controller.dto.WorkApiDto;
 import com.porest.hr.work.repository.dto.WorkHistorySearchCondition;
 import com.porest.hr.work.type.CodeType;
-import com.porest.hr.common.type.SystemType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -357,7 +356,7 @@ public interface WorkApi {
     @GetMapping("/api/v1/work/system-logs/status")
     ApiResponse checkSystemStatus(
             @Parameter(description = "시스템 코드 목록", example = "ERP,MES,WMS", required = true)
-            @RequestParam("system_codes") List<SystemType> systemCodes
+            @RequestParam("system_codes") List<String> systemCodes
     );
 
     // ========== 오늘 업무 시간 확인 ==========

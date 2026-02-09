@@ -1,10 +1,7 @@
 package com.porest.hr.repository;
 
-import com.porest.hr.common.type.CompanyType;
 import com.porest.core.type.CountryCode;
 import com.porest.hr.company.domain.Company;
-import com.porest.hr.common.type.DefaultCompanyType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.domain.Department;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.department.repository.DepartmentQueryDslRepository;
@@ -42,7 +39,7 @@ class DepartmentQueryDslRepositoryTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
@@ -51,13 +48,13 @@ class DepartmentQueryDslRepositoryTest {
     private User createTestUser(String id, String name, String email, LocalDate birth) {
         return User.createUser(
                 null, id, name, email,
-                birth, DefaultCompanyType.NONE, "9 ~ 18",
+                birth, "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
 
     // 테스트용 User 생성 헬퍼 메소드 (회사 타입 지정)
-    private User createTestUserWithCompany(String id, String name, String email, CompanyType companyType) {
+    private User createTestUserWithCompany(String id, String name, String email, String companyType) {
         return User.createUser(
                 null, id, name, email,
                 LocalDate.of(1990, 1, 1), companyType, "9 ~ 18",
@@ -356,7 +353,7 @@ class DepartmentQueryDslRepositoryTest {
     void findUsersNotInDepartmentExcludesSystemAccount() {
         // given
         User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com");
-        User systemUser = createTestUserWithCompany("systemUser", "시스템유저", "system@test.com", DefaultCompanyType.SYSTEM);
+        User systemUser = createTestUserWithCompany("systemUser", "시스템유저", "system@test.com", "SYSTEM");
         em.persist(normalUser);
         em.persist(systemUser);
 
@@ -371,7 +368,7 @@ class DepartmentQueryDslRepositoryTest {
         // then
         assertThat(users).hasSize(1);
         assertThat(users.get(0).getId()).isEqualTo("normalUser");
-        assertThat(users.get(0).getCompany()).isNotEqualTo(DefaultCompanyType.SYSTEM);
+        assertThat(users.get(0).getCompany()).isNotEqualTo("SYSTEM");
     }
 
     @Test
@@ -379,7 +376,7 @@ class DepartmentQueryDslRepositoryTest {
     void findUserDepartmentsInDepartmentExcludesSystemAccount() {
         // given
         User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com");
-        User systemUser = createTestUserWithCompany("systemUser", "시스템유저", "system@test.com", DefaultCompanyType.SYSTEM);
+        User systemUser = createTestUserWithCompany("systemUser", "시스템유저", "system@test.com", "SYSTEM");
         em.persist(normalUser);
         em.persist(systemUser);
 
@@ -397,6 +394,6 @@ class DepartmentQueryDslRepositoryTest {
         // then
         assertThat(userDepartments).hasSize(1);
         assertThat(userDepartments.get(0).getUser().getId()).isEqualTo("normalUser");
-        assertThat(userDepartments.get(0).getUser().getCompany()).isNotEqualTo(DefaultCompanyType.SYSTEM);
+        assertThat(userDepartments.get(0).getUser().getCompany()).isNotEqualTo("SYSTEM");
     }
 }

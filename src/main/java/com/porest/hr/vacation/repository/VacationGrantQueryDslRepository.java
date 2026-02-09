@@ -1,7 +1,6 @@
 package com.porest.hr.vacation.repository;
 
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.vacation.domain.VacationGrant;
 import com.porest.hr.vacation.type.GrantMethod;
 import com.porest.hr.vacation.type.GrantStatus;
@@ -92,7 +91,7 @@ public class VacationGrantQueryDslRepository implements VacationGrantRepository 
                 .join(vacationGrant.policy).fetchJoin()
                 .where(vacationGrant.isDeleted.eq(YNType.N)
                         .and(vacationGrant.status.eq(GrantStatus.ACTIVE))
-                        .and(vacationGrant.user.company.ne(DefaultCompanyType.SYSTEM)))
+                        .and(vacationGrant.user.company.ne("SYSTEM")))
                 .orderBy(vacationGrant.user.id.asc(), vacationGrant.expiryDate.asc())
                 .fetch();
     }

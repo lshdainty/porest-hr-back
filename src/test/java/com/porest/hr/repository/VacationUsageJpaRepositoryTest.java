@@ -2,7 +2,6 @@ package com.porest.hr.repository;
 
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.vacation.domain.VacationUsage;
 import com.porest.hr.vacation.repository.VacationUsageJpaRepository;
@@ -41,7 +40,7 @@ class VacationUsageJpaRepositoryTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
@@ -50,7 +49,7 @@ class VacationUsageJpaRepositoryTest {
     private User createTestUser(String id, String name, String email, LocalDate birth) {
         return User.createUser(
                 null, id, name, email,
-                birth, DefaultCompanyType.NONE, "9 ~ 18",
+                birth, "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }

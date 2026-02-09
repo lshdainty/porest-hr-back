@@ -2,8 +2,6 @@ package com.porest.hr.repository;
 
 import com.porest.core.type.CountryCode;
 import com.porest.hr.company.domain.Company;
-import com.porest.hr.common.type.DefaultCompanyType;
-import com.porest.hr.common.type.DefaultCompanyType;
 import com.porest.hr.department.domain.Department;
 import com.porest.hr.department.domain.UserDepartment;
 import com.porest.hr.department.repository.DepartmentJpaRepository;
@@ -41,7 +39,7 @@ class DepartmentJpaRepositoryTest {
     private User createTestUser(String id, String name, String email) {
         return User.createUser(
                 null, id, name, email,
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.NONE, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "NONE", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
     }
@@ -339,7 +337,7 @@ class DepartmentJpaRepositoryTest {
         User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com");
         User systemUser = User.createUser(
                 null, "systemUser", "시스템유저", "system@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "SYSTEM", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         em.persist(normalUser);
@@ -356,7 +354,7 @@ class DepartmentJpaRepositoryTest {
         // then
         assertThat(users).hasSize(1);
         assertThat(users.get(0).getId()).isEqualTo("normalUser");
-        assertThat(users.get(0).getCompany()).isNotEqualTo(DefaultCompanyType.SYSTEM);
+        assertThat(users.get(0).getCompany()).isNotEqualTo("SYSTEM");
     }
 
     @Test
@@ -366,7 +364,7 @@ class DepartmentJpaRepositoryTest {
         User normalUser = createTestUser("normalUser", "일반유저", "normal@test.com");
         User systemUser = User.createUser(
                 null, "systemUser", "시스템유저", "system@test.com",
-                LocalDate.of(1990, 1, 1), DefaultCompanyType.SYSTEM, "9 ~ 18",
+                LocalDate.of(1990, 1, 1), "SYSTEM", "9 ~ 18",
                 LocalDate.now(), YNType.N, null, null, CountryCode.KR
         );
         em.persist(normalUser);
@@ -386,6 +384,6 @@ class DepartmentJpaRepositoryTest {
         // then
         assertThat(userDepartments).hasSize(1);
         assertThat(userDepartments.get(0).getUser().getId()).isEqualTo("normalUser");
-        assertThat(userDepartments.get(0).getUser().getCompany()).isNotEqualTo(DefaultCompanyType.SYSTEM);
+        assertThat(userDepartments.get(0).getUser().getCompany()).isNotEqualTo("SYSTEM");
     }
 }
