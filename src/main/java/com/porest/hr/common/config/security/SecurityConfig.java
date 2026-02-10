@@ -60,6 +60,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/",
                         "/api/v1/auth/exchange", // 토큰 교환 API (SSO JWT로 HR JWT 발급)
+                        "/api/v1/auth/logout",   // 로그아웃 (쿠키 삭제)
                         "/actuator/health",      // Health check
                         "/actuator/prometheus",  // Prometheus metrics
                         "/actuator/metrics/**",  // Metrics

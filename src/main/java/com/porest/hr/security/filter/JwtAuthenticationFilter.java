@@ -7,6 +7,7 @@ import com.porest.hr.user.domain.User;
 import com.porest.hr.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String ACCESS_TOKEN_COOKIE = "hr_access_token";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -132,12 +135,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Authorization 헤더에서 Bearer 토큰 추출
+     * 쿠키 또는 Authorization 헤더에서 JWT 토큰 추출
+     * HttpOnly 쿠키를 우선 확인하고, 없으면 Authorization 헤더를 확인합니다.
      *
      * @param request HTTP 요청
      * @return JWT 토큰 (없으면 null)
      */
     private String resolveToken(HttpServletRequest request) {
+        // 1. HttpOnly 쿠키에서 토큰 추출
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            String cookieToken = Arrays.stream(cookies)
+                    .filter(c -> ACCESS_TOKEN_COOKIE.equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+            if (StringUtils.hasText(cookieToken)) {
+                return cookieToken;
+            }
+        }
+
+        // 2. Authorization 헤더에서 Bearer 토큰 추출 (fallback)
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(BEARER_PREFIX.length());

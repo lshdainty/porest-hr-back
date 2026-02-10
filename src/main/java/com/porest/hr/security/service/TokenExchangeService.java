@@ -38,7 +38,7 @@ public class TokenExchangeService {
      * @param ssoToken SSO에서 발급한 JWT 토큰
      * @return HR JWT 토큰 응답
      */
-    public TokenExchangeDto.Response exchange(String ssoToken) {
+    public TokenExchangeDto.ExchangeResult exchange(String ssoToken) {
         log.debug("Token exchange request received");
 
         // 1. SSO JWT 검증
@@ -85,6 +85,10 @@ public class TokenExchangeService {
 
         log.info("Token exchanged successfully for user: {}", userId);
 
-        return TokenExchangeDto.Response.of(hrToken, expiresIn, userInfo);
+        return TokenExchangeDto.ExchangeResult.builder()
+                .accessToken(hrToken)
+                .expiresIn(expiresIn)
+                .user(userInfo)
+                .build();
     }
 }
