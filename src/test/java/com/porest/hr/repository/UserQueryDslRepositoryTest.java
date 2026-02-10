@@ -151,7 +151,7 @@ class UserQueryDslRepositoryTest {
 
         // when
         User foundUser = userRepository.findById("testUser").orElseThrow();
-        foundUser.updateUser("수정이름", "updated@test.com", null,
+        foundUser.updateUser(null, "수정이름", "updated@test.com", null,
                 LocalDate.of(1991, 1, 1), "NONE", "8 ~ 17",
                 YNType.Y, null, null, null, null);
         em.flush();

@@ -1,9 +1,8 @@
 package com.porest.hr.common.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +30,7 @@ public class SsoUserEventSubscriber {
 
     public SsoUserEventSubscriber(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
-        this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        this.objectMapper = JsonMapper.builder().build();
     }
 
     /**
@@ -53,7 +50,7 @@ public class SsoUserEventSubscriber {
                 case USER_DELETED -> handleUserDeleted(event);
                 default -> log.warn("Unknown event type: {}", event.getType());
             }
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Failed to parse user event: {}", message, e);
         } catch (Exception e) {
             log.error("Failed to handle user event: {}", message, e);
@@ -121,6 +118,7 @@ public class SsoUserEventSubscriber {
      */
     private void syncSsoFields(User user, UserEvent event) {
         user.updateUser(
+                event.getUserId(),
                 event.getName(),
                 event.getEmail(),
                 null,  // roles - 변경하지 않음

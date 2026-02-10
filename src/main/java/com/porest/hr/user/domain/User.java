@@ -253,9 +253,10 @@ public class User extends AuditingFieldsWithIp {
      * Entity의 경우 Setter없이 Getter만 사용<br>
      * 해당 메소드를 통해 유저 수정할 것
      */
-    public void updateUser(String name, String email, List<Role> roles, LocalDate birth,
+    public void updateUser(String userId, String name, String email, List<Role> roles, LocalDate birth,
                            String company, String workTime,
                            YNType lunarYN, String profileName, String profileUUID, String dashboard, CountryCode countryCode) {
+        if (!Objects.isNull(userId)) { this.id = userId; }
         if (!Objects.isNull(name)) { this.name = name; }
         if (!Objects.isNull(email)) { this.email = email; }
         if (!Objects.isNull(roles)) {

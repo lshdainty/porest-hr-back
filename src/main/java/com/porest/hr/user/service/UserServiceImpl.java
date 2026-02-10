@@ -260,7 +260,7 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toList());
         }
 
-        user.updateUser(data.getName(), data.getEmail(), roles, data.getBirth(),
+        user.updateUser(null, data.getName(), data.getEmail(), roles, data.getBirth(),
                 data.getCompany(),
                 data.getWorkTime(),
                 data.getLunarYN(),
@@ -594,6 +594,7 @@ public class UserServiceImpl implements UserService {
 
         // 정보 수정 (비밀번호 제외 필드만)
         user.updateUser(
+                null, // userId - SSO 관리 필드이므로 HR에서 변경하지 않음
                 data.getName(),
                 data.getEmail(),
                 null, // roles

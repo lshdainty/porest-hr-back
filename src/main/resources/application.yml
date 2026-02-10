@@ -120,7 +120,7 @@ security:
 
 # SSO 연동 설정
 sso:
-  api-url: ${SSO_API_URL:http://localhost:8080}
+  api-url: ${SSO_API_URL:http://localhost:8001}
   client-code: ${SSO_CLIENT_CODE:hr}
   timeout:
     connect: ${SSO_CONNECT_TIMEOUT:5000}
