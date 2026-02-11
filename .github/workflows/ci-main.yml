@@ -36,7 +36,7 @@ jobs:
       #   run: ./gradlew --info test
       #   env:
       #     GITHUB_ACTOR: ${{ github.actor }}
-      #     GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+      #     GITHUB_TOKEN: ${{ secrets.READ_PACKAGE_TOKEN }}
 
       # - name: Publish Test Results
       #   uses: EnricoMi/publish-unit-test-result-action@v2
