@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env.${SPRING_PROFILES_ACTIVE:local}[.properties]
   application:
     name: porest
   main:
@@ -7,31 +9,30 @@ spring:
     basename: message/messages,message/messages-skc
     encoding: utf-8
 
-  # DB 연결 드라이버 설정
+  # DB 설정
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:10}
+      minimum-idle: ${HIKARI_MIN_IDLE:5}
+      connection-timeout: ${HIKARI_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${HIKARI_IDLE_TIMEOUT:600000}
+      max-lifetime: ${HIKARI_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${HIKARI_LEAK_DETECTION:60000}
     p6spy:
-      # JDBC 이벤트 로깅을 위한 P6LogFactory 등록
-      enable-logging: true
-
-      # com.p6spy.engine.spy.appender.MultiLineFormat 사용 (SingleLineFormat 대신)
+      enable-logging: ${P6SPY_ENABLED:true}
       multiline: true
-
-      # 기본 리스너들을 위한 로깅 사용 [slf4j, sysout, file, custom]
       logging: slf4j
-
-      # 실제 값으로 '?'를 대체한 효과적인 SQL 문자열을 추적 시스템에 보고
-      # 참고: 이 설정은 로깅 메시지에 영향을 주지 않음
       tracing:
         include-parameter-values: true
 
   # JPA 설정
   jpa:
     hibernate:
-      ddl-auto: ${DDL_AUTO:none}
+      ddl-auto: none
     properties:
       hibernate:
         default_batch_fetch_size: 100
@@ -39,30 +40,81 @@ spring:
   # Redis 설정
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: ${REDIS_DATABASE:2}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE}
 
+  # 파일 업로드 제한
+  servlet:
+    multipart:
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:10MB}
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:50MB}
+
+  # Graceful Shutdown
+  lifecycle:
+    timeout-per-shutdown-phase: ${SHUTDOWN_TIMEOUT:30s}
+
+  # 에러 정보 표시
+  web:
+    error:
+      include-stacktrace: ${ERROR_STACKTRACE:never}
+      include-message: ${ERROR_MESSAGE:never}
+      include-exception: ${ERROR_EXCEPTION:false}
+      include-binding-errors: ${ERROR_BINDING:never}
+
+  # OAuth2 설정
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: profile,email
+
+  # 메일 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connection-timeout: 5000
+          timeout: 5000
+          write-timeout: 5000
+
+# 서버 설정
 server:
+  port: ${SERVER_PORT:8000}
+  shutdown: ${SERVER_SHUTDOWN:graceful}
+  forward-headers-strategy: framework
   servlet:
     session:
       timeout: 8h
-  port: ${SERVER_PORT:8000}
-  forward-headers-strategy: framework
+      cookie:
+        secure: ${COOKIE_SECURE:false}
+        same-site: ${COOKIE_SAME_SITE:lax}
+        http-only: true
 
-# LOG 설정
+# 로깅 설정
 logging:
   level:
-    com.porest.hr.api: ${LOG_LEVEL:info}
-    com.porest.hr.repository: ${LOG_LEVEL:info}
-    com.porest.hr.service: ${LOG_LEVEL:info}
-    com.porest.hr.domain: ${LOG_LEVEL:info}
+    com.porest.hr: ${LOG_LEVEL:info}
+    org.hibernate.SQL: ${LOG_LEVEL_HIBERNATE:info}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_HIBERNATE_BINDER:info}
     p6spy: info
+    root: ${LOG_LEVEL_ROOT:info}
 
-# 파일 업로드 경로 설정
+# 파일 업로드 경로
 file:
-  root-path: ${FILE_ROOT_PATH:/app/files}
+  root-path: ${FILE_ROOT_PATH}
   web-url-prefix: /media
   resource-handler: ${file.web-url-prefix}/**
   resource-locations: file:${file.root-path}/
@@ -75,8 +127,9 @@ file:
 
 # 어플리케이션 정보
 app:
+  base-url: ${APP_BASE_URL:http://localhost:8000}
   frontend:
-    base-url: ${FRONTEND_BASE_URL:http://localhost:3000}
+    base-url: ${FRONTEND_BASE_URL}
   company:
     name: ${COMPANY_NAME:porest}
   email:
@@ -84,16 +137,16 @@ app:
       path: ${EMAIL_LOGO_PATH:templates/email/logo.png}
   redis:
     channel:
-      user-events: ${REDIS_CHANNEL_USER_EVENTS:porest:dev:sso:user-events}
+      user-events: ${REDIS_CHANNEL_USER_EVENTS}
 
 # Swagger 설정
 springdoc:
   api-docs:
     path: /v3/api-docs
-    enabled: true
+    enabled: ${SWAGGER_ENABLED:true}
   swagger-ui:
     path: /swagger-ui.html
-    enabled: true
+    enabled: ${SWAGGER_ENABLED:true}
     operations-sorter: alpha
     tags-sorter: alpha
     display-request-duration: true
@@ -104,24 +157,31 @@ springdoc:
 
 # JWT 설정
 jwt:
-  # SSO JWT 검증용 secret (SSO와 동일한 키 사용)
-  secret: ${JWT_SECRET:your-256-bit-secret-key-for-jwt-signing-must-be-at-least-32-characters}
-  # HR JWT 발급용 secret (별도 키 사용, 미설정 시 SSO secret 사용)
-  hr-secret: ${JWT_HR_SECRET:hr-service-256-bit-secret-key-for-jwt-signing-must-be-at-least-32-chars}
-  # HR Access Token 만료 시간 (밀리초, 기본 1시간)
+  secret: ${JWT_SECRET}
+  hr-secret: ${JWT_HR_SECRET}
   hr-access-expiration: ${JWT_HR_ACCESS_EXPIRATION:3600000}
 
 # 보안 설정
 security:
   ip-blacklist:
-    enabled: true  # IP 블랙리스트 기능 활성화 여부
-    log-level: WARN  # 차단 로그 레벨 (WARN 또는 ERROR)
-    file-path: ${IP_BLACKLIST_FILE_PATH:config/ip-blacklist.txt}  # IP 블랙리스트 파일 경로
+    enabled: true
+    log-level: WARN
+    file-path: ${IP_BLACKLIST_FILE_PATH:config/ip-blacklist.txt}
 
 # SSO 연동 설정
 sso:
-  api-url: ${SSO_API_URL:http://localhost:8001}
+  api-url: ${SSO_API_URL}
   client-code: ${SSO_CLIENT_CODE:hr}
   timeout:
     connect: ${SSO_CONNECT_TIMEOUT:5000}
     read: ${SSO_READ_TIMEOUT:10000}
+
+# Prometheus 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info, metrics
+  metrics:
+    tags:
+      application: porest
