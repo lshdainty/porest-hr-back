@@ -80,6 +80,7 @@ src/main/java/com/porest/hr/
 ├── dues/                  # 회비 관리
 ├── notice/                # 공지사항
 ├── calendar/              # 캘린더 API
+├── client/                # 외부 서비스(SSO) 연동
 ├── security/              # 보안 설정
 └── common/                # 공통 유틸리티
 ```
@@ -118,7 +119,7 @@ public class UserJpaRepository implements UserRepository { ... }
 
 ### 요구사항
 
-- **Java**: 17+
+- **Java**: 25+
 - **Gradle**: 8.x
 - **MariaDB**: 10.x+
 
@@ -128,12 +129,11 @@ public class UserJpaRepository implements UserRepository { ... }
 # 빌드 (테스트 제외)
 ./gradlew clean build -x test
 
-# 테스트 실행
-./gradlew test
-
 # 로컬 실행
 ./gradlew bootRun -Dspring.profiles.active=local
 ```
+
+> 참고: 현재 `build.gradle`에서 `test` 태스크가 `enabled = false`로 설정되어 있습니다.
 
 ---
 
