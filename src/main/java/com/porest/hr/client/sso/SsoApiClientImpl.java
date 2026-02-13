@@ -54,7 +54,7 @@ public class SsoApiClientImpl implements SsoApiClient {
                     INVITE_USER_PATH,
                     HttpMethod.POST,
                     entity,
-                    new ParameterizedTypeReference<>() {}
+                    new ParameterizedTypeReference<ApiResponse<SsoInviteResponse>>() {}
             );
 
             ApiResponse<SsoInviteResponse> body = response.getBody();
@@ -121,7 +121,7 @@ public class SsoApiClientImpl implements SsoApiClient {
                     INVITATION_STATUS_PATH,
                     HttpMethod.POST,
                     entity,
-                    new ParameterizedTypeReference<>() {}
+                    new ParameterizedTypeReference<ApiResponse<List<SsoInvitationStatusResponse>>>() {}
             );
 
             ApiResponse<List<SsoInvitationStatusResponse>> body = response.getBody();
