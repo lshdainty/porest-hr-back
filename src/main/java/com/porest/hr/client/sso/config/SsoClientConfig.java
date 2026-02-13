@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * SSO API 클라이언트 설정<br>
@@ -24,13 +26,16 @@ public class SsoClientConfig {
     private int readTimeout;
 
     @Bean(name = "ssoRestTemplate")
-    public RestTemplate ssoRestTemplate() {
+    public RestTemplate ssoRestTemplate(JsonMapper jsonMapper) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(connectTimeout);
         factory.setReadTimeout(readTimeout);
 
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(ssoApiUrl));
+
+        restTemplate.getMessageConverters()
+                .add(0, new JacksonJsonHttpMessageConverter(jsonMapper));
 
         return restTemplate;
     }
