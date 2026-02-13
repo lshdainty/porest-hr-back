@@ -80,6 +80,7 @@ src/main/java/com/porest/hr/
 ├── dues/                  # 회비 관리
 ├── notice/                # 공지사항
 ├── calendar/              # 캘린더 API
+├── client/                # 외부 서비스(SSO) 연동
 ├── security/              # 보안 설정
 └── common/                # 공통 유틸리티
 ```
