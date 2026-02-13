@@ -66,4 +66,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Jenkins Deploy
-        run: curl -s -X POST "${{ secrets.JENKINS_URL }}/generic-webhook-trigger/invoke?token=porest-back-deploy"
+        run: curl -s -X POST "${{ secrets.JENKINS_URL }}/generic-webhook-trigger/invoke?token=porest-hr-back-deploy"
