@@ -1,103 +1,81 @@
 pipeline {
     agent any
-    
-    tools {
-        jdk 'jdk25'
+    parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['dev', 'prod'], description: '배포 환경')
+        string(name: 'GIT_REF', defaultValue: 'main', description: '브랜치 또는 태그 (main, v1.0.0)')
     }
-    
     environment {
-        DEPLOY_PATH = '/home/porest/porest-back'
-        JAR_NAME = 'porest-0.0.1-SNAPSHOT.jar'
-        CONFIG_PATH = '/home/porest/porest-back/config'
-        IP_BLACKLIST_FILE = 'ip-blacklist.txt'
-        // GitHub Packages 인증
-        GITHUB_ACTOR = 'lshdainty'
-        GITHUB_TOKEN = credentials('github-packages-token')
+        REPO_URL = "https://github.com/lshdainty/porest-hr-back.git"
+        IMAGE_NAME = "porest-back"
+        SRC_DIR = "${env.POREST_BASE_DIR}/src/hr-back"
+        ENV_FILE_DEV = "${env.POREST_BASE_DIR}/backend/dev/hr/dev.env"
+        ENV_FILE_PROD = "${env.POREST_BASE_DIR}/backend/prod/hr/prod.env"
+        CONTAINER_NAME = "hr-backend"
     }
-    
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    credentialsId: 'github-credentials',
-                    url: 'https://github.com/lshdainty/porest-back.git'
-            }
-        }
-        
-        stage('Grant Execute Permission') {
-            steps {
-                sh 'chmod +x gradlew'
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                sh './gradlew clean build -x test -Pprofile=prod'
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                script {
-                    // 배포 디렉토리 생성
-                    sh "sudo mkdir -p ${DEPLOY_PATH}"
-                    sh "sudo mkdir -p ${CONFIG_PATH}"
-
-                    // 기존 프로세스 종료
-                    sh """
-                        sudo pkill -f "java -jar.*${JAR_NAME}" || true
-                        sleep 2
-                    """
-
-                    // JAR 파일 복사
-                    sh """
-                        sudo cp build/libs/*-SNAPSHOT.jar ${DEPLOY_PATH}/${JAR_NAME}
-                        sudo chown porest:porest ${DEPLOY_PATH}/${JAR_NAME}
-                    """
-
-                    // IP 블랙리스트 파일이 존재하지 않으면 빈 파일 생성
-                    sh """
-                        if ! ls "${CONFIG_PATH}/${IP_BLACKLIST_FILE}" > /dev/null 2>&1; then
-                            echo "File not found. Creating new one..."
-
-                            # 임시 파일 생성 후 sudo로 이동
-                            cat > /tmp/ip-blacklist.txt << 'EOF'
-# IP Blacklist File (Auto-generated)
-# Add one IP address or CIDR notation per line
-EOF
-                            sudo mv /tmp/ip-blacklist.txt "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
-                            sudo chown porest:porest "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
-                            sudo chmod 644 "${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
-                            echo "✅ Created empty IP blacklist file: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
-                        else
-                            echo "✅ IP blacklist file already exists: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
-                        fi
-                    """
-
-                    // 애플리케이션 재시작 (IP 블랙리스트 파일 경로 환경변수 전달)
-                    sh """
-                        sudo -u porest bash -c 'cd ${DEPLOY_PATH} && nohup java -jar ${JAR_NAME} --spring.profiles.active=prod --spring.config.additional-location=file:${CONFIG_PATH}/application-secret.properties -DIP_BLACKLIST_FILE_PATH=${CONFIG_PATH}/${IP_BLACKLIST_FILE} > app.log 2>&1 &'
-                        echo "Spring Boot application started as porest user with prod profile"
-                        echo "IP Blacklist file: ${CONFIG_PATH}/${IP_BLACKLIST_FILE}"
-                    """
-
-                    // 프로세스 확인
-                    sh "sleep 3 && pgrep -f 'java -jar' && echo '✅ Process running' || echo '⚠️ Warning: Process not found'"
+                dir("${SRC_DIR}") {
+                    git branch: "${params.GIT_REF}",
+                        url: "${REPO_URL}",
+                        credentialsId: 'github-credentials'
                 }
             }
         }
-    }
-    
-    post {
-        success {
-            echo '✅ Spring Boot 배포 성공!'
+        stage('Docker Build') {
+            steps {
+                dir("${SRC_DIR}") {
+                    withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+                        sh 'docker build --build-arg GITHUB_ACTOR=$GH_USER --build-arg GITHUB_TOKEN=$GH_TOKEN -t ' + IMAGE_NAME + ':latest .'
+                    }
+                }
+            }
         }
-        failure {
-            echo '❌ Spring Boot 배포 실패!'
+        stage('Deploy to Dev') {
+            when { expression { params.DEPLOY_ENV == 'dev' } }
+            steps {
+                echo "Deploying HR Backend to Development..."
+                sh """
+                    docker stop ${CONTAINER_NAME}-dev || true
+                    docker rm ${CONTAINER_NAME}-dev || true
+                    docker run -d --name ${CONTAINER_NAME}-dev \
+                        --hostname ${CONTAINER_NAME}-dev \
+                        --network ${env.DEV_NETWORK} \
+                        --env-file ${ENV_FILE_DEV} \
+                        -e SPRING_PROFILES_ACTIVE=dev \
+                        -e LOKI_URL=${env.LOKI_URL} \
+                        ${IMAGE_NAME}:latest
+                """
+            }
         }
-        cleanup {
-            cleanWs()
+        stage('Approval for Prod') {
+            when { expression { params.DEPLOY_ENV == 'prod' } }
+            steps {
+                script {
+                    input(
+                        id: 'DeployToProd',
+                        message: "운영 서버에 배포하시겠습니까?",
+                        ok: '배포'
+                    )
+                }
+            }
+        }
+        stage('Deploy to Prod') {
+            when { expression { params.DEPLOY_ENV == 'prod' } }
+            steps {
+                echo "Deploying HR Backend to Production..."
+                sh """
+                    docker stop ${CONTAINER_NAME}-prod || true
+                    docker rm ${CONTAINER_NAME}-prod || true
+                    docker run -d --name ${CONTAINER_NAME}-prod \
+                        --hostname ${CONTAINER_NAME}-prod \
+                        --network ${env.PROD_NETWORK} \
+                        --env-file ${ENV_FILE_PROD} \
+                        -e SPRING_PROFILES_ACTIVE=prod \
+                        -e LOKI_URL=${env.LOKI_URL} \
+                        ${IMAGE_NAME}:latest
+                """
+            }
         }
     }
 }
-
