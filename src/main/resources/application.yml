@@ -92,7 +92,7 @@ spring:
 
 # 서버 설정
 server:
-  port: ${SERVER_PORT:8000}
+  port: ${SERVER_PORT:8001}
   shutdown: ${SERVER_SHUTDOWN:graceful}
   forward-headers-strategy: framework
   servlet:
@@ -127,7 +127,7 @@ file:
 
 # 어플리케이션 정보
 app:
-  base-url: ${APP_BASE_URL:http://localhost:8000}
+  base-url: ${APP_BASE_URL:http://localhost:8001}
   frontend:
     base-url: ${FRONTEND_BASE_URL}
   company:
