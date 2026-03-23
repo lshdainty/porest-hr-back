@@ -6,7 +6,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   messages:
-    basename: message/messages,message/messages-skc
+    basename: message/core-messages,message/messages,message/messages-skc
     encoding: utf-8
 
   # DB 설정
