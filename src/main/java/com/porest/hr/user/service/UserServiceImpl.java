@@ -9,6 +9,7 @@ import com.porest.hr.client.sso.dto.SsoInviteResponse;
 import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.core.type.YNType;
 import com.porest.core.util.MessageResolver;
+import com.porest.core.util.FileUploadValidator;
 import com.porest.core.util.FileUtils;
 import com.porest.hr.department.repository.DepartmentRepository;
 import com.porest.hr.permission.domain.Role;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,6 +51,11 @@ public class UserServiceImpl implements UserService {
 
     @Value("${sso.client-code}")
     private String ssoClientCode;
+
+    private static final Set<String> ALLOWED_PROFILE_EXTENSIONS = Set.of(
+            "jpg", "jpeg", "png", "gif", "webp"
+    );
+    private static final long MAX_PROFILE_SIZE = 5 * 1024 * 1024L; // 5MB
 
     @Value("${file.root-path}")
     private String fileRootPath;
@@ -284,6 +291,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserServiceDto saveProfileImgInTempFolder(MultipartFile file) {
         log.debug("프로필 이미지 임시 저장 시작: filename={}", file.getOriginalFilename());
+
+        FileUploadValidator.validate(file, ALLOWED_PROFILE_EXTENSIONS, MAX_PROFILE_SIZE);
+
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
 
         String uuid = UUID.randomUUID().toString();
