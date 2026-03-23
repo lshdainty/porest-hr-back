@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Department", description = "부서 관리 API")
@@ -35,7 +36,7 @@ public interface DepartmentApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = DepartmentApiDto.RegistDepartmentReq.class))
             )
-            @RequestBody DepartmentApiDto.RegistDepartmentReq data
+            @Valid @RequestBody DepartmentApiDto.RegistDepartmentReq data
     );
 
     @Operation(
@@ -65,7 +66,7 @@ public interface DepartmentApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = DepartmentApiDto.EditDepartmentReq.class))
             )
-            @RequestBody DepartmentApiDto.EditDepartmentReq data
+            @Valid @RequestBody DepartmentApiDto.EditDepartmentReq data
     );
 
     @Operation(
@@ -170,7 +171,7 @@ public interface DepartmentApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = DepartmentApiDto.RegistDepartmentUserReq.class))
             )
-            @RequestBody DepartmentApiDto.RegistDepartmentUserReq data
+            @Valid @RequestBody DepartmentApiDto.RegistDepartmentUserReq data
     );
 
     @Operation(
@@ -200,7 +201,7 @@ public interface DepartmentApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = DepartmentApiDto.DeleteDepartmentUserReq.class))
             )
-            @RequestBody DepartmentApiDto.DeleteDepartmentUserReq data
+            @Valid @RequestBody DepartmentApiDto.DeleteDepartmentUserReq data
     );
 
     @Operation(

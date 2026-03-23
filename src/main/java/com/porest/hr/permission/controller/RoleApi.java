@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public interface RoleApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = RoleApiDto.CreateRoleReq.class))
             )
-            @RequestBody RoleApiDto.CreateRoleReq req
+            @Valid @RequestBody RoleApiDto.CreateRoleReq req
     );
 
     @Operation(summary = "역할 수정", description = "기존 역할의 설명 및 권한을 수정합니다.")
@@ -67,7 +68,7 @@ public interface RoleApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = RoleApiDto.UpdateRoleReq.class))
             )
-            @RequestBody RoleApiDto.UpdateRoleReq req
+            @Valid @RequestBody RoleApiDto.UpdateRoleReq req
     );
 
     @Operation(summary = "역할 삭제", description = "역할을 삭제합니다 (Soft Delete).")
@@ -104,7 +105,7 @@ public interface RoleApi {
     ApiResponse<Void> updateRolePermissions(
             @Parameter(description = "역할 코드", example = "ADMIN", required = true)
             @PathVariable String roleCode,
-            @RequestBody RoleApiDto.UpdateRolePermissionsReq req
+            @Valid @RequestBody RoleApiDto.UpdateRolePermissionsReq req
     );
 
     @Operation(summary = "역할에 권한 추가", description = "특정 역할에 권한을 추가합니다.")
@@ -116,7 +117,7 @@ public interface RoleApi {
     ApiResponse<Void> addPermissionToRole(
             @Parameter(description = "역할 코드", example = "ADMIN", required = true)
             @PathVariable String roleCode,
-            @RequestBody RoleApiDto.RolePermissionReq req
+            @Valid @RequestBody RoleApiDto.RolePermissionReq req
     );
 
     @Operation(summary = "역할에서 권한 제거", description = "특정 역할에서 권한을 제거합니다.")
@@ -174,7 +175,7 @@ public interface RoleApi {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "권한 없음 (ROLE:MANAGE 필요)")
     })
     @PostMapping("/api/v1/permissions")
-    ApiResponse<String> createPermission(@RequestBody RoleApiDto.CreatePermissionReq req);
+    ApiResponse<String> createPermission(@Valid @RequestBody RoleApiDto.CreatePermissionReq req);
 
     @Operation(summary = "권한 수정", description = "기존 권한 정보를 수정합니다.")
     @ApiResponses({
@@ -185,7 +186,7 @@ public interface RoleApi {
     ApiResponse<Void> updatePermission(
             @Parameter(description = "권한 코드", example = "USER_READ", required = true)
             @PathVariable String permissionCode,
-            @RequestBody RoleApiDto.UpdatePermissionReq req
+            @Valid @RequestBody RoleApiDto.UpdatePermissionReq req
     );
 
     @Operation(summary = "권한 삭제", description = "권한을 삭제합니다 (Soft Delete).")

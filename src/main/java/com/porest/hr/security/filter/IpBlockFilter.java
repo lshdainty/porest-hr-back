@@ -79,37 +79,38 @@ public class IpBlockFilter extends OncePerRequestFilter {
      * - Proxy/Load Balancer 고려
      * - X-Forwarded-For, X-Real-IP 헤더 확인
      */
-    private String getClientIp(HttpServletRequest request) {
-        // Proxy를 통한 경우 실제 IP 추출
-        String[] headerNames = {
-                "X-Forwarded-For",
-                "Proxy-Client-IP",
-                "WL-Proxy-Client-IP",
-                "HTTP_X_FORWARDED_FOR",
-                "HTTP_X_FORWARDED",
-                "HTTP_X_CLUSTER_CLIENT_IP",
-                "HTTP_CLIENT_IP",
-                "HTTP_FORWARDED_FOR",
-                "HTTP_FORWARDED",
-                "HTTP_VIA",
-                "REMOTE_ADDR",
-                "X-Real-IP"
-        };
+    private static final java.util.regex.Pattern IP_PATTERN = java.util.regex.Pattern.compile(
+            "^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$" +
+            "|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$" +
+            "|^::1$"
+    );
 
-        for (String header : headerNames) {
-            String ip = request.getHeader(header);
-            if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-                // X-Forwarded-For는 여러 IP를 포함할 수 있음 (쉼표로 구분)
-                // 첫 번째 IP가 실제 클라이언트 IP
-                if (ip.contains(",")) {
-                    ip = ip.split(",")[0].trim();
-                }
+    private String getClientIp(HttpServletRequest request) {
+        // forward-headers-strategy: framework 설정에 의해
+        // Spring이 프록시 헤더를 처리하므로 getRemoteAddr()를 우선 사용
+        String remoteAddr = request.getRemoteAddr();
+
+        // X-Forwarded-For는 신뢰할 수 있는 프록시 환경에서만 참조
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(forwardedFor)) {
+            String ip = forwardedFor.contains(",")
+                    ? forwardedFor.split(",")[0].trim()
+                    : forwardedFor.trim();
+
+            // IP 형식 검증으로 스푸핑 방지
+            if (IP_PATTERN.matcher(ip).matches()) {
                 return ip;
             }
         }
 
-        // 헤더에 없으면 기본 remote address 사용
-        return request.getRemoteAddr();
+        String realIp = request.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isEmpty() && !"unknown".equalsIgnoreCase(realIp)) {
+            if (IP_PATTERN.matcher(realIp.trim()).matches()) {
+                return realIp.trim();
+            }
+        }
+
+        return remoteAddr;
     }
 
     /**

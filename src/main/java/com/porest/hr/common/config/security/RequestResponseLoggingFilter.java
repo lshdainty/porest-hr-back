@@ -253,16 +253,28 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 민감한 정보 마스킹 (비밀번호, 토큰 등)
+     * 민감한 정보 마스킹 (비밀번호, 토큰, 시크릿 등)
      */
+    private static final String[] SENSITIVE_JSON_FIELDS = {
+            "password", "user_pw", "pwd", "secret", "token",
+            "accessToken", "refreshToken", "apiKey", "apiSecret",
+            "client_secret", "authorization"
+    };
+
     private String maskSensitiveData(String body) {
-        // 간단한 예시: password 필드를 마스킹
-        // 실제로는 더 정교한 로직이 필요할 수 있음
-        if (body.contains("password") || body.contains("user_pw")) {
-            body = body.replaceAll("(\"password\"\\s*:\\s*\")([^\"]+)(\")", "$1***$3")
-                      .replaceAll("(\"user_pw\"\\s*:\\s*\")([^\"]+)(\")", "$1***$3")
-                      .replaceAll("(&|\\?)password=([^&]+)", "$1password=***")
-                      .replaceAll("(&|\\?)user_pw=([^&]+)", "$1user_pw=***");
+        for (String field : SENSITIVE_JSON_FIELDS) {
+            if (body.contains(field)) {
+                // JSON 형태: "fieldName": "value"
+                body = body.replaceAll(
+                        "(\"" + field + "\"\\s*:\\s*\")([^\"]+)(\")",
+                        "$1***$3"
+                );
+                // Query parameter 형태: ?field=value 또는 &field=value
+                body = body.replaceAll(
+                        "(&|\\?)" + field + "=([^&]+)",
+                        "$1" + field + "=***"
+                );
+            }
         }
         return body;
     }

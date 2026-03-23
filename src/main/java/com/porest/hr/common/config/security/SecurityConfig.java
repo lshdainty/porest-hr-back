@@ -63,9 +63,6 @@ public class SecurityConfig {
                         "/api/v1/auth/logout",   // 로그아웃 (쿠키 삭제)
                         "/actuator/health",      // Health check
                         "/actuator/prometheus",  // Prometheus metrics
-                        "/actuator/metrics/**",  // Metrics
-                        "/swagger-ui/**",        // Swagger UI
-                        "/v3/api-docs/**",       // OpenAPI docs
                         "/css/**",
                         "/images/**",
                         "/js/**"
@@ -102,8 +99,10 @@ public class SecurityConfig {
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
 
-        // 허용 헤더
-        configuration.addAllowedHeader("*");
+        // 허용 헤더 (필요한 헤더만 명시적으로 허용)
+        configuration.setAllowedHeaders(List.of(
+                "Authorization", "Content-Type", "Accept", "Accept-Language", "X-Requested-With"
+        ));
 
         // Authorization 헤더 노출 (JWT 토큰 전달용)
         configuration.addExposedHeader("Authorization");

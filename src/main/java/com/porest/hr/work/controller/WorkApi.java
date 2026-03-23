@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ public interface WorkApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = WorkApiDto.CreateWorkHistoryReq.class))
             )
-            @RequestBody WorkApiDto.CreateWorkHistoryReq data
+            @Valid @RequestBody WorkApiDto.CreateWorkHistoryReq data
     );
 
     @Operation(
@@ -70,7 +71,7 @@ public interface WorkApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = WorkApiDto.BulkCreateWorkHistoryReq.class))
             )
-            @RequestBody WorkApiDto.BulkCreateWorkHistoryReq data
+            @Valid @RequestBody WorkApiDto.BulkCreateWorkHistoryReq data
     );
 
     @Operation(
@@ -142,7 +143,7 @@ public interface WorkApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = WorkApiDto.UpdateWorkHistoryReq.class))
             )
-            @RequestBody WorkApiDto.UpdateWorkHistoryReq data
+            @Valid @RequestBody WorkApiDto.UpdateWorkHistoryReq data
     );
 
     @Operation(
@@ -236,7 +237,7 @@ public interface WorkApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = WorkApiDto.CreateWorkCodeReq.class))
             )
-            @RequestBody WorkApiDto.CreateWorkCodeReq data
+            @Valid @RequestBody WorkApiDto.CreateWorkCodeReq data
     );
 
     @Operation(
@@ -292,7 +293,7 @@ public interface WorkApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = WorkApiDto.UpdateWorkCodeReq.class))
             )
-            @RequestBody WorkApiDto.UpdateWorkCodeReq data
+            @Valid @RequestBody WorkApiDto.UpdateWorkCodeReq data
     );
 
     @Operation(
@@ -339,7 +340,7 @@ public interface WorkApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = WorkApiDto.ToggleSystemCheckReq.class))
             )
-            @RequestBody WorkApiDto.ToggleSystemCheckReq req
+            @Valid @RequestBody WorkApiDto.ToggleSystemCheckReq req
     );
 
     @Operation(

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Dues", description = "회비 관리 API")
@@ -35,7 +36,7 @@ public interface DuesApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = DuesApiDto.RegistDuesReq.class))
             )
-            @RequestBody DuesApiDto.RegistDuesReq data
+            @Valid @RequestBody DuesApiDto.RegistDuesReq data
     );
 
     @Operation(
@@ -149,7 +150,7 @@ public interface DuesApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = DuesApiDto.EditDuesReq.class))
             )
-            @RequestBody DuesApiDto.EditDuesReq data
+            @Valid @RequestBody DuesApiDto.EditDuesReq data
     );
 
     @Operation(

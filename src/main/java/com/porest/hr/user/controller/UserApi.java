@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public interface UserApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserApiDto.JoinUserReq.class))
             )
-            @RequestBody UserApiDto.JoinUserReq data
+            @Valid @RequestBody UserApiDto.JoinUserReq data
     );
 
     @Operation(
@@ -126,7 +127,7 @@ public interface UserApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserApiDto.EditUserReq.class))
             )
-            @RequestBody UserApiDto.EditUserReq data
+            @Valid @RequestBody UserApiDto.EditUserReq data
     );
 
     @Operation(
@@ -218,7 +219,7 @@ public interface UserApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserApiDto.UpdateDashboardReq.class))
             )
-            @RequestBody UserApiDto.UpdateDashboardReq data
+            @Valid @RequestBody UserApiDto.UpdateDashboardReq data
     );
 
     @Operation(
@@ -270,7 +271,7 @@ public interface UserApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserApiDto.InviteUserReq.class))
             )
-            @RequestBody UserApiDto.InviteUserReq data
+            @Valid @RequestBody UserApiDto.InviteUserReq data
     );
 
     @Operation(
@@ -301,7 +302,7 @@ public interface UserApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserApiDto.EditInvitationReq.class))
             )
-            @RequestBody UserApiDto.EditInvitationReq data
+            @Valid @RequestBody UserApiDto.EditInvitationReq data
     );
 
     @Operation(

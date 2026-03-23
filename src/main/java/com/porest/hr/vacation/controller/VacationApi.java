@@ -281,7 +281,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.CreateVacationPolicyReq.class))
             )
-            @RequestBody VacationApiDto.CreateVacationPolicyReq data
+            @Valid @RequestBody VacationApiDto.CreateVacationPolicyReq data
     );
 
     @Operation(
@@ -535,7 +535,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationApiDto.RejectVacationReq.class))
             )
-            @RequestBody VacationApiDto.RejectVacationReq data,
+            @Valid @RequestBody VacationApiDto.RejectVacationReq data,
             @Parameter(hidden = true) @LoginUser User loginUser
     );
 
@@ -709,7 +709,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationPlanApiDto.CreatePlanReq.class))
             )
-            @RequestBody VacationPlanApiDto.CreatePlanReq data
+            @Valid @RequestBody VacationPlanApiDto.CreatePlanReq data
     );
 
     @Operation(
@@ -782,7 +782,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationPlanApiDto.UpdatePlanReq.class))
             )
-            @RequestBody VacationPlanApiDto.UpdatePlanReq data
+            @Valid @RequestBody VacationPlanApiDto.UpdatePlanReq data
     );
 
     @Operation(
@@ -896,7 +896,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationPlanApiDto.UpdatePlanPoliciesReq.class))
             )
-            @RequestBody VacationPlanApiDto.UpdatePlanPoliciesReq data
+            @Valid @RequestBody VacationPlanApiDto.UpdatePlanPoliciesReq data
     );
 
     // ========================================
@@ -934,7 +934,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationPlanApiDto.AssignPlanReq.class))
             )
-            @RequestBody VacationPlanApiDto.AssignPlanReq data
+            @Valid @RequestBody VacationPlanApiDto.AssignPlanReq data
     );
 
     @Operation(
@@ -964,7 +964,7 @@ public interface VacationApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = VacationPlanApiDto.AssignPlansReq.class))
             )
-            @RequestBody VacationPlanApiDto.AssignPlansReq data
+            @Valid @RequestBody VacationPlanApiDto.AssignPlansReq data
     );
 
     @Operation(

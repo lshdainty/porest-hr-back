@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +43,7 @@ public interface HolidayApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = HolidayApiDto.RegistHolidayReq.class))
             )
-            @RequestBody HolidayApiDto.RegistHolidayReq data
+            @Valid @RequestBody HolidayApiDto.RegistHolidayReq data
     );
 
     @Operation(
@@ -118,7 +119,7 @@ public interface HolidayApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = HolidayApiDto.EditHolidayReq.class))
             )
-            @RequestBody HolidayApiDto.EditHolidayReq data
+            @Valid @RequestBody HolidayApiDto.EditHolidayReq data
     );
 
     @Operation(
@@ -193,6 +194,6 @@ public interface HolidayApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = HolidayApiDto.BulkSaveHolidaysReq.class))
             )
-            @RequestBody HolidayApiDto.BulkSaveHolidaysReq data
+            @Valid @RequestBody HolidayApiDto.BulkSaveHolidaysReq data
     );
 }

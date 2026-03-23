@@ -143,10 +143,10 @@ app:
 springdoc:
   api-docs:
     path: /v3/api-docs
-    enabled: ${SWAGGER_ENABLED:true}
+    enabled: ${SWAGGER_ENABLED:false}
   swagger-ui:
     path: /swagger-ui.html
-    enabled: ${SWAGGER_ENABLED:true}
+    enabled: ${SWAGGER_ENABLED:false}
     operations-sorter: alpha
     tags-sorter: alpha
     display-request-duration: true
@@ -181,7 +181,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: prometheus, health, info, metrics
+        include: prometheus, health
   metrics:
     tags:
       application: porest
