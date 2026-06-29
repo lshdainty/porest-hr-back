@@ -1,7 +1,9 @@
 package com.porest.hr.user.controller;
 
 import com.porest.core.controller.ApiResponse;
+import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.user.controller.dto.UserApiDto;
+import com.porest.hr.user.domain.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -329,6 +331,70 @@ public interface UserApi {
     })
     @PostMapping("/api/v1/users/{userId}/invitations/resend")
     ApiResponse resendInvitation(
+            @Parameter(description = "사용자 ID", example = "user123", required = true)
+            @PathVariable("userId") String userId
+    );
+
+    // ==================== 비밀번호 관련 API ====================
+
+    @Operation(
+            summary = "본인 비밀번호 변경",
+            description = "로그인한 사용자가 자신의 비밀번호를 변경합니다. 검증·변경은 SSO 가 처리합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "비밀번호 변경 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "현재 비밀번호 불일치 또는 비밀번호 정책 위반"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 필요"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "502",
+                    description = "SSO 서비스 연동 실패"
+            )
+    })
+    @PatchMapping("/api/v1/users/me/password")
+    ApiResponse changePassword(
+            @Parameter(hidden = true) @LoginUser User loginUser,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "비밀번호 변경 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UserApiDto.ChangePasswordReq.class))
+            )
+            @Valid @RequestBody UserApiDto.ChangePasswordReq data
+    );
+
+    @Operation(
+            summary = "관리자 비밀번호 리셋",
+            description = "관리자가 특정 사용자의 비밀번호를 리셋합니다. " +
+                    "SSO 가 임시 비밀번호를 자동 생성·이메일 발송·강제 변경 처리합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "비밀번호 리셋 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 (USER:MANAGE 필요)"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "502",
+                    description = "SSO 서비스 연동 실패"
+            )
+    })
+    @PatchMapping("/api/v1/users/{userId}/password")
+    ApiResponse resetPassword(
             @Parameter(description = "사용자 ID", example = "user123", required = true)
             @PathVariable("userId") String userId
     );

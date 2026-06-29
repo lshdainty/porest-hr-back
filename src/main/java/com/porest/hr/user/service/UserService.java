@@ -185,4 +185,26 @@ public interface UserService {
      * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
      */
     void resendInvitation(String userId);
+
+    /**
+     * 사용자 본인 비밀번호 변경<br>
+     * SSO {@code /auth/password/change} 로 위임(서비스 토큰 client_credentials 인증).
+     *
+     * @param userId          대상 사용자 ID (HR User.id = SSO user_id)
+     * @param currentPassword 현재 비밀번호
+     * @param newPassword     새 비밀번호
+     * @param confirmPassword 새 비밀번호 확인
+     * @throws com.porest.core.exception.InvalidValueException    현재 비밀번호 불일치 등 검증 실패 시
+     * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
+     */
+    void changePassword(String userId, String currentPassword, String newPassword, String confirmPassword);
+
+    /**
+     * 관리자 비밀번호 리셋<br>
+     * SSO {@code /auth/password/reset-by-service} 로 위임. SSO 가 임시 비밀번호 자동 생성·발송.
+     *
+     * @param targetUserId 리셋 대상 사용자 ID (HR User.id = SSO user_id)
+     * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
+     */
+    void resetPassword(String targetUserId);
 }

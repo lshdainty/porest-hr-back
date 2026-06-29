@@ -1,8 +1,10 @@
 package com.porest.hr.user.controller;
 
 import com.porest.core.type.YNType;
+import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.user.controller.dto.UserApiDto;
 import com.porest.core.controller.ApiResponse;
+import com.porest.hr.user.domain.User;
 import com.porest.hr.user.service.UserService;
 import com.porest.hr.user.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
@@ -386,6 +388,32 @@ public class UserApiController implements UserApi {
         log.debug("REST request to resend invitation: {}", userId);
 
         userService.resendInvitation(userId);
+
+        return ApiResponse.success();
+    }
+
+    // ==================== 비밀번호 관련 API ====================
+
+    @Override
+    public ApiResponse changePassword(User loginUser, UserApiDto.ChangePasswordReq data) {
+        log.debug("REST request to change password: {}", loginUser.getId());
+
+        userService.changePassword(
+                loginUser.getId(),
+                data.getCurrentPassword(),
+                data.getNewPassword(),
+                data.getNewPasswordConfirm()
+        );
+
+        return ApiResponse.success();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('USER:MANAGE')")
+    public ApiResponse resetPassword(String userId) {
+        log.debug("REST request to reset password: {}", userId);
+
+        userService.resetPassword(userId);
 
         return ApiResponse.success();
     }

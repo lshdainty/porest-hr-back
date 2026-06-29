@@ -645,4 +645,24 @@ public class UserServiceImpl implements UserService {
 
         log.info("초대 재전송 완료: userId={}", userId);
     }
+
+    @Override
+    public void changePassword(String userId, String currentPassword, String newPassword, String confirmPassword) {
+        log.debug("비밀번호 변경 요청: userId={}", userId);
+
+        // 비밀번호 검증·변경은 SSO 가 최종 처리(서비스 토큰 client_credentials 위임)
+        ssoApiClient.changePassword(userId, currentPassword, newPassword, confirmPassword);
+
+        log.info("비밀번호 변경 완료: userId={}", userId);
+    }
+
+    @Override
+    public void resetPassword(String targetUserId) {
+        log.debug("비밀번호 리셋 요청: userId={}", targetUserId);
+
+        // 임시 비밀번호 자동 생성·이메일 발송·강제 변경은 SSO 가 처리(평문 미반환)
+        ssoApiClient.resetPassword(targetUserId);
+
+        log.info("비밀번호 리셋 완료: userId={}", targetUserId);
+    }
 }
