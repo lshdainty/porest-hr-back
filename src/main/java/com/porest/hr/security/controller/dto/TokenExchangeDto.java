@@ -19,6 +19,21 @@ public class TokenExchangeDto {
     }
 
     /**
+     * 인가코드 교환 요청 DTO (Authorization Code + PKCE)
+     */
+    @Getter
+    public static class CodeRequest {
+        @NotBlank(message = "인가 코드는 필수입니다")
+        private String code;
+
+        @NotBlank(message = "code_verifier는 필수입니다")
+        private String codeVerifier;
+
+        @NotBlank(message = "redirect_uri는 필수입니다")
+        private String redirectUri;
+    }
+
+    /**
      * 토큰 교환 응답 DTO
      * accessToken은 HttpOnly Cookie로 전달하므로 body에 포함하지 않음
      */

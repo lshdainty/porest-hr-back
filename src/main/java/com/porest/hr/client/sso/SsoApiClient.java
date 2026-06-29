@@ -41,4 +41,16 @@ public interface SsoApiClient {
      * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패 시
      */
     List<SsoInvitationStatusResponse> getInvitationStatus(List<Long> userNos);
+
+    /**
+     * OAuth2 인가코드(code)를 SSO {@code /oauth2/token} 에서 교환 → SSO access token(JWT) 반환<br>
+     * PKCE code_verifier 와 함께 전달. 표준 Authorization Code + PKCE 흐름.
+     *
+     * @param code         인가 코드 (SSO /oauth2/authorize 발급)
+     * @param codeVerifier PKCE code_verifier 원본
+     * @param redirectUri  authorize 때와 동일한 redirect_uri
+     * @return SSO access token (JWT)
+     * @throws com.porest.core.exception.ExternalServiceException SSO 서비스 연동 실패/무효 코드 시
+     */
+    String exchangeOAuthCode(String code, String codeVerifier, String redirectUri);
 }

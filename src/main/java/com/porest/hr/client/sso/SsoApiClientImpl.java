@@ -6,10 +6,13 @@ import com.porest.hr.client.sso.dto.SsoInvitationStatusRequest;
 import com.porest.hr.client.sso.dto.SsoInvitationStatusResponse;
 import com.porest.hr.client.sso.dto.SsoInviteRequest;
 import com.porest.hr.client.sso.dto.SsoInviteResponse;
+import com.porest.hr.client.sso.dto.SsoTokenRequest;
+import com.porest.hr.client.sso.dto.SsoTokenResponse;
 import com.porest.hr.common.exception.HrErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,9 +39,13 @@ public class SsoApiClientImpl implements SsoApiClient {
     @Qualifier("ssoRestTemplate")
     private final RestTemplate ssoRestTemplate;
 
+    @Value("${sso.client-code:hr}")
+    private String clientCode;
+
     private static final String INVITE_USER_PATH = "/api/v1/users/invite";
     private static final String RESEND_INVITATION_PATH = "/api/v1/users/resend";
     private static final String INVITATION_STATUS_PATH = "/api/v1/users/invitation-status";
+    private static final String OAUTH_TOKEN_PATH = "/api/v1/oauth2/token";
 
     @Override
     public SsoInviteResponse inviteUser(SsoInviteRequest request) {
@@ -137,6 +144,45 @@ public class SsoApiClientImpl implements SsoApiClient {
         } catch (RestClientException e) {
             log.error("SSO getInvitationStatus API failed: {}", e.getMessage(), e);
             throw new ExternalServiceException(HrErrorCode.SSO_SERVICE_ERROR, "SSO 초대 상태 조회 API 호출 실패", e);
+        }
+    }
+
+    @Override
+    public String exchangeOAuthCode(String code, String codeVerifier, String redirectUri) {
+        log.debug("Calling SSO /oauth2/token: clientId={}", clientCode);
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            SsoTokenRequest requestBody = SsoTokenRequest.builder()
+                    .grantType("authorization_code")
+                    .code(code)
+                    .codeVerifier(codeVerifier)
+                    .clientId(clientCode)
+                    .redirectUri(redirectUri)
+                    .build();
+
+            HttpEntity<SsoTokenRequest> entity = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<ApiResponse<SsoTokenResponse>> response = ssoRestTemplate.exchange(
+                    OAUTH_TOKEN_PATH,
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<ApiResponse<SsoTokenResponse>>() {}
+            );
+
+            ApiResponse<SsoTokenResponse> body = response.getBody();
+            if (body == null || body.getData() == null || body.getData().getAccessToken() == null) {
+                throw new ExternalServiceException(HrErrorCode.SSO_SERVICE_ERROR, "SSO 토큰 응답이 비어있습니다");
+            }
+
+            log.info("SSO /oauth2/token success");
+            return body.getData().getAccessToken();
+
+        } catch (RestClientException e) {
+            log.error("SSO /oauth2/token API failed: {}", e.getMessage(), e);
+            throw new ExternalServiceException(HrErrorCode.SSO_SERVICE_ERROR, "SSO 토큰 교환 실패", e);
         }
     }
 }

@@ -56,6 +56,28 @@ public class TokenExchangeController {
     }
 
     /**
+     * OAuth2 인가코드를 HR 토큰으로 교환 (Authorization Code + PKCE)
+     * SSO /oauth2/token 에서 code+code_verifier 를 교환한 뒤 HR JWT 를 HttpOnly Cookie 로 설정.
+     *
+     * @param request 인가코드/code_verifier/redirect_uri 가 포함된 요청
+     * @param response HTTP 응답 (쿠키 설정용)
+     * @return 사용자 정보 응답 (토큰은 쿠키로 전달)
+     */
+    @PostMapping("/exchange-code")
+    @Operation(summary = "인가코드 교환", description = "OAuth2 인가코드(+PKCE)를 HR JWT로 교환합니다. HR 서비스 접근 권한이 있어야 합니다.")
+    public ApiResponse<TokenExchangeDto.Response> exchangeCode(
+            @Valid @RequestBody TokenExchangeDto.CodeRequest request,
+            HttpServletResponse response) {
+        log.debug("Authorization code exchange request");
+        TokenExchangeDto.ExchangeResult result = tokenExchangeService.exchangeCode(
+                request.getCode(), request.getCodeVerifier(), request.getRedirectUri());
+
+        setAccessTokenCookie(response, result.getAccessToken());
+
+        return ApiResponse.success(TokenExchangeDto.Response.of(result.getExpiresIn(), result.getUser()));
+    }
+
+    /**
      * 로그아웃 (쿠키 삭제)
      *
      * @param response HTTP 응답 (쿠키 삭제용)

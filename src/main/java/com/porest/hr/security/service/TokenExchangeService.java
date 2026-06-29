@@ -3,6 +3,7 @@ package com.porest.hr.security.service;
 import com.porest.core.exception.ErrorCode;
 import com.porest.core.exception.ForbiddenException;
 import com.porest.core.exception.UnauthorizedException;
+import com.porest.hr.client.sso.SsoApiClient;
 import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.hr.permission.domain.Role;
 import com.porest.hr.security.controller.dto.TokenExchangeDto;
@@ -29,8 +30,25 @@ public class TokenExchangeService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final SsoApiClient ssoApiClient;
 
     private static final String HR_SERVICE_CODE = "hr";
+
+    /**
+     * OAuth2 인가코드(code)를 HR 토큰으로 교환 (Authorization Code + PKCE)<br>
+     * SSO {@code /oauth2/token} 에서 code+code_verifier 를 SSO access token 으로 교환한 뒤,
+     * 기존 {@link #exchange(String)} 로직을 재사용해 자체 HR JWT 를 발급한다.
+     *
+     * @param code         인가 코드
+     * @param codeVerifier PKCE code_verifier
+     * @param redirectUri  authorize 때와 동일한 redirect_uri
+     * @return HR JWT 토큰 응답
+     */
+    public TokenExchangeDto.ExchangeResult exchangeCode(String code, String codeVerifier, String redirectUri) {
+        log.debug("Authorization code exchange request received");
+        String ssoToken = ssoApiClient.exchangeOAuthCode(code, codeVerifier, redirectUri);
+        return exchange(ssoToken);
+    }
 
     /**
      * SSO 토큰을 HR 토큰으로 교환
