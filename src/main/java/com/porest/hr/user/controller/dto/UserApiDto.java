@@ -5,6 +5,7 @@ import tools.jackson.databind.annotation.JsonNaming;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
@@ -475,6 +476,24 @@ public class UserApiDto {
 
         @Schema(description = "국가코드", example = "KR")
         private CountryCode countryCode;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Schema(description = "비밀번호 변경 요청")
+    public static class ChangePasswordReq {
+        @NotBlank(message = "현재 비밀번호는 필수입니다")
+        @Schema(description = "현재 비밀번호", example = "OldPass123!")
+        private String currentPassword;
+
+        @NotBlank(message = "새 비밀번호는 필수입니다")
+        @Schema(description = "새 비밀번호", example = "NewPass123!")
+        private String newPassword;
+
+        @NotBlank(message = "새 비밀번호 확인은 필수입니다")
+        @Schema(description = "새 비밀번호 확인", example = "NewPass123!")
+        private String newPasswordConfirm;
     }
 
 }

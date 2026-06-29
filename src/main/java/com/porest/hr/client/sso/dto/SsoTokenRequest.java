@@ -24,6 +24,9 @@ public class SsoTokenRequest {
     @JsonProperty("client_id")
     private String clientId;
 
+    @JsonProperty("client_secret")
+    private String clientSecret;
+
     @JsonProperty("redirect_uri")
     private String redirectUri;
 }
