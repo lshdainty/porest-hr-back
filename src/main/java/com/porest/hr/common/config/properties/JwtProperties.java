@@ -17,9 +17,15 @@ public class JwtProperties {
 
     /**
      * JWT 서명 검증을 위한 비밀키
-     * SSO와 동일한 키를 사용해야 함
+     * (RS256 전환 후 SSO 검증엔 미사용 — HR 자체 토큰 hrSecret 폴백용으로만 유지)
      */
     private String secret;
+
+    /**
+     * SSO 토큰(RS256) 검증용 JWKS 엔드포인트 URI
+     * 예: https://sso.../.well-known/jwks.json
+     */
+    private String ssoJwksUri;
 
     /**
      * HR JWT 발급을 위한 비밀키
