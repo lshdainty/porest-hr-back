@@ -28,7 +28,7 @@ import java.util.List;
 public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
-    private SecretKey ssoKey;
+    private final SsoJwksKeyLocator ssoJwksKeyLocator;
     private SecretKey hrKey;
 
     private static final String HR_ISSUER = "porest-hr";
@@ -37,14 +37,11 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        this.ssoKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
-        // HR secret이 설정되어 있으면 별도 키 사용, 없으면 SSO 키와 동일하게 사용
+        // HR 자체 토큰(HMAC) 서명/검증 키. hrSecret 우선, 없으면 secret 폴백.
+        // SSO 토큰은 더 이상 HMAC 이 아니라 SSO JWKS(RS256 public key) 로 검증한다(SsoJwksKeyLocator).
         String hrSecret = jwtProperties.getHrSecret();
-        if (hrSecret != null && !hrSecret.isBlank()) {
-            this.hrKey = Keys.hmacShaKeyFor(hrSecret.getBytes(StandardCharsets.UTF_8));
-        } else {
-            this.hrKey = this.ssoKey;
-        }
+        String hrKeySource = (hrSecret != null && !hrSecret.isBlank()) ? hrSecret : jwtProperties.getSecret();
+        this.hrKey = Keys.hmacShaKeyFor(hrKeySource.getBytes(StandardCharsets.UTF_8));
     }
 
     // ==================== SSO JWT 검증 ====================
@@ -58,7 +55,7 @@ public class JwtTokenProvider {
     public boolean validateSsoToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(ssoKey)
+                    .keyLocator(ssoJwksKeyLocator)
                     .build()
                     .parseSignedClaims(token);
             return true;
@@ -115,7 +112,7 @@ public class JwtTokenProvider {
      */
     private Claims getSsoClaims(String token) {
         return Jwts.parser()
-                .verifyWith(ssoKey)
+                .keyLocator(ssoJwksKeyLocator)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
