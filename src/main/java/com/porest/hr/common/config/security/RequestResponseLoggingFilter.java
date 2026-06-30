@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -258,20 +259,25 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
     private static final String[] SENSITIVE_JSON_FIELDS = {
             "password", "user_pw", "pwd", "secret", "token",
             "accessToken", "refreshToken", "apiKey", "apiSecret",
-            "client_secret", "authorization"
+            "client_secret", "authorization",
+            // 비밀번호 변경 필드 — DTO 는 snake_case(@JsonNaming) 이고, 프록시/변형 대비 camelCase 도 포함
+            "current_password", "new_password", "new_password_confirm",
+            "currentPassword", "newPassword", "confirmPassword", "newPasswordConfirm"
     };
 
     private String maskSensitiveData(String body) {
+        // 키 비교를 대소문자 무시로 수행하기 위한 가드용 소문자 사본(키 이름은 마스킹으로 사라지지 않으므로 1회 계산으로 충분).
+        String lower = body.toLowerCase(Locale.ROOT);
         for (String field : SENSITIVE_JSON_FIELDS) {
-            if (body.contains(field)) {
-                // JSON 형태: "fieldName": "value"
+            if (lower.contains(field.toLowerCase(Locale.ROOT))) {
+                // JSON 형태: "fieldName": "value" (키 대소문자 무시, 키 자체는 $1 로 원본 보존)
                 body = body.replaceAll(
-                        "(\"" + field + "\"\\s*:\\s*\")([^\"]+)(\")",
+                        "(?i)(\"" + field + "\"\\s*:\\s*\")([^\"]+)(\")",
                         "$1***$3"
                 );
-                // Query parameter 형태: ?field=value 또는 &field=value
+                // Query parameter 형태: ?field=value 또는 &field=value (키 대소문자 무시)
                 body = body.replaceAll(
-                        "(&|\\?)" + field + "=([^&]+)",
+                        "(?i)(&|\\?)" + field + "=([^&]+)",
                         "$1" + field + "=***"
                 );
             }
