@@ -63,16 +63,6 @@ spring:
       include-exception: ${ERROR_EXCEPTION:false}
       include-binding-errors: ${ERROR_BINDING:never}
 
-  # OAuth2 설정
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope: profile,email
-
   # 메일 설정
   mail:
     host: smtp.gmail.com
@@ -127,7 +117,6 @@ file:
 
 # 어플리케이션 정보
 app:
-  base-url: ${APP_BASE_URL:http://localhost:8001}
   frontend:
     base-url: ${FRONTEND_BASE_URL}
   company:
@@ -135,9 +124,6 @@ app:
   email:
     logo:
       path: ${EMAIL_LOGO_PATH:templates/email/logo.png}
-  redis:
-    channel:
-      user-events: ${REDIS_CHANNEL_USER_EVENTS}
 
 # Swagger 설정
 springdoc:
