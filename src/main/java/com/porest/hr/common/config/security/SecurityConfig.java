@@ -59,7 +59,6 @@ public class SecurityConfig {
                 // 인증 없이 접근 가능한 경로
                 .requestMatchers(
                         "/",
-                        "/api/v1/auth/exchange", // 토큰 교환 API (SSO JWT로 HR JWT 발급)
                         "/api/v1/auth/exchange-code", // 인가코드 교환 API (OAuth2 Authorization Code + PKCE)
                         "/api/v1/auth/logout",   // 로그아웃 (쿠키 삭제)
                         "/actuator/health",      // Health check
