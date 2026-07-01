@@ -34,28 +34,6 @@ public class TokenExchangeController {
     private static final String ACCESS_TOKEN_COOKIE = "hr_access_token";
 
     /**
-     * SSO 토큰을 HR 토큰으로 교환
-     * HR JWT를 HttpOnly Cookie로 설정하고 사용자 정보를 응답합니다.
-     *
-     * @param request SSO 토큰이 포함된 요청
-     * @param response HTTP 응답 (쿠키 설정용)
-     * @return 사용자 정보 응답 (토큰은 쿠키로 전달)
-     */
-    @PostMapping("/exchange")
-    @Operation(summary = "토큰 교환", description = "SSO JWT를 HR JWT로 교환합니다. HR 서비스 접근 권한이 있어야 합니다.")
-    public ApiResponse<TokenExchangeDto.Response> exchangeToken(
-            @Valid @RequestBody TokenExchangeDto.Request request,
-            HttpServletResponse response) {
-        log.debug("Token exchange request for SSO token");
-        TokenExchangeDto.ExchangeResult result = tokenExchangeService.exchange(request.getSsoToken());
-
-        // HR JWT를 HttpOnly Cookie로 설정
-        setAccessTokenCookie(response, result.getAccessToken());
-
-        return ApiResponse.success(TokenExchangeDto.Response.of(result.getExpiresIn(), result.getUser()));
-    }
-
-    /**
      * OAuth2 인가코드를 HR 토큰으로 교환 (Authorization Code + PKCE)
      * SSO /oauth2/token 에서 code+code_verifier 를 교환한 뒤 HR JWT 를 HttpOnly Cookie 로 설정.
      *

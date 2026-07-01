@@ -10,15 +10,6 @@ import lombok.Getter;
 public class TokenExchangeDto {
 
     /**
-     * 토큰 교환 요청 DTO
-     */
-    @Getter
-    public static class Request {
-        @NotBlank(message = "SSO 토큰은 필수입니다")
-        private String ssoToken;
-    }
-
-    /**
      * 인가코드 교환 요청 DTO (Authorization Code + PKCE)
      */
     @Getter
