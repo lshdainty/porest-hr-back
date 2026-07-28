@@ -141,7 +141,6 @@ springdoc:
 
 # JWT 설정
 jwt:
-  secret: ${JWT_SECRET}
   hr-secret: ${JWT_HR_SECRET}
   hr-access-expiration: ${JWT_HR_ACCESS_EXPIRATION:3600000}
   # SSO 토큰(RS256) 검증용 JWKS — SSO base URL + /.well-known/jwks.json (시작 시 fetch 안 함, 첫 검증 시 fetch·캐시)

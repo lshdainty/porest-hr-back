@@ -37,11 +37,13 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        // HR 자체 토큰(HMAC) 서명/검증 키. hrSecret 우선, 없으면 secret 폴백.
-        // SSO 토큰은 더 이상 HMAC 이 아니라 SSO JWKS(RS256 public key) 로 검증한다(SsoJwksKeyLocator).
+        // HR 자체 토큰(HMAC) 서명/검증 키.
+        // SSO 토큰은 HMAC 이 아니라 SSO JWKS(RS256 public key) 로 검증한다(SsoJwksKeyLocator).
         String hrSecret = jwtProperties.getHrSecret();
-        String hrKeySource = (hrSecret != null && !hrSecret.isBlank()) ? hrSecret : jwtProperties.getSecret();
-        this.hrKey = Keys.hmacShaKeyFor(hrKeySource.getBytes(StandardCharsets.UTF_8));
+        if (hrSecret == null || hrSecret.isBlank()) {
+            throw new IllegalStateException("jwt.hr-secret(JWT_HR_SECRET) 이 설정되지 않았습니다");
+        }
+        this.hrKey = Keys.hmacShaKeyFor(hrSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     // ==================== SSO JWT 검증 ====================
