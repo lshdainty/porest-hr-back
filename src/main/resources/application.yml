@@ -174,7 +174,7 @@ management:
       enabled: true
   metrics:
     tags:
-      application: porest
+      application: porest-hr
 
 # 배포 버전 (Jenkins 가 git describe 결과를 APP_VERSION 으로 주입)
 # 확인: GET /actuator/info
