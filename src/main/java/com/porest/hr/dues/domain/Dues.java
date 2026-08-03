@@ -57,6 +57,8 @@ public class Dues extends AuditingFieldsWithIp {
     /**
      * 회비 날짜<br>
      * 회비 납부 또는 사용 날짜
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "dues_date", nullable = false)
     private LocalDate date;

@@ -63,6 +63,8 @@ public class VacationApproval extends AuditingFieldsWithIp {
     /**
      * 승인일시<br>
      * 승인자가 승인 또는 거부한 일시
+     *
+     * <p>[UTC] 시스템 기록 시각 — 저장·비교 UTC, 표시할 때만 사용자 타임존 변환
      */
     @Column(name = "approval_date")
     private LocalDateTime approvalDate;

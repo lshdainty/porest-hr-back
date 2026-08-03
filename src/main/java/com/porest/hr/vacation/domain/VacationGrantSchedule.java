@@ -54,6 +54,8 @@ public class VacationGrantSchedule extends AuditingFieldsWithIp {
      * 마지막 휴가 부여 일시<br>
      * 스케줄러 실행으로 휴가를 부여한 마지막 시점<br>
      * 중복 부여 방지를 위한 컬럼
+     *
+     * <p>[UTC] 시스템 기록 시각 — 저장·비교 UTC, 표시할 때만 사용자 타임존 변환
      */
     @Column(name = "last_granted_at")
     private LocalDateTime lastGrantedAt;
@@ -62,6 +64,8 @@ public class VacationGrantSchedule extends AuditingFieldsWithIp {
      * 다음 휴가 부여 일자<br>
      * 스케줄러 조회 최적화용 컬럼<br>
      * 인덱스 추가 예정
+     *
+     * <p>[serviceClock] 배치가 서비스 기준(Asia/Seoul)으로 산출
      */
     @Column(name = "next_grant_date")
     private LocalDate nextGrantDate;

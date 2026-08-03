@@ -54,6 +54,8 @@ public class VacationUsage extends AuditingFieldsWithIp {
     /**
      * 휴가 사용 시작일<br>
      * 사용자가 사용한 휴가의 시작 일자와 시간
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
@@ -61,6 +63,8 @@ public class VacationUsage extends AuditingFieldsWithIp {
     /**
      * 휴가 사용 종료일<br>
      * 사용자가 사용한 휴가의 종료 일자와 시간
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
