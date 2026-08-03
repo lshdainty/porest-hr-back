@@ -90,7 +90,7 @@ class WorkHistoryServiceTest {
 
     private WorkCode createTestWorkCode(Long id, String code, String name, CodeType type) {
         WorkCode workCode = WorkCode.createWorkCode(code, name, type, null, 1);
-        ReflectionTestUtils.setField(workCode, "id", id);
+        ReflectionTestUtils.setField(workCode, "rowId", id);
         return workCode;
     }
 
@@ -98,7 +98,7 @@ class WorkHistoryServiceTest {
         WorkHistory workHistory = WorkHistory.createWorkHistory(
                 LocalDate.now(), user, group, part, division, new BigDecimal("8.0000"), "테스트 업무 내용"
         );
-        ReflectionTestUtils.setField(workHistory, "id", id);
+        ReflectionTestUtils.setField(workHistory, "rowId", id);
         return workHistory;
     }
 
@@ -450,7 +450,7 @@ class WorkHistoryServiceTest {
             WorkHistory workHistory = WorkHistory.createWorkHistory(
                     LocalDate.now(), user, group, part, division, new BigDecimal("4.0000"), "테스트 업무 내용"
             );
-            ReflectionTestUtils.setField(workHistory, "id", 1L);
+            ReflectionTestUtils.setField(workHistory, "rowId", 1L);
 
             given(workHistoryRepository.findByUserAndDate(eq(userId), any(LocalDate.class)))
                     .willReturn(List.of(workHistory));

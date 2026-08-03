@@ -533,6 +533,9 @@ class UserServiceTest {
             String physicalFilename = "test.jpg_some-uuid";
 
             try (MockedStatic<FileUtils> mocked = mockStatic(FileUtils.class)) {
+                // FileUploadValidator 가 내부에서 확장자를 뽑아 쓴다 — static mock 이 걸린 상태라
+                // stub 하지 않으면 null 이 흘러 NPE 가 난다.
+                mocked.when(() -> FileUtils.getExtension(anyString())).thenReturn("jpg");
                 mocked.when(() -> FileUtils.generatePhysicalFilename(eq("test.jpg"), anyString()))
                         .thenReturn(physicalFilename);
                 mocked.when(() -> FileUtils.save(eq(mockFile), anyString(), eq(physicalFilename), eq(messageResolver)))
@@ -888,7 +891,7 @@ class UserServiceTest {
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "부서KR", null, approver, 1L, "desc", "#000", company);
-            ReflectionTestUtils.setField(dept, "id", 1L);
+            ReflectionTestUtils.setField(dept, "rowId", 1L);
 
             given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of(dept));
             given(userRepository.findByIdWithRolesAndPermissions("head1")).willReturn(Optional.of(approver));
@@ -912,7 +915,7 @@ class UserServiceTest {
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "부서KR", null, null, 1L, "desc", "#000", company);
-            ReflectionTestUtils.setField(dept, "id", 1L);
+            ReflectionTestUtils.setField(dept, "rowId", 1L);
 
             given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of(dept));
 
@@ -936,7 +939,7 @@ class UserServiceTest {
 
             Company company = Company.createCompany("회사", "Company", "desc");
             Department dept = Department.createDepartment("부서", "부서KR", null, deletedApprover, 1L, "desc", "#000", company);
-            ReflectionTestUtils.setField(dept, "id", 1L);
+            ReflectionTestUtils.setField(dept, "rowId", 1L);
 
             given(departmentRepository.findApproversByUserId(userId)).willReturn(List.of(dept));
             given(userRepository.findByIdWithRolesAndPermissions("deleted")).willReturn(Optional.of(deletedApprover));

@@ -85,7 +85,7 @@ class VacationGrantSchedulerTest {
                     user, policy, "연차", VacationType.ANNUAL, new BigDecimal("15.0"),
                     LocalDateTime.of(2024, 1, 1, 0, 0), LocalDateTime.of(2024, 12, 31, 23, 59)
             );
-            ReflectionTestUtils.setField(grant, "id", 1L);
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
 
             given(vacationGrantRepository.findExpiredTargets(any())).willReturn(List.of(grant));
 
@@ -126,10 +126,10 @@ class VacationGrantSchedulerTest {
                     LocalDateTime.of(2025, 1, 1, 0, 0), YNType.Y, null,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policy, "id", 1L);
+            ReflectionTestUtils.setField(policy, "rowId", 1L);
 
             VacationGrantSchedule schedule = VacationGrantSchedule.createSchedule(user, policy);
-            ReflectionTestUtils.setField(schedule, "id", 1L);
+            ReflectionTestUtils.setField(schedule, "rowId", 1L);
 
             given(strategyFactory.getStrategy(GrantMethod.REPEAT_GRANT)).willReturn(repeatGrant);
             given(vacationGrantScheduleRepository.findRepeatGrantTargetsForToday(any())).willReturn(List.of(schedule));
@@ -169,7 +169,7 @@ class VacationGrantSchedulerTest {
                 new BigDecimal("15.0"), YNType.N, YNType.N,
                 EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
         );
-        ReflectionTestUtils.setField(policy, "id", 1L);
+        ReflectionTestUtils.setField(policy, "rowId", 1L);
         return policy;
     }
 }

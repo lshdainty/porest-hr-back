@@ -62,7 +62,7 @@ class RepeatGrantTest {
             given(vacationPolicyRepository.existsByName("연차")).willReturn(false);
             willAnswer(invocation -> {
                 VacationPolicy policy = invocation.getArgument(0);
-                ReflectionTestUtils.setField(policy, "id", 1L);
+                ReflectionTestUtils.setField(policy, "rowId", 1L);
                 return null;
             }).given(vacationPolicyRepository).save(any(VacationPolicy.class));
 
@@ -526,7 +526,7 @@ class RepeatGrantTest {
                 LocalDateTime.of(2025, 1, 1, 0, 0), YNType.Y, null,
                 EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
         );
-        ReflectionTestUtils.setField(policy, "id", 1L);
+        ReflectionTestUtils.setField(policy, "rowId", 1L);
         return policy;
     }
 }

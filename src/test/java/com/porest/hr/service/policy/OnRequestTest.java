@@ -57,7 +57,7 @@ class OnRequestTest {
             given(vacationPolicyRepository.existsByName("연차")).willReturn(false);
             willAnswer(invocation -> {
                 VacationPolicy policy = invocation.getArgument(0);
-                ReflectionTestUtils.setField(policy, "id", 1L);
+                ReflectionTestUtils.setField(policy, "rowId", 1L);
                 return null;
             }).given(vacationPolicyRepository).save(any(VacationPolicy.class));
 
