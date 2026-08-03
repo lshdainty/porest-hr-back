@@ -3,6 +3,7 @@ package com.porest.hr.schedule.service;
 import com.porest.core.exception.BusinessRuleViolationException;
 import com.porest.core.exception.EntityNotFoundException;
 import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.core.type.YNType;
 import com.porest.core.util.TimeUtils;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    private final CompanyClock companyClock;
     private final UserService userService;
 
     @Override
@@ -89,7 +91,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         log.debug("일정 삭제 시작: scheduleId={}", scheduleId);
         Schedule schedule = checkScheduleExist(scheduleId);
 
-        if (schedule.getEndDate().isBefore(LocalDateTime.now())) {
+        if (schedule.getEndDate().isBefore(companyClock.now())) {
             log.warn("일정 삭제 실패 - 종료일이 현재보다 이전: scheduleId={}, endDate={}", scheduleId, schedule.getEndDate());
             throw new BusinessRuleViolationException(HrErrorCode.SCHEDULE_INVALID_DATE);
         }

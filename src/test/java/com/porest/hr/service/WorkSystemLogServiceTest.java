@@ -1,5 +1,6 @@
 package com.porest.hr.service;
 
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.hr.work.domain.WorkSystemLog;
 import com.porest.hr.work.repository.WorkSystemLogRepository;
 import com.porest.hr.work.service.WorkSystemLogServiceImpl;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -30,6 +32,13 @@ class WorkSystemLogServiceTest {
 
     @Mock
     private WorkSystemLogRepository workSystemLogRepository;
+
+    // 날짜 판정용 — @InjectMocks 가 null 을 넣으면 NPE. 실물을 주입하되 회사 조회는 비어
+    // 서비스 기준(Asia/Seoul)으로 폴백한다(기존 테스트가 기대하던 KST 동작 유지).
+    @Spy
+    private CompanyClock companyClock = new CompanyClock(
+            org.mockito.Mockito.mock(com.porest.hr.company.repository.CompanyRepository.class),
+            new com.porest.core.time.ServiceClock("Asia/Seoul"));
 
     @InjectMocks
     private WorkSystemLogServiceImpl workSystemLogService;

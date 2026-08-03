@@ -243,10 +243,16 @@ public class VacationGrant extends AuditingFieldsWithIp {
 
     /**
      * 만료 확인
+     *
+     * <p>기준 날짜를 밖에서 받는다 — 도메인은 Clock 을 주입받을 수 없고,
+     * {@code LocalDate.now()} 는 JVM 기본 타임존(컨테이너 = UTC)을 타서 한국 기준
+     * 오전 9시 전까지 하루 늦게 만료된다. 호출부는 {@code companyClock.today()} 를 넘긴다.
+     *
+     * @param today 회사 기준 오늘 날짜 ([userClock])
      */
-    public boolean isExpired() {
+    public boolean isExpired(LocalDate today) {
         return getExpiryDate() != null &&
-                LocalDate.now().isAfter(getExpiryDate().toLocalDate());
+                today.isAfter(getExpiryDate().toLocalDate());
     }
 
     /**

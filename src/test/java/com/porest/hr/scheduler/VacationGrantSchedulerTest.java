@@ -1,5 +1,6 @@
 package com.porest.hr.scheduler;
 
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
 import com.porest.hr.user.domain.User;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -50,6 +52,13 @@ class VacationGrantSchedulerTest {
 
     @Mock
     private RepeatGrant repeatGrant;
+
+    // 날짜 판정용 — @InjectMocks 가 null 을 넣으면 NPE. 실물을 주입하되 회사 조회는 비어
+    // 서비스 기준(Asia/Seoul)으로 폴백한다(기존 테스트가 기대하던 KST 동작 유지).
+    @Spy
+    private CompanyClock companyClock = new CompanyClock(
+            org.mockito.Mockito.mock(com.porest.hr.company.repository.CompanyRepository.class),
+            new com.porest.core.time.ServiceClock("Asia/Seoul"));
 
     @InjectMocks
     private VacationGrantScheduler scheduler;

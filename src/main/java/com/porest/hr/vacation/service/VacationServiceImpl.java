@@ -5,6 +5,7 @@ import com.porest.core.exception.EntityNotFoundException;
 import com.porest.core.exception.ErrorCode;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.core.util.TimeUtils;
 import com.porest.core.type.CountryCode;
 import com.porest.core.type.YNType;
@@ -66,6 +67,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class VacationServiceImpl implements VacationService {
     private final VacationPolicyRepository vacationPolicyRepository;
+    private final CompanyClock companyClock;
     private final UserVacationPlanRepository userVacationPlanRepository;
     private final HolidayRepository holidayRepository;
     private final UserService userService;
@@ -316,7 +318,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         // 3. 삭제 가능 시점 체크 (현재 시간이 사용 시작일 이전인지 확인)
-        if (TimeUtils.isAfter(LocalDateTime.now(), usage.getStartDate())) {
+        if (TimeUtils.isAfter(companyClock.now(), usage.getStartDate())) {
             log.warn("휴가 사용 취소 실패 - 시작일 이후 취소 불가: vacationUsageId={}, startDate={}", vacationUsageId, usage.getStartDate());
             throw new BusinessRuleViolationException(HrErrorCode.VACATION_CANNOT_CANCEL);
         }
@@ -773,7 +775,7 @@ public class VacationServiceImpl implements VacationService {
             log.info("Using user-provided dates - grantDate: {}, expiryDate: {}", grantDate, expiryDate);
         } else {
             // 정책의 effectiveType, expirationType을 사용하여 계산
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = companyClock.now();
             grantDate = policy.getEffectiveType().calculateDate(now);
             expiryDate = policy.getExpirationType().calculateDate(grantDate);
             log.info("Calculated dates using policy types - grantDate: {}, expiryDate: {}", grantDate, expiryDate);
@@ -990,7 +992,7 @@ public class VacationServiceImpl implements VacationService {
             // 승인이 필요 없는 경우 즉시 ACTIVE 상태로 전환
             // - 정책의 approvalRequiredCount가 0 또는 null인 경우
             // - 가용 승인자가 0명인 경우 (최상위 조직장 등)
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = companyClock.now();
             LocalDateTime grantDate = policy.getEffectiveType().calculateDate(now);
             LocalDateTime expiryDate = policy.getExpirationType().calculateDate(grantDate);
             vacationGrant.approve(grantDate, expiryDate);
@@ -1055,7 +1057,7 @@ public class VacationServiceImpl implements VacationService {
         if (allApproved) {
             // 모든 승인이 완료되면 VacationGrant를 ACTIVE 상태로 전환
             VacationPolicy policy = vacationGrant.getPolicy();
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = companyClock.now();
             LocalDateTime grantDate = policy.getEffectiveType().calculateDate(now);
             LocalDateTime expiryDate = policy.getExpirationType().calculateDate(grantDate);
 
@@ -1319,7 +1321,7 @@ public class VacationServiceImpl implements VacationService {
         List<VacationGrant> allGrants = vacationGrantRepository.findAllRequestedVacationsByUserIdAndYear(userId, year);
 
         // 현재 날짜 기준
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = companyClock.now();
         LocalDateTime startOfCurrentMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime startOfPreviousMonth = startOfCurrentMonth.minusMonths(1);
 
