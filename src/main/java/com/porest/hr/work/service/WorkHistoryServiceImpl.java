@@ -2,6 +2,7 @@ package com.porest.hr.work.service;
 
 import com.porest.core.exception.EntityNotFoundException;
 import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.core.type.CountryCode;
 import com.porest.hr.holiday.domain.Holiday;
@@ -53,6 +54,7 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class WorkHistoryServiceImpl implements WorkHistoryService {
     private final WorkHistoryRepository workHistoryRepository;
+    private final CompanyClock companyClock;
     private final WorkCodeRepository workCodeRepository;
     private final UserService userService;
     private final HolidayService holidayService;
@@ -463,7 +465,7 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
     @Override
     public TodayWorkStatus checkTodayWorkStatus(String userId) {
         log.debug("오늘 업무 상태 확인: userId={}", userId);
-        LocalDate today = LocalDate.now();
+        LocalDate today = companyClock.today();
 
         // 오늘 날짜의 업무 내역 리스트 조회
         List<WorkHistory> todayWorkHistories = workHistoryRepository.findByUserAndDate(userId, today);

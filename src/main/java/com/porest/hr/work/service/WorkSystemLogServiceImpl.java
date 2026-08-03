@@ -1,5 +1,6 @@
 package com.porest.hr.work.service;
 
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.hr.work.domain.WorkSystemLog;
 import com.porest.hr.work.repository.WorkSystemLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class WorkSystemLogServiceImpl implements WorkSystemLogService {
     private final WorkSystemLogRepository workSystemLogRepository;
+    private final CompanyClock companyClock;
 
     @Override
     @Transactional
     public boolean toggleSystemCheck(String code) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = companyClock.today();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
 
@@ -47,7 +49,7 @@ public class WorkSystemLogServiceImpl implements WorkSystemLogService {
 
     @Override
     public boolean isCheckedToday(String code) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = companyClock.today();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
 
@@ -58,7 +60,7 @@ public class WorkSystemLogServiceImpl implements WorkSystemLogService {
 
     @Override
     public Map<String, Boolean> checkSystemStatusBatch(List<String> codes) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = companyClock.today();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
 

@@ -2,6 +2,7 @@ package com.porest.hr.notice.service;
 
 import com.porest.core.exception.EntityNotFoundException;
 import com.porest.hr.common.exception.HrErrorCode;
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.core.exception.InvalidValueException;
 import com.porest.core.type.YNType;
 import com.porest.hr.notice.domain.Notice;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class NoticeServiceImpl implements NoticeService {
     private final NoticeRepository noticeRepository;
+    private final CompanyClock companyClock;
     private final UserService userService;
 
     @Override
@@ -93,7 +95,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public Page<NoticeServiceDto> searchActiveNotices(Pageable pageable) {
         log.debug("활성 공지사항 조회: page={}", pageable.getPageNumber());
-        LocalDate now = LocalDate.now();
+        LocalDate now = companyClock.today();
         return noticeRepository.findActiveNotices(now, pageable)
                 .map(this::convertToDto);
     }

@@ -1,5 +1,6 @@
 package com.porest.hr.vacation.scheduler;
 
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.hr.vacation.domain.VacationGrant;
 import com.porest.hr.vacation.domain.VacationGrantSchedule;
 import com.porest.hr.vacation.domain.VacationPolicy;
@@ -29,6 +30,7 @@ import java.util.List;
 @Slf4j
 public class VacationGrantScheduler {
     private final VacationGrantScheduleRepository vacationGrantScheduleRepository;
+    private final CompanyClock companyClock;
     private final VacationGrantRepository vacationGrantRepository;
     private final VacationPolicyStrategyFactory strategyFactory;
 
@@ -40,7 +42,7 @@ public class VacationGrantScheduler {
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     public void expireVacationsDaily() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = companyClock.now();
         log.info("========== 휴가 만료 처리 스케줄러 시작 ========== [{}]", now);
 
         try {
@@ -94,7 +96,7 @@ public class VacationGrantScheduler {
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     public void grantVacationsDaily() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = companyClock.today();
         log.info("========== 휴가 자동 부여 스케줄러 시작 ========== [{}]", today);
 
         try {
@@ -140,7 +142,7 @@ public class VacationGrantScheduler {
                     VacationType vacationType = policy.getVacationType();
 
                     // 효력 발생일과 만료일 계산
-                    LocalDateTime now = LocalDateTime.now();
+                    LocalDateTime now = companyClock.now();
                     LocalDateTime startDate = policy.getEffectiveType().calculateDate(now);
                     LocalDateTime expiryDate = policy.getExpirationType().calculateDate(startDate);
 
