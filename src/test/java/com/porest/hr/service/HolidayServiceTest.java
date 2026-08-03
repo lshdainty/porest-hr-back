@@ -524,7 +524,7 @@ class HolidayServiceTest {
     // 테스트 헬퍼 메서드
     private void setHolidayId(Holiday holiday, Long id) {
         try {
-            java.lang.reflect.Field field = Holiday.class.getDeclaredField("id");
+            java.lang.reflect.Field field = Holiday.class.getDeclaredField("rowId");
             field.setAccessible(true);
             field.set(holiday, id);
         } catch (Exception e) {

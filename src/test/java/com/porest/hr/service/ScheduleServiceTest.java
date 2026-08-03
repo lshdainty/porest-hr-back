@@ -1,5 +1,6 @@
 package com.porest.hr.service;
 
+import com.porest.hr.common.time.CompanyClock;
 import com.porest.core.exception.BusinessRuleViolationException;
 import com.porest.core.exception.EntityNotFoundException;
 import com.porest.core.exception.InvalidValueException;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -41,6 +43,13 @@ class ScheduleServiceTest {
     private ScheduleRepository scheduleRepository;
     @Mock
     private UserService userService;
+
+    // 날짜 판정용 — @InjectMocks 가 null 을 넣으면 NPE. 실물을 주입하되 회사 조회는 비어
+    // 서비스 기준(Asia/Seoul)으로 폴백한다(기존 테스트가 기대하던 KST 동작 유지).
+    @Spy
+    private CompanyClock companyClock = new CompanyClock(
+            org.mockito.Mockito.mock(com.porest.hr.company.repository.CompanyRepository.class),
+            new com.porest.core.time.ServiceClock("Asia/Seoul"));
 
     @InjectMocks
     private ScheduleServiceImpl scheduleService;
@@ -103,29 +112,8 @@ class ScheduleServiceTest {
             then(userService).should().checkUserExist(userId);
         }
 
-        @Test
-        @DisplayName("실패 - 시작일이 종료일보다 늦으면 예외가 발생한다")
-        void registScheduleFailStartAfterEnd() {
-            // given
-            String userId = "test1";
-            User user = createTestUser(userId);
-            LocalDateTime start = LocalDateTime.now().plusDays(2);
-            LocalDateTime end = start.minusDays(1);
-
-            ScheduleServiceDto data = ScheduleServiceDto.builder()
-                    .userId(userId)
-                    .type(ScheduleType.EDUCATION)
-                    .desc("교육")
-                    .startDate(start)
-                    .endDate(end)
-                    .build();
-
-            given(userService.checkUserExist(userId)).willReturn(user);
-
-            // when & then
-            assertThatThrownBy(() -> scheduleService.registSchedule(data))
-                    .isInstanceOf(InvalidValueException.class);
-        }
+        // 날짜 범위(시작일 > 종료일) 검증은 Controller DTO 의 @DateRange(Bean Validation)로 옮겨졌다.
+        // 서비스는 더 이상 검증하지 않으므로 서비스 레벨 예외 테스트를 제거한다.
     }
 
     @Nested
@@ -371,7 +359,7 @@ class ScheduleServiceTest {
     // 테스트 헬퍼 메서드
     private void setScheduleId(Schedule schedule, Long id) {
         try {
-            java.lang.reflect.Field field = Schedule.class.getDeclaredField("id");
+            java.lang.reflect.Field field = Schedule.class.getDeclaredField("rowId");
             field.setAccessible(true);
             field.set(schedule, id);
         } catch (Exception e) {

@@ -102,7 +102,7 @@ dependencies {
 }
 
 tasks.named('test') {
-    enabled = false
+    enabled = true
     useJUnitPlatform()
     jvmArgs '-Xmx2g', '-XX:+HeapDumpOnOutOfMemoryError'
     finalizedBy jacocoTestReport
@@ -160,11 +160,15 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             enabled = true
-            element = 'CLASS'
+            // CLASS 단위(클래스마다 하한)는 SSO 연동 클라이언트처럼 단위 테스트가 붙지 않은
+            // 클래스 하나만 있어도 빌드가 죽는다. desk-back 과 같이 BUNDLE(전체 합산) 로 건다.
+            element = 'BUNDLE'
             limit {
                 counter = 'LINE'
                 value = 'COVEREDRATIO'
-                // minimum = 0.60
+                // 실측 86.7%(3286/3790, 2026-08-03) 기준 여유를 두고 0.80.
+                // 올릴 때는 실측을 먼저 확인하고 단계적으로 상향한다.
+                minimum = 0.80
             }
         }
     }

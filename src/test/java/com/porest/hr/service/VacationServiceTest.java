@@ -254,11 +254,11 @@ class VacationServiceTest {
             Long usageId = 1L;
             User user = createTestUser("user1");
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", usageId);
+            ReflectionTestUtils.setField(usage, "rowId", usageId);
             ReflectionTestUtils.setField(usage, "startDate", LocalDateTime.now().plusDays(1));
 
             VacationGrant grant = createTestGrant(user);
-            ReflectionTestUtils.setField(grant, "id", 1L);
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
 
             VacationUsageDeduction deduction = VacationUsageDeduction.createVacationUsageDeduction(
                     usage, grant, new BigDecimal("1.0000"));
@@ -294,7 +294,7 @@ class VacationServiceTest {
             Long usageId = 1L;
             User user = createTestUser("user1");
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", usageId);
+            ReflectionTestUtils.setField(usage, "rowId", usageId);
             usage.deleteVacationUsage();
 
             given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
@@ -314,7 +314,7 @@ class VacationServiceTest {
             // given
             Long policyId = 1L;
             VacationPolicy policy = createTestPolicy();
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
 
             given(vacationPolicyRepository.findByRowId(policyId))
                     .willReturn(Optional.of(policy));
@@ -350,8 +350,8 @@ class VacationServiceTest {
             // given
             VacationPolicy policy1 = createTestPolicy();
             VacationPolicy policy2 = createTestPolicy();
-            ReflectionTestUtils.setField(policy1, "id", 1L);
-            ReflectionTestUtils.setField(policy2, "id", 2L);
+            ReflectionTestUtils.setField(policy1, "rowId", 1L);
+            ReflectionTestUtils.setField(policy2, "rowId", 2L);
 
             given(vacationPolicyRepository.findVacationPolicies())
                     .willReturn(List.of(policy1, policy2));
@@ -386,7 +386,7 @@ class VacationServiceTest {
             // given
             Long policyId = 1L;
             VacationPolicy policy = createTestPolicy();
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
 
             given(vacationPolicyRepository.findByRowId(policyId))
                     .willReturn(Optional.of(policy));
@@ -407,7 +407,7 @@ class VacationServiceTest {
             // given
             Long policyId = 1L;
             VacationPolicy policy = createTestPolicy();
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
             policy.deleteVacationPolicy();
 
             given(vacationPolicyRepository.findByRowId(policyId))
@@ -424,7 +424,7 @@ class VacationServiceTest {
             // given
             Long policyId = 1L;
             VacationPolicy policy = createTestPolicy();
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
             ReflectionTestUtils.setField(policy, "canDeleted", YNType.N);
 
             given(vacationPolicyRepository.findByRowId(policyId))
@@ -446,16 +446,16 @@ class VacationServiceTest {
             String userId = "user1";
             User user = createTestUser(userId);
             VacationPolicy policy = createTestPolicy();
-            ReflectionTestUtils.setField(policy, "id", 1L);
+            ReflectionTestUtils.setField(policy, "rowId", 1L);
 
             VacationPlan plan = VacationPlan.createPlan("DEFAULT", "기본 플랜", "테스트 플랜");
-            ReflectionTestUtils.setField(plan, "id", 1L);
+            ReflectionTestUtils.setField(plan, "rowId", 1L);
             VacationPlanPolicy planPolicy = VacationPlanPolicy.createPlanPolicy(plan, policy, 1, YNType.N);
-            ReflectionTestUtils.setField(planPolicy, "id", 1L);
+            ReflectionTestUtils.setField(planPolicy, "rowId", 1L);
             // Plan에 PlanPolicy 추가
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", List.of(planPolicy));
             UserVacationPlan userPlan = UserVacationPlan.createUserVacationPlan(user, plan);
-            ReflectionTestUtils.setField(userPlan, "id", 1L);
+            ReflectionTestUtils.setField(userPlan, "rowId", 1L);
 
             given(userService.checkUserExist(userId)).willReturn(user);
             given(userVacationPlanRepository.findByUserIdWithPlanAndPolicies(userId)).willReturn(List.of(userPlan));
@@ -496,7 +496,7 @@ class VacationServiceTest {
             Long grantId = 1L;
             User user = createTestUser("user1");
             VacationGrant grant = createTestGrant(user);
-            ReflectionTestUtils.setField(grant, "id", grantId);
+            ReflectionTestUtils.setField(grant, "rowId", grantId);
 
             given(vacationGrantRepository.findById(grantId)).willReturn(Optional.of(grant));
 
@@ -526,7 +526,7 @@ class VacationServiceTest {
             Long grantId = 1L;
             User user = createTestUser("user1");
             VacationGrant grant = createTestGrant(user);
-            ReflectionTestUtils.setField(grant, "id", grantId);
+            ReflectionTestUtils.setField(grant, "rowId", grantId);
             grant.revoke(); // REVOKED 상태로 변경
 
             given(vacationGrantRepository.findById(grantId)).willReturn(Optional.of(grant));
@@ -543,7 +543,7 @@ class VacationServiceTest {
             Long grantId = 1L;
             User user = createTestUser("user1");
             VacationGrant grant = createTestGrant(user);
-            ReflectionTestUtils.setField(grant, "id", grantId);
+            ReflectionTestUtils.setField(grant, "rowId", grantId);
             grant.deduct(new BigDecimal("1.0000")); // 일부 사용
 
             given(vacationGrantRepository.findById(grantId)).willReturn(Optional.of(grant));
@@ -566,14 +566,14 @@ class VacationServiceTest {
             User user = createTestUser(userId);
 
             VacationPolicy policy = createTestPolicy();
-            ReflectionTestUtils.setField(policy, "id", 1L);
+            ReflectionTestUtils.setField(policy, "rowId", 1L);
             ReflectionTestUtils.setField(policy, "grantMethod", GrantMethod.ON_REQUEST);
 
             VacationGrant grant = VacationGrant.createPendingVacationGrant(
                     user, policy, "신청 사유", VacationType.ANNUAL, new BigDecimal("1.0000"),
                     LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), "상세 사유"
             );
-            ReflectionTestUtils.setField(grant, "id", grantId);
+            ReflectionTestUtils.setField(grant, "rowId", grantId);
 
             given(vacationGrantRepository.findById(grantId)).willReturn(Optional.of(grant));
 
@@ -595,14 +595,14 @@ class VacationServiceTest {
             User user = createTestUser(userId);
 
             VacationPolicy policy = createTestPolicy();
-            ReflectionTestUtils.setField(policy, "id", 1L);
+            ReflectionTestUtils.setField(policy, "rowId", 1L);
             ReflectionTestUtils.setField(policy, "grantMethod", GrantMethod.ON_REQUEST);
 
             VacationGrant grant = VacationGrant.createPendingVacationGrant(
                     user, policy, "신청 사유", VacationType.ANNUAL, new BigDecimal("1.0000"),
                     LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), "상세 사유"
             );
-            ReflectionTestUtils.setField(grant, "id", grantId);
+            ReflectionTestUtils.setField(grant, "rowId", grantId);
 
             given(vacationGrantRepository.findById(grantId)).willReturn(Optional.of(grant));
 
@@ -624,7 +624,7 @@ class VacationServiceTest {
 
             User user = createTestUser("user1");
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", 1L);
+            ReflectionTestUtils.setField(usage, "rowId", 1L);
 
             given(vacationUsageRepository.findByPeriodWithUser(startDate, endDate))
                     .willReturn(List.of(usage));
@@ -834,7 +834,7 @@ class VacationServiceTest {
             String userId = "user1";
             User user = createTestUser(userId);
             VacationGrant grant = createTestGrant(user);
-            ReflectionTestUtils.setField(grant, "id", 1L);
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
             LocalDateTime startDate = LocalDateTime.now();
 
             given(vacationGrantRepository.findAvailableGrantsByUserIdAndDate(userId, startDate))
@@ -1016,7 +1016,7 @@ class VacationServiceTest {
             LocalDateTime end = LocalDateTime.of(2025, 12, 31, 23, 59);
             User user = createTestUser(userId);
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", 1L);
+            ReflectionTestUtils.setField(usage, "rowId", 1L);
 
             given(vacationUsageRepository.findByUserIdAndPeriodWithUser(userId, start, end))
                     .willReturn(List.of(usage));
@@ -1044,7 +1044,7 @@ class VacationServiceTest {
                     new BigDecimal("3.0000"), YNType.N, YNType.N,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
 
             VacationServiceDto data = VacationServiceDto.builder()
                     .policyId(policyId)
@@ -1078,7 +1078,7 @@ class VacationServiceTest {
                     null, YNType.Y, YNType.N,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
 
             VacationServiceDto data = VacationServiceDto.builder()
                     .policyId(policyId)
@@ -1112,7 +1112,7 @@ class VacationServiceTest {
                     new BigDecimal("1.0000"), YNType.N, YNType.N, 1,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
 
             VacationServiceDto data = VacationServiceDto.builder()
                     .policyId(policyId)
@@ -1138,7 +1138,7 @@ class VacationServiceTest {
                     null, YNType.Y, YNType.N,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policy, "id", policyId);
+            ReflectionTestUtils.setField(policy, "rowId", policyId);
 
             VacationServiceDto data = VacationServiceDto.builder()
                     .policyId(policyId)
@@ -1167,18 +1167,18 @@ class VacationServiceTest {
             User user = createTestUser(userId);
 
             VacationPolicy policy1 = createTestPolicy();
-            ReflectionTestUtils.setField(policy1, "id", 1L);
+            ReflectionTestUtils.setField(policy1, "rowId", 1L);
             VacationPolicy policy2 = createTestPolicy();
-            ReflectionTestUtils.setField(policy2, "id", 2L);
+            ReflectionTestUtils.setField(policy2, "rowId", 2L);
 
             VacationPlan plan = VacationPlan.createPlan("DEFAULT", "기본 플랜", "테스트 플랜");
-            ReflectionTestUtils.setField(plan, "id", 1L);
+            ReflectionTestUtils.setField(plan, "rowId", 1L);
             VacationPlanPolicy planPolicy = VacationPlanPolicy.createPlanPolicy(plan, policy1, 1, YNType.N);
-            ReflectionTestUtils.setField(planPolicy, "id", 1L);
+            ReflectionTestUtils.setField(planPolicy, "rowId", 1L);
             // Plan에 PlanPolicy 추가
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", List.of(planPolicy));
             UserVacationPlan userPlan = UserVacationPlan.createUserVacationPlan(user, plan);
-            ReflectionTestUtils.setField(userPlan, "id", 1L);
+            ReflectionTestUtils.setField(userPlan, "rowId", 1L);
 
             given(userService.checkUserExist(userId)).willReturn(user);
             given(vacationPolicyRepository.findVacationPolicies()).willReturn(List.of(policy1, policy2));
@@ -1203,7 +1203,7 @@ class VacationServiceTest {
             Long usageId = 1L;
             User user = createTestUser("user1");
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", usageId);
+            ReflectionTestUtils.setField(usage, "rowId", usageId);
 
             given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
 
@@ -1259,7 +1259,7 @@ class VacationServiceTest {
             Long usageId = 1L;
             User user = createTestUser("user1");
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", usageId);
+            ReflectionTestUtils.setField(usage, "rowId", usageId);
             usage.deleteVacationUsage();
 
             VacationServiceDto data = VacationServiceDto.builder()
@@ -1285,7 +1285,7 @@ class VacationServiceTest {
             Long usageId = 1L;
             User user = createTestUser("user1");
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", usageId);
+            ReflectionTestUtils.setField(usage, "rowId", usageId);
             ReflectionTestUtils.setField(usage, "startDate", LocalDateTime.now().minusDays(1));
 
             VacationServiceDto data = VacationServiceDto.builder()
@@ -1329,10 +1329,10 @@ class VacationServiceTest {
 
             User user = createTestUser("user1");
             VacationUsage usage = createTestUsage(user);
-            ReflectionTestUtils.setField(usage, "id", 1L);
+            ReflectionTestUtils.setField(usage, "rowId", 1L);
 
             VacationGrant grant = createTestGrant(user);
-            ReflectionTestUtils.setField(grant, "id", 1L);
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
 
             VacationUsageDeduction deduction = VacationUsageDeduction.createVacationUsageDeduction(
                     usage, grant, new BigDecimal("1.0000"));
@@ -1378,14 +1378,14 @@ class VacationServiceTest {
                     new BigDecimal("15.0000"), YNType.N, YNType.Y,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policyWithMinute, "id", 1L);
+            ReflectionTestUtils.setField(policyWithMinute, "rowId", 1L);
 
             VacationGrant grant = VacationGrant.createVacationGrant(
                     user, policyWithMinute, "휴가 부여", VacationType.ANNUAL, new BigDecimal("15.0000"),
                     LocalDateTime.of(2025, 1, 1, 0, 0),
                     LocalDateTime.of(2025, 12, 31, 23, 59)
             );
-            ReflectionTestUtils.setField(grant, "id", 1L);
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
 
             given(userService.checkUserExist(userId)).willReturn(user);
             // 분단위 검증이 먼저 실행됨
@@ -1432,7 +1432,7 @@ class VacationServiceTest {
                     new BigDecimal("15.0000"), YNType.N, YNType.N,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policyWithoutMinute, "id", 1L);
+            ReflectionTestUtils.setField(policyWithoutMinute, "rowId", 1L);
 
             given(userService.checkUserExist(userId)).willReturn(user);
             // 분단위 검증이 먼저 실행되어 실패하므로 holidayRepository는 호출되지 않음
@@ -1469,7 +1469,7 @@ class VacationServiceTest {
                     new BigDecimal("15.0000"), YNType.N, YNType.N,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policyWithoutMinute, "id", 1L);
+            ReflectionTestUtils.setField(policyWithoutMinute, "rowId", 1L);
 
             // 분단위 부여 허용 정책
             VacationPolicy policyWithMinute = VacationPolicy.createManualGrantPolicy(
@@ -1477,14 +1477,14 @@ class VacationServiceTest {
                     new BigDecimal("15.0000"), YNType.N, YNType.Y,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policyWithMinute, "id", 2L);
+            ReflectionTestUtils.setField(policyWithMinute, "rowId", 2L);
 
             VacationGrant grant = VacationGrant.createVacationGrant(
                     user, policyWithMinute, "휴가 부여", VacationType.ANNUAL, new BigDecimal("15.0000"),
                     LocalDateTime.of(2025, 1, 1, 0, 0),
                     LocalDateTime.of(2025, 12, 31, 23, 59)
             );
-            ReflectionTestUtils.setField(grant, "id", 1L);
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
 
             given(userService.checkUserExist(userId)).willReturn(user);
             // 분단위 검증이 먼저 실행됨
@@ -1530,14 +1530,14 @@ class VacationServiceTest {
                     new BigDecimal("15.0000"), YNType.N, YNType.N,
                     EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(policyWithoutMinute, "id", 1L);
+            ReflectionTestUtils.setField(policyWithoutMinute, "rowId", 1L);
 
             VacationGrant grant = VacationGrant.createVacationGrant(
                     user, policyWithoutMinute, "휴가 부여", VacationType.ANNUAL, new BigDecimal("15.0000"),
                     LocalDateTime.of(2025, 1, 1, 0, 0),
                     LocalDateTime.of(2025, 12, 31, 23, 59)
             );
-            ReflectionTestUtils.setField(grant, "id", 1L);
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
 
             given(userService.checkUserExist(userId)).willReturn(user);
             given(holidayRepository.findHolidaysByStartEndDateWithType(any(), any(), any(), any()))
@@ -1600,7 +1600,7 @@ class VacationServiceTest {
 
     private VacationGrant createTestGrant(User user, VacationType type, BigDecimal remainTime) {
         VacationPolicy policy = createTestPolicy();
-        ReflectionTestUtils.setField(policy, "id", 1L);
+        ReflectionTestUtils.setField(policy, "rowId", 1L);
 
         return VacationGrant.createVacationGrant(
                 user, policy, "휴가 부여", type, remainTime,

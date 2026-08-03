@@ -89,13 +89,13 @@ class VacationPlanServiceTest {
         user = createTestUser("user1");
 
         plan = VacationPlan.createPlan("DEFAULT", "기본 플랜", "기본 휴가 플랜");
-        ReflectionTestUtils.setField(plan, "id", 1L);
+        ReflectionTestUtils.setField(plan, "rowId", 1L);
 
         policy = VacationPolicy.createManualGrantPolicy(
                 "연차", "연차 정책", VacationType.ANNUAL, new BigDecimal("15.0"),
                 YNType.N, YNType.N, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
         );
-        ReflectionTestUtils.setField(policy, "id", 1L);
+        ReflectionTestUtils.setField(policy, "rowId", 1L);
 
         repeatPolicy = VacationPolicy.createRepeatGrantPolicy(
                 "정기연차", "정기 연차 정책", VacationType.ANNUAL,
@@ -103,7 +103,7 @@ class VacationPlanServiceTest {
                 LocalDateTime.of(2025, 1, 1, 0, 0), YNType.Y, null,
                 EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
         );
-        ReflectionTestUtils.setField(repeatPolicy, "id", 2L);
+        ReflectionTestUtils.setField(repeatPolicy, "rowId", 2L);
     }
 
     @Nested
@@ -191,7 +191,7 @@ class VacationPlanServiceTest {
         void getPlanSuccess() {
             // given
             VacationPlanPolicy planPolicy = VacationPlanPolicy.createPlanPolicy(plan, policy, 1, YNType.N);
-            ReflectionTestUtils.setField(planPolicy, "id", 1L);
+            ReflectionTestUtils.setField(planPolicy, "rowId", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(planPolicy)));
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
 
@@ -253,7 +253,7 @@ class VacationPlanServiceTest {
         void getAllPlansSuccess() {
             // given
             VacationPlan plan2 = VacationPlan.createPlan("SENIOR", "선임 플랜", "선임용");
-            ReflectionTestUtils.setField(plan2, "id", 2L);
+            ReflectionTestUtils.setField(plan2, "rowId", 2L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             ReflectionTestUtils.setField(plan2, "vacationPlanPolicies", new ArrayList<>());
             given(vacationPlanRepository.findAllWithPolicies()).willReturn(List.of(plan, plan2));
@@ -383,7 +383,7 @@ class VacationPlanServiceTest {
         void addPolicyToPlanDuplicate() {
             // given
             VacationPlanPolicy planPolicy = VacationPlanPolicy.createPlanPolicy(plan, policy, 1, YNType.N);
-            ReflectionTestUtils.setField(planPolicy, "id", 1L);
+            ReflectionTestUtils.setField(planPolicy, "rowId", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(planPolicy)));
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
             given(vacationPolicyRepository.findByRowId(1L)).willReturn(Optional.of(policy));
@@ -402,7 +402,7 @@ class VacationPlanServiceTest {
         void removePolicyFromPlanSuccess() {
             // given
             VacationPlanPolicy planPolicy = VacationPlanPolicy.createPlanPolicy(plan, policy, 1, YNType.N);
-            ReflectionTestUtils.setField(planPolicy, "id", 1L);
+            ReflectionTestUtils.setField(planPolicy, "rowId", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(planPolicy)));
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
             given(vacationPolicyRepository.findByRowId(1L)).willReturn(Optional.of(policy));
@@ -447,14 +447,14 @@ class VacationPlanServiceTest {
         void updatePlanPoliciesSuccess() {
             // given
             VacationPlanPolicy oldPlanPolicy = VacationPlanPolicy.createPlanPolicy(plan, policy, 1, YNType.N);
-            ReflectionTestUtils.setField(oldPlanPolicy, "id", 1L);
+            ReflectionTestUtils.setField(oldPlanPolicy, "rowId", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(oldPlanPolicy)));
 
             VacationPolicy newPolicy = VacationPolicy.createManualGrantPolicy(
                     "건강휴가", "건강휴가 정책", VacationType.HEALTH, new BigDecimal("3.0"),
                     YNType.N, YNType.N, EffectiveType.IMMEDIATELY, ExpirationType.END_OF_YEAR
             );
-            ReflectionTestUtils.setField(newPolicy, "id", 3L);
+            ReflectionTestUtils.setField(newPolicy, "rowId", 3L);
 
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
             given(vacationPolicyRepository.findByRowId(3L)).willReturn(Optional.of(newPolicy));
@@ -517,7 +517,7 @@ class VacationPlanServiceTest {
         void assignPlanToUserWithRepeatPolicy() {
             // given
             VacationPlanPolicy planPolicy = VacationPlanPolicy.createPlanPolicy(plan, repeatPolicy, 1, YNType.N);
-            ReflectionTestUtils.setField(planPolicy, "id", 1L);
+            ReflectionTestUtils.setField(planPolicy, "rowId", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(planPolicy)));
 
             given(userService.checkUserExist("user1")).willReturn(user);
@@ -568,7 +568,7 @@ class VacationPlanServiceTest {
         void assignPlansToUserSuccess() {
             // given
             VacationPlan plan2 = VacationPlan.createPlan("SENIOR", "선임 플랜", "선임용");
-            ReflectionTestUtils.setField(plan2, "id", 2L);
+            ReflectionTestUtils.setField(plan2, "rowId", 2L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             ReflectionTestUtils.setField(plan2, "vacationPlanPolicies", new ArrayList<>());
 
@@ -591,7 +591,7 @@ class VacationPlanServiceTest {
         void assignPlansToUserSkipExisting() {
             // given
             VacationPlan plan2 = VacationPlan.createPlan("SENIOR", "선임 플랜", "선임용");
-            ReflectionTestUtils.setField(plan2, "id", 2L);
+            ReflectionTestUtils.setField(plan2, "rowId", 2L);
             ReflectionTestUtils.setField(plan2, "vacationPlanPolicies", new ArrayList<>());
 
             given(userService.checkUserExist("user1")).willReturn(user);
@@ -618,7 +618,7 @@ class VacationPlanServiceTest {
             // given
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             UserVacationPlan userPlan = UserVacationPlan.createUserVacationPlan(user, plan);
-            ReflectionTestUtils.setField(userPlan, "id", 1L);
+            ReflectionTestUtils.setField(userPlan, "rowId", 1L);
 
             given(userService.checkUserExist("user1")).willReturn(user);
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
@@ -637,14 +637,14 @@ class VacationPlanServiceTest {
         void revokePlanFromUserWithRepeatPolicy() {
             // given
             VacationPlanPolicy planPolicy = VacationPlanPolicy.createPlanPolicy(plan, repeatPolicy, 1, YNType.N);
-            ReflectionTestUtils.setField(planPolicy, "id", 1L);
+            ReflectionTestUtils.setField(planPolicy, "rowId", 1L);
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>(List.of(planPolicy)));
 
             UserVacationPlan userPlan = UserVacationPlan.createUserVacationPlan(user, plan);
-            ReflectionTestUtils.setField(userPlan, "id", 1L);
+            ReflectionTestUtils.setField(userPlan, "rowId", 1L);
 
             VacationGrantSchedule schedule = VacationGrantSchedule.createSchedule(user, repeatPolicy);
-            ReflectionTestUtils.setField(schedule, "id", 1L);
+            ReflectionTestUtils.setField(schedule, "rowId", 1L);
 
             given(userService.checkUserExist("user1")).willReturn(user);
             given(vacationPlanRepository.findByCodeWithPolicies("DEFAULT")).willReturn(Optional.of(plan));
@@ -695,7 +695,7 @@ class VacationPlanServiceTest {
             // given
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             UserVacationPlan userPlan = UserVacationPlan.createUserVacationPlan(user, plan);
-            ReflectionTestUtils.setField(userPlan, "id", 1L);
+            ReflectionTestUtils.setField(userPlan, "rowId", 1L);
 
             given(userService.checkUserExist("user1")).willReturn(user);
             given(userVacationPlanRepository.findByUserIdWithPlanAndPolicies("user1")).willReturn(List.of(userPlan));
@@ -714,7 +714,7 @@ class VacationPlanServiceTest {
             // given
             ReflectionTestUtils.setField(plan, "vacationPlanPolicies", new ArrayList<>());
             UserVacationPlan userPlan = UserVacationPlan.createUserVacationPlan(user, plan);
-            ReflectionTestUtils.setField(userPlan, "id", 1L);
+            ReflectionTestUtils.setField(userPlan, "rowId", 1L);
             userPlan.deleteUserVacationPlan();
 
             given(userService.checkUserExist("user1")).willReturn(user);

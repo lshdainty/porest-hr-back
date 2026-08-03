@@ -65,6 +65,7 @@ class DepartmentServiceTest {
         void registRootDepartmentSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "테스트 회사", "설명");
+            setCompanyId(company, 1L);
             DepartmentServiceDto data = DepartmentServiceDto.builder()
                     .companyId("COMPANY001")
                     .name("Development")
@@ -91,6 +92,7 @@ class DepartmentServiceTest {
         void registChildDepartmentSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "테스트 회사", "설명");
+            setCompanyId(company, 1L);
             Department parent = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(parent, 1L);
 
@@ -121,7 +123,9 @@ class DepartmentServiceTest {
         void registFailDifferentCompany() {
             // given
             Company company1 = Company.createCompany("COMPANY001", "회사1", "설명");
+            setCompanyId(company1, 1L);
             Company company2 = Company.createCompany("COMPANY002", "회사2", "설명");
+            setCompanyId(company2, 2L);
             Department parent = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company2);
             setDepartmentId(parent, 1L);
 
@@ -149,6 +153,7 @@ class DepartmentServiceTest {
         void editSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
@@ -175,6 +180,7 @@ class DepartmentServiceTest {
         void editFailSelfParent() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
@@ -197,6 +203,7 @@ class DepartmentServiceTest {
         void editFailCircularReference() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department parent = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(parent, 1L);
             Department child = Department.createDepartment("Backend", "백엔드팀", parent, null, 2L, "설명", "#00FF00", company);
@@ -222,7 +229,9 @@ class DepartmentServiceTest {
         void editFailDifferentCompany() {
             // given
             Company company1 = Company.createCompany("COMPANY001", "회사1", "설명");
+            setCompanyId(company1, 1L);
             Company company2 = Company.createCompany("COMPANY002", "회사2", "설명");
+            setCompanyId(company2, 2L);
 
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company1);
             setDepartmentId(department, 1L);
@@ -248,6 +257,7 @@ class DepartmentServiceTest {
         void editSuccessWithParentChange() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
 
             Department department = Department.createDepartment("Backend", "백엔드팀", null, null, 2L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
@@ -295,6 +305,7 @@ class DepartmentServiceTest {
         void deleteSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
@@ -313,6 +324,7 @@ class DepartmentServiceTest {
         void deleteFailHasChildren() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department parent = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(parent, 1L);
             Department child = Department.createDepartment("Backend", "백엔드팀", parent, null, 2L, "설명", "#00FF00", company);
@@ -329,6 +341,7 @@ class DepartmentServiceTest {
         void deleteSuccessWithDeletedChildren() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department parent = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(parent, 1L);
             Department child = Department.createDepartment("Backend", "백엔드팀", parent, null, 2L, "설명", "#00FF00", company);
@@ -353,6 +366,7 @@ class DepartmentServiceTest {
         void searchDepartmentByIdSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
@@ -372,6 +386,7 @@ class DepartmentServiceTest {
         void searchDepartmentByIdWithChildrenSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
             Department child = Department.createDepartment("Backend", "백엔드팀", department, null, 2L, "설명", "#00FF00", company);
@@ -397,6 +412,7 @@ class DepartmentServiceTest {
         void registUserDepartmentsSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
             User user = createTestUser("user1");
@@ -428,6 +444,7 @@ class DepartmentServiceTest {
         void registUserDepartmentsFailAlreadyHasMain() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
             User user = createTestUser("user1");
@@ -454,6 +471,7 @@ class DepartmentServiceTest {
         void registUserDepartmentsSuccessNotMain() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
             User user = createTestUser("user1");
@@ -490,6 +508,7 @@ class DepartmentServiceTest {
         void deleteUserDepartmentsSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
             User user = createTestUser("user1");
@@ -525,6 +544,7 @@ class DepartmentServiceTest {
         void getUsersInAndNotInDepartmentSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
@@ -552,6 +572,7 @@ class DepartmentServiceTest {
         void getUsersInAndNotInDepartmentEmptyUsersIn() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
@@ -579,6 +600,7 @@ class DepartmentServiceTest {
         void checkDepartmentExistsSuccess() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             setDepartmentId(department, 1L);
 
@@ -607,6 +629,7 @@ class DepartmentServiceTest {
         void checkDepartmentExistsFailDeleted() {
             // given
             Company company = Company.createCompany("COMPANY001", "회사", "설명");
+            setCompanyId(company, 1L);
             Department department = Department.createDepartment("Development", "개발팀", null, null, 1L, "설명", "#FF0000", company);
             department.deleteDepartment();
 
@@ -619,9 +642,20 @@ class DepartmentServiceTest {
     }
 
     // 테스트 헬퍼 메서드
+    /** 영속 엔티티를 흉내 낸다 — rowId 가 null 이면 회사 비교(getRowId().equals)가 NPE 로 죽는다. */
+    private void setCompanyId(Company company, Long id) {
+        try {
+            java.lang.reflect.Field field = Company.class.getDeclaredField("rowId");
+            field.setAccessible(true);
+            field.set(company, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void setDepartmentId(Department department, Long id) {
         try {
-            java.lang.reflect.Field field = Department.class.getDeclaredField("id");
+            java.lang.reflect.Field field = Department.class.getDeclaredField("rowId");
             field.setAccessible(true);
             field.set(department, id);
         } catch (Exception e) {

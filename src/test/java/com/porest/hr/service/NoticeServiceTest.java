@@ -120,29 +120,8 @@ class NoticeServiceTest {
             then(userService).should().checkUserExist(writerId);
         }
 
-        @Test
-        @DisplayName("실패 - 시작일이 종료일보다 늦으면 예외가 발생한다")
-        void createNoticeFailStartAfterEnd() {
-            // given
-            String writerId = "admin";
-            User writer = createTestUser(writerId);
-            LocalDate start = LocalDate.now().plusDays(30);
-            LocalDate end = LocalDate.now();
-
-            NoticeServiceDto data = NoticeServiceDto.builder()
-                    .writerId(writerId)
-                    .title("테스트")
-                    .content("내용")
-                    .startDate(start)
-                    .endDate(end)
-                    .build();
-
-            given(userService.checkUserExist(writerId)).willReturn(writer);
-
-            // when & then
-            assertThatThrownBy(() -> noticeService.createNotice(data))
-                    .isInstanceOf(InvalidValueException.class);
-        }
+        // 날짜 범위(시작일 > 종료일) 검증은 Controller DTO 의 @DateRange(Bean Validation)로 옮겨졌다.
+        // 서비스는 더 이상 검증하지 않으므로 서비스 레벨 예외 테스트를 제거한다.
     }
 
     @Nested
@@ -402,30 +381,8 @@ class NoticeServiceTest {
                     .isInstanceOf(EntityNotFoundException.class);
         }
 
-        @Test
-        @DisplayName("실패 - 시작일이 종료일보다 늦으면 예외가 발생한다")
-        void updateNoticeFailInvalidDate() {
-            // given
-            Long noticeId = 1L;
-            User writer = createTestUser("admin");
-            Notice notice = Notice.createNotice(
-                    writer, "원본 제목", "원본 내용", NoticeType.GENERAL,
-                    YNType.N, LocalDate.now(), LocalDate.now().plusDays(30)
-            );
-            setNoticeId(notice, noticeId);
-
-            NoticeServiceDto updateData = NoticeServiceDto.builder()
-                    .title("수정 제목")
-                    .startDate(LocalDate.now().plusDays(30))
-                    .endDate(LocalDate.now())
-                    .build();
-
-            given(noticeRepository.findByRowId(noticeId)).willReturn(Optional.of(notice));
-
-            // when & then
-            assertThatThrownBy(() -> noticeService.updateNotice(noticeId, updateData))
-                    .isInstanceOf(InvalidValueException.class);
-        }
+        // 날짜 범위(시작일 > 종료일) 검증은 Controller DTO 의 @DateRange(Bean Validation)로 옮겨졌다.
+        // 서비스는 더 이상 검증하지 않으므로 서비스 레벨 예외 테스트를 제거한다.
     }
 
     @Nested
@@ -543,7 +500,7 @@ class NoticeServiceTest {
     // 테스트 헬퍼 메서드
     private void setNoticeId(Notice notice, Long id) {
         try {
-            java.lang.reflect.Field field = Notice.class.getDeclaredField("id");
+            java.lang.reflect.Field field = Notice.class.getDeclaredField("rowId");
             field.setAccessible(true);
             field.set(notice, id);
         } catch (Exception e) {

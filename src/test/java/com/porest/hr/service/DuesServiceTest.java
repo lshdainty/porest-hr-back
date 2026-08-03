@@ -306,7 +306,7 @@ class DuesServiceTest {
     // 테스트 헬퍼 메서드
     private void setDuesId(Dues dues, Long id) {
         try {
-            java.lang.reflect.Field field = Dues.class.getDeclaredField("id");
+            java.lang.reflect.Field field = Dues.class.getDeclaredField("rowId");
             field.setAccessible(true);
             field.set(dues, id);
         } catch (Exception e) {
