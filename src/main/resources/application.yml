@@ -97,7 +97,7 @@ logging:
     com.porest.hr: ${LOG_LEVEL:info}
     org.hibernate.SQL: ${LOG_LEVEL_HIBERNATE:info}
     org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_HIBERNATE_BINDER:info}
-    p6spy: info
+    p6spy: ${LOG_LEVEL_P6SPY:info}
     root: ${LOG_LEVEL_ROOT:info}
 
 # 파일 업로드 경로
