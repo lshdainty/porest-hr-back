@@ -140,6 +140,8 @@ public class VacationPolicy extends AuditingFieldsWithIp {
      * 첫 부여 일시<br>
      * 정책 생성 시점과는 다른 값<br>
      * 정책은 25년에 생성했지만 정책 실행은 26년도부터 가능하도록 할 때 사용
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "first_grant_date")
     private LocalDateTime firstGrantDate;

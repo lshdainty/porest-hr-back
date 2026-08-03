@@ -74,6 +74,8 @@ public class Notice extends AuditingFieldsWithIp {
     /**
      * 게시 시작일<br>
      * 공지사항이 표시되기 시작하는 날짜
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -81,6 +83,8 @@ public class Notice extends AuditingFieldsWithIp {
     /**
      * 게시 종료일<br>
      * 공지사항이 표시 종료되는 날짜
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "end_date")
     private LocalDate endDate;

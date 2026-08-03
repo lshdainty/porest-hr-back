@@ -71,6 +71,8 @@ public class User extends AuditingFieldsWithIp {
     /**
      * 사용자 생일<br>
      * 사용자의 생년월일
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "user_birth")
     private LocalDate birth;
@@ -85,6 +87,8 @@ public class User extends AuditingFieldsWithIp {
     /**
      * 사용자 입사 일자<br>
      * 사용자의 회사 입사 날짜
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "join_date")
     private LocalDate joinDate;

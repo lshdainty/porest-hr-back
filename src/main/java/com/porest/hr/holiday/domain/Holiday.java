@@ -31,6 +31,7 @@ public class Holiday extends AuditingFieldsWithIp {
      * 공휴일이 해당하는 날짜 (양력 기준)
      */
     @NotNull
+    /** [userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다) */
     @Column(name = "holiday_date", nullable = false)
     private LocalDate date;
 
@@ -72,6 +73,8 @@ public class Holiday extends AuditingFieldsWithIp {
     /**
      * 음력 일자<br>
      * 음력 기준 공휴일 날짜 (음력 여부가 Y일 경우 사용)
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "lunar_date")
     private LocalDate lunarDate;

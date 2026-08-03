@@ -53,6 +53,8 @@ public class Schedule extends AuditingFieldsWithIp {
     /**
      * 시작 일자<br>
      * 스케줄이 시작되는 날짜와 시간
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "start_date")
     private LocalDateTime startDate;
@@ -60,6 +62,8 @@ public class Schedule extends AuditingFieldsWithIp {
     /**
      * 종료 일자<br>
      * 스케줄이 종료되는 날짜와 시간
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "end_date")
     private LocalDateTime endDate;

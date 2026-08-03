@@ -68,6 +68,8 @@ public class VacationGrant extends AuditingFieldsWithIp {
      * 사용자가 휴가 정책을 통해 휴가를 부여받아
      * 사용할 수 있는 기간의 시작 일자를 의미<br>
      * 시스템에서 추가하는 createAt하고 grantDate는 다름
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "grant_date")
     private LocalDateTime grantDate;
@@ -76,6 +78,8 @@ public class VacationGrant extends AuditingFieldsWithIp {
      * 휴가 사용 가능시간 종료 일시<br>
      * 사용자가 휴가 정책을 통해 휴가를 부여받아
      * 사용할 수 있는 기간의 만료 일자를 의미
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
@@ -112,6 +116,8 @@ public class VacationGrant extends AuditingFieldsWithIp {
      * - OT: OT 시작 시간 (예: 2025-09-14 18:00)<br>
      * - 결혼/출산: 해당 일자 (예: 2025-09-14 00:00)<br>
      * 모든 신청 타입에서 필수로 사용됨
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "request_start_time")
     private LocalDateTime requestStartTime;
@@ -121,6 +127,8 @@ public class VacationGrant extends AuditingFieldsWithIp {
      * OT일 경우에만 값이 들어간다.<br>
      * OT 종료 시간 (예: 2025-09-14 19:00)<br>
      * 결혼/출산 등 OT가 아닌 경우는 null
+     *
+     * <p>[userClock] 사용자·업무가 정한 벽시계 — 타임존 변환 금지(자정 근처 날짜가 밀린다)
      */
     @Column(name = "request_end_time")
     private LocalDateTime requestEndTime;
