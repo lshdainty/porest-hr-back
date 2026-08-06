@@ -118,7 +118,9 @@ class VacationGrantSchedulerTest {
         @DisplayName("성공 - 부여 대상 정책에 휴가를 부여한다")
         void grantVacationsDailySuccess() {
             // given
-            LocalDate today = LocalDate.now();
+            // 스케줄러가 보는 날짜와 같은 시계를 써야 한다. LocalDate.now() 는 JVM 기본
+            // 타임존이라 CI(UTC)에서는 KST 와 날짜가 갈려 stub 이 안 맞고 saveAll 이 안 불린다.
+            LocalDate today = companyClock.today();
             User user = createTestUser("user1");
             VacationPolicy policy = VacationPolicy.createRepeatGrantPolicy(
                     "연차", "연차 정책", VacationType.ANNUAL,
