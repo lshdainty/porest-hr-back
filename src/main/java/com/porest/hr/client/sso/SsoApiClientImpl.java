@@ -59,8 +59,10 @@ public class SsoApiClientImpl implements SsoApiClient {
         log.debug("Calling SSO inviteUser API: userId={}, email={}", request.getUserId(), request.getEmail());
 
         try {
+            // 서버 간 호출 전용 API — SSO 가 ROLE_SERVICE 를 요구한다
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(issueServiceToken());
 
             HttpEntity<SsoInviteRequest> entity = new HttpEntity<>(request, headers);
 
@@ -92,8 +94,10 @@ public class SsoApiClientImpl implements SsoApiClient {
         log.debug("Calling SSO resendInvitation API: userId={}", userId);
 
         try {
+            // 서버 간 호출 전용 API — SSO 가 ROLE_SERVICE 를 요구한다
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(issueServiceToken());
 
             Map<String, String> requestBody = Map.of("userId", userId);
             HttpEntity<Map<String, String>> entity = new HttpEntity<>(requestBody, headers);
@@ -122,8 +126,10 @@ public class SsoApiClientImpl implements SsoApiClient {
         log.debug("Calling SSO getInvitationStatus API: userNos count={}", userNos.size());
 
         try {
+            // 서버 간 호출 전용 API — SSO 가 ROLE_SERVICE 를 요구한다
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(issueServiceToken());
 
             SsoInvitationStatusRequest request = SsoInvitationStatusRequest.builder()
                     .userNos(userNos)
