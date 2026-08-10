@@ -1,5 +1,6 @@
 package com.porest.hr.user.service;
 
+import com.porest.core.util.MaskUtils;
 import com.porest.hr.common.config.properties.AppProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -38,7 +39,8 @@ public class EmailServiceImpl implements EmailService {
     @Async("emailTaskExecutor")
     @Override
     public void sendInvitationEmail(String toEmail, String userName, String userId, String invitationCode) {
-        log.debug("초대 이메일 발송 시작: toEmail={}, userName={}, userId={}", toEmail, userName, userId);
+        log.debug("초대 이메일 발송 시작: toEmail={}, userName={}, userId={}",
+                MaskUtils.email(toEmail), MaskUtils.name(userName), userId);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -111,9 +113,9 @@ public class EmailServiceImpl implements EmailService {
             }
 
             mailSender.send(message);
-            log.info("초대 이메일 발송 완료: {}", toEmail);
+            log.info("초대 이메일 발송 완료: {}", MaskUtils.email(toEmail));
         } catch (MessagingException e) {
-            log.error("초대 이메일 발송 실패: {}", toEmail, e);
+            log.error("초대 이메일 발송 실패: {}", MaskUtils.email(toEmail), e);
             throw new RuntimeException("이메일 발송에 실패했습니다.", e);
         }
     }
@@ -121,7 +123,8 @@ public class EmailServiceImpl implements EmailService {
     @Async("emailTaskExecutor")
     @Override
     public void sendPasswordResetEmail(String toEmail, String userName, String tempPassword) {
-        log.debug("비밀번호 초기화 이메일 발송 시작: toEmail={}, userName={}", toEmail, userName);
+        log.debug("비밀번호 초기화 이메일 발송 시작: toEmail={}, userName={}",
+                MaskUtils.email(toEmail), MaskUtils.name(userName));
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -181,9 +184,9 @@ public class EmailServiceImpl implements EmailService {
             }
 
             mailSender.send(message);
-            log.info("비밀번호 초기화 이메일 발송 완료: {}", toEmail);
+            log.info("비밀번호 초기화 이메일 발송 완료: {}", MaskUtils.email(toEmail));
         } catch (MessagingException e) {
-            log.error("비밀번호 초기화 이메일 발송 실패: {}", toEmail, e);
+            log.error("비밀번호 초기화 이메일 발송 실패: {}", MaskUtils.email(toEmail), e);
             throw new RuntimeException("이메일 발송에 실패했습니다.", e);
         }
     }

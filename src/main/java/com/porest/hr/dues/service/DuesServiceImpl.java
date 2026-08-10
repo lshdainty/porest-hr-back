@@ -1,6 +1,7 @@
 package com.porest.hr.dues.service;
 
 import com.porest.core.exception.EntityNotFoundException;
+import com.porest.core.util.MaskUtils;
 import com.porest.hr.common.exception.HrErrorCode;
 import com.porest.hr.dues.domain.Dues;
 import com.porest.hr.dues.repository.DuesRepository;
@@ -25,7 +26,8 @@ public class DuesServiceImpl implements DuesService {
     @Override
     @Transactional
     public Long registDues(DuesServiceDto data) {
-        log.debug("회비 등록 시작: userName={}, amount={}, type={}", data.getUserName(), data.getAmount(), data.getType());
+        log.debug("회비 등록 시작: userName={}, amount={}, type={}",
+                MaskUtils.name(data.getUserName()), data.getAmount(), data.getType());
         Dues dues = Dues.createDues(
                 data.getUserName(),
                 data.getAmount(),
