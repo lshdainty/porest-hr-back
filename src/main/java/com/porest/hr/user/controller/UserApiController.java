@@ -1,5 +1,7 @@
 package com.porest.hr.user.controller;
 
+import com.porest.core.audit.AccessAction;
+import com.porest.core.audit.AuditAccess;
 import com.porest.core.type.YNType;
 import com.porest.hr.security.annotation.LoginUser;
 import com.porest.hr.user.controller.dto.UserApiDto;
@@ -46,6 +48,7 @@ public class UserApiController implements UserApi {
 
     @Override
     @PreAuthorize("hasAuthority('USER:READ')")
+    @AuditAccess(action = AccessAction.READ, targetType = "USER", targetId = "#userId")
     public ApiResponse searchUser(String userId) {
         UserServiceDto user = userService.searchUser(userId);
 
@@ -104,6 +107,7 @@ public class UserApiController implements UserApi {
 
     @Override
     @PreAuthorize("hasAuthority('USER:READ')")
+    @AuditAccess(action = AccessAction.LIST, targetType = "USER", detail = "전체 사용자 목록")
     public ApiResponse searchUsers() {
         List<UserServiceDto> users = userService.searchUsers();
 
@@ -162,6 +166,7 @@ public class UserApiController implements UserApi {
 
     @Override
     @PreAuthorize("hasAuthority('USER:EDIT')")
+    @AuditAccess(action = AccessAction.UPDATE, targetType = "USER", targetId = "#userId")
     public ApiResponse editUser(String userId, UserApiDto.EditUserReq data) {
         userService.editUser(UserServiceDto.builder()
                 .id(userId)
@@ -224,6 +229,7 @@ public class UserApiController implements UserApi {
 
     @Override
     @PreAuthorize("hasAuthority('USER:MANAGE')")
+    @AuditAccess(action = AccessAction.DELETE, targetType = "USER", targetId = "#userId")
     public ApiResponse deleteUser(String userId) {
         userService.deleteUser(userId);
         return ApiResponse.success();
@@ -328,6 +334,8 @@ public class UserApiController implements UserApi {
     // ==================== 초대 관련 API ====================
 
     @Override
+    @AuditAccess(action = AccessAction.CREATE, targetType = "USER", targetId = "#data.userId",
+            detail = "사용자 초대")
     public ApiResponse inviteUser(UserApiDto.InviteUserReq data) {
         log.debug("REST request to invite user: {}", data.getUserId());
 
@@ -358,6 +366,8 @@ public class UserApiController implements UserApi {
     }
 
     @Override
+    @AuditAccess(action = AccessAction.UPDATE, targetType = "USER", targetId = "#userId",
+            detail = "초대 정보 수정")
     public ApiResponse editInvitation(String userId, UserApiDto.EditInvitationReq data) {
         log.debug("REST request to edit invitation: {}", userId);
 
@@ -384,6 +394,8 @@ public class UserApiController implements UserApi {
     }
 
     @Override
+    @AuditAccess(action = AccessAction.UPDATE, targetType = "USER", targetId = "#userId",
+            detail = "초대 재발송")
     public ApiResponse resendInvitation(String userId) {
         log.debug("REST request to resend invitation: {}", userId);
 
@@ -410,6 +422,8 @@ public class UserApiController implements UserApi {
 
     @Override
     @PreAuthorize("hasAuthority('USER:MANAGE')")
+    @AuditAccess(action = AccessAction.UPDATE, targetType = "USER", targetId = "#userId",
+            detail = "비밀번호 초기화")
     public ApiResponse resetPassword(String userId) {
         log.debug("REST request to reset password: {}", userId);
 
