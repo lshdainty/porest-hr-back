@@ -3,6 +3,7 @@ package com.porest.hr.common.event;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+import com.porest.core.util.MaskUtils;
 import com.porest.hr.user.domain.User;
 import com.porest.hr.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +76,7 @@ public class SsoUserEventSubscriber {
         // HR에 사용자가 없으면 로깅만 수행
         // HR 관리자가 회사, 근무시간, 입사일 등 HR 필수 정보와 함께 사용자를 생성해야 함
         log.info("User not found in HR, awaiting HR admin creation: ssoUserRowId={}, userId={}, email={}",
-                event.getUserNo(), event.getUserId(), event.getEmail());
+                event.getUserNo(), event.getUserId(), MaskUtils.email(event.getEmail()));
     }
 
     /**
