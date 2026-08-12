@@ -1,5 +1,6 @@
 package com.porest.hr.security.filter;
 
+import com.porest.hr.common.config.properties.JwtProperties;
 import com.porest.hr.security.jwt.JwtTokenProvider;
 import com.porest.hr.security.principal.JwtClaimsPrincipal;
 import com.porest.hr.security.principal.JwtUserPrincipal;
@@ -12,6 +13,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,10 +40,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final JwtProperties jwtProperties;
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String ACCESS_TOKEN_COOKIE = "hr_access_token";
+    private static final long RENEWAL_THRESHOLD_MS = 600_000L;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -56,6 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (jwtTokenProvider.isHrToken(token)) {
                     // HR JWT인 경우: Claims에서 직접 정보 추출 (DB 조회 없음)
                     authentication = createAuthenticationFromHrToken(token);
+
+                    // 슬라이딩 갱신 — 잔여 수명이 임계 아래로 내려간 유효 토큰은 새 토큰을
+                    // 쿠키로 실어 준다(desk-back 정합). 이게 없으면 쓰고 있는 중에도 정각
+                    // 1시간에 세션이 끊긴다. SSO JWT 는 SSO 발행분이라 여기서 재발급하지 않는다.
+                    renewIfExpiringSoon(token, response);
                 } else {
                     // SSO JWT인 경우: HR DB 조회 필요 (하위 호환성 유지)
                     authentication = createAuthenticationFromSsoToken(token);
@@ -132,6 +142,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.debug("SSO JWT 인증 성공 (DB 조회): userId={}, authorities={}", userId, authorities.size());
 
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
+    }
+
+    /**
+     * 잔여 수명이 임계(10분) 미만인 HR 토큰을 같은 claims 로 재발급해 쿠키로 실어 준다.
+     * 만료(잔여 0)는 살려 주지 않는다 — 죽은 토큰의 부활은 로그인 흐름의 몫이다.
+     */
+    private void renewIfExpiringSoon(String token, HttpServletResponse response) {
+        long remainingMs = jwtTokenProvider.getRemainingExpiration(token);
+        if (remainingMs <= 0 || remainingMs >= RENEWAL_THRESHOLD_MS) {
+            return;
+        }
+        String renewed = jwtTokenProvider.createHrAccessToken(
+                jwtTokenProvider.getUserId(token),
+                jwtTokenProvider.getSsoUserRowIdFromHrToken(token),
+                jwtTokenProvider.getNameFromHrToken(token),
+                jwtTokenProvider.getEmailFromHrToken(token),
+                jwtTokenProvider.getRolesFromHrToken(token),
+                jwtTokenProvider.getPermissionsFromHrToken(token));
+        // TokenExchangeController.setAccessTokenCookie 와 같은 속성 — 로그인이 심는 쿠키를
+        // 그대로 대체해야 두 쿠키가 병존하지 않는다.
+        ResponseCookie cookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE, renewed)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtProperties.getHrAccessExpiration() / 1000)
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        log.debug("HR 토큰 슬라이딩 갱신: userId={}", jwtTokenProvider.getUserId(token));
     }
 
     /**
