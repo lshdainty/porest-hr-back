@@ -131,22 +131,47 @@ public class JwtTokenProvider {
      * @return HR Access Token
      */
     public String createHrAccessToken(User user, List<String> roles, List<String> permissions) {
+        return createHrAccessToken(user.getId(), user.getSsoUserRowId(),
+                user.getName(), user.getEmail(), roles, permissions);
+    }
+
+    /**
+     * HR Access Token 생성 (claims 직접 전달)
+     *
+     * <p>슬라이딩 갱신처럼 이미 검증한 토큰의 claims 만 손에 있는 자리에서 쓴다 —
+     * User 엔티티를 다시 조회하면 갱신 창(만료 전 10분) 동안 요청마다 DB 를 때린다.
+     */
+    public String createHrAccessToken(String userId, Long ssoUserRowId,
+                                      String name, String email,
+                                      List<String> roles, List<String> permissions) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + jwtProperties.getHrAccessExpiration());
 
         return Jwts.builder()
-                .subject(user.getId())
+                .subject(userId)
                 .issuer(HR_ISSUER)
                 .issuedAt(now)
                 .expiration(expiration)
                 .claim(TOKEN_TYPE_CLAIM, TOKEN_TYPE_HR_ACCESS)
-                .claim("ssoUserRowId", user.getSsoUserRowId())
-                .claim("name", user.getName())
-                .claim("email", user.getEmail())
+                .claim("ssoUserRowId", ssoUserRowId)
+                .claim("name", name)
+                .claim("email", email)
                 .claim("roles", roles)
                 .claim("permissions", permissions)
                 .signWith(hrKey)
                 .compact();
+    }
+
+    /**
+     * 토큰의 남은 수명 (밀리초). 만료·파싱 실패는 0 — 갱신 판단에서 자연히 제외된다.
+     */
+    public long getRemainingExpiration(String token) {
+        try {
+            Claims claims = isHrToken(token) ? getHrClaims(token) : getSsoClaims(token);
+            return Math.max(0, claims.getExpiration().getTime() - System.currentTimeMillis());
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     /**
