@@ -1,5 +1,6 @@
 package com.porest.hr.common.config.security;
 
+import com.porest.core.logging.SensitiveDataMasker;
 import com.porest.core.util.HttpUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -28,6 +28,18 @@ import java.util.UUID;
  * - 실행 시간 측정
  * - User ID, Client IP, User-Agent 수집
  * - 가독성 좋은 한 줄 포맷으로 로그 출력
+ *
+ * <h2>원본은 절대 건드리지 않는다</h2>
+ * 마스킹은 {@link SensitiveDataMasker} 가 돌려주는 <b>새 문자열</b>에만 적용되고,
+ * 그 문자열은 로그로만 나간다. 본문은 {@code ContentCaching*Wrapper} 가 들고 있는
+ * <b>사본</b>({@code getContentAsByteArray()})에서만 읽으므로 스트림이 소비되지 않고
+ * 컨트롤러는 요청 본문을 온전히 받는다. 응답은 {@link #doFilterInternal} 의 바깥
+ * {@code finally} 에서 반드시 {@code copyBodyToResponse()} 로 흘려보낸다.
+ *
+ * <h2>헤더는 로깅하지 않는다</h2>
+ * User-Agent 만 찍는다. {@code Authorization} · {@code Cookie} · {@code Set-Cookie}
+ * (HR 은 JWT 를 {@code hr_access_token} 쿠키로 실어 보낸다)를 로그에 넣지 마라 —
+ * 넣는 순간 액세스 토큰 전문이 로그로 나간다.
  */
 @Slf4j
 @Component
@@ -41,6 +53,29 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
             "/actuator/health",
             "/actuator/prometheus",
             "/favicon.ico"
+    );
+
+    /**
+     * 마스킹 규칙은 core 한 벌만 쓴다. 같은 코드의 사본이 desk·sso·hr 에 각자 늙어 있었고,
+     * 목록이 가장 좁은 사본이 토큰을 가장 많이 다루는 서비스에 붙어 있었다.
+     *
+     * <p>여기 추가한 키는 HR 고유다(core 기본 목록에는 없다):
+     * <ul>
+     *   <li>{@code invitation_token} — SSO 초대 토큰. 이 값 하나면 초대 대상의 가입을 끝낼 수 있다.
+     *       {@code SsoInviteResponse.invitationToken} 이라 정규화하면 같은 키가 된다.</li>
+     *   <li>{@code hr_access_token} — HR JWT 쿠키 이름. 지금은 헤더를 안 찍어 로그에 안 나오지만,
+     *       쿼리스트링이나 본문에 실려 오는 경로가 생기면 이름만으로 걸린다.</li>
+     * </ul>
+     * {@code code} · {@code code_verifier}(인가코드 교환 {@code POST /api/v1/auth/exchange-code})는
+     * core 가 <b>값이 43자 이상 base64url 일 때만</b> 가린다 — {@code ApiResponse} 봉투의
+     * {@code "code":"COMMON_200"} 을 통째로 가려 로그를 못 쓰게 만들지 않기 위해서다.
+     *
+     * <p>{@code static final} 로 한 번만 만든다. core 의 정규식은 정적이라 인스턴스를 만들어도
+     * 다시 컴파일되지 않는다(예전 판은 요청 하나마다 최대 34번 {@code Pattern.compile} 을 했다).
+     */
+    private static final SensitiveDataMasker MASKER = SensitiveDataMasker.withExtraKeys(
+            "invitation_token",
+            "hr_access_token"
     );
 
     @Override
@@ -65,14 +100,17 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
         long startTime = System.currentTimeMillis();
 
         try {
-            // 다음 필터로 전달
-            filterChain.doFilter(wrappedRequest, wrappedResponse);
+            try {
+                // 다음 필터로 전달
+                filterChain.doFilter(wrappedRequest, wrappedResponse);
+            } finally {
+                long executionTime = System.currentTimeMillis() - startTime;
+
+                // 로그 출력. 여기서 무엇이 터지든(Exception 이든 Error 든) 바깥 finally 가
+                // copyBodyToResponse() 를 반드시 실행한다 — 안 그러면 클라이언트가 빈 본문을 받는다.
+                logRequestResponse(wrappedRequest, wrappedResponse, traceId, executionTime);
+            }
         } finally {
-            long executionTime = System.currentTimeMillis() - startTime;
-
-            // 로그 출력
-            logRequestResponse(wrappedRequest, wrappedResponse, traceId, executionTime);
-
             // Response Body를 실제 응답으로 복사 (중요!)
             wrappedResponse.copyBodyToResponse();
 
@@ -98,11 +136,16 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
      * 요청/응답 정보를 가독성 좋은 한 줄 포맷으로 로깅
      * 포맷: [traceId] | status | time | METHOD URI | IP:ip | User:user | Agent:agent | Req:body | Res:body
      * Body가 길 경우 요약본은 INFO/WARN/ERROR로, 전체 원본은 DEBUG로 별도 출력
+     *
+     * <p>여기 들어오는 문자열은 전부 {@link #MASKER} 를 이미 통과한 사본이다. 새 값을 로그 줄에
+     * 붙일 때는 반드시 마스킹을 먼저 태워라 — 잘라 쓰는 것만으로는 안 가려진다.
+     *
+     * <p>테스트가 "로깅이 터져도 응답이 온전히 나간다"를 확인할 수 있도록 {@code protected} 다.
      */
-    private void logRequestResponse(ContentCachingRequestWrapper request,
-                                     ContentCachingResponseWrapper response,
-                                     String traceId,
-                                     long executionTime) {
+    protected void logRequestResponse(ContentCachingRequestWrapper request,
+                                      ContentCachingResponseWrapper response,
+                                      String traceId,
+                                      long executionTime) {
         try {
             int status = response.getStatus();
             String method = request.getMethod();
@@ -114,8 +157,8 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
             String requestBody = getRequestBody(request);
             String responseBody = getResponseBody(response);
 
-            // URI에 쿼리스트링 포함
-            String fullUri = queryString != null ? uri + "?" + queryString : uri;
+            // URI에 쿼리스트링 포함. 쿼리스트링에도 토큰·인가코드가 실려 오므로 마스킹한다.
+            String fullUri = queryString != null ? uri + "?" + mask(queryString) : uri;
 
             // Body 잘림 여부 확인
             boolean requestBodyTruncated = requestBody != null && requestBody.length() > MAX_BODY_LENGTH;
@@ -166,6 +209,10 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
     /**
      * 잘린 Body의 전체 원본을 DEBUG 레벨로 출력
+     *
+     * <p><b>여기 들어오는 두 문자열은 이미 마스킹된 사본이다</b>({@link #getRequestBody} ·
+     * {@link #getResponseBody} 가 태운다). 한 줄 로그는 500자에서 잘리지만 이 경로는 전문을 찍으므로,
+     * 마스킹을 우회해 원본을 넘기면 잘려서 안 보이던 토큰 뒷부분이 그대로 로그에 남는다.
      */
     private void logFullBody(String traceId, String requestBody, String responseBody,
                               boolean requestBodyTruncated, boolean responseBodyTruncated) {
@@ -214,27 +261,33 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Request Body 추출
+     * Request Body 추출 (캐시된 사본에서만 읽는다 — 스트림은 건드리지 않는다)
      */
     private String getRequestBody(ContentCachingRequestWrapper request) {
         byte[] content = request.getContentAsByteArray();
         if (content.length > 0) {
-            String body = new String(content, StandardCharsets.UTF_8);
-            // 비밀번호 등 민감한 정보 마스킹 (선택적)
-            return maskSensitiveData(body);
+            return mask(new String(content, StandardCharsets.UTF_8));
         }
         return null;
     }
 
     /**
-     * Response Body 추출
+     * Response Body 추출 (캐시된 사본에서만 읽는다 — 원본은 copyBodyToResponse 로 그대로 나간다)
      */
     private String getResponseBody(ContentCachingResponseWrapper response) {
         byte[] content = response.getContentAsByteArray();
         if (content.length > 0) {
-            return new String(content, StandardCharsets.UTF_8);
+            return mask(new String(content, StandardCharsets.UTF_8));
         }
         return null;
+    }
+
+    /**
+     * 로그로 나갈 문자열의 민감값을 가린다. 입력은 변하지 않고 <b>새 문자열</b>이 나온다.
+     * core 의 {@code apply()} 는 어떤 입력에도 예외를 던지지 않는다.
+     */
+    private String mask(String text) {
+        return MASKER.apply(text);
     }
 
     /**
@@ -251,37 +304,5 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
             log.debug("Failed to get current user", e);
         }
         return null;
-    }
-
-    /**
-     * 민감한 정보 마스킹 (비밀번호, 토큰, 시크릿 등)
-     */
-    private static final String[] SENSITIVE_JSON_FIELDS = {
-            "password", "user_pw", "pwd", "secret", "token",
-            "accessToken", "refreshToken", "apiKey", "apiSecret",
-            "client_secret", "authorization",
-            // 비밀번호 변경 필드 — DTO 는 snake_case(@JsonNaming) 이고, 프록시/변형 대비 camelCase 도 포함
-            "current_password", "new_password", "new_password_confirm",
-            "currentPassword", "newPassword", "confirmPassword", "newPasswordConfirm"
-    };
-
-    private String maskSensitiveData(String body) {
-        // 키 비교를 대소문자 무시로 수행하기 위한 가드용 소문자 사본(키 이름은 마스킹으로 사라지지 않으므로 1회 계산으로 충분).
-        String lower = body.toLowerCase(Locale.ROOT);
-        for (String field : SENSITIVE_JSON_FIELDS) {
-            if (lower.contains(field.toLowerCase(Locale.ROOT))) {
-                // JSON 형태: "fieldName": "value" (키 대소문자 무시, 키 자체는 $1 로 원본 보존)
-                body = body.replaceAll(
-                        "(?i)(\"" + field + "\"\\s*:\\s*\")([^\"]+)(\")",
-                        "$1***$3"
-                );
-                // Query parameter 형태: ?field=value 또는 &field=value (키 대소문자 무시)
-                body = body.replaceAll(
-                        "(?i)(&|\\?)" + field + "=([^&]+)",
-                        "$1" + field + "=***"
-                );
-            }
-        }
-        return body;
     }
 }
