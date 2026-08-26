@@ -21,3 +21,18 @@ spring:
       hibernate:
         default_batch_fetch_size: 100
     database-platform: org.hibernate.dialect.H2Dialect
+
+# p6spy — 테스트에서도 끈다.
+#
+# 이 파일은 클래스패스에서 src/main/resources/application.yml 을 **통째로 가린다**
+# (테스트 리소스가 먼저 잡힌다 — 병합이 아니라 대체다). 그래서 main 쪽에 적어 둔
+# decorator.datasource.p6spy 는 테스트에서 읽히지 않는다. 여기에도 못 박아야
+# @SpringBootTest 가 생기는 날 p6spy 가 라이브러리 기본값 true 로 되살아나지 않는다.
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
+logging:
+  level:
+    p6spy: off

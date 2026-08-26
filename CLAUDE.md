@@ -219,6 +219,24 @@ XxxException(ErrorCode errorCode, String customMessage, Throwable cause) // 둘 
 - Tracing: OpenTelemetry 자동 계측 + TraceId 로깅 상관관계 [web:26]
 - Health: /actuator/health, readiness/liveness 분리 [web:26]
 
+## 로깅 · 개인정보
+
+- **SQL 을 보고 싶으면 `LOG_LEVEL_HIBERNATE=debug` 다.** p6spy 는 기본으로 꺼져 있다
+  (`P6SPY_LOG_SQL_VALUES=false`) — 켜면 `?` 에 값을 끼워 넣은 완성 SQL 이 남고, 인사
+  시스템이라 거기엔 `user_name` · `user_email` · `user_birth`(생년월일) · `join_date` 와
+  휴가 · 근태 · 회비의 개인별 기록이 그대로 들어간다. 한 줄에 이름과 생년월일과 이메일이
+  같이 있으면 그건 그냥 신원이다.
+- **`RequestResponseLoggingFilter` 의 마스킹은 SQL 에 닿지 않는다** — 마스커는 JSON `"키":값` 과
+  쿼리스트링 `키=값` 을 보는데 INSERT 는 값 옆에 컬럼명이 없다. 마스킹으로 못 막고 끄는 것으로
+  막는다. 값까지 봐야 하는 디버깅만 **로컬에서** `P6SPY_LOG_SQL_VALUES=true` 로 켠다.
+- 설정은 `spring.datasource.p6spy` 가 아니라 **`decorator.datasource.p6spy`** 아래에 둔다 —
+  앞의 것은 읽는 `@ConfigurationProperties` 가 없어 조용히 무시되고, 그래서 예전 `P6SPY_ENABLED` 는
+  무슨 값을 넣어도 효과가 없었다(`P6SpyLoggingConfigTest` 가 이 자리를 고정한다).
+- **`src/test/resources/application.yml` 은 main 의 것을 통째로 가린다**(클래스패스 우선 —
+  병합이 아니라 대체다). 테스트에서만 걸리는 설정 문제를 볼 때 main 쪽 yml 을 고치고 있으면
+  아무 일도 안 일어난다. 배포되는 설정을 검사하는 테스트는 클래스패스가 아니라
+  `src/main/resources/application.yml` 을 직접 읽어야 한다.
+
 ## Do Not
 - 엔티티 직렬화로 API 응답 반환 금지 [web:26]
 - EAGER 남발 금지, 양방향 연관 복잡화 금지 [web:26]
