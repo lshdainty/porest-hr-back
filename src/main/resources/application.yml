@@ -81,7 +81,7 @@ server:
     session:
       timeout: 8h
       cookie:
-        secure: ${COOKIE_SECURE:false}
+        secure: ${COOKIE_SECURE:true}
         same-site: ${COOKIE_SAME_SITE:lax}
         http-only: true
 
