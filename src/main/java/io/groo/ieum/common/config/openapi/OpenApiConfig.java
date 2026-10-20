@@ -28,8 +28,8 @@ public class OpenApiConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("Porest HR API")
-                .description("Porest HR 백엔드 API 문서")
+                .title("그루 이음 API")
+                .description("그루 이음 백엔드 API 문서")
                 .version("v1.0.0");
     }
 

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/POREST-6DB33F?style=for-the-badge&logo=spring&logoColor=white" alt="POREST" />
+  <img src="https://img.shields.io/badge/%EA%B7%B8%EB%A3%A8_%EC%9D%B4%EC%9D%8C-6DB33F?style=for-the-badge&logo=spring&logoColor=white" alt="그루" />
 </p>
 
-<h1 align="center">POREST HR Backend</h1>
+<h1 align="center">그루 이음 Backend</h1>
 
 <p align="center">
   <strong>사업장 근로자를 위한 일정관리 및 휴가관리 서비스</strong>
@@ -23,7 +23,7 @@
 
 ## 소개
 
-**POREST HR Backend**는 [POREST](https://github.com/lshdainty/POREST) 서비스의 HR(인사관리) 백엔드입니다.
+**그루 이음 Backend**는 [그루](https://github.com/lshdainty/groo) 서비스의 HR(인사관리) 백엔드입니다.
 
 Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며, 기존 사용하던 Legacy 프로그램을 **JPA**, **QueryDSL** 등 실무에서 많이 사용중인 라이브러리를 사용하여 개선하고자 합니다.
 
@@ -43,7 +43,7 @@ Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며, 기존 
 | **Authentication** | ![JWT](https://img.shields.io/badge/JJWT_0.12.6-000000?style=flat-square&logo=jsonwebtokens&logoColor=white) ![Nimbus JOSE](https://img.shields.io/badge/Nimbus_JOSE_10.4-5A29E4?style=flat-square) SSO 토큰(RS256) JWKS 검증 |
 | **Utilities** | ![Apache POI](https://img.shields.io/badge/Apache_POI_5.3.0-D22128?style=flat-square) ![Korean Lunar](https://img.shields.io/badge/KoreanLunarCalendar_0.3.1-0076D6?style=flat-square) ![Spring Mail](https://img.shields.io/badge/Spring_Mail-6DB33F?style=flat-square) |
 | **Monitoring** | ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) ![Loki](https://img.shields.io/badge/Loki_2.0.1-F46800?style=flat-square&logo=grafana&logoColor=white) ![P6Spy](https://img.shields.io/badge/P6Spy-4B32C3?style=flat-square) |
-| **공통 라이브러리** | ![groo-core](https://img.shields.io/badge/porest--core_2.0.3-6DB33F?style=flat-square) |
+| **공통 라이브러리** | ![groo-core](https://img.shields.io/badge/groo--core_3.0.0-6DB33F?style=flat-square) |
 | **API Documentation** | ![Swagger](https://img.shields.io/badge/SpringDoc_OpenAPI_3.0.0-85EA2D?style=flat-square&logo=swagger&logoColor=black) |
 | **Testing** | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Mockito](https://img.shields.io/badge/Mockito-C5D9C8?style=flat-square) |
 | **Build** | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=gradle&logoColor=white) |
@@ -186,7 +186,7 @@ src/main/resources/message/
 
 | Repository | Description |
 |------------|-------------|
-| [POREST](https://github.com/lshdainty/POREST) | 통합 레포지토리 (서비스 소개) |
+| [그루](https://github.com/lshdainty/groo) | 통합 레포지토리 (서비스 소개) |
 | [porest-hr-front](https://github.com/lshdainty/porest-hr-front) | HR 프론트엔드 |
 | [groo-core](https://github.com/lshdainty/groo-core) | 공통 라이브러리 |
 | [porest-sso-back](https://github.com/lshdainty/porest-sso-back) | SSO 백엔드 |

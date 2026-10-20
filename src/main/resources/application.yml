@@ -139,7 +139,7 @@ app:
   frontend:
     base-url: ${FRONTEND_BASE_URL}
   company:
-    name: ${COMPANY_NAME:porest}
+    name: ${COMPANY_NAME:그루}
   email:
     logo:
       path: ${EMAIL_LOGO_PATH:templates/email/logo.png}
