@@ -1,0 +1,71 @@
+package io.groo.ieum.calendar.controller;
+
+import io.groo.ieum.calendar.controller.dto.CalendarApiDto;
+import io.groo.core.controller.ApiResponse;
+import io.groo.core.type.DisplayType;
+import io.groo.ieum.schedule.domain.Schedule;
+import io.groo.ieum.schedule.service.ScheduleService;
+import io.groo.ieum.vacation.service.VacationService;
+import io.groo.ieum.vacation.service.dto.VacationServiceDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+public class CalendarApiController implements CalendarApi {
+    private final ScheduleService scheduleService;
+    private final VacationService vacationService;
+    private final MessageSource messageSource;
+
+    @Override
+    public ApiResponse searchEventsByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        List<CalendarApiDto.searchEventsByPeriodResp> resp = new ArrayList<>();
+
+        List<Schedule> schedules = scheduleService.searchSchedulesByPeriod(startDate, endDate);
+        resp.addAll(schedules.stream()
+                .map(s -> new CalendarApiDto.searchEventsByPeriodResp(
+                        s.getUser().getId(),
+                        s.getUser().getName(),
+                        getTranslatedName(s.getType()),
+                        s.getType().name(),
+                        s.getDesc(),
+                        s.getStartDate(),
+                        s.getEndDate(),
+                        "schedule",
+                        null,
+                        s.getRowId()
+                ))
+                .toList());
+
+        List<VacationServiceDto> histories = vacationService.getVacationUsagesByPeriod(startDate, endDate);
+        resp.addAll(histories.stream()
+                .map(v -> new CalendarApiDto.searchEventsByPeriodResp(
+                        v.getUser().getId(),
+                        v.getUser().getName(),
+                        getTranslatedName(v.getTimeType()),
+                        v.getTimeType().name(),
+                        v.getDesc(),
+                        v.getStartDate(),
+                        v.getEndDate(),
+                        "vacation",
+                        v.getType(),
+                        v.getId()
+                ))
+                .toList());
+
+        return ApiResponse.success(resp);
+    }
+
+    private String getTranslatedName(DisplayType type) {
+        if (type == null) return null;
+        return messageSource.getMessage(type.getMessageKey(), null, LocaleContextHolder.getLocale());
+    }
+}

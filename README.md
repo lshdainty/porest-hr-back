@@ -43,7 +43,7 @@ Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며, 기존 
 | **Authentication** | ![JWT](https://img.shields.io/badge/JJWT_0.12.6-000000?style=flat-square&logo=jsonwebtokens&logoColor=white) ![Nimbus JOSE](https://img.shields.io/badge/Nimbus_JOSE_10.4-5A29E4?style=flat-square) SSO 토큰(RS256) JWKS 검증 |
 | **Utilities** | ![Apache POI](https://img.shields.io/badge/Apache_POI_5.3.0-D22128?style=flat-square) ![Korean Lunar](https://img.shields.io/badge/KoreanLunarCalendar_0.3.1-0076D6?style=flat-square) ![Spring Mail](https://img.shields.io/badge/Spring_Mail-6DB33F?style=flat-square) |
 | **Monitoring** | ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white) ![Loki](https://img.shields.io/badge/Loki_2.0.1-F46800?style=flat-square&logo=grafana&logoColor=white) ![P6Spy](https://img.shields.io/badge/P6Spy-4B32C3?style=flat-square) |
-| **공통 라이브러리** | ![porest-core](https://img.shields.io/badge/porest--core_2.0.3-6DB33F?style=flat-square) |
+| **공통 라이브러리** | ![groo-core](https://img.shields.io/badge/porest--core_2.0.3-6DB33F?style=flat-square) |
 | **API Documentation** | ![Swagger](https://img.shields.io/badge/SpringDoc_OpenAPI_3.0.0-85EA2D?style=flat-square&logo=swagger&logoColor=black) |
 | **Testing** | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Mockito](https://img.shields.io/badge/Mockito-C5D9C8?style=flat-square) |
 | **Build** | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=gradle&logoColor=white) |
@@ -64,10 +64,10 @@ Golang 사용자가 Java Spring Boot를 공부하고자 시작했으며, 기존 
 
 ```
 porest-hr-back (단일 Gradle 모듈: porest-hr)
-└── porest-core   # 공통 라이브러리 (GitHub Packages 의존성)
+└── groo-core   # 공통 라이브러리 (GitHub Packages 의존성)
 ```
 
-- **porest-core**: 예외 처리, API 응답 포맷(`ApiResponse`), 공통 타입, i18n 메시지 키 등 프로젝트 전반에서 사용되는 컴포넌트 제공
+- **groo-core**: 예외 처리, API 응답 포맷(`ApiResponse`), 공통 타입, i18n 메시지 키 등 프로젝트 전반에서 사용되는 컴포넌트 제공
 - **회사별 확장**: 회사/시스템 코드 테이블과 회사별 메시지 번들(`message/messages-{company}`)로 회사별 커스텀을 분리
 
 ---
@@ -75,7 +75,7 @@ porest-hr-back (단일 Gradle 모듈: porest-hr)
 ## 도메인 모듈
 
 ```
-src/main/java/com/porest/hr/
+src/main/java/io/groo/ieum/
 ├── user/                  # 사용자 관리
 ├── vacation/              # 휴가 관리 (핵심 도메인)
 ├── work/                  # 근무 이력 관리
@@ -128,7 +128,7 @@ public class UserJpaRepository implements UserRepository { ... }
 
 - **Base path**: `/api/v1`
 - **응답 JSON은 snake_case**: 모든 컨트롤러 DTO에 `@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)` 적용
-- **공통 응답 포맷**: porest-core의 `ApiResponse` 사용
+- **공통 응답 포맷**: groo-core의 `ApiResponse` 사용
 - **API 문서**: `SWAGGER_ENABLED=true` 설정 시 `/swagger-ui.html` (SpringDoc OpenAPI)
 
 ---
@@ -141,7 +141,7 @@ public class UserJpaRepository implements UserRepository { ... }
 - **Gradle**: Wrapper 포함 (9.2.1)
 - **MariaDB**: 운영 DB (`ddl-auto: none`)
 - **Redis**: SSO 사용자 이벤트 수신 (Pub/Sub 채널 `porest:sso:user-events`)
-- **GitHub Packages 접근**: `GITHUB_ACTOR`, `GITHUB_TOKEN` 환경변수 필요 (porest-core 의존성)
+- **GitHub Packages 접근**: `GITHUB_ACTOR`, `GITHUB_TOKEN` 환경변수 필요 (groo-core 의존성)
 
 ### 환경 설정
 
@@ -178,7 +178,7 @@ src/main/resources/message/
 ```
 
 - Bean Validation 메시지는 `ValidationMessages{,_en,_ko}.properties`로 별도 관리
-- 메시지 basename에 porest-core 제공 `core-messages`와 회사별 `messages-{company}` 번들 포함
+- 메시지 basename에 groo-core 제공 `core-messages`와 회사별 `messages-{company}` 번들 포함
 
 ---
 
@@ -188,7 +188,7 @@ src/main/resources/message/
 |------------|-------------|
 | [POREST](https://github.com/lshdainty/POREST) | 통합 레포지토리 (서비스 소개) |
 | [porest-hr-front](https://github.com/lshdainty/porest-hr-front) | HR 프론트엔드 |
-| [porest-core](https://github.com/lshdainty/porest-core) | 공통 라이브러리 |
+| [groo-core](https://github.com/lshdainty/groo-core) | 공통 라이브러리 |
 | [porest-sso-back](https://github.com/lshdainty/porest-sso-back) | SSO 백엔드 |
 | [porest-sso-front](https://github.com/lshdainty/porest-sso-front) | SSO 프론트엔드 |
 
