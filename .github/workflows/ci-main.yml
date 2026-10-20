@@ -36,7 +36,7 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
-      # porest-core 를 GitHub Packages 에서 받으려면 토큰이 필요하다.
+      # groo-core 를 GitHub Packages 에서 받으려면 토큰이 필요하다.
       # 이 레포의 시크릿 이름만 READ_PACKAGES_TOKEN(복수)이다 — desk/sso 는 단수.
       - name: Test with Gradle
         run: ./gradlew --info test

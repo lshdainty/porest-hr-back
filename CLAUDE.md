@@ -46,7 +46,7 @@ public class SsoApiClientImpl implements SsoApiClient {
 ## Modules & Structure
 - modules: core(domain), api(web), infra(persistence, external-clients) [web:27]
 - Hexagonal 스타일: domain은 framework 의존 금지, adapter는 의존 허용 [web:26]
-- 패키지 규칙: com.porest.hr.{domain}.{controller, service, repository} [web:26]
+- 패키지 규칙: io.groo.ieum.{domain}.{controller, service, repository} [web:26]
 
 ## Coding Standards
 - Controller: DTO 변환 철저, 엔티티 노출 금지 [web:26]
