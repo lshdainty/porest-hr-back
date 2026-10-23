@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -103,7 +105,7 @@ public class WorkApiController implements WorkApi {
 
     @Override
     @PreAuthorize("hasAuthority('WORK:WRITE')")
-    public ApiResponse updateWorkHistory(Long id, WorkApiDto.UpdateWorkHistoryReq data) {
+    public ApiResponse updateWorkHistory(Long id, WorkApiDto.UpdateWorkHistoryReq data, User loginUser) {
         workHistoryService.updateWorkHistory(WorkHistoryServiceDto.builder()
                 .id(id)
                 .date(data.getWorkDate())
@@ -113,15 +115,27 @@ public class WorkApiController implements WorkApi {
                 .classCode(data.getWorkClassCode())
                 .hours(data.getWorkHour())
                 .content(data.getWorkContent())
-                .build());
+                .build(), loginUser.getId(), hasWorkManageAuthority());
         return ApiResponse.success();
     }
 
     @Override
     @PreAuthorize("hasAuthority('WORK:WRITE')")
-    public ApiResponse deleteWorkHistory(Long id) {
-        workHistoryService.deleteWorkHistory(id);
+    public ApiResponse deleteWorkHistory(Long id, User loginUser) {
+        workHistoryService.deleteWorkHistory(id, loginUser.getId(), hasWorkManageAuthority());
         return ApiResponse.success();
+    }
+
+    /**
+     * 현재 사용자가 WORK:MANAGE 권한을 가지고 있는지 확인
+     */
+    private boolean hasWorkManageAuthority() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(auth -> "WORK:MANAGE".equals(auth.getAuthority()));
     }
 
     @Override

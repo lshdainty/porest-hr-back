@@ -1,6 +1,7 @@
 package io.groo.ieum.work.service;
 
 import io.groo.core.exception.EntityNotFoundException;
+import io.groo.core.exception.ForbiddenException;
 import io.groo.ieum.common.exception.HrErrorCode;
 import io.groo.ieum.common.time.CompanyClock;
 import io.groo.core.exception.InvalidValueException;
@@ -157,9 +158,14 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
 
     @Override
     @Transactional
-    public void updateWorkHistory(WorkHistoryServiceDto data) {
+    public void updateWorkHistory(WorkHistoryServiceDto data, String loginUserId, boolean canManage) {
         log.debug("업무 이력 수정 시작: id={}", data.getId());
         WorkHistory workHistory = checkWorkHistoryExist(data.getId());
+        validateWorkHistoryOwnership(workHistory, loginUserId, canManage);
+        if (!canManage && !loginUserId.equals(data.getUserId())) {
+            log.warn("업무 이력 수정 접근 거부 - 로그인 유저: {}, 변경할 담당자: {}", loginUserId, data.getUserId());
+            throw new ForbiddenException(HrErrorCode.PERMISSION_DENIED);
+        }
         User user = userService.checkUserExist(data.getUserId());
         WorkCode group = checkWorkCodeExist(data.getGroupCode());
         WorkCode part = checkWorkCodeExist(data.getPartCode());
@@ -178,11 +184,24 @@ public class WorkHistoryServiceImpl implements WorkHistoryService {
 
     @Override
     @Transactional
-    public void deleteWorkHistory(Long id) {
+    public void deleteWorkHistory(Long id, String loginUserId, boolean canManage) {
         log.debug("업무 이력 삭제 시작: id={}", id);
         WorkHistory workHistory = checkWorkHistoryExist(id);
+        validateWorkHistoryOwnership(workHistory, loginUserId, canManage);
         workHistoryRepository.delete(workHistory);
         log.info("업무 이력 삭제 완료: id={}", id);
+    }
+
+    /**
+     * 업무 이력 주인 검증
+     * 기록의 지금 주인이 로그인 유저가 아니면 WORK:MANAGE 권한이 있을 때만 허용
+     */
+    private void validateWorkHistoryOwnership(WorkHistory workHistory, String loginUserId, boolean canManage) {
+        String ownerId = workHistory.getUser().getId();
+        if (!canManage && !ownerId.equals(loginUserId)) {
+            log.warn("업무 이력 접근 거부 - 로그인 유저: {}, 대상 유저: {}", loginUserId, ownerId);
+            throw new ForbiddenException(HrErrorCode.PERMISSION_DENIED);
+        }
     }
 
     private WorkHistory checkWorkHistoryExist(Long rowId) {

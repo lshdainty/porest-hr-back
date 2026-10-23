@@ -2,6 +2,7 @@ package io.groo.ieum.service;
 
 import io.groo.ieum.common.time.CompanyClock;
 import io.groo.core.exception.EntityNotFoundException;
+import io.groo.core.exception.ForbiddenException;
 import io.groo.core.exception.InvalidValueException;
 import io.groo.core.type.CountryCode;
 import io.groo.core.type.YNType;
@@ -45,6 +46,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.never;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -344,7 +346,7 @@ class WorkHistoryServiceTest {
             given(workCodeRepository.findByCode("DIVISION")).willReturn(Optional.of(division));
 
             // when
-            workHistoryService.updateWorkHistory(dto);
+            workHistoryService.updateWorkHistory(dto, "user1", false);
 
             // then
             assertThat(workHistory.getHours()).isEqualByComparingTo(new BigDecimal("4.0000"));
@@ -370,8 +372,88 @@ class WorkHistoryServiceTest {
             given(workHistoryRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(dto))
+            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(dto, "user1", false))
                     .isInstanceOf(EntityNotFoundException.class);
+        }
+
+        private WorkHistoryServiceDto updateDto(Long id, String workUserId) {
+            return WorkHistoryServiceDto.builder()
+                    .id(id)
+                    .date(LocalDate.now())
+                    .userId(workUserId)
+                    .groupCode("GROUP")
+                    .partCode("PART")
+                    .classCode("DIVISION")
+                    .hours(new BigDecimal("4.0000"))
+                    .content("수정된 업무 내용")
+                    .build();
+        }
+
+        @Test
+        @DisplayName("실패 - 남의 기록을 WORK:MANAGE 없이 수정하면 403 이고 기록이 그대로다")
+        void updateWorkHistoryFailNotOwner() {
+            // given
+            Long id = 1L;
+            User owner = createTestUser("user1");
+            WorkCode group = createTestWorkCode(1L, "GROUP", "그룹", CodeType.LABEL);
+            WorkCode part = createTestWorkCode(2L, "PART", "파트", CodeType.OPTION);
+            WorkCode division = createTestWorkCode(3L, "DIVISION", "분류", CodeType.OPTION);
+            WorkHistory workHistory = createTestWorkHistory(id, owner, group, part, division);
+            String beforeContent = workHistory.getContent();
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
+
+            // when & then
+            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(updateDto(id, "user1"), "user2", false))
+                    .isInstanceOf(ForbiddenException.class)
+                    .extracting(e -> ((ForbiddenException) e).getErrorCode().getCode())
+                    .isEqualTo("PERMISSION_001");
+            assertThat(workHistory.getContent()).isEqualTo(beforeContent);
+            assertThat(workHistory.getUser()).isSameAs(owner);
+        }
+
+        @Test
+        @DisplayName("실패 - 본인 기록의 담당자를 남으로 바꾸면 403 이고 기록이 그대로다")
+        void updateWorkHistoryFailReassignToOther() {
+            // given
+            Long id = 1L;
+            User owner = createTestUser("user1");
+            WorkCode group = createTestWorkCode(1L, "GROUP", "그룹", CodeType.LABEL);
+            WorkCode part = createTestWorkCode(2L, "PART", "파트", CodeType.OPTION);
+            WorkCode division = createTestWorkCode(3L, "DIVISION", "분류", CodeType.OPTION);
+            WorkHistory workHistory = createTestWorkHistory(id, owner, group, part, division);
+            String beforeContent = workHistory.getContent();
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
+
+            // when & then
+            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(updateDto(id, "user2"), "user1", false))
+                    .isInstanceOf(ForbiddenException.class)
+                    .extracting(e -> ((ForbiddenException) e).getErrorCode().getCode())
+                    .isEqualTo("PERMISSION_001");
+            assertThat(workHistory.getContent()).isEqualTo(beforeContent);
+            assertThat(workHistory.getUser()).isSameAs(owner);
+        }
+
+        @Test
+        @DisplayName("성공 - WORK:MANAGE 가 있으면 남의 기록도 수정된다")
+        void updateWorkHistorySuccessByManager() {
+            // given
+            Long id = 1L;
+            User owner = createTestUser("user1");
+            WorkCode group = createTestWorkCode(1L, "GROUP", "그룹", CodeType.LABEL);
+            WorkCode part = createTestWorkCode(2L, "PART", "파트", CodeType.OPTION);
+            WorkCode division = createTestWorkCode(3L, "DIVISION", "분류", CodeType.OPTION);
+            WorkHistory workHistory = createTestWorkHistory(id, owner, group, part, division);
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
+            given(userService.checkUserExist("user1")).willReturn(owner);
+            given(workCodeRepository.findByCode("GROUP")).willReturn(Optional.of(group));
+            given(workCodeRepository.findByCode("PART")).willReturn(Optional.of(part));
+            given(workCodeRepository.findByCode("DIVISION")).willReturn(Optional.of(division));
+
+            // when
+            workHistoryService.updateWorkHistory(updateDto(id, "user1"), "admin", true);
+
+            // then
+            assertThat(workHistory.getContent()).isEqualTo("수정된 업무 내용");
         }
     }
 
@@ -393,7 +475,7 @@ class WorkHistoryServiceTest {
             willDoNothing().given(workHistoryRepository).delete(workHistory);
 
             // when
-            workHistoryService.deleteWorkHistory(id);
+            workHistoryService.deleteWorkHistory(id, "user1", false);
 
             // then
             then(workHistoryRepository).should().delete(workHistory);
@@ -407,8 +489,48 @@ class WorkHistoryServiceTest {
             given(workHistoryRepository.findByRowId(id)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> workHistoryService.deleteWorkHistory(id))
+            assertThatThrownBy(() -> workHistoryService.deleteWorkHistory(id, "user1", false))
                     .isInstanceOf(EntityNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("실패 - 남의 기록을 WORK:MANAGE 없이 삭제하면 403 이고 삭제 호출이 없다")
+        void deleteWorkHistoryFailNotOwner() {
+            // given
+            Long id = 1L;
+            User owner = createTestUser("user1");
+            WorkCode group = createTestWorkCode(1L, "GROUP", "그룹", CodeType.LABEL);
+            WorkCode part = createTestWorkCode(2L, "PART", "파트", CodeType.OPTION);
+            WorkCode division = createTestWorkCode(3L, "DIVISION", "분류", CodeType.OPTION);
+            WorkHistory workHistory = createTestWorkHistory(id, owner, group, part, division);
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
+
+            // when & then
+            assertThatThrownBy(() -> workHistoryService.deleteWorkHistory(id, "user2", false))
+                    .isInstanceOf(ForbiddenException.class)
+                    .extracting(e -> ((ForbiddenException) e).getErrorCode().getCode())
+                    .isEqualTo("PERMISSION_001");
+            then(workHistoryRepository).should(never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("성공 - WORK:MANAGE 가 있으면 남의 기록도 삭제된다")
+        void deleteWorkHistorySuccessByManager() {
+            // given
+            Long id = 1L;
+            User owner = createTestUser("user1");
+            WorkCode group = createTestWorkCode(1L, "GROUP", "그룹", CodeType.LABEL);
+            WorkCode part = createTestWorkCode(2L, "PART", "파트", CodeType.OPTION);
+            WorkCode division = createTestWorkCode(3L, "DIVISION", "분류", CodeType.OPTION);
+            WorkHistory workHistory = createTestWorkHistory(id, owner, group, part, division);
+            given(workHistoryRepository.findByRowId(id)).willReturn(Optional.of(workHistory));
+            willDoNothing().given(workHistoryRepository).delete(workHistory);
+
+            // when
+            workHistoryService.deleteWorkHistory(id, "admin", true);
+
+            // then
+            then(workHistoryRepository).should().delete(workHistory);
         }
     }
 
@@ -610,7 +732,7 @@ class WorkHistoryServiceTest {
             given(workCodeRepository.findByCode("NONEXISTENT_PART")).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(dto))
+            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(dto, "user1", false))
                     .isInstanceOf(EntityNotFoundException.class);
         }
 
@@ -643,7 +765,7 @@ class WorkHistoryServiceTest {
             given(workCodeRepository.findByCode("NONEXISTENT_DIVISION")).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(dto))
+            assertThatThrownBy(() -> workHistoryService.updateWorkHistory(dto, "user1", false))
                     .isInstanceOf(EntityNotFoundException.class);
         }
     }

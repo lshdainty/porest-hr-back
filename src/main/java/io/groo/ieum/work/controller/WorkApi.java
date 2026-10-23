@@ -127,7 +127,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK:WRITE 필요)"
+                    description = "권한 없음 (WORK:WRITE 필요) 또는 본인 기록이 아님 (WORK:MANAGE 없음)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -143,7 +143,8 @@ public interface WorkApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = WorkApiDto.UpdateWorkHistoryReq.class))
             )
-            @Valid @RequestBody WorkApiDto.UpdateWorkHistoryReq data
+            @Valid @RequestBody WorkApiDto.UpdateWorkHistoryReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
@@ -157,7 +158,7 @@ public interface WorkApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (WORK:WRITE 필요)"
+                    description = "권한 없음 (WORK:WRITE 필요) 또는 본인 기록이 아님 (WORK:MANAGE 없음)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -167,7 +168,8 @@ public interface WorkApi {
     @DeleteMapping("/api/v1/work-histories/{id}")
     ApiResponse deleteWorkHistory(
             @Parameter(description = "업무 내역 ID", example = "1", required = true)
-            @PathVariable("id") Long id
+            @PathVariable("id") Long id,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
