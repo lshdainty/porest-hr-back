@@ -259,8 +259,8 @@ public class UserApiController implements UserApi {
      */
     @Override
     @PreAuthorize("hasAuthority('USER:EDIT')")
-    public ApiResponse updateDashboard(String userId, UserApiDto.UpdateDashboardReq data) {
-        UserServiceDto result = userService.updateDashboard(userId, data.getDashboard());
+    public ApiResponse updateDashboard(String userId, UserApiDto.UpdateDashboardReq data, User loginUser) {
+        UserServiceDto result = userService.updateDashboard(loginUser.getId(), userId, data.getDashboard());
 
         return ApiResponse.success(new UserApiDto.UpdateDashboardResp(
                 result.getId(),

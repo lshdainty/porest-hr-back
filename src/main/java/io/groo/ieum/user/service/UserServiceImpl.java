@@ -1,6 +1,7 @@
 package io.groo.ieum.user.service;
 
 import io.groo.core.exception.EntityNotFoundException;
+import io.groo.core.exception.ForbiddenException;
 import io.groo.core.exception.InvalidValueException;
 import io.groo.ieum.client.sso.SsoApiClient;
 import io.groo.ieum.client.sso.dto.SsoInvitationStatusResponse;
@@ -392,7 +393,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserServiceDto updateDashboard(String userId, String dashboard) {
+    public UserServiceDto updateDashboard(String loginUserId, String userId, String dashboard) {
+        if (!userId.equals(loginUserId)) {
+            log.warn("대시보드 수정 접근 거부 - 로그인 유저: {}, 대상 유저: {}", loginUserId, userId);
+            throw new ForbiddenException(HrErrorCode.PERMISSION_DENIED);
+        }
         log.debug("대시보드 수정 시작: userId={}", userId);
         User user = checkUserExist(userId);
         user.updateDashboard(dashboard);

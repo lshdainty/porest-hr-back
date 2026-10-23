@@ -205,7 +205,7 @@ public interface UserApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (USER:EDIT 필요)"
+                    description = "권한 없음 (USER:EDIT 필요) 또는 본인이 아님"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
@@ -221,7 +221,8 @@ public interface UserApi {
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserApiDto.UpdateDashboardReq.class))
             )
-            @Valid @RequestBody UserApiDto.UpdateDashboardReq data
+            @Valid @RequestBody UserApiDto.UpdateDashboardReq data,
+            @Parameter(hidden = true) @LoginUser User loginUser
     );
 
     @Operation(
