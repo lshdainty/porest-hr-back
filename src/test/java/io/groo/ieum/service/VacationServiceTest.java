@@ -3,6 +3,7 @@ package io.groo.ieum.service;
 import io.groo.ieum.common.time.CompanyClock;
 import io.groo.core.exception.BusinessRuleViolationException;
 import io.groo.core.exception.EntityNotFoundException;
+import io.groo.core.exception.ForbiddenException;
 import io.groo.core.type.CountryCode;
 import io.groo.core.type.YNType;
 import io.groo.ieum.department.repository.DepartmentRepository;
@@ -1248,7 +1249,7 @@ class VacationServiceTest {
             given(vacationUsageRepository.findById(usageId)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data))
+            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data, "user1", false))
                     .isInstanceOf(EntityNotFoundException.class);
         }
 
@@ -1274,7 +1275,7 @@ class VacationServiceTest {
             given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
 
             // when & then
-            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data))
+            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data, "user1", false))
                     .isInstanceOf(BusinessRuleViolationException.class);
         }
 
@@ -1300,8 +1301,96 @@ class VacationServiceTest {
             given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
 
             // when & then
-            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data))
+            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, data, "user1", false))
                     .isInstanceOf(BusinessRuleViolationException.class);
+        }
+
+        private VacationServiceDto updateData(String userId) {
+            return VacationServiceDto.builder()
+                    .userId(userId)
+                    .type(VacationType.ANNUAL)
+                    .timeType(VacationTimeType.DAYOFF)
+                    .startDate(LocalDateTime.of(2030, 6, 3, 9, 0))
+                    .endDate(LocalDateTime.of(2030, 6, 3, 18, 0))
+                    .desc("수정된 휴가")
+                    .build();
+        }
+
+        /** 주인 user1 의 미래 휴가 사용(1일) + 차감 내역. 부여는 14일 남은 상태(1일 차감된 뒤). */
+        private VacationGrant stubFutureUsageOwnedByUser1(Long usageId, VacationUsage usage) {
+            User owner = usage.getUser();
+            ReflectionTestUtils.setField(usage, "rowId", usageId);
+            ReflectionTestUtils.setField(usage, "startDate", LocalDateTime.now().plusDays(1));
+            VacationGrant grant = createTestGrant(owner, VacationType.ANNUAL, new BigDecimal("14.0000"));
+            ReflectionTestUtils.setField(grant, "rowId", 1L);
+            VacationUsageDeduction deduction = VacationUsageDeduction.createVacationUsageDeduction(
+                    usage, grant, new BigDecimal("1.0000"));
+            given(vacationUsageRepository.findById(usageId)).willReturn(Optional.of(usage));
+            lenient().when(vacationUsageDeductionRepository.findByUsageId(usageId)).thenReturn(List.of(deduction));
+            return grant;
+        }
+
+        @Test
+        @DisplayName("성공 - 본인 기록이면 지우고 새로 쓴다 (부여는 되돌렸다가 다시 차감)")
+        void updateVacationUsageSuccessOwner() {
+            // given
+            Long usageId = 1L;
+            User owner = createTestUser("user1");
+            VacationUsage usage = createTestUsage(owner);
+            VacationGrant grant = stubFutureUsageOwnedByUser1(usageId, usage);
+            given(userService.checkUserExist("user1")).willReturn(owner);
+            given(holidayRepository.findHolidaysByStartEndDateWithType(any(), any(), any(), any())).willReturn(List.of());
+            given(vacationGrantRepository.findAvailableGrantsByUserIdAndTypeAndDate(eq("user1"), eq(VacationType.ANNUAL), any()))
+                    .willReturn(List.of(grant));
+
+            // when
+            vacationService.updateVacationUsage(usageId, updateData("user1"), "user1", false);
+
+            // then
+            assertThat(usage.getIsDeleted()).isEqualTo(YNType.Y);
+            assertThat(grant.getRemainTime()).isEqualByComparingTo(new BigDecimal("14.0000"));
+            then(vacationUsageRepository).should().save(any(VacationUsage.class));
+        }
+
+        @Test
+        @DisplayName("성공 - VACATION:MANAGE 가 있으면 남의 기록도 지우고 새로 쓴다")
+        void updateVacationUsageSuccessManager() {
+            // given
+            Long usageId = 1L;
+            User owner = createTestUser("user1");
+            VacationUsage usage = createTestUsage(owner);
+            VacationGrant grant = stubFutureUsageOwnedByUser1(usageId, usage);
+            given(userService.checkUserExist("user1")).willReturn(owner);
+            given(holidayRepository.findHolidaysByStartEndDateWithType(any(), any(), any(), any())).willReturn(List.of());
+            given(vacationGrantRepository.findAvailableGrantsByUserIdAndTypeAndDate(eq("user1"), eq(VacationType.ANNUAL), any()))
+                    .willReturn(List.of(grant));
+
+            // when
+            vacationService.updateVacationUsage(usageId, updateData("user1"), "admin", true);
+
+            // then
+            assertThat(usage.getIsDeleted()).isEqualTo(YNType.Y);
+            then(vacationUsageRepository).should().save(any(VacationUsage.class));
+        }
+
+        @Test
+        @DisplayName("실패 - 남의 기록이면 403(VACATION_013)이고 기록 · 부여 남은 시간 · 새 사용이 그대로다")
+        void updateVacationUsageFailNotOwner() {
+            // given
+            Long usageId = 1L;
+            User owner = createTestUser("user1");
+            VacationUsage usage = createTestUsage(owner);
+            VacationGrant grant = stubFutureUsageOwnedByUser1(usageId, usage);
+
+            // when & then - 본문 user_id 를 자기 id(user2)로 보내도 고칠 기록의 주인이 아니면 막힌다
+            assertThatThrownBy(() -> vacationService.updateVacationUsage(usageId, updateData("user2"), "user2", false))
+                    .isInstanceOf(ForbiddenException.class)
+                    .extracting(e -> ((ForbiddenException) e).getErrorCode().getCode())
+                    .isEqualTo("VACATION_013");
+            assertThat(usage.getIsDeleted()).isEqualTo(YNType.N);
+            assertThat(grant.getRemainTime()).isEqualByComparingTo(new BigDecimal("14.0000"));
+            then(vacationUsageRepository).should(never()).save(any(VacationUsage.class));
+            then(vacationUsageDeductionRepository).should(never()).findByUsageId(any());
         }
     }
 

@@ -64,11 +64,15 @@ public interface VacationService {
      * 휴가 사용 수정
      * - 기존 휴가 사용 내역 삭제 후 새로운 휴가 사용 내역 등록
      *
+     * - 고칠 기록의 주인이 로그인 유저가 아니면 canManage(VACATION:MANAGE)일 때만 허용
+     *
      * @param vacationUsageId 수정할 휴가 사용 내역 ID
      * @param data 새로운 휴가 사용 정보
+     * @param loginUserId 로그인한 사용자 ID
+     * @param canManage VACATION:MANAGE 권한 여부
      * @return 새로 생성된 휴가 사용 내역 ID
      */
-    Long updateVacationUsage(Long vacationUsageId, VacationServiceDto data);
+    Long updateVacationUsage(Long vacationUsageId, VacationServiceDto data, String loginUserId, boolean canManage);
 
     /**
      * 기간별 휴가 사용 내역 조회
