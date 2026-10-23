@@ -123,7 +123,7 @@ public interface VacationApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "403",
-                    description = "권한 없음 (VACATION:USE 필요)"
+                    description = "권한 없음 (VACATION:USE 필요) 또는 본인 기록이 아님 (VACATION:MANAGE 없음)"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",

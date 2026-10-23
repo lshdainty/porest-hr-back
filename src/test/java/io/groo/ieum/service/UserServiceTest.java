@@ -1,6 +1,7 @@
 package io.groo.ieum.service;
 
 import io.groo.core.exception.EntityNotFoundException;
+import io.groo.core.exception.ForbiddenException;
 import io.groo.core.type.CountryCode;
 import io.groo.core.type.YNType;
 import io.groo.core.util.FileUtils;
@@ -823,7 +824,7 @@ class UserServiceTest {
             String dashboardData = "{\"widgets\": [{\"type\": \"chart\", \"position\": 1}]}";
 
             // when
-            UserServiceDto result = userService.updateDashboard(userId, dashboardData);
+            UserServiceDto result = userService.updateDashboard(userId, userId, dashboardData);
 
             // then
             then(userRepository).should().findById(userId);
@@ -842,11 +843,35 @@ class UserServiceTest {
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             // when
-            UserServiceDto result = userService.updateDashboard(userId, null);
+            UserServiceDto result = userService.updateDashboard(userId, userId, null);
 
             // then
             assertThat(result.getDashboard()).isNull();
             assertThat(user.getDashboard()).isNull();
+        }
+
+        @Test
+        @DisplayName("실패 - 남의 대시보드면 403 이고 저장소를 건드리지 않는다")
+        void updateDashboardFailNotOwner() {
+            // given
+
+            // when & then
+            assertThatThrownBy(() -> userService.updateDashboard("user1", "other", "{\"new\": true}"))
+                    .isInstanceOf(ForbiddenException.class)
+                    .extracting(e -> ((ForbiddenException) e).getErrorCode().getCode())
+                    .isEqualTo("PERMISSION_001");
+            then(userRepository).shouldHaveNoInteractions();
+        }
+
+        @Test
+        @DisplayName("실패 - 관리자(ADMIN 권한 묶음)도 남의 대시보드면 403 (권한과 무관, 서비스는 권한을 받지 않는다)")
+        void updateDashboardFailAdminNotOwner() {
+            // given
+
+            // when & then - 서비스는 권한을 받지 않으므로 관리자도 로그인 id 가 다르면 같은 경로로 막힌다
+            assertThatThrownBy(() -> userService.updateDashboard("admin", "other", "{\"new\": true}"))
+                    .isInstanceOf(ForbiddenException.class);
+            then(userRepository).shouldHaveNoInteractions();
         }
 
         @Test
@@ -857,7 +882,7 @@ class UserServiceTest {
             given(userRepository.findById(userId)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> userService.updateDashboard(userId, "{\"test\": true}"))
+            assertThatThrownBy(() -> userService.updateDashboard(userId, userId, "{\"test\": true}"))
                     .isInstanceOf(EntityNotFoundException.class);
         }
 
@@ -871,7 +896,7 @@ class UserServiceTest {
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
             // when & then
-            assertThatThrownBy(() -> userService.updateDashboard(userId, "{\"test\": true}"))
+            assertThatThrownBy(() -> userService.updateDashboard(userId, userId, "{\"test\": true}"))
                     .isInstanceOf(EntityNotFoundException.class);
         }
     }

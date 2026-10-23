@@ -121,11 +121,14 @@ public interface UserService {
     /**
      * 대시보드 데이터 수정
      *
-     * @param userId 사용자 ID
+     * 본인 대시보드만 수정할 수 있다 (관리자도 예외 없음).
+     *
+     * @param loginUserId 로그인한 사용자 ID
+     * @param userId 대상 사용자 ID
      * @param dashboard 대시보드 JSON 데이터
      * @return 수정된 사용자 정보
      */
-    UserServiceDto updateDashboard(String userId, String dashboard);
+    UserServiceDto updateDashboard(String loginUserId, String userId, String dashboard);
 
     /**
      * 특정 유저의 승인권자 목록 조회

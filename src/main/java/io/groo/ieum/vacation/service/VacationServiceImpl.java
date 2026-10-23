@@ -2,6 +2,7 @@ package io.groo.ieum.vacation.service;
 
 import io.groo.core.exception.BusinessRuleViolationException;
 import io.groo.core.exception.EntityNotFoundException;
+import io.groo.core.exception.ForbiddenException;
 import io.groo.core.exception.ErrorCode;
 import io.groo.core.exception.InvalidValueException;
 import io.groo.ieum.common.exception.HrErrorCode;
@@ -341,7 +342,15 @@ public class VacationServiceImpl implements VacationService {
 
     @Transactional
     @Override
-    public Long updateVacationUsage(Long vacationUsageId, VacationServiceDto data) {
+    public Long updateVacationUsage(Long vacationUsageId, VacationServiceDto data, String loginUserId, boolean canManage) {
+        // 0. 고칠 기록의 주인 확인 (지우기 API 와 같은 규칙 · 같은 오류 코드)
+        VacationUsage target = validateAndGetVacationUsage(vacationUsageId);
+        String ownerId = target.getUser().getId();
+        if (!canManage && !ownerId.equals(loginUserId)) {
+            log.warn("휴가 사용 수정 접근 거부 - 로그인 유저: {}, 대상 유저: {}", loginUserId, ownerId);
+            throw new ForbiddenException(HrErrorCode.VACATION_ACCESS_DENIED);
+        }
+
         // 1. 기존 휴가 사용 내역 삭제
         cancelVacationUsage(vacationUsageId);
 

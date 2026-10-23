@@ -49,16 +49,24 @@ public interface WorkHistoryService {
     /**
      * 업무 이력 수정
      *
+     * 기록의 주인(그리고 본문 담당자)이 로그인 유저가 아니면 canManage 일 때만 허용한다.
+     *
      * @param data 업무 이력 수정 데이터
+     * @param loginUserId 로그인한 사용자 ID
+     * @param canManage WORK:MANAGE 권한 여부
      */
-    void updateWorkHistory(WorkHistoryServiceDto data);
+    void updateWorkHistory(WorkHistoryServiceDto data, String loginUserId, boolean canManage);
 
     /**
      * 업무 이력 삭제
      *
+     * 기록의 주인이 로그인 유저가 아니면 canManage 일 때만 허용한다.
+     *
      * @param id 업무 이력 id
+     * @param loginUserId 로그인한 사용자 ID
+     * @param canManage WORK:MANAGE 권한 여부
      */
-    void deleteWorkHistory(Long id);
+    void deleteWorkHistory(Long id, String loginUserId, boolean canManage);
 
     /**
      * 업무 이력 엑셀 다운로드

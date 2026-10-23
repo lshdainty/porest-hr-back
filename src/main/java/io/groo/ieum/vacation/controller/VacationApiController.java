@@ -194,7 +194,9 @@ public class VacationApiController implements VacationApi {
                         .timeType(data.getVacationTimeType())
                         .startDate(data.getStartDate())
                         .endDate(data.getEndDate())
-                        .build()
+                        .build(),
+                loginUser.getId(),
+                hasVacationManageAuthority()
         );
 
         return ApiResponse.success(new VacationApiDto.UpdateVacationUsageResp(newVacationUsageId));
